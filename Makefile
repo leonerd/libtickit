@@ -47,7 +47,7 @@ src/%.lo: src/%.c $(HFILES_INT)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 t/%.t: t/%.c $(LIBRARY) t/taplib.lo
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $^
+	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude $^
 
 t/taplib.lo: t/taplib.c
 	$(LIBTOOL) --mode=compile --tag=CC gcc $(CFLAGS) -o $@ -c $^
