@@ -9,6 +9,7 @@ typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len,
 TickitTerm *tickit_term_new(void);
 void tickit_term_free(TickitTerm *tt);
 
+void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
 
 void tickit_term_print(TickitTerm *tt, const char *str);
