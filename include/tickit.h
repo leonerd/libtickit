@@ -13,5 +13,6 @@ void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
 
 void tickit_term_print(TickitTerm *tt, const char *str);
+void tickit_term_goto(TickitTerm *tt, int line, int col);
 
 #endif
