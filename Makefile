@@ -19,6 +19,16 @@ ifeq ($(PROFILE),1)
   LDFLAGS+=-pg
 endif
 
+ifeq ($(shell pkg-config --atleast-version=0.1.0 unibilium && echo 1),1)
+  CFLAGS +=$(shell pkg-config --cflags unibilium) -DHAVE_UNIBILIUM
+  LDFLAGS+=$(shell pkg-config --libs   unibilium)
+else ifeq ($(shell pkg-config ncursesw && echo 1),1)
+  CFLAGS +=$(shell pkg-config --cflags ncursesw)
+  LDFLAGS+=$(shell pkg-config --libs   ncursesw)
+else
+  LDFLAGS+=-lncurses
+endif
+
 CFILES=$(wildcard src/*.c)
 HFILES=$(wildcard include/*.h)
 OBJECTS=$(CFILES:.c=.lo)
@@ -47,7 +57,7 @@ src/%.lo: src/%.c $(HFILES_INT)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 t/%.t: t/%.c $(LIBRARY) t/taplib.lo
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude $^
+	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude $(LDFLAGS) $^
 
 t/taplib.lo: t/taplib.c
 	$(LIBTOOL) --mode=compile --tag=CC gcc $(CFLAGS) -o $@ -c $^

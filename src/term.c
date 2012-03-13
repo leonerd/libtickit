@@ -9,10 +9,18 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef HAVE_UNIBILIUM
+# include "unibilium.h"
+#endif
+
 struct TickitTerm {
   int                   outfd;
   TickitTermOutputFunc *outfunc;
   void                 *outfunc_user;
+
+  struct {
+    unsigned int bce:1;
+  } cap;
 
   struct {
     unsigned int altscreen:1;
@@ -23,7 +31,18 @@ struct TickitTerm {
 
 TickitTerm *tickit_term_new(void)
 {
+  const char *termtype = getenv("TERM");
+  if(!termtype)
+    termtype = "xterm";
+
+  return tickit_term_new_for_termtype(termtype);
+}
+
+TickitTerm *tickit_term_new_for_termtype(const char *termtype)
+{
   TickitTerm *tt = malloc(sizeof(TickitTerm));
+  if(!tt)
+    return NULL;
 
   tt->outfd   = -1;
   tt->outfunc = NULL;
@@ -31,6 +50,22 @@ TickitTerm *tickit_term_new(void)
   tt->mode.altscreen = 0;
   tt->mode.cursorvis = 1;
   tt->mode.mouse     = 0;
+
+#ifdef HAVE_UNIBILIUM
+  {
+    unibi_term *ut = unibi_from_term(termtype);
+    if(!ut) {
+      tickit_term_free(tt);
+      return NULL;
+    }
+
+    tt->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
+
+    unibi_destroy(ut);
+  }
+#else
+# error "TODO: implement non-unibilium terminfo lookup"
+#endif
 
   return tt;
 }
@@ -154,6 +189,31 @@ void tickit_term_insertch(TickitTerm *tt, int count)
     write_str(tt, "\e[@", 3);
   else if(count > 1)
     write_strf(tt, "\e[%d@", count);
+}
+
+void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
+{
+  if(count < 1)
+    return;
+
+  if(tt->cap.bce) {
+    if(count == 1)
+      write_str(tt, "\e[X", 3);
+    else
+      write_strf(tt, "\e[%dX", count);
+
+    if(moveend == 1)
+      tickit_term_move(tt, 0, count);
+  }
+  else {
+    if(count <= 5)
+      write_str(tt, "     ", count);
+    else
+      write_strf(tt, " \e[%db", count - 1);
+
+    if(moveend == 0)
+      tickit_term_move(tt, 0, -count);
+  }
 }
 
 void tickit_term_deletech(TickitTerm *tt, int count)

@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
 
   plan_tests(7);
 
-  tt = tickit_term_new();
+  tt = tickit_term_new_for_termtype("xterm");
 
-  ok(!!tt, "tickit_term_new");
+  ok(!!tt, "tickit_term_new_for_termtype");
 
   tickit_term_set_output_fd(tt, fd[1]);
 

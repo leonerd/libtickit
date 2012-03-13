@@ -7,6 +7,7 @@ typedef struct TickitTerm TickitTerm;
 typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len, void *user);
 
 TickitTerm *tickit_term_new(void);
+TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_free(TickitTerm *tt);
 void tickit_term_destroy(TickitTerm *tt);
 
@@ -18,6 +19,7 @@ void tickit_term_goto(TickitTerm *tt, int line, int col);
 void tickit_term_move(TickitTerm *tt, int downward, int rightward);
 
 void tickit_term_clear(TickitTerm *tt);
+void tickit_term_erasech(TickitTerm *tt, int count, int moveend);
 void tickit_term_insertch(TickitTerm *tt, int count);
 void tickit_term_deletech(TickitTerm *tt, int count);
 

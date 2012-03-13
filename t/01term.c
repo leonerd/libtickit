@@ -6,7 +6,7 @@
 void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
 {
   char *buffer = user;
-  strcat(buffer, bytes);
+  strncat(buffer, bytes, len);
 }
 
 int main(int argc, char *argv[])
@@ -14,11 +14,11 @@ int main(int argc, char *argv[])
   TickitTerm *tt;
   char buffer[1024];
 
-  plan_tests(19);
+  plan_tests(27);
 
-  tt = tickit_term_new();
+  tt = tickit_term_new_for_termtype("xterm");
 
-  ok(!!tt, "tickit_term_new");
+  ok(!!tt, "tickit_term_new_for_termtype");
 
   tickit_term_set_output_func(tt, output, buffer);
 
@@ -88,6 +88,26 @@ int main(int argc, char *argv[])
   is_str(buffer, "\e[2J", "buffer after tickit_term_clear");
 
   buffer[0] = 0;
+  tickit_term_erasech(tt, 1, 0);
+
+  is_str(buffer, "\e[X", "buffer after tickit_term_erasech 1 nomove");
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 3, 0);
+
+  is_str(buffer, "\e[3X", "buffer after tickit_term_erasech 3 nomove");
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 1, 1);
+
+  is_str(buffer, "\e[X\e[D", "buffer after tickit_term_erasech 1 move");
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 3, 1);
+
+  is_str(buffer, "\e[3X\e[3D", "buffer after tickit_term_erasech 3 move");
+
+  buffer[0] = 0;
   tickit_term_insertch(tt, 1);
 
   is_str(buffer, "\e[@", "buffer after tickit_term_insertch 1");
@@ -110,6 +130,32 @@ int main(int argc, char *argv[])
   tickit_term_destroy(tt);
 
   ok(1, "tickit_term_destroy");
+
+  /* Test erasech without bce */
+  tt = tickit_term_new_for_termtype("screen");
+  tickit_term_set_output_func(tt, output, buffer);
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 1, 0);
+
+  is_str(buffer, " \e[C", "buffer after tickit_term_erasech 1 nomove");
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 3, 0);
+
+  is_str(buffer, "   \e[3C", "buffer after tickit_term_erasech 3 nomove");
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 1, 1);
+
+  is_str(buffer, " ", "buffer after tickit_term_erasech 1 move");
+
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 3, 1);
+
+  is_str(buffer, "   ", "buffer after tickit_term_erasech 3 move");
+
+  tickit_term_destroy(tt);
 
   return exit_status();
 }
