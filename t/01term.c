@@ -107,9 +107,9 @@ int main(int argc, char *argv[])
 
   is_str(buffer, "\e[5P", "buffer after tickit_term_deletech 5");
 
-  tickit_term_free(tt);
+  tickit_term_destroy(tt);
 
-  ok(1, "tickit_term_free");
+  ok(1, "tickit_term_destroy");
 
   return exit_status();
 }

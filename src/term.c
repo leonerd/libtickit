@@ -13,6 +13,12 @@ struct TickitTerm {
   int                   outfd;
   TickitTermOutputFunc *outfunc;
   void                 *outfunc_user;
+
+  struct {
+    unsigned int altscreen:1;
+    unsigned int cursorvis:1;
+    unsigned int mouse:1;
+  } mode;
 };
 
 TickitTerm *tickit_term_new(void)
@@ -22,12 +28,28 @@ TickitTerm *tickit_term_new(void)
   tt->outfd   = -1;
   tt->outfunc = NULL;
 
+  tt->mode.altscreen = 0;
+  tt->mode.cursorvis = 1;
+  tt->mode.mouse     = 0;
+
   return tt;
 }
 
 void tickit_term_free(TickitTerm *tt)
 {
   free(tt);
+}
+
+void tickit_term_destroy(TickitTerm *tt)
+{
+  if(tt->mode.mouse)
+    tickit_term_set_mode_mouse(tt, 0);
+  if(!tt->mode.cursorvis)
+    tickit_term_set_mode_cursorvis(tt, 1);
+  if(tt->mode.altscreen)
+    tickit_term_set_mode_altscreen(tt, 0);
+
+  tickit_term_free(tt);
 }
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd)
@@ -140,4 +162,31 @@ void tickit_term_deletech(TickitTerm *tt, int count)
     write_str(tt, "\e[P", 3);
   else if(count > 1)
     write_strf(tt, "\e[%dP", count);
+}
+
+void tickit_term_set_mode_altscreen(TickitTerm *tt, int on)
+{
+  if(!tt->mode.altscreen == !on)
+    return;
+
+  write_str(tt, on ? "\e[?1049h" : "\e[?1049l", 0);
+  tt->mode.altscreen = !!on;
+}
+
+void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on)
+{
+  if(!tt->mode.cursorvis == !on)
+    return;
+
+  write_str(tt, on ? "\e[?25h" : "\e[?25l", 0);
+  tt->mode.cursorvis = !!on;
+}
+
+void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
+{
+  if(!tt->mode.mouse == !on)
+    return;
+
+  write_str(tt, on ? "\e[?1002h" : "\e[?1002l", 0);
+  tt->mode.mouse = !!on;
 }
