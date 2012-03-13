@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt;
   char buffer[1024];
 
-  plan_tests(6);
+  plan_tests(19);
 
   tt = tickit_term_new();
 
@@ -41,6 +41,71 @@ int main(int argc, char *argv[])
   tickit_term_goto(tt, -1, 10);
 
   is_str(buffer, "\e[11G", "buffer after tickit_term_goto col");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, 1, 0);
+
+  is_str(buffer, "\e[B", "buffer after tickit_term_move down 1");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, 2, 0);
+
+  is_str(buffer, "\e[2B", "buffer after tickit_term_move down 2");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, -1, 0);
+
+  is_str(buffer, "\e[A", "buffer after tickit_term_move down 1");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, -2, 0);
+
+  is_str(buffer, "\e[2A", "buffer after tickit_term_move down 2");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, 0, 1);
+
+  is_str(buffer, "\e[D", "buffer after tickit_term_move right 1");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, 0, 2);
+
+  is_str(buffer, "\e[2D", "buffer after tickit_term_move right 2");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, 0, -1);
+
+  is_str(buffer, "\e[C", "buffer after tickit_term_move left 1");
+
+  buffer[0] = 0;
+  tickit_term_move(tt, 0, -2);
+
+  is_str(buffer, "\e[2C", "buffer after tickit_term_move left 2");
+
+  buffer[0] = 0;
+  tickit_term_clear(tt);
+
+  is_str(buffer, "\e[2J", "buffer after tickit_term_clear");
+
+  buffer[0] = 0;
+  tickit_term_insertch(tt, 1);
+
+  is_str(buffer, "\e[@", "buffer after tickit_term_insertch 1");
+
+  buffer[0] = 0;
+  tickit_term_insertch(tt, 5);
+
+  is_str(buffer, "\e[5@", "buffer after tickit_term_insertch 5");
+
+  buffer[0] = 0;
+  tickit_term_deletech(tt, 1);
+
+  is_str(buffer, "\e[P", "buffer after tickit_term_deletech 1");
+
+  buffer[0] = 0;
+  tickit_term_deletech(tt, 5);
+
+  is_str(buffer, "\e[5P", "buffer after tickit_term_deletech 5");
 
   tickit_term_free(tt);
 

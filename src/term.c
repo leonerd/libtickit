@@ -47,6 +47,9 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 
 static void write_str(TickitTerm *tt, const char *str, size_t len)
 {
+  if(len == 0)
+    len = strlen(str);
+
   if(tt->outfunc) {
     (*tt->outfunc)(tt, str, len, tt->outfunc_user);
   }
@@ -95,4 +98,46 @@ void tickit_term_goto(TickitTerm *tt, int line, int col)
     write_strf(tt, "\e[%dH", line+1);
   else
     write_strf(tt, "\e[%d;%dH", line+1, col+1);
+}
+
+void tickit_term_move(TickitTerm *tt, int downward, int rightward)
+{
+  if(downward > 1)
+    write_strf(tt, "\e[%dB", downward);
+  else if(downward == 1)
+    write_str(tt, "\e[B", 3);
+  else if(downward == -1)
+    write_str(tt, "\e[A", 3);
+  else if(downward < -1)
+    write_strf(tt, "\e[%dA", -downward);
+
+  if(rightward > 1)
+    write_strf(tt, "\e[%dD", rightward);
+  else if(rightward == 1)
+    write_str(tt, "\e[D", 3);
+  else if(rightward == -1)
+    write_str(tt, "\e[C", 3);
+  else if(rightward < -1)
+    write_strf(tt, "\e[%dC", -rightward);
+}
+
+void tickit_term_clear(TickitTerm *tt)
+{
+  write_strf(tt, "\e[2J", 4);
+}
+
+void tickit_term_insertch(TickitTerm *tt, int count)
+{
+  if(count == 1)
+    write_str(tt, "\e[@", 3);
+  else if(count > 1)
+    write_strf(tt, "\e[%d@", count);
+}
+
+void tickit_term_deletech(TickitTerm *tt, int count)
+{
+  if(count == 1)
+    write_str(tt, "\e[P", 3);
+  else if(count > 1)
+    write_strf(tt, "\e[%dP", count);
 }
