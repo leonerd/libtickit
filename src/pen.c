@@ -173,11 +173,6 @@ int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr)
 
 void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr)
 {
-  if(!tickit_pen_has_attr(src, attr)) {
-    tickit_pen_clear_attr(dst, attr);
-    return;
-  }
-
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_BOOL:
     tickit_pen_set_bool_attr(dst, attr, tickit_pen_get_bool_attr(src, attr));
