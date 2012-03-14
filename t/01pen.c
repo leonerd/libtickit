@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(26);
+  plan_tests(27);
 
   pen = tickit_pen_new();
 
@@ -55,16 +55,19 @@ int main(int argc, char *argv[])
 
   pen2 = tickit_pen_new();
 
-  ok(tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equal bold attribute initially");
+  ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equiv bold attribute initially");
 
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
 
-  ok(!tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have unequal bold attribute after set");
+  ok(!tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have unequiv bold attribute after set");
 
-  ok(tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_ITALIC), "pens have equal italic attribute");
+  ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_ITALIC), "pens have equiv italic attribute");
+
+  tickit_pen_set_bool_attr(pen, TICKIT_PEN_ITALIC, 0);
+  ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_ITALIC), "pens have equiv italic attribute after set 0");
 
   tickit_pen_copy_attr(pen2, pen, TICKIT_PEN_BOLD);
-  ok(tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equal bold attribute after copy");
+  ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equiv bold attribute after copy");
 
   tickit_pen_destroy(pen);
   tickit_pen_destroy(pen2);
