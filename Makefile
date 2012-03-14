@@ -39,6 +39,8 @@ HFILES_INT=$(wildcard src/*.h) $(HFILES)
 TESTSOURCES=$(wildcard t/[0-9]*.c)
 TESTFILES=$(TESTSOURCES:.c=.t)
 
+EXAMPLESOURCES=$(wildcard examples/*.c)
+
 VERSION_CURRENT=0
 VERSION_REVISION=0
 VERSION_AGE=0
@@ -74,3 +76,12 @@ clean-test:
 clean: clean-test
 	$(LIBTOOL) --mode=clean rm -f $(OBJECTS)
 	$(LIBTOOL) --mode=clean rm -f $(LIBRARY)
+
+.PHONY: examples
+examples: $(EXAMPLESOURCES:.c=)
+
+examples/%.lo: examples/%.c $(HFILES)
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
+
+examples/%: examples/%.lo $(LIBRARY)
+	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $(LDFLAGS) $^
