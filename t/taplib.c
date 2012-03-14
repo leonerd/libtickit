@@ -99,6 +99,7 @@ void is_str_escape(const char *got, const char *expect, char *name)
   else {
     const char *got_e    = strescape(got);
     const char *expect_e = strescape(expect);
+    ok(0, name);
     diag("got \"%s\" expected \"%s\"", got_e, expect_e);
     free(got_e);
     free(expect_e);
