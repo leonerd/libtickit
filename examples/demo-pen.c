@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 struct {
   char *name;
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
   tt = tickit_term_new();
   if(!tt) {
     fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
-    exit(1);
+    return 1;
   }
 
   tickit_term_set_output_fd(tt, 1);
@@ -121,4 +122,6 @@ int main(int argc, char *argv[])
   sleep(2);
 
   tickit_term_destroy(tt);
+
+  return 0;
 }
