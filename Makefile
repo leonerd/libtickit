@@ -66,7 +66,11 @@ t/taplib.lo: t/taplib.c
 test: $(TESTFILES)
 	prove -e ""
 
+.PHONY: clean-test
+clean-test:
+	$(LIBTOOL) --mode=clean rm -f $(TESTFILES) t/taplib.lo
+
 .PHONY: clean
-clean:
+clean: clean-test
 	$(LIBTOOL) --mode=clean rm -f $(OBJECTS)
 	$(LIBTOOL) --mode=clean rm -f $(LIBRARY)
