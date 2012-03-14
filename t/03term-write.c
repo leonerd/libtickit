@@ -28,28 +28,28 @@ int main(int argc, char *argv[])
   buffer[len] = 0;
 
   is_int(len, 12, "read() length after tickit_term_print");
-  is_str(buffer, "Hello world!", "buffer after tickit_term_print");
+  is_str_escape(buffer, "Hello world!", "buffer after tickit_term_print");
 
   tickit_term_goto(tt, 2, 5);
 
   len = read(fd[0], buffer, sizeof buffer);
   buffer[len] = 0;
 
-  is_str(buffer, "\e[3;6H", "buffer after tickit_term_goto line+col");
+  is_str_escape(buffer, "\e[3;6H", "buffer after tickit_term_goto line+col");
 
   tickit_term_goto(tt, 4, -1);
 
   len = read(fd[0], buffer, sizeof buffer);
   buffer[len] = 0;
 
-  is_str(buffer, "\e[5H", "buffer after tickit_term_goto line");
+  is_str_escape(buffer, "\e[5H", "buffer after tickit_term_goto line");
 
   tickit_term_goto(tt, -1, 10);
 
   len = read(fd[0], buffer, sizeof buffer);
   buffer[len] = 0;
 
-  is_str(buffer, "\e[11G", "buffer after tickit_term_goto col");
+  is_str_escape(buffer, "\e[11G", "buffer after tickit_term_goto col");
 
   tickit_term_destroy(tt);
 

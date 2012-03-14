@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int nexttest = 1;
@@ -48,6 +49,59 @@ void is_str(const char *got, const char *expect, char *name)
   else {
     ok(0, name);
     diag("got '%s' expected '%s'", got, expect);
+  }
+}
+
+static const char *strescape(const char *s)
+{
+  size_t len = 0;
+  char *ret;
+  char *q;
+
+  for(const char *p = s; p[0]; p++)
+    switch(p[0]) {
+      case '\n':
+      case '\r':
+      case '\x1b':
+      case '\\':
+        len += 2;
+        break;
+      default:
+        len += 1;
+    }
+
+  ret = malloc(len + 1);
+
+  q = ret;
+  for(const char *p = s; p[0]; p++)
+    switch(p[0]) {
+      case '\n':
+        q[0] = '\\'; q[1] = 'n'; q += 2; break;
+      case '\r':
+        q[0] = '\\'; q[1] = 'r'; q += 2; break;
+      case '\x1b':
+        q[0] = '\\'; q[1] = 'e'; q += 2; break;
+      case '\\':
+        q[0] = '\\'; q[1] = '\\'; q += 2; break;
+      default:
+        q[0] = p[0]; q += 1; break;
+    }
+
+  q[0] = 0;
+
+  return ret;
+}
+
+void is_str_escape(const char *got, const char *expect, char *name)
+{
+  if(strcmp(got, expect) == 0)
+    ok(1, name);
+  else {
+    const char *got_e    = strescape(got);
+    const char *expect_e = strescape(expect);
+    diag("got \"%s\" expected \"%s\"", got_e, expect_e);
+    free(got_e);
+    free(expect_e);
   }
 }
 
