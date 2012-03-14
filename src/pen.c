@@ -60,6 +60,34 @@ int tickit_pen_has_attr(TickitPen *pen, TickitPenAttr attr)
   return 0;
 }
 
+int tickit_pen_is_nonempty(TickitPen *pen)
+{
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    if(tickit_pen_has_attr(pen, attr))
+      return 1;
+  }
+  return 0;
+}
+
+int tickit_pen_is_nondefault(TickitPen *pen)
+{
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    if(!tickit_pen_has_attr(pen, attr))
+      continue;
+    switch(tickit_pen_attrtype(attr)) {
+    case TICKIT_PENTYPE_BOOL:
+      if(tickit_pen_get_bool_attr(pen, attr))
+        return 1;
+      break;
+    case TICKIT_PENTYPE_INT:
+      if(tickit_pen_get_int_attr(pen, attr) > -1)
+        return 1;
+      break;
+    }
+  }
+  return 0;
+}
+
 int tickit_pen_get_bool_attr(TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))

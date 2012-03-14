@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(20);
+  plan_tests(26);
 
   pen = tickit_pen_new();
 
@@ -17,10 +17,21 @@ int main(int argc, char *argv[])
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold initially");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 initially");
 
+  ok(!tickit_pen_is_nonempty(pen), "pen initially empty");
+  ok(!tickit_pen_is_nondefault(pen), "pen initially default");
+
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
 
   ok(tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen has bold after set");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 1, "bold 1 after set");
+
+  ok(tickit_pen_is_nonempty(pen), "pen non-empty after set bold on");
+  ok(tickit_pen_is_nondefault(pen), "pen non-default after set bold on");
+
+  tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
+
+  ok(tickit_pen_is_nonempty(pen), "pen non-empty after set bold off");
+  ok(!tickit_pen_is_nondefault(pen), "pen default after set bold off");
 
   tickit_pen_clear_attr(pen, TICKIT_PEN_BOLD);
 

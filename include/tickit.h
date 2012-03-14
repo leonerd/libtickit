@@ -31,6 +31,8 @@ TickitPen *tickit_pen_new(void);
 void       tickit_pen_destroy(TickitPen *pen);
 
 int tickit_pen_has_attr(TickitPen *pen, TickitPenAttr attr);
+int tickit_pen_is_nonempty(TickitPen *pen);
+int tickit_pen_is_nondefault(TickitPen *pen);
 
 int  tickit_pen_get_bool_attr(TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val);
