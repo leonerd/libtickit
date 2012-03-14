@@ -6,11 +6,13 @@ int main(int argc, char *argv[])
   TickitPen *pen;
   TickitPenAttr attr;
 
-  plan_tests(14);
+  plan_tests(16);
 
   pen = tickit_pen_new();
 
   ok(!!pen, "tickit_pen_new");
+
+  is_int(tickit_pen_attrtype(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold initially");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 initially");
@@ -24,6 +26,8 @@ int main(int argc, char *argv[])
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold after clear");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 after clear");
+
+  is_int(tickit_pen_attrtype(TICKIT_PEN_FG), TICKIT_PENTYPE_INT, "foreground is an integer attribute");
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen lacks foreground initially");
   is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 initially");

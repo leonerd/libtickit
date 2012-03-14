@@ -22,6 +22,11 @@ typedef enum {
   TICKIT_N_PEN_ATTRS
 } TickitPenAttr;
 
+typedef enum {
+  TICKIT_PENTYPE_BOOL,
+  TICKIT_PENTYPE_INT
+} TickitPenAttrType;
+
 TickitPen *tickit_pen_new(void);
 void       tickit_pen_destroy(TickitPen *pen);
 
@@ -34,6 +39,8 @@ int  tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
+
+TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
 
 /*
  * TickitTerm

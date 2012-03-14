@@ -130,3 +130,25 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
       break;
   }
 }
+
+TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
+{
+  switch(attr) {
+    case TICKIT_PEN_FG:
+    case TICKIT_PEN_BG:
+    case TICKIT_PEN_ALTFONT:
+      return TICKIT_PENTYPE_INT;
+
+    case TICKIT_PEN_BOLD:
+    case TICKIT_PEN_UNDER:
+    case TICKIT_PEN_ITALIC:
+    case TICKIT_PEN_REVERSE:
+    case TICKIT_PEN_STRIKE:
+      return TICKIT_PENTYPE_BOOL;
+
+    case TICKIT_N_PEN_ATTRS:
+      return -1;
+  }
+
+  return -1;
+}
