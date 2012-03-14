@@ -3,6 +3,42 @@
 
 #include <stdlib.h>
 
+/*
+ * TickitPen
+ */
+
+typedef struct TickitPen TickitPen;
+
+typedef enum {
+  TICKIT_PEN_FG,         /* number: TODO - colour? */
+  TICKIT_PEN_BG,         /* number: TODO - colour? */
+  TICKIT_PEN_BOLD,       /* bool */
+  TICKIT_PEN_UNDER,      /* bool: TODO - number? */
+  TICKIT_PEN_ITALIC,     /* bool */
+  TICKIT_PEN_REVERSE,    /* bool */
+  TICKIT_PEN_STRIKE,     /* bool */
+  TICKIT_PEN_ALTFONT,    /* number */
+
+  TICKIT_N_PEN_ATTRS
+} TickitPenAttr;
+
+TickitPen *tickit_pen_new(void);
+void       tickit_pen_destroy(TickitPen *pen);
+
+int tickit_pen_has_attr(TickitPen *pen, TickitPenAttr attr);
+
+int  tickit_pen_get_bool_attr(TickitPen *pen, TickitPenAttr attr);
+void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val);
+
+int  tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr);
+void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
+
+void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
+
+/*
+ * TickitTerm
+ */
+
 typedef struct TickitTerm TickitTerm;
 typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len, void *user);
 
