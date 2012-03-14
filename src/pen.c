@@ -131,6 +131,43 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
   }
 }
 
+int tickit_pen_equal_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr)
+{
+  if(!tickit_pen_has_attr(a, attr) && !tickit_pen_has_attr(b, attr))
+    return 1;
+
+  if(!tickit_pen_has_attr(a, attr) || !tickit_pen_has_attr(b, attr))
+    return 0;
+
+  switch(tickit_pen_attrtype(attr)) {
+  case TICKIT_PENTYPE_BOOL:
+    return tickit_pen_get_bool_attr(a, attr) == tickit_pen_get_bool_attr(b, attr);
+  case TICKIT_PENTYPE_INT:
+    return tickit_pen_get_int_attr(a, attr) == tickit_pen_get_int_attr(b, attr);
+  }
+
+  return 0;
+}
+
+void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr)
+{
+  if(!tickit_pen_has_attr(src, attr)) {
+    tickit_pen_clear_attr(dst, attr);
+    return;
+  }
+
+  switch(tickit_pen_attrtype(attr)) {
+  case TICKIT_PENTYPE_BOOL:
+    tickit_pen_set_bool_attr(dst, attr, tickit_pen_get_bool_attr(src, attr));
+    return;
+  case TICKIT_PENTYPE_INT:
+    tickit_pen_set_int_attr(dst, attr, tickit_pen_get_int_attr(src, attr));
+    return;
+  }
+
+  return;
+}
+
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
 {
   switch(attr) {

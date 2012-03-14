@@ -3,10 +3,10 @@
 
 int main(int argc, char *argv[])
 {
-  TickitPen *pen;
+  TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(16);
+  plan_tests(20);
 
   pen = tickit_pen_new();
 
@@ -42,7 +42,21 @@ int main(int argc, char *argv[])
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen lacks foreground after clear");
   is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 after clear");
 
+  pen2 = tickit_pen_new();
+
+  ok(tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equal bold attribute initially");
+
+  tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
+
+  ok(!tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have unequal bold attribute after set");
+
+  ok(tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_ITALIC), "pens have equal italic attribute");
+
+  tickit_pen_copy_attr(pen2, pen, TICKIT_PEN_BOLD);
+  ok(tickit_pen_equal_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equal bold attribute after copy");
+
   tickit_pen_destroy(pen);
+  tickit_pen_destroy(pen2);
 
   ok(1, "tickit_pen_destroy");
 

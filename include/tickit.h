@@ -40,6 +40,10 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 
+int tickit_pen_equal_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr);
+
+void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr);
+
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
 
 /*
