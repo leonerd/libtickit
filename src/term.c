@@ -230,7 +230,7 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
       else if(val < 16)
         params[pindex++] = onoff->on+60 + val-8;
       else {
-        params[pindex++] = onoff->on | 0x80000000;
+        params[pindex++] = (onoff->on+8) | 0x80000000;
         params[pindex++] = 5 | 0x80000000;
         params[pindex++] = val;
       }
@@ -269,7 +269,7 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
 
   size_t len = 3; /* ESC [ ... m */
   for(int i = 0; i < pindex; i++)
-    len += snprintf(NULL, 0, "%d", params[i]) + 1;
+    len += snprintf(NULL, 0, "%d", params[i]&0x7fffffff) + 1;
   if(pindex > 0)
     len--; /* Last one has no final separator */
 
@@ -278,7 +278,7 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
 
   s += sprintf(s, "\e[");
   for(int i = 0; i < pindex-1; i++)
-    s += sprintf(s, "%d%c", params[i]&0x7fffffff, params[i]&0x8000000 ? ':' : ';');
+    s += sprintf(s, "%d%c", params[i]&0x7fffffff, params[i]&0x80000000 ? ':' : ';');
   if(pindex > 0)
     s += sprintf(s, "%d", params[pindex-1]&0x7fffffff);
   sprintf(s, "m");

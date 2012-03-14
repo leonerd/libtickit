@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   char buffer[1024];
   TickitPen *pen;
 
-  plan_tests(11);
+  plan_tests(12);
 
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_output_func(tt, output, buffer);
@@ -92,6 +92,13 @@ int main(int argc, char *argv[])
   tickit_term_chpen(tt, pen);
 
   is_str_escape(buffer, "\e[91m", "chpen foreground high");
+
+  tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 123);
+
+  buffer[0] = 0;
+  tickit_term_chpen(tt, pen);
+
+  is_str_escape(buffer, "\e[38:5:123m", "chpen foreground xterm256");
 
   tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 1);
