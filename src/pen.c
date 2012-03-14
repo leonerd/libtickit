@@ -3,14 +3,16 @@
 #include <stdlib.h>
 
 struct TickitPen {
-  unsigned int fg      : 8, /* 0 - 255 */
-               bg      : 8, /* 0 - 255 */
-               bold    : 1,
+  signed   int fg      : 9, /* 0 - 255 or -1 */
+               bg      : 9; /* 0 - 255 or -1 */
+
+  unsigned int bold    : 1,
                under   : 1,
                italic  : 1,
                reverse : 1,
-               strike  : 1,
-               altfont : 4; /* 1 - 10 */
+               strike  : 1;
+
+  signed   int altfont : 5; /* 1 - 10 or -1 */
 
   struct {
     unsigned int fg      : 1,
