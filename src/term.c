@@ -27,6 +27,8 @@ struct TickitTerm {
     unsigned int cursorvis:1;
     unsigned int mouse:1;
   } mode;
+
+  TickitPen *pen;
 };
 
 TickitTerm *tickit_term_new(void)
@@ -67,11 +69,18 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 # error "TODO: implement non-unibilium terminfo lookup"
 #endif
 
+  /* Initially empty because we don't necessarily know the initial state
+   * of the terminal
+   */
+  tt->pen = tickit_pen_new();
+
   return tt;
 }
 
 void tickit_term_free(TickitTerm *tt)
 {
+  tickit_pen_destroy(tt->pen);
+
   free(tt);
 }
 
@@ -176,6 +185,117 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
     write_str(tt, "\e[C", 3);
   else if(rightward < -1)
     write_strf(tt, "\e[%dC", -rightward);
+}
+
+struct SgrOnOff { int on, off; } sgr_onoff[] = {
+  { 30, 39 }, /* fg */
+  { 40, 49 }, /* bg */
+  {  1, 22 }, /* bold */
+  {  4, 24 }, /* under */
+  {  3, 23 }, /* italic */
+  {  7, 27 }, /* reverse */
+  {  9, 29 }, /* strike */
+  { 10, 10 }, /* altfont */
+};
+
+static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
+{
+  /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
+   * 6 single attributes
+   */
+  int params[12];
+  int pindex = 0;
+
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    if(!tickit_pen_has_attr(pen, attr) && ignoremissing)
+      continue;
+
+    if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
+      continue;
+
+    tickit_pen_copy_attr(tt->pen, pen, attr);
+
+    struct SgrOnOff *onoff = &sgr_onoff[attr];
+
+    int val;
+
+    switch(attr) {
+    case TICKIT_PEN_FG:
+    case TICKIT_PEN_BG:
+      val = tickit_pen_get_int_attr(pen, attr);
+      if(val < 0)
+        params[pindex++] = onoff->off;
+      else if(val < 8)
+        params[pindex++] = onoff->on + val;
+      else if(val < 16)
+        params[pindex++] = onoff->on+60 + val-8;
+      else {
+        params[pindex++] = onoff->on | 0x80000000;
+        params[pindex++] = 5 | 0x80000000;
+        params[pindex++] = val;
+      }
+      break;
+
+    case TICKIT_PEN_ALTFONT:
+      val = tickit_pen_get_int_attr(pen, attr);
+      if(val < 0 || val >= 10)
+        params[pindex++] = onoff->off;
+      else
+        params[pindex++] = onoff->on + val;
+      break;
+
+    case TICKIT_PEN_BOLD:
+    case TICKIT_PEN_UNDER:
+    case TICKIT_PEN_ITALIC:
+    case TICKIT_PEN_REVERSE:
+    case TICKIT_PEN_STRIKE:
+      val = tickit_pen_get_bool_attr(pen, attr);
+      params[pindex++] = val ? onoff->on : onoff->off;
+      break;
+
+    case TICKIT_N_PEN_ATTRS:
+      break;
+    }
+  }
+
+  if(pindex == 0)
+    return;
+
+  /* If we're going to clear all the attributes then empty SGR is neater */
+  if(!tickit_pen_is_nondefault(tt->pen))
+    pindex = 0;
+
+  /* Render params[] into a CSI string */
+
+  size_t len = 3; /* ESC [ ... m */
+  for(int i = 0; i < pindex; i++)
+    len += snprintf(NULL, 0, "%d", params[i]) + 1;
+  if(pindex > 0)
+    len--; /* Last one has no final separator */
+
+  char *buffer = malloc(len + 1);
+  char *s = buffer;
+
+  s += sprintf(s, "\e[");
+  for(int i = 0; i < pindex-1; i++)
+    s += sprintf(s, "%d%c", params[i]&0x7fffffff, params[i]&0x8000000 ? ':' : ';');
+  if(pindex > 0)
+    s += sprintf(s, "%d", params[pindex-1]&0x7fffffff);
+  sprintf(s, "m");
+
+  write_str(tt, buffer, len);
+
+  free(buffer);
+}
+
+void tickit_term_chpen(TickitTerm *tt, TickitPen *pen)
+{
+  do_pen(tt, pen, 1);
+}
+
+void tickit_term_setpen(TickitTerm *tt, TickitPen *pen)
+{
+  do_pen(tt, pen, 0);
 }
 
 void tickit_term_clear(TickitTerm *tt)

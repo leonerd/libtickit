@@ -67,6 +67,9 @@ void tickit_term_print(TickitTerm *tt, const char *str);
 void tickit_term_goto(TickitTerm *tt, int line, int col);
 void tickit_term_move(TickitTerm *tt, int downward, int rightward);
 
+void tickit_term_chpen(TickitTerm *tt, TickitPen *pen);
+void tickit_term_setpen(TickitTerm *tt, TickitPen *pen);
+
 void tickit_term_clear(TickitTerm *tt);
 void tickit_term_erasech(TickitTerm *tt, int count, int moveend);
 void tickit_term_insertch(TickitTerm *tt, int count);
