@@ -245,11 +245,17 @@ int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int col
     write_strf(tt, "\e[%d;%dr", top + 1, top + lines);
     if(downward > 0) {
       tickit_term_goto(tt, top + lines - 1, -1);
-      write_str_rep(tt, "\n", 1, downward);
+      if(downward > 4)
+        write_strf(tt, "\e[%dT", downward);
+      else 
+        write_str(tt, "\n\n\n\n", downward);
     }
     else {
       tickit_term_goto(tt, top, -1);
-      write_str_rep(tt, "\eM", 2, -downward);
+      if(downward < -2)
+        write_strf(tt, "\e[%dS", -downward);
+      else
+        write_str(tt, "\eM\eM", 2 * -downward);
     }
     write_str(tt, "\e[r", 3);
     return 1;
