@@ -203,12 +203,16 @@ void tickit_term_print(TickitTerm *tt, const char *str)
 
 void tickit_term_goto(TickitTerm *tt, int line, int col)
 {
-  if(line == -1)
-    write_strf(tt, "\e[%dG", col+1);
-  else if(col == -1)
-    write_strf(tt, "\e[%dH", line+1);
-  else
+  if(line != -1 && col > 0)
     write_strf(tt, "\e[%d;%dH", line+1, col+1);
+  else if(line != -1 && col == 0)
+    write_strf(tt, "\e[%dH", line+1);
+  else if(line != -1)
+    write_strf(tt, "\e[%dd", line+1);
+  else if(col > 0)
+    write_strf(tt, "\e[%dG", col+1);
+  else if(col != -1)
+    write_str(tt, "\e[G", 3);
 }
 
 void tickit_term_move(TickitTerm *tt, int downward, int rightward)

@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
   len = read(fd[0], buffer, sizeof buffer);
   buffer[len] = 0;
 
-  is_str_escape(buffer, "\e[5H", "buffer after tickit_term_goto line");
+  is_str_escape(buffer, "\e[5d", "buffer after tickit_term_goto line");
 
   tickit_term_goto(tt, -1, 10);
 
