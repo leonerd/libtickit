@@ -232,6 +232,30 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
     write_strf(tt, "\e[%dC", -rightward);
 }
 
+int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
+{
+  if(!downward && !rightward)
+    return 1;
+
+  if(left == 0 && cols == tt->cols && rightward == 0) {
+    write_strf(tt, "\e[%d;%dr", top + 1, top + lines);
+    if(downward > 0) {
+      tickit_term_goto(tt, top + lines - 1, -1);
+      write_str_rep(tt, "\n", 1, downward);
+    }
+    else {
+      tickit_term_goto(tt, top, -1);
+      write_str_rep(tt, "\eM", 2, -downward);
+    }
+    write_str(tt, "\e[r", 3);
+    return 1;
+  }
+
+  /* TODO: ICH/DCH emulation */
+
+  return 0;
+}
+
 struct SgrOnOff { int on, off; } sgr_onoff[] = {
   { 30, 39 }, /* fg */
   { 40, 49 }, /* bg */

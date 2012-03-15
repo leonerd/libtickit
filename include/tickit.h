@@ -69,6 +69,7 @@ void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
 void tickit_term_print(TickitTerm *tt, const char *str);
 void tickit_term_goto(TickitTerm *tt, int line, int col);
 void tickit_term_move(TickitTerm *tt, int downward, int rightward);
+int  tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward);
 
 void tickit_term_chpen(TickitTerm *tt, TickitPen *pen);
 void tickit_term_setpen(TickitTerm *tt, TickitPen *pen);
