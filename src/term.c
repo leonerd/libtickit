@@ -255,7 +255,15 @@ int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int col
     return 1;
   }
 
-  /* TODO: ICH/DCH emulation */
+  if(left + cols == tt->cols && downward == 0) {
+    for(int line = top; line < top + lines; line++) {
+      tickit_term_goto(tt, line, left);
+      if(rightward > 0)
+        tickit_term_insertch(tt,  rightward);
+      else
+        tickit_term_deletech(tt, -rightward);
+    }
+  }
 
   return 0;
 }

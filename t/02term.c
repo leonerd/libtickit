@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(34);
+  plan_tests(38);
 
   tt = tickit_term_new_for_termtype("xterm");
   ok(!!tt, "tickit_term_new_for_termtype");
@@ -86,11 +86,27 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 3, 0, 7, 80, 3, 0);
-  is_str_escape(buffer, "\e[4;10r\e[10d\n\n\n\e[r", "buffer after tickit_term_scroll lines 3-9 +3");
+  is_str_escape(buffer, "\e[4;10r\e[10d\n\n\n\e[r", "buffer after tickit_term_scroll lines 3-9 3 down");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 3, 0, 7, 80, -3, 0);
-  is_str_escape(buffer, "\e[4;10r\e[4d\eM\eM\eM\e[r", "buffer after tickit_term_scroll lines 3-9 -3");
+  is_str_escape(buffer, "\e[4;10r\e[4d\eM\eM\eM\e[r", "buffer after tickit_term_scroll lines 3-9 3 up");
+
+  buffer[0] = 0;
+  tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, 3);
+  is_str_escape(buffer, "\e[6H\e[3@", "buffer after tickit_term_scrollrect line 5 3 right");
+
+  buffer[0] = 0;
+  tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, 5);
+  is_str_escape(buffer, "\e[7;11H\e[5@\e[8;11H\e[5@", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 right");
+
+  buffer[0] = 0;
+  tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, -3);
+  is_str_escape(buffer, "\e[6H\e[3P", "buffer after tickit_term_scrollrect line 5 3 left");
+
+  buffer[0] = 0;
+  tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, -5);
+  is_str_escape(buffer, "\e[7;11H\e[5P\e[8;11H\e[5P", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 left");
 
   buffer[0] = 0;
   tickit_term_clear(tt);
