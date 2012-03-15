@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(29);
+  plan_tests(30);
 
   tt = tickit_term_new_for_termtype("xterm");
 
@@ -162,6 +162,12 @@ int main(int argc, char *argv[])
   tickit_term_erasech(tt, 3, 1);
 
   is_str_escape(buffer, "   ", "buffer after tickit_term_erasech 3 move");
+
+  /* also test write_str_rep() */
+  buffer[0] = 0;
+  tickit_term_erasech(tt, 10, 1);
+
+  is_str_escape(buffer, "          ", "buffer after tickit_term_erasech 10 move");
 
   tickit_term_destroy(tt);
 
