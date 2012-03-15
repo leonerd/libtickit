@@ -13,14 +13,22 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
   char buffer[1024];
+  int lines, cols;
 
-  plan_tests(27);
+  plan_tests(29);
 
   tt = tickit_term_new_for_termtype("xterm");
 
   ok(!!tt, "tickit_term_new_for_termtype");
 
   tickit_term_set_output_func(tt, output, buffer);
+
+  tickit_term_set_size(tt, 24, 80);
+
+  tickit_term_get_size(tt, &lines, &cols);
+
+  is_int(lines, 24, "get_size lines");
+  is_int(cols,  80, "get_size cols");
 
   buffer[0] = 0;
   tickit_term_print(tt, "Hello world!");

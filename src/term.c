@@ -28,6 +28,9 @@ struct TickitTerm {
     unsigned int mouse:1;
   } mode;
 
+  int lines;
+  int cols;
+
   TickitPen *pen;
 };
 
@@ -69,6 +72,9 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 # error "TODO: implement non-unibilium terminfo lookup"
 #endif
 
+  tt->lines = 0;
+  tt->cols  = 0;
+
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
    */
@@ -94,6 +100,20 @@ void tickit_term_destroy(TickitTerm *tt)
     tickit_term_set_mode_altscreen(tt, 0);
 
   tickit_term_free(tt);
+}
+
+void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols)
+{
+  if(lines)
+    *lines = tt->lines;
+  if(cols)
+    *cols  = tt->cols;
+}
+
+void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
+{
+  tt->lines = lines;
+  tt->cols  = cols;
 }
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd)
