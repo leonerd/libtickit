@@ -65,6 +65,7 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 
 void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
+void tickit_term_refresh_size(TickitTerm *tt);
 
 void tickit_term_print(TickitTerm *tt, const char *str);
 void tickit_term_goto(TickitTerm *tt, int line, int col);

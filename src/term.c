@@ -9,6 +9,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/ioctl.h>
+
 #ifdef HAVE_UNIBILIUM
 # include "unibilium.h"
 #endif
@@ -116,11 +118,25 @@ void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
   tt->cols  = cols;
 }
 
+void tickit_term_refresh_size(TickitTerm *tt)
+{
+  if(tt->outfd == -1)
+    return;
+
+  struct winsize ws = { 0, 0, 0, 0 };
+  if(ioctl(tt->outfd, TIOCGWINSZ, &ws) == -1)
+    return;
+
+  tickit_term_set_size(tt, ws.ws_row, ws.ws_col);
+}
+
 void tickit_term_set_output_fd(TickitTerm *tt, int fd)
 {
   tt->outfd = fd;
 
   tt->outfunc = NULL;
+
+  tickit_term_refresh_size(tt);
 }
 
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user)
