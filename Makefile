@@ -85,3 +85,18 @@ examples/%.lo: examples/%.c $(HFILES)
 
 examples/%: examples/%.lo $(LIBRARY)
 	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $(LDFLAGS) $^
+
+.PHONY: install
+install: install-inc install-lib
+	$(LIBTOOL) --mode=finish $(DESTDIR)$(LIBDIR)
+
+install-inc: $(HFILES)
+	install -d $(DESTDIR)$(INCDIR)
+	install -m644 $(HFILES) $(DESTDIR)$(INCDIR)
+	install -d $(DESTDIR)$(LIBDIR)/pkgconfig
+	sed "s,@LIBDIR@,$(LIBDIR),;s,@INCDIR@,$(INCDIR)," <tickit.pc.in >$(DESTDIR)$(LIBDIR)/pkgconfig/tickit.pc
+
+# rm the old binary first in case it's still in use
+install-lib: $(LIBRARY)
+	install -d $(DESTDIR)$(LIBDIR)
+	$(LIBTOOL) --mode=install cp --remove-destination $(LIBRARY) $(DESTDIR)$(LIBDIR)/
