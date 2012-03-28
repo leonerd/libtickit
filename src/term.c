@@ -252,6 +252,22 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
     write_strf(tt, "\e[%dC", -rightward);
 }
 
+static void insertch(TickitTerm *tt, int count)
+{
+  if(count == 1)
+    write_str(tt, "\e[@", 3);
+  else if(count > 1)
+    write_strf(tt, "\e[%d@", count);
+}
+
+static void deletech(TickitTerm *tt, int count)
+{
+  if(count == 1)
+    write_str(tt, "\e[P", 3);
+  else if(count > 1)
+    write_strf(tt, "\e[%dP", count);
+}
+
 int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
 {
   if(!downward && !rightward)
@@ -281,9 +297,9 @@ int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int col
     for(int line = top; line < top + lines; line++) {
       tickit_term_goto(tt, line, left);
       if(rightward > 0)
-        tickit_term_insertch(tt,  rightward);
+        insertch(tt,  rightward);
       else
-        tickit_term_deletech(tt, -rightward);
+        deletech(tt, -rightward);
     }
   }
 
@@ -406,14 +422,6 @@ void tickit_term_clear(TickitTerm *tt)
   write_strf(tt, "\e[2J", 4);
 }
 
-void tickit_term_insertch(TickitTerm *tt, int count)
-{
-  if(count == 1)
-    write_str(tt, "\e[@", 3);
-  else if(count > 1)
-    write_strf(tt, "\e[%d@", count);
-}
-
 void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
 {
   if(count < 1)
@@ -440,14 +448,6 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
     if(moveend == 0)
       tickit_term_move(tt, 0, -count);
   }
-}
-
-void tickit_term_deletech(TickitTerm *tt, int count)
-{
-  if(count == 1)
-    write_str(tt, "\e[P", 3);
-  else if(count > 1)
-    write_strf(tt, "\e[%dP", count);
 }
 
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on)

@@ -77,8 +77,6 @@ void tickit_term_setpen(TickitTerm *tt, TickitPen *pen);
 
 void tickit_term_clear(TickitTerm *tt);
 void tickit_term_erasech(TickitTerm *tt, int count, int moveend);
-void tickit_term_insertch(TickitTerm *tt, int count);
-void tickit_term_deletech(TickitTerm *tt, int count);
 
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on);
 void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on);

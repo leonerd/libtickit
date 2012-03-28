@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(40);
+  plan_tests(36);
 
   tt = tickit_term_new_for_termtype("xterm");
   ok(!!tt, "tickit_term_new_for_termtype");
@@ -135,22 +135,6 @@ int main(int argc, char *argv[])
   buffer[0] = 0;
   tickit_term_erasech(tt, 3, 1);
   is_str_escape(buffer, "\e[3X\e[3D", "buffer after tickit_term_erasech 3 move");
-
-  buffer[0] = 0;
-  tickit_term_insertch(tt, 1);
-  is_str_escape(buffer, "\e[@", "buffer after tickit_term_insertch 1");
-
-  buffer[0] = 0;
-  tickit_term_insertch(tt, 5);
-  is_str_escape(buffer, "\e[5@", "buffer after tickit_term_insertch 5");
-
-  buffer[0] = 0;
-  tickit_term_deletech(tt, 1);
-  is_str_escape(buffer, "\e[P", "buffer after tickit_term_deletech 1");
-
-  buffer[0] = 0;
-  tickit_term_deletech(tt, 5);
-  is_str_escape(buffer, "\e[5P", "buffer after tickit_term_deletech 5");
 
   tickit_term_destroy(tt);
   ok(1, "tickit_term_destroy");
