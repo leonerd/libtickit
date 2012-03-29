@@ -51,9 +51,11 @@ size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitSt
 
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
-  while(str[pos->bytes]) {
+  TickitStringPos here = *pos;
+
+  while(str[here.bytes]) {
     uint32_t cp;
-    int bytes = next_utf8(str + pos->bytes, &cp);
+    int bytes = next_utf8(str + here.bytes, &cp);
     if(bytes == -1)
       return -1;
 
@@ -65,12 +67,27 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
     if(width == -1)
       return -1;
 
-    pos->bytes += bytes;
-    pos->chars += 1;
-    if(width)
-      pos->graphemes += 1;
-    pos->columns += width;;
+    int is_grapheme = (width > 0) ? 1 : 0;
+    if(is_grapheme) // Commit on the previous grapheme
+      *pos = here;
+
+    if(limit && limit->bytes != -1 && here.bytes + bytes > limit->bytes)
+      break;
+    if(limit && limit->chars != -1 && here.chars + 1 > limit->chars)
+      break;
+    if(limit && limit->graphemes != -1 && here.graphemes + is_grapheme > limit->graphemes)
+      break;
+    if(limit && limit->columns != -1 && here.columns + width > limit->columns)
+      break;
+
+    here.bytes += bytes;
+    here.chars += 1;
+    here.graphemes += is_grapheme;
+    here.columns += width;
   }
+
+  if(str[here.bytes] == 0) // Commit on the final grapheme
+    *pos = here;
 
   return pos->bytes;
 }
