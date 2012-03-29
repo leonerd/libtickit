@@ -82,4 +82,18 @@ void tickit_term_set_mode_altscreen(TickitTerm *tt, int on);
 void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on);
 void tickit_term_set_mode_mouse(TickitTerm *tt, int on);
 
+/*
+ * String handling utilities
+ */
+
+typedef struct {
+  size_t bytes;
+  int    chars;
+  int    graphemes;
+  int    columns;
+} TickitStringPos;
+
+size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+
 #endif
