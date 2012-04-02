@@ -53,13 +53,13 @@ INCDIR=$(PREFIX)/include
 all: $(LIBRARY)
 
 $(LIBRARY): $(OBJECTS)
-	$(LIBTOOL) --mode=link --tag=CC $(CC) -rpath $(LIBDIR) -version-info $(VERSION_CURRENT):$(VERSION_REVISION):$(VERSION_AGE) -o $@ $^
+	$(LIBTOOL) --mode=link --tag=CC $(CC) -rpath $(LIBDIR) -version-info $(VERSION_CURRENT):$(VERSION_REVISION):$(VERSION_AGE) -o $@ $^ $(LDFLAGS)
 
 src/%.lo: src/%.c $(HFILES_INT)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 t/%.t: t/%.c $(LIBRARY) t/taplib.lo
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude $(LDFLAGS) $^
+	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude $^
 
 t/taplib.lo: t/taplib.c
 	$(LIBTOOL) --mode=compile --tag=CC gcc $(CFLAGS) -o $@ -c $^
@@ -84,7 +84,7 @@ examples/%.lo: examples/%.c $(HFILES)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 examples/%: examples/%.lo $(LIBRARY)
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $(LDFLAGS) $^
+	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $^
 
 .PHONY: install
 install: install-inc install-lib
