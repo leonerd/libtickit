@@ -61,6 +61,7 @@ void tickit_term_free(TickitTerm *tt);
 void tickit_term_destroy(TickitTerm *tt);
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
+int  tickit_term_get_output_fd(TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
 
 void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols);

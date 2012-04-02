@@ -15,12 +15,14 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(36);
+  plan_tests(37);
 
   tt = tickit_term_new_for_termtype("xterm");
   ok(!!tt, "tickit_term_new_for_termtype");
 
   tickit_term_set_output_func(tt, output, buffer);
+
+  is_int(tickit_term_get_output_fd(tt), -1, "tickit_term_get_output_fd");
 
   tickit_term_set_size(tt, 24, 80);
 

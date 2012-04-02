@@ -139,6 +139,11 @@ void tickit_term_set_output_fd(TickitTerm *tt, int fd)
   tickit_term_refresh_size(tt);
 }
 
+int tickit_term_get_output_fd(TickitTerm *tt)
+{
+  return tt->outfd;
+}
+
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user)
 {
   tt->outfunc      = fn;
