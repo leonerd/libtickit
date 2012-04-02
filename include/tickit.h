@@ -4,6 +4,19 @@
 #include <stdlib.h>
 
 /*
+ * Tickit events
+ */
+
+/* bitmasks */
+typedef enum {
+  TICKIT_EV_RESIZE = 0x01,
+} TickitEventType;
+
+typedef struct {
+  int lines, cols; // RESIZE
+} TickitEvent;
+
+/*
  * TickitPen
  */
 
@@ -67,6 +80,11 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
 void tickit_term_refresh_size(TickitTerm *tt);
+
+typedef void TickitTermEventFn(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data);
+
+int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *data);
+void tickit_term_unbind_event_id(TickitTerm *tt, int id);
 
 void tickit_term_print(TickitTerm *tt, const char *str);
 void tickit_term_goto(TickitTerm *tt, int line, int col);

@@ -15,6 +15,14 @@
 # include "unibilium.h"
 #endif
 
+struct TickitTermEventHook {
+  struct TickitTermEventHook *next;
+  TickitEventType             ev;
+  TickitTermEventFn          *fn;
+  void                       *data;
+  int                         id;
+};
+
 struct TickitTerm {
   int                   outfd;
   TickitTermOutputFunc *outfunc;
@@ -34,7 +42,16 @@ struct TickitTerm {
   int cols;
 
   TickitPen *pen;
+
+  struct TickitTermEventHook *hooks;
 };
+
+static void run_events(TickitTerm *tt, TickitEventType ev, TickitEvent *args)
+{
+  for(struct TickitTermEventHook *hook = tt->hooks; hook; hook = hook->next)
+    if(hook->ev & ev)
+      (*hook->fn)(tt, ev, args, hook->data);
+}
 
 TickitTerm *tickit_term_new(void)
 {
@@ -82,11 +99,19 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
    */
   tt->pen = tickit_pen_new();
 
+  tt->hooks = NULL;
+
   return tt;
 }
 
 void tickit_term_free(TickitTerm *tt)
 {
+  for(struct TickitTermEventHook *hook = tt->hooks; hook;) {
+    struct TickitTermEventHook *next = hook->next;
+    free(hook);
+    hook = next;
+  }
+
   tickit_pen_destroy(tt->pen);
 
   free(tt);
@@ -114,8 +139,13 @@ void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols)
 
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
 {
-  tt->lines = lines;
-  tt->cols  = cols;
+  if(tt->lines != lines || tt->cols != cols) {
+    tt->lines = lines;
+    tt->cols  = cols;
+
+    TickitEvent args = { .lines = lines, .cols = cols };
+    run_events(tt, TICKIT_EV_RESIZE, &args);
+  }
 }
 
 void tickit_term_refresh_size(TickitTerm *tt)
@@ -480,4 +510,40 @@ void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
 
   write_str(tt, on ? "\e[?1002h" : "\e[?1002l", 0);
   tt->mode.mouse = !!on;
+}
+
+int tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *data)
+{
+  int max_id = 0;
+
+  /* Find the end of a linked list, and find the highest ID in use while we're
+   * at it
+   */
+  struct TickitTermEventHook **newhook = &tt->hooks;
+  for(; *newhook; newhook = &(*newhook)->next)
+    if((*newhook)->id > max_id)
+      max_id = (*newhook)->id;
+
+  *newhook = malloc(sizeof(struct TickitTermEventHook)); // TODO: malloc failure
+
+  (*newhook)->next = NULL;
+  (*newhook)->ev = ev;
+  (*newhook)->fn = fn;
+  (*newhook)->data = data;
+
+  return (*newhook)->id = max_id + 1;
+}
+
+void tickit_term_unbind_event_id(TickitTerm *tt, int id)
+{
+  struct TickitTermEventHook **link = &tt->hooks;
+  for(struct TickitTermEventHook *hook = tt->hooks; hook;) {
+    if(hook->id == id) {
+      *link = hook->next;
+      free(hook);
+      hook = *link;
+    }
+    else
+      hook = hook->next;
+  }
 }
