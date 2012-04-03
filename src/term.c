@@ -239,11 +239,8 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
   }
 }
 
-void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len)
+static void get_keys(TickitTerm *tt, TermKey *tk)
 {
-  TermKey *tk = get_termkey(tt);
-  termkey_push_bytes(tk, bytes, len);
-
   TermKeyResult res;
   TermKeyKey key;
   while((res = termkey_getkey(tk, &key)) == TERMKEY_RES_KEY) {
@@ -267,6 +264,22 @@ void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len)
   else {
     tt->input_timeout_at.tv_sec = -1;
   }
+}
+
+void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len)
+{
+  TermKey *tk = get_termkey(tt);
+  termkey_push_bytes(tk, bytes, len);
+
+  get_keys(tt, tk);
+}
+
+void tickit_term_input_readable(TickitTerm *tt)
+{
+  TermKey *tk = get_termkey(tt);
+  termkey_advisereadable(tk);
+
+  get_keys(tt, tk);
 }
 
 int tickit_term_input_check_timeout(TickitTerm *tt)
@@ -300,6 +313,20 @@ int tickit_term_input_check_timeout(TickitTerm *tt)
 
   tt->input_timeout_at.tv_sec = -1;
   return -1;
+}
+
+void tickit_term_input_wait(TickitTerm *tt)
+{
+  TermKey *tk = get_termkey(tt);
+  TermKeyKey key;
+
+  termkey_waitkey(tk, &key);
+  got_key(tt, tk, &key);
+
+  /* Might as well get any more that are ready */
+  while(termkey_getkey(tk, &key) == TERMKEY_RES_KEY) {
+    got_key(tt, tk, &key);
+  }
 }
 
 static void write_str(TickitTerm *tt, const char *str, size_t len)

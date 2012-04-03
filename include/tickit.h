@@ -90,7 +90,9 @@ void tickit_term_set_input_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_input_fd(TickitTerm *tt);
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
+void tickit_term_input_readable(TickitTerm *tt);
 int  tickit_term_input_check_timeout(TickitTerm *tt);
+void tickit_term_input_wait(TickitTerm *tt);
 
 void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
