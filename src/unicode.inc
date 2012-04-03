@@ -1,3 +1,5 @@
+// vim:ft=c
+
 // ### The following from http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c
 // With modifications:
 //   made functions static
