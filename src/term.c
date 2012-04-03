@@ -90,6 +90,9 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->mode.cursorvis = 1;
   tt->mode.mouse     = 0;
 
+  tt->lines = 0;
+  tt->cols  = 0;
+
 #ifdef HAVE_UNIBILIUM
   {
     unibi_term *ut = unibi_from_term(termtype);
@@ -100,14 +103,14 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 
     tt->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
 
+    tt->lines = unibi_get_num(ut, unibi_lines);
+    tt->cols  = unibi_get_num(ut, unibi_columns);
+
     unibi_destroy(ut);
   }
 #else
 # error "TODO: implement non-unibilium terminfo lookup"
 #endif
-
-  tt->lines = 0;
-  tt->cols  = 0;
 
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
