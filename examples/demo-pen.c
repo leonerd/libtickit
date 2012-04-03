@@ -37,7 +37,8 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  tickit_term_set_output_fd(tt, 1);
+  tickit_term_set_input_fd(tt, STDIN_FILENO);
+  tickit_term_set_output_fd(tt, STDOUT_FILENO);
   tickit_term_set_mode_altscreen(tt, 1);
   tickit_term_set_mode_cursorvis(tt, 0);
 
@@ -119,7 +120,8 @@ int main(int argc, char *argv[])
   tickit_term_setpen(tt, pen);
   tickit_term_print(tt, "alternate font");
 
-  sleep(2);
+  /* Wait for any key to exit */
+  tickit_term_input_wait(tt);
 
   tickit_term_destroy(tt);
 
