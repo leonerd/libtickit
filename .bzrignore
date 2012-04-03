@@ -2,3 +2,4 @@
 *.la
 .libs
 t/*.t
+RE:examples/demo-[^.]+
