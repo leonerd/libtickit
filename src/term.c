@@ -223,8 +223,8 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 
   if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
-    args.keytype = TICKIT_KEYEV_TEXT;
-    args.str     = key->utf8;
+    args.type = TICKIT_KEYEV_TEXT;
+    args.str  = key->utf8;
 
     run_events(tt, TICKIT_EV_KEY, &args);
   }
@@ -232,8 +232,8 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     char buffer[64]; // TODO: should be long enough
     termkey_strfkey(tk, buffer, sizeof buffer, key, TERMKEY_FORMAT_ALTISMETA);
 
-    args.keytype = TICKIT_KEYEV_KEY;
-    args.str     = buffer;
+    args.type = TICKIT_KEYEV_KEY;
+    args.str  = buffer;
 
     run_events(tt, TICKIT_EV_KEY, &args);
   }

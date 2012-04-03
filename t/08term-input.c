@@ -8,7 +8,7 @@ char               keystr[16];
 
 void on_key(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
 {
-  keytype = args->keytype;
+  keytype = args->type;
   strncpy(keystr, args->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
 }
 

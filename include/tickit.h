@@ -10,7 +10,7 @@
 /* bitmasks */
 typedef enum {
   TICKIT_EV_RESIZE = 0x01, // lines, cols
-  TICKIT_EV_KEY    = 0x02, // keytype, str
+  TICKIT_EV_KEY    = 0x02, // type(TickitKeyEventType), str
 } TickitEventType;
 
 typedef enum {
@@ -19,9 +19,9 @@ typedef enum {
 } TickitKeyEventType;
 
 typedef struct {
-  int                 lines, cols; // RESIZE
-  TickitKeyEventType  keytype;     // KEY
-  const char         *str;         // KEY
+  int         lines, cols; // RESIZE
+  int         type;        // KEY
+  const char *str;         // KEY
 } TickitEvent;
 
 /*
