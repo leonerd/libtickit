@@ -129,6 +129,9 @@ void tickit_term_free(TickitTerm *tt)
 
   tickit_pen_destroy(tt->pen);
 
+  if(tt->termkey)
+    termkey_destroy(tt->termkey);
+
   free(tt);
 }
 
