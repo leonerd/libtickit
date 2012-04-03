@@ -12,15 +12,27 @@ void on_key(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
   strncpy(keystr, args->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
 }
 
+TickitMouseEventType mousetype;
+int mousebutton, mouseline, mousecol;
+
+void on_mouse(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
+{
+  mousetype   = args->type;
+  mousebutton = args->button;
+  mouseline   = args->line;
+  mousecol    = args->col;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  plan_tests(16);
+  plan_tests(20);
 
   tt = tickit_term_new_for_termtype("xterm");
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY, on_key, NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_KEY,   on_key,   NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, on_mouse, NULL);
 
   tickit_term_input_push_bytes(tt, "A", 1);
 
@@ -35,6 +47,13 @@ int main(int argc, char *argv[])
   is_str(keystr,  "Up",             "keystr after push_bytes Up");
 
   is_int(tickit_term_input_check_timeout(tt), -1, "term has no timeout after Up");
+
+  tickit_term_input_push_bytes(tt, "\e[M !!", 6);
+
+  is_int(mousetype,   TICKIT_MOUSEEV_PRESS, "mousetype after mouse button press");
+  is_int(mousebutton, 1,                    "mousebutton after mouse button press");
+  is_int(mouseline,   0,                    "mouseline after mouse button press");
+  is_int(mousecol,    0,                    "mousecol after mouse button press");
 
   keytype = -1; keystr[0] = 0;
   tickit_term_input_push_bytes(tt, "\e[", 2);

@@ -11,17 +11,26 @@
 typedef enum {
   TICKIT_EV_RESIZE = 0x01, // lines, cols
   TICKIT_EV_KEY    = 0x02, // type(TickitKeyEventType), str
+  TICKIT_EV_MOUSE  = 0x04, // type(TickitMouseEventType), button, line, col
 } TickitEventType;
 
 typedef enum {
-  TICKIT_KEYEV_KEY,
+  TICKIT_KEYEV_KEY = 1,
   TICKIT_KEYEV_TEXT,
 } TickitKeyEventType;
 
+typedef enum {
+  TICKIT_MOUSEEV_PRESS = 1,
+  TICKIT_MOUSEEV_DRAG,
+  TICKIT_MOUSEEV_RELEASE,
+} TickitMouseEventType;
+
 typedef struct {
   int         lines, cols; // RESIZE
-  int         type;        // KEY
+  int         type;        // KEY, MOUSE
   const char *str;         // KEY
+  int         button;      // MOUSE
+  int         line, col;   // MOUSE
 } TickitEvent;
 
 /*

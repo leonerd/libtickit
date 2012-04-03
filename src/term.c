@@ -221,7 +221,21 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 {
   TickitEvent args;
 
-  if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
+  if(key->type == TERMKEY_TYPE_MOUSE) {
+    TermKeyMouseEvent ev;
+    termkey_interpret_mouse(tk, key, &ev, &args.button, &args.line, &args.col);
+    /* TermKey is 1-based, Tickit is 0-based for position */
+    args.line--; args.col--;
+    switch(ev) {
+    case TERMKEY_MOUSE_PRESS:   args.type = TICKIT_MOUSEEV_PRESS;   break;
+    case TERMKEY_MOUSE_DRAG:    args.type = TICKIT_MOUSEEV_DRAG;    break;
+    case TERMKEY_MOUSE_RELEASE: args.type = TICKIT_MOUSEEV_RELEASE; break;
+    default:                    args.type = -1; break;
+    }
+
+    run_events(tt, TICKIT_EV_MOUSE, &args);
+  }
+  else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
     args.type = TICKIT_KEYEV_TEXT;
     args.str  = key->utf8;
