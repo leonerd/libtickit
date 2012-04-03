@@ -10,10 +10,17 @@
 #include <unistd.h>
 
 #include <sys/ioctl.h>
+#include <sys/time.h>
+
+/* unit multipliers for working in microseconds */
+#define MSEC      1000
+#define SECOND 1000000
 
 #ifdef HAVE_UNIBILIUM
 # include "unibilium.h"
 #endif
+
+#include <termkey.h>
 
 struct TickitTermEventHook {
   struct TickitTermEventHook *next;
@@ -27,6 +34,10 @@ struct TickitTerm {
   int                   outfd;
   TickitTermOutputFunc *outfunc;
   void                 *outfunc_user;
+
+  int                   infd;
+  TermKey              *termkey;
+  struct timeval        input_timeout_at; /* absolute time */
 
   struct {
     unsigned int bce:1;
@@ -70,6 +81,10 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 
   tt->outfd   = -1;
   tt->outfunc = NULL;
+
+  tt->infd    = -1;
+  tt->termkey = NULL;
+  tt->input_timeout_at.tv_sec = -1;
 
   tt->mode.altscreen = 0;
   tt->mode.cursorvis = 1;
@@ -180,6 +195,111 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
   tt->outfunc_user = user;
 
   tt->outfd = -1;
+}
+
+void tickit_term_set_input_fd(TickitTerm *tt, int fd)
+{
+  //: TODO: some way to signal an error
+  if(!tt->termkey)
+    tt->infd = fd;
+}
+
+int tickit_term_get_input_fd(TickitTerm *tt)
+{
+  return tt->infd;
+}
+
+static TermKey *get_termkey(TickitTerm *tt)
+{
+  if(!tt->termkey)
+    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR);
+
+  return tt->termkey;
+}
+
+static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
+{
+  TickitEvent args;
+
+  if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
+    /* Unmodified unicode */
+    args.keytype = TICKIT_KEYEV_TEXT;
+    args.str     = key->utf8;
+
+    run_events(tt, TICKIT_EV_KEY, &args);
+  }
+  else {
+    char buffer[64]; // TODO: should be long enough
+    termkey_strfkey(tk, buffer, sizeof buffer, key, TERMKEY_FORMAT_ALTISMETA);
+
+    args.keytype = TICKIT_KEYEV_KEY;
+    args.str     = buffer;
+
+    run_events(tt, TICKIT_EV_KEY, &args);
+  }
+}
+
+void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len)
+{
+  TermKey *tk = get_termkey(tt);
+  termkey_push_bytes(tk, bytes, len);
+
+  TermKeyResult res;
+  TermKeyKey key;
+  while((res = termkey_getkey(tk, &key)) == TERMKEY_RES_KEY) {
+    got_key(tt, tk, &key);
+  }
+
+  if(res == TERMKEY_RES_AGAIN) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    /* tv += waittime in MSEC */
+    int new_usec = tv.tv_usec + (termkey_get_waittime(tk) * MSEC);
+    if(new_usec >= SECOND) {
+      tv.tv_sec++;
+      new_usec -= SECOND;
+    }
+    tv.tv_usec = new_usec;
+
+    tt->input_timeout_at = tv;
+  }
+  else {
+    tt->input_timeout_at.tv_sec = -1;
+  }
+}
+
+int tickit_term_input_check_timeout(TickitTerm *tt)
+{
+  if(tt->input_timeout_at.tv_sec == -1)
+    return -1;
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+
+  /* tv = tt->input_timeout_at - tv */
+  int new_usec = tt->input_timeout_at.tv_usec - tv.tv_usec;
+  tv.tv_sec    = tt->input_timeout_at.tv_sec  - tv.tv_sec;
+  if(new_usec < 0) {
+    tv.tv_sec--;
+    tv.tv_usec = new_usec + SECOND;
+  }
+  else {
+    tv.tv_usec = new_usec;
+  }
+
+  if(tv.tv_sec > 0 || (tv.tv_sec == 0 && tv.tv_usec > 0))
+    return tv.tv_sec * 1000 + (tv.tv_usec+MSEC-1)/MSEC;
+
+  TermKey *tk = get_termkey(tt);
+
+  TermKeyKey key;
+  if(termkey_getkey_force(tk, &key) == TERMKEY_RES_KEY) {
+    got_key(tt, tk, &key);
+  }
+
+  tt->input_timeout_at.tv_sec = -1;
+  return -1;
 }
 
 static void write_str(TickitTerm *tt, const char *str, size_t len)

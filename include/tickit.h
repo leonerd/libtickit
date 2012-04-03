@@ -9,11 +9,19 @@
 
 /* bitmasks */
 typedef enum {
-  TICKIT_EV_RESIZE = 0x01,
+  TICKIT_EV_RESIZE = 0x01, // lines, cols
+  TICKIT_EV_KEY    = 0x02, // keytype, str
 } TickitEventType;
 
+typedef enum {
+  TICKIT_KEYEV_KEY,
+  TICKIT_KEYEV_TEXT,
+} TickitKeyEventType;
+
 typedef struct {
-  int lines, cols; // RESIZE
+  int                 lines, cols; // RESIZE
+  TickitKeyEventType  keytype;     // KEY
+  const char         *str;         // KEY
 } TickitEvent;
 
 /*
@@ -76,6 +84,13 @@ void tickit_term_destroy(TickitTerm *tt);
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_output_fd(TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
+
+/* fd is allowed to be unset (-1); works abstractly */
+void tickit_term_set_input_fd(TickitTerm *tt, int fd);
+int  tickit_term_get_input_fd(TickitTerm *tt);
+
+void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
+int  tickit_term_input_check_timeout(TickitTerm *tt);
 
 void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);

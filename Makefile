@@ -29,6 +29,9 @@ else
   LDFLAGS+=-lncurses
 endif
 
+CFLAGS +=$(shell pkg-config --cflags termkey)
+LDFLAGS+=$(shell pkg-config --libs   termkey)
+
 CFILES=$(wildcard src/*.c)
 HFILES=$(wildcard include/*.h)
 OBJECTS=$(CFILES:.c=.lo)
