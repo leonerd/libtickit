@@ -43,7 +43,7 @@ static int next_utf8(const char *str, uint32_t *cp)
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
   pos->bytes = 0;
-  pos->chars = 0;
+  pos->codepoints = 0;
   pos->graphemes = 0;
   pos->columns = 0;
   return tickit_string_countmore(str, pos, limit);
@@ -73,7 +73,7 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
 
     if(limit && limit->bytes != -1 && here.bytes + bytes > limit->bytes)
       break;
-    if(limit && limit->chars != -1 && here.chars + 1 > limit->chars)
+    if(limit && limit->codepoints != -1 && here.codepoints + 1 > limit->codepoints)
       break;
     if(limit && limit->graphemes != -1 && here.graphemes + is_grapheme > limit->graphemes)
       break;
@@ -81,7 +81,7 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
       break;
 
     here.bytes += bytes;
-    here.chars += 1;
+    here.codepoints += 1;
     here.graphemes += is_grapheme;
     here.columns += width;
   }

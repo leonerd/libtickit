@@ -133,7 +133,7 @@ void tickit_term_set_mode_mouse(TickitTerm *tt, int on);
 
 typedef struct {
   size_t bytes;
-  int    chars;
+  int    codepoints;
   int    graphemes;
   int    columns;
 } TickitStringPos;
