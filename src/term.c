@@ -126,6 +126,8 @@ void tickit_term_free(TickitTerm *tt)
 {
   for(struct TickitTermEventHook *hook = tt->hooks; hook;) {
     struct TickitTermEventHook *next = hook->next;
+    if(hook->ev & TICKIT_EV_UNBIND)
+      (*hook->fn)(tt, TICKIT_EV_UNBIND, NULL, hook->data);
     free(hook);
     hook = next;
   }
@@ -707,6 +709,8 @@ void tickit_term_unbind_event_id(TickitTerm *tt, int id)
   for(struct TickitTermEventHook *hook = tt->hooks; hook;) {
     if(hook->id == id) {
       *link = hook->next;
+      if(hook->ev & TICKIT_EV_UNBIND)
+        (*hook->fn)(tt, TICKIT_EV_UNBIND, NULL, hook->data);
       free(hook);
       hook = *link;
     }

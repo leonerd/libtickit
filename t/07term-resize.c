@@ -2,9 +2,15 @@
 #include "taplib.h"
 
 int new_lines, new_cols;
+int unbound = 0;
 
 void on_resize(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
 {
+  if(ev == TICKIT_EV_UNBIND) {
+    unbound = 1;
+    return;
+  }
+
   is_int(ev, TICKIT_EV_RESIZE, "ev type to on_resize()");
 
   new_lines = args->lines;
@@ -25,12 +31,12 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  plan_tests(11);
+  plan_tests(12);
 
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_size(tt, 25, 80);
 
-  int hookid = tickit_term_bind_event(tt, TICKIT_EV_RESIZE, on_resize, NULL);
+  int hookid = tickit_term_bind_event(tt, TICKIT_EV_RESIZE|TICKIT_EV_UNBIND, on_resize, NULL);
 
   tickit_term_set_size(tt, 30, 100);
 
@@ -53,6 +59,8 @@ int main(int argc, char *argv[])
   is_int(new_lines, 35, "new_lines still 35 after unbind event");
 
   tickit_term_destroy(tt);
+
+  is_int(unbound, 1, "on_resize unbound after tickit_term_destroy");
 
   return exit_status();
 }
