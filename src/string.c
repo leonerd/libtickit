@@ -42,10 +42,7 @@ static int next_utf8(const char *str, uint32_t *cp)
 
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
-  pos->bytes = 0;
-  pos->codepoints = 0;
-  pos->graphemes = 0;
-  pos->columns = 0;
+  tickit_stringpos_zero(pos);
   return tickit_string_countmore(str, pos, limit);
 }
 

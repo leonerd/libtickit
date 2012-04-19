@@ -141,4 +141,30 @@ typedef struct {
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
 
+// Some convenient mutators for TickitStringPos structs
+
+static inline void tickit_stringpos_zero(TickitStringPos *pos) {
+  pos->bytes = pos->codepoints = pos->graphemes = pos->columns = 0;
+}
+
+static inline void tickit_stringpos_limit_bytes(TickitStringPos *pos, size_t bytes) {
+  pos->codepoints = pos->graphemes = pos->columns = -1;
+  pos->bytes = bytes;
+}
+
+static inline void tickit_stringpos_limit_codepoints(TickitStringPos *pos, int codepoints) {
+  pos->bytes = pos->graphemes = pos->columns = -1;
+  pos->codepoints = codepoints;
+}
+
+static inline void tickit_stringpos_limit_graphemes(TickitStringPos *pos, int graphemes) {
+  pos->bytes = pos->codepoints = pos->columns = -1;
+  pos->graphemes = graphemes;
+}
+
+static inline void tickit_stringpos_limit_columns(TickitStringPos *pos, int columns) {
+  pos->bytes = pos->codepoints = pos->graphemes = -1;
+  pos->columns = columns;
+}
+
 #endif

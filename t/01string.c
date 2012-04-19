@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
   /* Now with some limits */
 
-  limit.bytes = 5; limit.codepoints = -1; limit.graphemes = -1; limit.columns = -1;
+  tickit_stringpos_limit_bytes(&limit, 5);
 
   is_int(tickit_string_count("hello world", &pos, &limit), 5, "tickit_string_count byte-limit");
   is_int(pos.bytes,      5, "tickit_string_count byte-limit bytes");
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
   is_int(tickit_string_count("caf\xc3\xa9", &pos, &limit), 3, "tickit_string_count byte-limit split");
   is_int(pos.bytes,      3, "tickit_string_count byte-limit split bytes");
 
-  limit.bytes = -1; limit.codepoints = 3; limit.graphemes = -1; limit.columns = -1;
+  tickit_stringpos_limit_codepoints(&limit, 3);
 
   is_int(tickit_string_count("hello world", &pos, &limit), 3, "tickit_string_count char-limit");
   is_int(pos.bytes,      3, "tickit_string_count char-limit bytes");
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   is_int(tickit_string_count("cafe\xcc\x81", &pos, &limit), 3, "tickit_string_count char-limit split");
   is_int(pos.codepoints, 3, "tickit_string_count char-limit split codepoints");
 
-  limit.bytes = -1; limit.codepoints = -1; limit.graphemes = 4; limit.columns = -1;
+  tickit_stringpos_limit_graphemes(&limit, 4);
 
   is_int(tickit_string_count("hello world", &pos, &limit), 4, "tickit_string_count grapheme-limit");
   is_int(pos.bytes,      4, "tickit_string_count grapheme-limit bytes");
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   is_int(pos.graphemes,  4, "tickit_string_count grapheme-limit graphemes");
   is_int(pos.columns,    4, "tickit_string_count grapheme-limit columns");
 
-  limit.bytes = -1; limit.codepoints = -1; limit.graphemes = -1; limit.columns = 6;
+  tickit_stringpos_limit_columns(&limit, 6);
 
   is_int(tickit_string_count("hello world", &pos, &limit), 6, "tickit_string_count column-limit");
   is_int(pos.bytes,      6, "tickit_string_count column-limit bytes");
