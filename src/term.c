@@ -187,8 +187,6 @@ void tickit_term_set_output_fd(TickitTerm *tt, int fd)
 {
   tt->outfd = fd;
 
-  tt->outfunc = NULL;
-
   tickit_term_refresh_size(tt);
 }
 
@@ -201,8 +199,6 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 {
   tt->outfunc      = fn;
   tt->outfunc_user = user;
-
-  tt->outfd = -1;
 }
 
 void tickit_term_set_input_fd(TickitTerm *tt, int fd)
