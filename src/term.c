@@ -447,13 +447,13 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
     write_strf(tt, "\e[%dA", -downward);
 
   if(rightward > 1)
-    write_strf(tt, "\e[%dD", rightward);
+    write_strf(tt, "\e[%dC", rightward);
   else if(rightward == 1)
-    write_str(tt, "\e[D", 3);
-  else if(rightward == -1)
     write_str(tt, "\e[C", 3);
+  else if(rightward == -1)
+    write_str(tt, "\e[D", 3);
   else if(rightward < -1)
-    write_strf(tt, "\e[%dC", -rightward);
+    write_strf(tt, "\e[%dD", -rightward);
 }
 
 static void insertch(TickitTerm *tt, int count)

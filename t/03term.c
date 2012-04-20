@@ -72,19 +72,19 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_move(tt, 0, 1);
-  is_str_escape(buffer, "\e[D", "buffer after tickit_term_move right 1");
+  is_str_escape(buffer, "\e[C", "buffer after tickit_term_move right 1");
 
   buffer[0] = 0;
   tickit_term_move(tt, 0, 2);
-  is_str_escape(buffer, "\e[2D", "buffer after tickit_term_move right 2");
+  is_str_escape(buffer, "\e[2C", "buffer after tickit_term_move right 2");
 
   buffer[0] = 0;
   tickit_term_move(tt, 0, -1);
-  is_str_escape(buffer, "\e[C", "buffer after tickit_term_move left 1");
+  is_str_escape(buffer, "\e[D", "buffer after tickit_term_move left 1");
 
   buffer[0] = 0;
   tickit_term_move(tt, 0, -2);
-  is_str_escape(buffer, "\e[2C", "buffer after tickit_term_move left 2");
+  is_str_escape(buffer, "\e[2D", "buffer after tickit_term_move left 2");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 3, 0, 7, 80, 2, 0);
@@ -132,11 +132,11 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_erasech(tt, 1, 1);
-  is_str_escape(buffer, "\e[X\e[D", "buffer after tickit_term_erasech 1 move");
+  is_str_escape(buffer, "\e[X\e[C", "buffer after tickit_term_erasech 1 move");
 
   buffer[0] = 0;
   tickit_term_erasech(tt, 3, 1);
-  is_str_escape(buffer, "\e[3X\e[3D", "buffer after tickit_term_erasech 3 move");
+  is_str_escape(buffer, "\e[3X\e[3C", "buffer after tickit_term_erasech 3 move");
 
   tickit_term_destroy(tt);
   ok(1, "tickit_term_destroy");
@@ -147,11 +147,11 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_erasech(tt, 1, 0);
-  is_str_escape(buffer, " \e[C", "buffer after tickit_term_erasech 1 nomove");
+  is_str_escape(buffer, " \e[D", "buffer after tickit_term_erasech 1 nomove");
 
   buffer[0] = 0;
   tickit_term_erasech(tt, 3, 0);
-  is_str_escape(buffer, "   \e[3C", "buffer after tickit_term_erasech 3 nomove");
+  is_str_escape(buffer, "   \e[3D", "buffer after tickit_term_erasech 3 nomove");
 
   buffer[0] = 0;
   tickit_term_erasech(tt, 1, 1);
