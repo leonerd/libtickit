@@ -18,6 +18,21 @@
 
 #ifdef HAVE_UNIBILIUM
 # include "unibilium.h"
+#else
+# include <curses.h>
+# include <term.h>
+
+/* term.h has defined 'lines' as a macro. Eugh. We'd really rather prefer it
+ * didn't pollute our namespace so we'll provide some functions here and then
+ * #undef the name pollution
+ */
+static inline int terminfo_bce(void)     { return back_color_erase; }
+static inline int terminfo_lines(void)   { return lines; }
+static inline int terminfo_columns(void) { return columns; }
+
+# undef back_color_erase
+# undef lines
+# undef columns
 #endif
 
 #include <termkey.h>
@@ -109,7 +124,16 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
     unibi_destroy(ut);
   }
 #else
-# error "TODO: implement non-unibilium terminfo lookup"
+  {
+    int err;
+    if(setupterm((char*)termtype, 1, &err) != OK)
+      return 0;
+
+    tt->cap.bce = terminfo_bce();
+
+    tt->lines = terminfo_lines();
+    tt->cols  = terminfo_columns();
+  }
 #endif
 
   /* Initially empty because we don't necessarily know the initial state
