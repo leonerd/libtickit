@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  plan_tests(20);
+  plan_tests(24);
 
   tt = tickit_term_new_for_termtype("xterm");
 
@@ -54,6 +54,13 @@ int main(int argc, char *argv[])
   is_int(mousebutton, 1,                    "mousebutton after mouse button press");
   is_int(mouseline,   0,                    "mouseline after mouse button press");
   is_int(mousecol,    0,                    "mousecol after mouse button press");
+
+  tickit_term_input_push_bytes(tt, "\e[M`!!", 6);
+
+  is_int(mousetype,   TICKIT_MOUSEEV_WHEEL, "mousetype after mouse wheel up");
+  is_int(mousebutton, TICKIT_MOUSEWHEEL_UP, "mousebutton after mouse wheel up");
+  is_int(mouseline,   0,                    "mouseline after mouse wheel up");
+  is_int(mousecol,    0,                    "mousecol after mouse wheel up");
 
   keytype = -1; keystr[0] = 0;
   tickit_term_input_push_bytes(tt, "\e[", 2);

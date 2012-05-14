@@ -261,6 +261,12 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     default:                    args.type = -1; break;
     }
 
+    /* Translate PRESS of buttons >= 4 into wheel events */
+    if(ev == TERMKEY_MOUSE_PRESS && args.button >= 4) {
+      args.type = TICKIT_MOUSEEV_WHEEL;
+      args.button -= (4 - TICKIT_MOUSEWHEEL_UP);
+    }
+
     run_events(tt, TICKIT_EV_MOUSE, &args);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {

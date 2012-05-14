@@ -38,13 +38,19 @@ static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, 
     case TICKIT_MOUSEEV_PRESS:   tickit_term_print(tt, "press   "); break;
     case TICKIT_MOUSEEV_DRAG:    tickit_term_print(tt, "drag    "); break;
     case TICKIT_MOUSEEV_RELEASE: tickit_term_print(tt, "release "); break;
+    case TICKIT_MOUSEEV_WHEEL:   tickit_term_print(tt, "wheel ");   break;
     default: return;
   }
 
   /* TODO: want a tickit_term_printf()
    */
   char buffer[64];
-  snprintf(buffer, sizeof buffer, "button %d at (%d,%d)", button, line, col);
+  if(type == TICKIT_MOUSEEV_WHEEL) {
+    snprintf(buffer, sizeof buffer, "%s at (%d,%d)", button == TICKIT_MOUSEWHEEL_DOWN ? "down" : "up", line, col);
+  }
+  else {
+    snprintf(buffer, sizeof buffer, "button %d at (%d,%d)", button, line, col);
+  }
   tickit_term_print(tt, buffer);
   tickit_term_erasech(tt, 8, -1);
 }

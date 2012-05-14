@@ -25,7 +25,13 @@ typedef enum {
   TICKIT_MOUSEEV_PRESS = 1,
   TICKIT_MOUSEEV_DRAG,
   TICKIT_MOUSEEV_RELEASE,
+  TICKIT_MOUSEEV_WHEEL,
 } TickitMouseEventType;
+
+enum {
+  TICKIT_MOUSEWHEEL_UP = 1,
+  TICKIT_MOUSEWHEEL_DOWN,
+};
 
 typedef struct {
   int         lines, cols; // RESIZE
