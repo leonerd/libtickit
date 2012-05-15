@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 3, 0, 15, 80, 8, 0);
-  is_str_escape(buffer, "\e[4;18r\e[18d\e[8T\e[r", "buffer after tickit_term_scroll lines 3-17 8 down");
+  is_str_escape(buffer, "\e[4;18r\e[18d\e[8S\e[r", "buffer after tickit_term_scroll lines 3-17 8 down");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 3, 0, 7, 80, -2, 0);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 3, 0, 15, 80, -8, 0);
-  is_str_escape(buffer, "\e[4;18r\e[4d\e[8S\e[r", "buffer after tickit_term_scroll lines 3-17 8 up");
+  is_str_escape(buffer, "\e[4;18r\e[4d\e[8T\e[r", "buffer after tickit_term_scroll lines 3-17 8 up");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, 3);
