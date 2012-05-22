@@ -79,6 +79,14 @@ static void run_events(TickitTerm *tt, TickitEventType ev, TickitEvent *args)
       (*hook->fn)(tt, ev, args, hook->data);
 }
 
+static TermKey *get_termkey(TickitTerm *tt)
+{
+  if(!tt->termkey)
+    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR);
+
+  return tt->termkey;
+}
+
 TickitTerm *tickit_term_new(void)
 {
   const char *termtype = getenv("TERM");
@@ -227,22 +235,16 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 
 void tickit_term_set_input_fd(TickitTerm *tt, int fd)
 {
-  //: TODO: some way to signal an error
-  if(!tt->termkey)
-    tt->infd = fd;
+  if(tt->termkey)
+    termkey_destroy(tt->termkey);
+
+  tt->infd = fd;
+  (void)get_termkey(tt);
 }
 
 int tickit_term_get_input_fd(TickitTerm *tt)
 {
   return tt->infd;
-}
-
-static TermKey *get_termkey(TickitTerm *tt)
-{
-  if(!tt->termkey)
-    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR);
-
-  return tt->termkey;
 }
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
