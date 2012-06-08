@@ -85,6 +85,10 @@ int tickit_pen_is_nondefault(TickitPen *pen)
       if(tickit_pen_get_int_attr(pen, attr) > -1)
         return 1;
       break;
+    case TICKIT_PENTYPE_COLOUR:
+      if(tickit_pen_get_colour_attr(pen, attr) > -1)
+        return 1;
+      break;
     }
   }
   return 0;
@@ -125,8 +129,6 @@ int tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr)
     return -1;
 
   switch(attr) {
-    case TICKIT_PEN_FG:      return pen->fg;
-    case TICKIT_PEN_BG:      return pen->bg;
     case TICKIT_PEN_ALTFONT: return pen->altfont;
     default:
       return 0;
@@ -136,9 +138,31 @@ int tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr)
 void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
 {
   switch(attr) {
-    case TICKIT_PEN_FG:      pen->fg      = val; pen->valid.fg      = 1; break;
-    case TICKIT_PEN_BG:      pen->bg      = val; pen->valid.bg      = 1; break;
     case TICKIT_PEN_ALTFONT: pen->altfont = val; pen->valid.altfont = 1; break;
+    default:
+      break;
+  }
+}
+
+/* Cheat and pretend the index of a colour attribute is a number attribute */
+int tickit_pen_get_colour_attr(TickitPen *pen, TickitPenAttr attr)
+{
+  if(!tickit_pen_has_attr(pen, attr))
+    return -1;
+
+  switch(attr) {
+    case TICKIT_PEN_FG: return pen->fg;
+    case TICKIT_PEN_BG: return pen->bg;
+    default:
+      return 0;
+  }
+}
+
+void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
+{
+  switch(attr) {
+    case TICKIT_PEN_FG: pen->fg = val; pen->valid.fg = 1; break;
+    case TICKIT_PEN_BG: pen->bg = val; pen->valid.bg = 1; break;
     default:
       break;
   }
@@ -168,6 +192,8 @@ int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr)
     return tickit_pen_get_bool_attr(a, attr) == tickit_pen_get_bool_attr(b, attr);
   case TICKIT_PENTYPE_INT:
     return tickit_pen_get_int_attr(a, attr) == tickit_pen_get_int_attr(b, attr);
+  case TICKIT_PENTYPE_COLOUR:
+    return tickit_pen_get_colour_attr(a, attr) == tickit_pen_get_colour_attr(b, attr);
   }
 
   return 0;
@@ -182,6 +208,9 @@ void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr)
   case TICKIT_PENTYPE_INT:
     tickit_pen_set_int_attr(dst, attr, tickit_pen_get_int_attr(src, attr));
     return;
+  case TICKIT_PENTYPE_COLOUR:
+    tickit_pen_set_colour_attr(dst, attr, tickit_pen_get_colour_attr(src, attr));
+    return;
   }
 
   return;
@@ -192,6 +221,8 @@ TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
   switch(attr) {
     case TICKIT_PEN_FG:
     case TICKIT_PEN_BG:
+      return TICKIT_PENTYPE_COLOUR;
+
     case TICKIT_PEN_ALTFONT:
       return TICKIT_PENTYPE_INT;
 

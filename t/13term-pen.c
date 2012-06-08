@@ -77,15 +77,15 @@ int main(int argc, char *argv[])
 
   tickit_pen_clear_attr(pen, TICKIT_PEN_UNDER);
 
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 1);
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_BG, 5);
+  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 1);
+  tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, 5);
 
   buffer[0] = 0;
   tickit_term_setpen(tt, pen);
 
   is_str_escape(buffer, "\e[31;45m", "chpen foreground+background");
 
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 9);
+  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 9);
   tickit_pen_clear_attr(pen, TICKIT_PEN_BG);
 
   buffer[0] = 0;
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer, "\e[91m", "chpen foreground high");
 
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 123);
+  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 123);
 
   buffer[0] = 0;
   tickit_term_chpen(tt, pen);

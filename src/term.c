@@ -572,7 +572,7 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
     switch(attr) {
     case TICKIT_PEN_FG:
     case TICKIT_PEN_BG:
-      val = tickit_pen_get_int_attr(pen, attr);
+      val = tickit_pen_get_colour_attr(pen, attr);
       if(val < 0)
         params[pindex++] = onoff->off;
       else if(val < 8)

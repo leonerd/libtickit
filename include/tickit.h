@@ -48,8 +48,8 @@ typedef struct {
 typedef struct TickitPen TickitPen;
 
 typedef enum {
-  TICKIT_PEN_FG,         /* number: TODO - colour? */
-  TICKIT_PEN_BG,         /* number: TODO - colour? */
+  TICKIT_PEN_FG,         /* colour */
+  TICKIT_PEN_BG,         /* colour */
   TICKIT_PEN_BOLD,       /* bool */
   TICKIT_PEN_UNDER,      /* bool: TODO - number? */
   TICKIT_PEN_ITALIC,     /* bool */
@@ -62,7 +62,8 @@ typedef enum {
 
 typedef enum {
   TICKIT_PENTYPE_BOOL,
-  TICKIT_PENTYPE_INT
+  TICKIT_PENTYPE_INT,
+  TICKIT_PENTYPE_COLOUR,
 } TickitPenAttrType;
 
 TickitPen *tickit_pen_new(void);
@@ -77,6 +78,9 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
 int  tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
+
+int  tickit_pen_get_colour_attr(TickitPen *pen, TickitPenAttr attr);
+void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int value);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 

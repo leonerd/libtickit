@@ -38,20 +38,20 @@ int main(int argc, char *argv[])
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold after clear");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 after clear");
 
-  is_int(tickit_pen_attrtype(TICKIT_PEN_FG), TICKIT_PENTYPE_INT, "foreground is an integer attribute");
+  is_int(tickit_pen_attrtype(TICKIT_PEN_FG), TICKIT_PENTYPE_COLOUR, "foreground is a colour attribute");
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen lacks foreground initially");
-  is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 initially");
+  is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 initially");
 
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 4);
+  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 4);
 
   ok(tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen has foreground after set");
-  is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_FG), 4, "foreground 4 after set");
+  is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 4, "foreground 4 after set");
 
   tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen lacks foreground after clear");
-  is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 after clear");
+  is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 after clear");
 
   pen2 = tickit_pen_new();
 
