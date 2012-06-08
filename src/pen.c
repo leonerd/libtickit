@@ -1,6 +1,8 @@
 #include "tickit.h"
 
+#include <stdio.h>   /* sscanf */
 #include <stdlib.h>
+#include <string.h>
 
 struct TickitPen {
   signed   int fg      : 9, /* 0 - 255 or -1 */
@@ -166,6 +168,45 @@ void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
     default:
       break;
   }
+}
+
+static const char *colournames[] = {
+  "black",
+  "red",
+  "green",
+  "yellow",
+  "blue",
+  "magenta",
+  "cyan",
+  "white",
+};
+
+int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *desc)
+{
+  int hi = 0;
+  int val;
+  if(strncmp(desc, "hi-", 3) == 0) {
+    desc += 3;
+    hi   = 8;
+  }
+
+  if(sscanf(desc, "%d", &val) == 1) {
+    if(hi && val > 7)
+      return 0;
+
+    tickit_pen_set_colour_attr(pen, attr, val + hi);
+    return 1;
+  }
+
+  for(val = 0; val < sizeof(colournames)/sizeof(colournames[0]); val++) {
+    if(strcmp(desc, colournames[val]) != 0)
+      continue;
+
+    tickit_pen_set_colour_attr(pen, attr, val + hi);
+    return 1;
+  }
+
+  return 0;
 }
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)

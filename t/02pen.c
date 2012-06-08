@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(27);
+  plan_tests(33);
 
   pen = tickit_pen_new();
 
@@ -47,6 +47,15 @@ int main(int argc, char *argv[])
 
   ok(tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen has foreground after set");
   is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 4, "foreground 4 after set");
+
+  ok(tickit_pen_set_colour_attr_desc(pen, TICKIT_PEN_FG, "12"), "pen set foreground '12'");
+  is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 12, "foreground 12 after set '12'");
+
+  ok(tickit_pen_set_colour_attr_desc(pen, TICKIT_PEN_FG, "green"), "pen set foreground 'green'");
+  is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 2, "foreground 2 after set 'green'");
+
+  ok(tickit_pen_set_colour_attr_desc(pen, TICKIT_PEN_FG, "hi-red"), "pen set foreground 'hi-red'");
+  is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 8+1, "foreground 8+1 after set 'hi-red'");
 
   tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
 

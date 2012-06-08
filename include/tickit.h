@@ -81,6 +81,7 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
 int  tickit_pen_get_colour_attr(TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int value);
+int  tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *value);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 
