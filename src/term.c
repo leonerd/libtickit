@@ -1,4 +1,5 @@
 #include "tickit.h"
+#include "hooklists.h"
 
 /* We need C99 vsnprintf() semantics */
 #define _ISOC99_SOURCE
@@ -37,14 +38,6 @@ static inline int terminfo_columns(void) { return columns; }
 
 #include <termkey.h>
 
-struct TickitTermEventHook {
-  struct TickitTermEventHook *next;
-  TickitEventType             ev;
-  TickitTermEventFn          *fn;
-  void                       *data;
-  int                         id;
-};
-
 struct TickitTerm {
   int                   outfd;
   TickitTermOutputFunc *outfunc;
@@ -69,14 +62,12 @@ struct TickitTerm {
 
   TickitPen *pen;
 
-  struct TickitTermEventHook *hooks;
+  struct TickitEventHook *hooks;
 };
 
 static void run_events(TickitTerm *tt, TickitEventType ev, TickitEvent *args)
 {
-  for(struct TickitTermEventHook *hook = tt->hooks; hook; hook = hook->next)
-    if(hook->ev & ev)
-      (*hook->fn)(tt, ev, args, hook->data);
+  tickit_hooklist_run_event(tt->hooks, tt, ev, args);
 }
 
 static TermKey *get_termkey(TickitTerm *tt)
@@ -156,14 +147,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 
 void tickit_term_free(TickitTerm *tt)
 {
-  for(struct TickitTermEventHook *hook = tt->hooks; hook;) {
-    struct TickitTermEventHook *next = hook->next;
-    if(hook->ev & TICKIT_EV_UNBIND)
-      (*hook->fn)(tt, TICKIT_EV_UNBIND, NULL, hook->data);
-    free(hook);
-    hook = next;
-  }
-
+  tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
   tickit_pen_destroy(tt->pen);
 
   if(tt->termkey)
@@ -711,38 +695,10 @@ void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
 
 int tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *data)
 {
-  int max_id = 0;
-
-  /* Find the end of a linked list, and find the highest ID in use while we're
-   * at it
-   */
-  struct TickitTermEventHook **newhook = &tt->hooks;
-  for(; *newhook; newhook = &(*newhook)->next)
-    if((*newhook)->id > max_id)
-      max_id = (*newhook)->id;
-
-  *newhook = malloc(sizeof(struct TickitTermEventHook)); // TODO: malloc failure
-
-  (*newhook)->next = NULL;
-  (*newhook)->ev = ev;
-  (*newhook)->fn = fn;
-  (*newhook)->data = data;
-
-  return (*newhook)->id = max_id + 1;
+  return tickit_hooklist_bind_event(&tt->hooks, tt, ev, (TickitEventFn*)fn, data);
 }
 
 void tickit_term_unbind_event_id(TickitTerm *tt, int id)
 {
-  struct TickitTermEventHook **link = &tt->hooks;
-  for(struct TickitTermEventHook *hook = tt->hooks; hook;) {
-    if(hook->id == id) {
-      *link = hook->next;
-      if(hook->ev & TICKIT_EV_UNBIND)
-        (*hook->fn)(tt, TICKIT_EV_UNBIND, NULL, hook->data);
-      free(hook);
-      hook = *link;
-    }
-    else
-      hook = hook->next;
-  }
+  tickit_hooklist_unbind_event_id(&tt->hooks, tt, id);
 }
