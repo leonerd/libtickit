@@ -102,4 +102,4 @@ install-inc: $(HFILES)
 # rm the old binary first in case it's still in use
 install-lib: $(LIBRARY)
 	install -d $(DESTDIR)$(LIBDIR)
-	$(LIBTOOL) --mode=install cp --remove-destination $(LIBRARY) $(DESTDIR)$(LIBDIR)/
+	$(LIBTOOL) --mode=install install $(LIBRARY) $(DESTDIR)$(LIBDIR)/
