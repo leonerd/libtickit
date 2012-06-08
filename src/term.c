@@ -65,10 +65,7 @@ struct TickitTerm {
   struct TickitEventHook *hooks;
 };
 
-static void run_events(TickitTerm *tt, TickitEventType ev, TickitEvent *args)
-{
-  tickit_hooklist_run_event(tt->hooks, tt, ev, args);
-}
+DEFINE_HOOKLIST_FUNCS(term,TickitTerm,TickitTermEventFn)
 
 static TermKey *get_termkey(TickitTerm *tt)
 {
@@ -691,14 +688,4 @@ void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
 
   write_str(tt, on ? "\e[?1002h" : "\e[?1002l", 0);
   tt->mode.mouse = !!on;
-}
-
-int tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *data)
-{
-  return tickit_hooklist_bind_event(&tt->hooks, tt, ev, (TickitEventFn*)fn, data);
-}
-
-void tickit_term_unbind_event_id(TickitTerm *tt, int id)
-{
-  tickit_hooklist_unbind_event_id(&tt->hooks, tt, id);
 }
