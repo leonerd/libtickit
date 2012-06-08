@@ -1,4 +1,5 @@
 #include "tickit.h"
+#include "hooklists.h"
 
 #include <stdio.h>   /* sscanf */
 #include <stdlib.h>
@@ -26,13 +27,19 @@ struct TickitPen {
                  strike  : 1,
                  altfont : 1;
   } valid;
+
+  struct TickitEventHook *hooks;
 };
+
+DEFINE_HOOKLIST_FUNCS(pen,TickitPen,TickitPenEventFn)
 
 TickitPen *tickit_pen_new(void)
 {
   TickitPen *pen = malloc(sizeof(TickitPen));
   if(!pen)
     return NULL;
+
+  pen->hooks = NULL;
 
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
     tickit_pen_clear_attr(pen, attr);
@@ -42,6 +49,7 @@ TickitPen *tickit_pen_new(void)
 
 void tickit_pen_destroy(TickitPen *pen)
 {
+  tickit_hooklist_unbind_and_destroy(pen->hooks, pen);
   free(pen);
 }
 
@@ -121,8 +129,9 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val)
     case TICKIT_PEN_REVERSE: pen->reverse = !!val; pen->valid.reverse = 1; break;
     case TICKIT_PEN_STRIKE:  pen->strike  = !!val; pen->valid.strike  = 1; break;
     default:
-      break;
+      return;
   }
+  run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
 int tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr)
@@ -142,8 +151,9 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
   switch(attr) {
     case TICKIT_PEN_ALTFONT: pen->altfont = val; pen->valid.altfont = 1; break;
     default:
-      break;
+      return;
   }
+  run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
 /* Cheat and pretend the index of a colour attribute is a number attribute */
@@ -166,8 +176,9 @@ void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
     case TICKIT_PEN_FG: pen->fg = val; pen->valid.fg = 1; break;
     case TICKIT_PEN_BG: pen->bg = val; pen->valid.bg = 1; break;
     default:
-      break;
+      return;
   }
+  run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
 static const char *colournames[] = {
@@ -222,8 +233,9 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_ALTFONT: pen->valid.altfont = 0; break;
 
     case TICKIT_N_PEN_ATTRS:
-      break;
+      return;
   }
+  run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
 int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr)

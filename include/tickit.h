@@ -12,6 +12,7 @@ typedef enum {
   TICKIT_EV_RESIZE = 0x01, // lines, cols
   TICKIT_EV_KEY    = 0x02, // type(TickitKeyEventType), str
   TICKIT_EV_MOUSE  = 0x04, // type(TickitMouseEventType), button, line, col
+  TICKIT_EV_CHANGE = 0x08, // {none}
 
   TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
 } TickitEventType;
@@ -88,6 +89,11 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr);
 
 void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr);
+
+typedef void TickitPenEventFn(TickitPen *tt, TickitEventType ev, TickitEvent *args, void *data);
+
+int  tickit_pen_bind_event(TickitPen *tt, TickitEventType ev, TickitPenEventFn *fn, void *data);
+void tickit_pen_unbind_event_id(TickitPen *tt, int id);
 
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
 

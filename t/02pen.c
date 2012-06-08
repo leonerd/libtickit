@@ -1,18 +1,29 @@
 #include "tickit.h"
 #include "taplib.h"
 
+static int changed = 0;
+
+void on_changed(TickitPen *pen, TickitEventType ev, TickitEvent *args, void *data)
+{
+  changed++;
+}
+
 int main(int argc, char *argv[])
 {
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(33);
+  plan_tests(37);
 
   pen = tickit_pen_new();
 
   ok(!!pen, "tickit_pen_new");
 
+  tickit_pen_bind_event(pen, TICKIT_EV_CHANGE, on_changed, NULL);
+
   is_int(tickit_pen_attrtype(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
+
+  is_int(changed, 0, "change counter 0 initially");
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold initially");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 initially");
@@ -28,15 +39,21 @@ int main(int argc, char *argv[])
   ok(tickit_pen_is_nonempty(pen), "pen non-empty after set bold on");
   ok(tickit_pen_is_nondefault(pen), "pen non-default after set bold on");
 
+  is_int(changed, 1, "change counter 1 after set bold on");
+
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
 
   ok(tickit_pen_is_nonempty(pen), "pen non-empty after set bold off");
   ok(!tickit_pen_is_nondefault(pen), "pen default after set bold off");
 
+  is_int(changed, 2, "change counter 2 after set bold off");
+
   tickit_pen_clear_attr(pen, TICKIT_PEN_BOLD);
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold after clear");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 after clear");
+
+  is_int(changed, 3, "change counter 3 after clear bold");
 
   is_int(tickit_pen_attrtype(TICKIT_PEN_FG), TICKIT_PENTYPE_COLOUR, "foreground is a colour attribute");
 
