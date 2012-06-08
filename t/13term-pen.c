@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
   buffer[0] = 0;
   tickit_term_chpen(tt, pen);
 
-  is_str_escape(buffer, "\e[38:5:123m", "chpen foreground xterm256");
+  is_str_escape(buffer, "\e[38;5;123m", "chpen foreground xterm256");
 
   tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 1);

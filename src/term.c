@@ -629,7 +629,8 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
 
   s += sprintf(s, "\e[");
   for(int i = 0; i < pindex-1; i++)
-    s += sprintf(s, "%d%c", params[i]&0x7fffffff, params[i]&0x80000000 ? ':' : ';');
+    /* TODO: Work out what terminals support :s */
+    s += sprintf(s, "%d%c", params[i]&0x7fffffff, ';');
   if(pindex > 0)
     s += sprintf(s, "%d", params[pindex-1]&0x7fffffff);
   sprintf(s, "m");
