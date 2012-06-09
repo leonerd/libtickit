@@ -89,6 +89,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr);
 
 void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr);
+void tickit_pen_copy(TickitPen *dst, TickitPen *src, int overwrite);
 
 typedef void TickitPenEventFn(TickitPen *tt, TickitEventType ev, TickitEvent *args, void *data);
 

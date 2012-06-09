@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(37);
+  plan_tests(39);
 
   pen = tickit_pen_new();
 
@@ -93,7 +93,17 @@ int main(int argc, char *argv[])
   ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_ITALIC), "pens have equiv italic attribute after set 0");
 
   tickit_pen_copy_attr(pen2, pen, TICKIT_PEN_BOLD);
+  ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equiv bold attribute after copy attr");
+
+  tickit_pen_clear_attr(pen2, TICKIT_PEN_BOLD);
+  tickit_pen_copy(pen2, pen, 1);
+
   ok(tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have equiv bold attribute after copy");
+
+  tickit_pen_set_bool_attr(pen2, TICKIT_PEN_BOLD, 0);
+  tickit_pen_copy(pen2, pen, 0);
+
+  ok(!tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have non-equiv bold attribute after copy no overwrite");
 
   tickit_pen_destroy(pen);
   tickit_pen_destroy(pen2);

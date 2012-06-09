@@ -269,6 +269,62 @@ void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr)
   return;
 }
 
+void tickit_pen_copy(TickitPen *dst, TickitPen *src, int overwrite)
+{
+  int changed = 0;
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    if(!tickit_pen_has_attr(src, attr))
+      continue;
+    if(tickit_pen_has_attr(dst, attr) && !overwrite)
+      continue;
+    if(tickit_pen_equiv_attr(src, dst, attr))
+      continue;
+
+    /* Avoid using copy_attr so it doesn't invoke change events yet */
+    switch(attr) {
+    case TICKIT_PEN_FG:
+      dst->fg = src->fg;
+      dst->valid.fg = 1;
+      break;
+    case TICKIT_PEN_BG:
+      dst->bg = src->bg;
+      dst->valid.bg = 1;
+      break;
+    case TICKIT_PEN_BOLD:
+      dst->bold = src->bold;
+      dst->valid.bold = 1;
+      break;
+    case TICKIT_PEN_ITALIC:
+      dst->italic = src->italic;
+      dst->valid.italic = 1;
+      break;
+    case TICKIT_PEN_UNDER:
+      dst->under = src->under;
+      dst->valid.under = 1;
+      break;
+    case TICKIT_PEN_REVERSE:
+      dst->reverse = src->reverse;
+      dst->valid.reverse = 1;
+      break;
+    case TICKIT_PEN_STRIKE:
+      dst->strike = src->strike;
+      dst->valid.strike = 1;
+      break;
+    case TICKIT_PEN_ALTFONT:
+      dst->altfont = src->altfont;
+      dst->valid.altfont = 1;
+      break;
+    case TICKIT_N_PEN_ATTRS:
+      continue;
+    }
+
+    changed++;
+  }
+
+  if(changed)
+    run_events(dst, TICKIT_EV_CHANGE, NULL);
+}
+
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
 {
   switch(attr) {
