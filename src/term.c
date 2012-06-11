@@ -72,6 +72,9 @@ static TermKey *get_termkey(TickitTerm *tt)
   if(!tt->termkey)
     tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR);
 
+  termkey_set_canonflags(tt->termkey,
+      termkey_get_canonflags(tt->termkey) | TERMKEY_CANON_DELBS);
+
   return tt->termkey;
 }
 
