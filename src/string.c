@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "../src/unicode.inc"
+#include "unicode.inc"
 
 static int next_utf8(const char *str, uint32_t *cp)
 {
