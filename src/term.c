@@ -44,6 +44,7 @@ struct TickitTerm {
   void                 *outfunc_user;
 
   int                   infd;
+  int                   termkey_flags;
   TermKey              *termkey;
   struct timeval        input_timeout_at; /* absolute time */
 
@@ -69,8 +70,10 @@ DEFINE_HOOKLIST_FUNCS(term,TickitTerm,TickitTermEventFn)
 
 static TermKey *get_termkey(TickitTerm *tt)
 {
-  if(!tt->termkey)
-    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR);
+  if(!tt->termkey) {
+    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR | tt->termkey_flags);
+    tt->termkey_flags = termkey_get_flags(tt->termkey);
+  }
 
   termkey_set_canonflags(tt->termkey,
       termkey_get_canonflags(tt->termkey) | TERMKEY_CANON_DELBS);
@@ -98,6 +101,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 
   tt->infd    = -1;
   tt->termkey = NULL;
+  tt->termkey_flags = 0;
   tt->input_timeout_at.tv_sec = -1;
 
   tt->mode.altscreen = 0;
@@ -229,6 +233,22 @@ void tickit_term_set_input_fd(TickitTerm *tt, int fd)
 int tickit_term_get_input_fd(TickitTerm *tt)
 {
   return tt->infd;
+}
+
+void tickit_term_set_utf8(TickitTerm *tt, int utf8)
+{
+  /* TODO: See what we can think of for the output side */
+  if(utf8) {
+    tt->termkey_flags |=  TERMKEY_FLAG_UTF8;
+    tt->termkey_flags &= ~TERMKEY_FLAG_RAW;
+  }
+  else {
+    tt->termkey_flags |=  TERMKEY_FLAG_RAW;
+    tt->termkey_flags &= ~TERMKEY_FLAG_UTF8;
+  }
+
+  if(tt->termkey)
+    termkey_set_flags(tt->termkey, tt->termkey_flags);
 }
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)

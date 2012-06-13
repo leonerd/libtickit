@@ -118,6 +118,8 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 void tickit_term_set_input_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_input_fd(TickitTerm *tt);
 
+void tickit_term_utf8(TickitTerm *tt, int utf8);
+
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
 void tickit_term_input_readable(TickitTerm *tt);
 int  tickit_term_input_check_timeout(TickitTerm *tt);

@@ -27,9 +27,10 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  plan_tests(24);
+  plan_tests(26);
 
   tt = tickit_term_new_for_termtype("xterm");
+  tickit_term_set_utf8(tt, 1);
 
   tickit_term_bind_event(tt, TICKIT_EV_KEY,   on_key,   NULL);
   tickit_term_bind_event(tt, TICKIT_EV_MOUSE, on_mouse, NULL);
@@ -40,6 +41,14 @@ int main(int argc, char *argv[])
   is_str(keystr,  "A",               "keystr after push_bytes A");
 
   is_int(tickit_term_input_check_timeout(tt), -1, "term has no timeout after A");
+
+  /* U+0109 - LATIN SMALL LETTER C WITH CIRCUMFLEX
+   * UTF-8: 0xc4 0x89
+   */
+  tickit_term_input_push_bytes(tt, "\xc4\x89", 2);
+
+  is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after push_bytes U+0109");
+  is_str(keystr,  "\xc4\x89",        "keystr after push_bytes U+0109");
 
   tickit_term_input_push_bytes(tt, "\e[A", 3);
 
