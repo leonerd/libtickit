@@ -52,6 +52,9 @@ PREFIX=/usr/local
 BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
 INCDIR=$(PREFIX)/include
+MANDIR=$(PREFIX)/share/man
+MAN3DIR=$(MANDIR)/man3
+MAN7DIR=$(MANDIR)/man7
 
 all: $(LIBRARY)
 
@@ -90,7 +93,7 @@ examples/%: examples/%.lo $(LIBRARY)
 	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $^
 
 .PHONY: install
-install: install-inc install-lib
+install: install-inc install-lib install-man
 	$(LIBTOOL) --mode=finish $(DESTDIR)$(LIBDIR)
 
 install-inc: $(HFILES)
@@ -103,3 +106,16 @@ install-inc: $(HFILES)
 install-lib: $(LIBRARY)
 	install -d $(DESTDIR)$(LIBDIR)
 	$(LIBTOOL) --mode=install install $(LIBRARY) $(DESTDIR)$(LIBDIR)/
+
+install-man:
+	install -d $(DESTDIR)$(MAN3DIR)
+	install -d $(DESTDIR)$(MAN7DIR)
+	for F in man/*.3; do \
+	  gzip <$$F >$(DESTDIR)$(MAN3DIR)/$${F#man/}.gz; \
+	done
+	for F in man/*.7; do \
+	  gzip <$$F >$(DESTDIR)$(MAN7DIR)/$${F#man/}.gz; \
+	done
+	while read FROM EQ TO; do \
+	  echo ln -sf $$TO.gz $(DESTDIR)$(MAN3DIR)/$$FROM.gz; \
+	done < man/also
