@@ -90,6 +90,8 @@ TickitTerm *tickit_term_new(void)
   return tickit_term_new_for_termtype(termtype);
 }
 
+void tickit_term_free(TickitTerm *tt);
+
 TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 {
   TickitTerm *tt = malloc(sizeof(TickitTerm));
