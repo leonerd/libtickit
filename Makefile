@@ -119,3 +119,8 @@ install-man:
 	while read FROM EQ TO; do \
 	  echo ln -sf $$TO.gz $(DESTDIR)$(MAN3DIR)/$$FROM.gz; \
 	done < man/also
+
+HTMLDIR=html
+
+htmldocs: $(BUILTMAN)
+	perl $(HOME)/src/perl/Parse-Man/examples/man-to-html.pl -O $(HTMLDIR) --file-extension tmpl --link-extension html --template home_lou.tt2 --also man/also man/*.3 man/*.7 --index index.tmpl
