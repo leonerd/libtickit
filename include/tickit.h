@@ -9,10 +9,10 @@
 
 /* bitmasks */
 typedef enum {
-  TICKIT_EV_RESIZE = 0x01, // lines, cols
-  TICKIT_EV_KEY    = 0x02, // type(TickitKeyEventType), str
-  TICKIT_EV_MOUSE  = 0x04, // type(TickitMouseEventType), button, line, col
-  TICKIT_EV_CHANGE = 0x08, // {none}
+  TICKIT_EV_RESIZE = 0x01, // Term = lines, cols
+  TICKIT_EV_KEY    = 0x02, // Term = type(TickitKeyEventType), str
+  TICKIT_EV_MOUSE  = 0x04, // Term = type(TickitMouseEventType), button, line, col
+  TICKIT_EV_CHANGE = 0x08, // Pen = {none}
 
   TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
 } TickitEventType;
