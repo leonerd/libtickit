@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
   tickit_term_goto(tt, 2, 0);
   for(int i = 0; i < 16; i++) {
-    tickit_pen_set_int_attr(pen, TICKIT_PEN_BG, i);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, i);
     tickit_term_setpen(tt, pen);
     tickit_term_printf(tt, "[%02d]", i);
   }
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
   for(int y = 0; y < 6; y++) {
     tickit_term_goto(tt, 6+y, 0);
     for(int x = 0; x < 36; x++) {
-      tickit_pen_set_int_attr(pen, TICKIT_PEN_BG, y*36 + x + 16);
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, y*36 + x + 16);
       tickit_term_setpen(tt, pen);
       tickit_term_print(tt, "  ");
     }
@@ -75,9 +75,9 @@ int main(int argc, char *argv[])
 
   tickit_term_goto(tt, 15, 0);
   for(int i = 0; i < 24; i++) {
-    tickit_pen_set_int_attr(pen, TICKIT_PEN_BG, 232 + i);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, 232 + i);
     if(i > 12)
-      tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 0);
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 0);
     tickit_term_setpen(tt, pen);
     tickit_term_printf(tt, "g%02d", i);
   }

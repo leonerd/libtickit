@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   tickit_term_goto(tt, 0, 0);
 
   for(int i = 0; i < 4; i++) {
-    tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, colours[i].val);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, colours[i].val);
     tickit_term_setpen(tt, pen);
     tickit_term_print(tt, "fg ");
     tickit_term_print(tt, colours[i].name);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
   /* ANSI high-brightness colours foreground */
   for(int i = 0; i < 4; i++) {
-    tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, colours[i].val+8);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, colours[i].val+8);
     tickit_term_setpen(tt, pen);
     tickit_term_print(tt, "fg hi-");
     tickit_term_print(tt, colours[i].name);
@@ -76,10 +76,10 @@ int main(int argc, char *argv[])
   /* ANSI colours background */
   tickit_term_goto(tt, 4, 0);
 
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_FG, 0);
+  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 0);
 
   for(int i = 0; i < 4; i++) {
-    tickit_pen_set_int_attr(pen, TICKIT_PEN_BG, colours[i].val);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, colours[i].val);
     tickit_term_setpen(tt, pen);
     tickit_term_print(tt, "bg ");
     tickit_term_print(tt, colours[i].name);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
   /* ANSI high-brightness colours background */
   for(int i = 0; i < 4; i++) {
-    tickit_pen_set_int_attr(pen, TICKIT_PEN_BG, colours[i].val+8);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, colours[i].val+8);
     tickit_term_setpen(tt, pen);
     tickit_term_print(tt, "bg hi-");
     tickit_term_print(tt, colours[i].name);
