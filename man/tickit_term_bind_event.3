@@ -1,0 +1,26 @@
+.TH TICKIT_TERM_BIND_EVENT 3
+.SH NAME
+tickit_term_bind_event, tickit_term_unbind_event_id \- add or remove event handlers
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "typedef void " TickitTermEventFn "(TickitTerm *" tt ", TickitEventType " ev ,
+.BI "    TickitEvent *" args ", void *" user );
+.sp
+.BI "int tickit_pen_bind_event(TickitPen *" tt ", TickitEventType " ev ,
+.BI "    TickitPenEventFn *" fn ", void *" user );
+.BI "void tickit_pen_unbind_event_id(TickitTerm *" tt ", int " id );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_bind_event\fP() adds a new event handler to the set of handlers stored by the terminal, and returns an integer to identify this handler. This handler will be invoked for any of the events given by the \fIev\fP bitmask. When invoked, \fIfunc\fP will be passed the terminal instance, an event bitmask, a pointer to a \fBTickitEvent\fP structure, and the data pointer it was installed with.
+.PP
+\fBtickit_term_unbind_event_id\fP() removes an event handler previously added, by the identifier returned when it was added.
+.SH "RETURN VALUE"
+\fBtickit_term_bind_event\fP() returns an identifier integer. \fBtickit_term_unbind_event_id\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term (7),
+.BR tickit (7)

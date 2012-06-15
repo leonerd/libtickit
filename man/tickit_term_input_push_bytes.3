@@ -1,0 +1,22 @@
+.TH TICKIT_TERM_INPUT_PUSH_BYTES 3
+.SH NAME
+tickit_term_input_push_bytes \- supply more input data
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_input_push_bytes(TickitTerm *" tt ", const char *" bytes ", size_t " len );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_push_input_bytes\fP() supplies more data to the terminal instance, as if it had been read from a terminal file descriptor. Calling this function may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked.
+.SH "RETURN VALUE"
+\fBtickit_term_input_push_bytes\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_input_readable (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

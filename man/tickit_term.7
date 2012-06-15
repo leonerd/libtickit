@@ -17,7 +17,7 @@ A terminal instance will need either an output function or an output filehandle 
 .SM UTF-8
 if enabled; either by detection of a
 .SM UTF-8
-locale, explicitly by calling \fBtickit_term_set_utf8\fP(3).
+locale, explicitly by calling \fBtickit_term_utf8\fP(3).
 .PP
 The size of the terminal can be queried using \fBtickit_term_get_size\fP(3), or forced to a given size by \fBtickit_term_set_size\fP(3). If the application is aware that the size of a terminal represented by a \fBtty\fP(7) filehandle has changed (for example due to receipt of a \fBSIGWINCH\fP signal), it can call \fBtickit_term_refresh_size\fP(3) to update it.
 .SH OUTPUT

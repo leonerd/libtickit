@@ -1,0 +1,22 @@
+.TH TICKIT_TERM_INPUT_WAIT 3
+.SH NAME
+tickit_term_input_wait \- read more data from the terminal
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_input_wait(TickitTerm *" tt );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_input_wait\fP() waits for at least one input event to be received. Calling this function may block if the underlying file descriptor is in blocking mode. It may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked.
+.SH "RETURN VALUE"
+\fBtickit_term_input_wait\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_input_readable (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

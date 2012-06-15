@@ -1,0 +1,29 @@
+.TH TICKIT_TERM_NEW 3
+.SH NAME
+tickit_term_new, tickit_term_destroy \- create or destroy a terminal instance
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitTerm *tickit_term_new(void);"
+.BI "TickitTerm *tickit_term_new_for_termtype(const char *" termtype );
+.BI "void tickit_term_destroy(TickitTerm *" tt );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_new\fP() creates a new \fBTickitTerm\fP instance for the terminal type given by the \fBTERM\fP environment variable.
+.PP
+\fBtickit_term_new_for_termtype\fP() creates a new \fBTickitTerm\fP instance for the given terminal type.
+.PP
+\fBtickit_term_destroy\fP() destroys the given instance and releases any resources controlled by it. It will unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate. It will not close any filehandles associated with the instance.
+.SH "RETURN VALUE"
+If successful, \fBtickit_term_new\fP() and \fBtickit_term_new_for_termtype\fP() return a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure. \fBtickit_term_destroy\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_set_output_fd (3),
+.BR tickit_term_set_output_func (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_print (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

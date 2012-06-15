@@ -1,0 +1,22 @@
+.TH TICKIT_TERM_INPUT_CHECK_TIMEOUT 3
+.SH NAME
+tickit_term_input_check_timeout \- terminal timeout behaviour
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_term_input_check_timeout(TickitTerm *" tt );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_input_check_timeout\fP() performs input-related timeout behaviour, used to handle multi-byte input events, the Escape key, and other things. It returns a value indicating the number of miliseconds of delay before it wishes to be called again. When called again, it may perform any timeout behaviours that are required, and either return another timeout delay, or -1 to indicate there is no longer a need for timeout. Calling it may result in \fBTICKIT_EV_KEY\fP events.
+.SH "RETURN VALUE"
+\fBtickit_term_input_check_timeout\fP() returns a number indicating a timeout delay in miliseconds.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_input_push_bytes (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

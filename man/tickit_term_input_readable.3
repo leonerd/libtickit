@@ -1,0 +1,22 @@
+.TH TICKIT_TERM_INPUT_READABLE 3
+.SH NAME
+tickit_term_input_readable \- read more data from the terminal
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_input_readable(TickitTerm *" tt );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_input_readable\fP() informs the terminal instance that more data is, or may be, available on the input file descriptor previously set with \fBtickit_term_set_input_fd\fP(), and reads it. Calling this function may block if the underlying file descriptor is in blocking mode. It may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked.
+.SH "RETURN VALUE"
+\fBtickit_term_input_readable\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_input_push_bytes (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

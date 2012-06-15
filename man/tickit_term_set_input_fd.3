@@ -1,0 +1,23 @@
+.TH TICKIT_TERM_SET_INPUT_FD 3
+.SH NAME
+tickit_term_set_input_fd, tickit_term_get_input_fd \- manage terminal input
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_set_input_fd(TickitTerm *" tt ", int " fd );
+.BI "int tickit_term_get_input_fd(TickitTerm *" tt );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_set_input_fd\fP() associates an input file descriptor with the terminal instance. This file descriptor will be used by \fBtickit_term_input_readable\fP(3) to read more data from the terminal, that may provide key or mouse events. The value -1 may be set to indicate an absence of a file descriptor.
+.PP
+\fBtickit_term_get_input_fd\fP() returns the currently associated input file descriptor, or -1 if none has been set.
+.SH "RETURN VALUE"
+\fBtickit_term_set_input_fd\fP() returns no value. \fBtickit_term_get_input_fd\fP() returns a file descriptor or -1.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

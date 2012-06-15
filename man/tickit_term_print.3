@@ -1,0 +1,25 @@
+.TH TICKIT_TERM_PRINT 3
+.SH NAME
+tickit_term_print \- send text to the terminal
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_print(TickitTerm *" tt ", const char *" str );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_print\fP() sends a string of text to the terminal to be printed at the current cursor location. The string must be free from any control characters.
+.SH "RETURN VALUE"
+\fBtickit_term_print\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_output_fd (3),
+.BR tickit_term_set_output_func (3),
+.BR tickit_term_goto (3),
+.BR tickit_term_setpen (3),
+.BR tickit_term_chpen (3),
+.BR tickit_term_erasech (3)
+.BR tickit_term (7),
+.BR tickit (7)

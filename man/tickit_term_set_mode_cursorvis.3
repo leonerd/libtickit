@@ -1,0 +1,22 @@
+.TH TICKIT_TERM_SET_MODE_CURSORVIS 3
+.SH NAME
+tickit_term_set_mode_cursorvis \- show or hide the terminal cursor
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_set_mode_cursorvis(TickitTerm *" tt ", int " on );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_set_mode_cursorvis\fP() controls the terminal's cursor visible mode. When enabled the location of the cursor is made visible by the terminal. When disabled the cursor position is not visible. Typically applications will hide the cursor while performing redrawing operations so as not to show a "flickering" effect as the cursor moves, and show it again when drawing is complete.
+.SH "RETURN VALUE"
+\fBtickit_term_set_mode_cursorvis\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_output_fd (3),
+.BR tickit_term_set_output_func (3),
+.BR tickit_term_goto (3),
+.BR tickit_term (7),
+.BR tickit (7)

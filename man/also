@@ -1,0 +1,9 @@
+tickit_term_new_for_termtype.3 = tickit_term_new.3
+tickit_term_destroy.3 = tickit_term_new.3
+tickit_term_unbind_event_id.3 = tickit_term_bind_event.3
+tickit_term_get_output_fd.3 = tickit_term_set_output_fd.3
+tickit_term_get_input_fd.3 = tickit_term_set_input_fd.3
+tickit_term_set_size.3 = tickit_term_get_size.3
+tickit_term_refresh_size.3 = tickit_term_get_size.3
+tickit_term_move.3 = tickit_term_goto.3
+tickit_term_setpen.3 = tickit_term_chpen.3

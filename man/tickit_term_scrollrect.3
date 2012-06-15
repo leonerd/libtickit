@@ -1,0 +1,24 @@
+.TH TICKIT_TERM_SCROLLRECT 3
+.SH NAME
+tickit_term_scrollrect \- scroll a region of the terminal
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_term_scrollrect(TickitTerm *" tt ", int " top ", int " left ", int " lines ", int " cols ",
+.BI "    int " downward ", int " rightward );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_scrollrect\fP() attempts to scroll a rectangular region of the terminal by a given offset, efficiently moving content within the display. Whether or not this is possible depends on the type of terminal and what region and offset were specified. This function returns a true value if this operation was successful. If it was not possible to perform the scroll, it will return false without modifying the terminal. In this situation, the application must fall back to re-drawing the affected region with new content.
+.SH "RETURN VALUE"
+\fBtickit_term_scrollrect\fP() returns a boolean indicating if the scrolling operation was successful.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_goto (3),
+.BR tickit_term_print (3),
+.BR tickit_term_setpen (3),
+.BR tickit_term_chpen (3),
+.BR tickit_term (7),
+.BR tickit (7)

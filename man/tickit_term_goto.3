@@ -1,0 +1,23 @@
+.TH TICKIT_TERM_GOTO 3
+.SH NAME
+tickit_term_goto, tickit_term_move \- move the terminal output cursor
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_goto(TickitTerm *" tt ", int " line ", int " col );
+.BI "void tickit_term_move(TickitTerm *" tt ", int " downward ", int " rightward );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_goto\fP() moves the terminal output cursor to the absolute position specified. Either \fIline\fP or \fIcol\fP may be specified as -1 to move within the line or column it is currently in.
+.PP
+\fBtickit_term_move\fP() moves the terminal output cursor relative to its current position. Either \fIdownward\fP or \fIrightward\fP may be specified as 0 to not move in that direction.
+.SH "RETURN VALUE"
+\fBtickit_term_goto\fP() and \fBtickit_term_move\fP return no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_print (3),
+.BR tickit_term (7),
+.BR tickit (7)
