@@ -48,6 +48,10 @@ struct TickitTerm {
   TermKey              *termkey;
   struct timeval        input_timeout_at; /* absolute time */
 
+  char *outbuffer;
+  size_t outbuffer_len; /* size of outbuffer */
+  size_t outbuffer_cur; /* current fill level */
+
   char *tmpbuffer;
   size_t tmpbuffer_len;
 
@@ -109,6 +113,10 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->termkey_flags = 0;
   tt->input_timeout_at.tv_sec = -1;
 
+  tt->outbuffer = NULL;
+  tt->outbuffer_len = 0;
+  tt->outbuffer_cur = 0;
+
   tt->tmpbuffer = NULL;
   tt->tmpbuffer_len = 0;
 
@@ -164,6 +172,9 @@ void tickit_term_free(TickitTerm *tt)
 
   if(tt->termkey)
     termkey_destroy(tt->termkey);
+
+  if(tt->outbuffer)
+    free(tt->outbuffer);
 
   if(tt->tmpbuffer)
     free(tt->tmpbuffer);
@@ -242,6 +253,18 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 {
   tt->outfunc      = fn;
   tt->outfunc_user = user;
+}
+
+void tickit_term_set_output_buffer(TickitTerm *tt, size_t len)
+{
+  void *buffer = len ? malloc(len) : NULL;
+
+  if(tt->outbuffer)
+    free(tt->outbuffer);
+
+  tt->outbuffer = buffer;
+  tt->outbuffer_len = len;
+  tt->outbuffer_cur = 0;
 }
 
 void tickit_term_set_input_fd(TickitTerm *tt, int fd)
@@ -406,12 +429,38 @@ void tickit_term_input_wait(TickitTerm *tt)
   }
 }
 
+void tickit_term_flush(TickitTerm *tt)
+{
+  if(tt->outbuffer_cur == 0)
+    return;
+
+  if(tt->outfunc)
+    (*tt->outfunc)(tt, tt->outbuffer, tt->outbuffer_cur, tt->outfunc_user);
+  else if(tt->outfd != -1) {
+    write(tt->outfd, tt->outbuffer, tt->outbuffer_cur);
+  }
+
+  tt->outbuffer_cur = 0;
+}
+
 static void write_str(TickitTerm *tt, const char *str, size_t len)
 {
   if(len == 0)
     len = strlen(str);
 
-  if(tt->outfunc) {
+  if(tt->outbuffer) {
+    while(len > 0) {
+      size_t space = tt->outbuffer_len - tt->outbuffer_cur;
+      if(len < space)
+        space = len;
+      memcpy(tt->outbuffer + tt->outbuffer_cur, str, space);
+      tt->outbuffer_cur += space;
+      len -= space;
+      if(tt->outbuffer_cur >= tt->outbuffer_len)
+        tickit_term_flush(tt);
+    }
+  }
+  else if(tt->outfunc) {
     (*tt->outfunc)(tt, str, len, tt->outfunc_user);
   }
   else if(tt->outfd != -1) {
@@ -427,7 +476,7 @@ static void write_str_rep(TickitTerm *tt, const char *str, size_t len, int repea
   if(repeat < 1)
     return;
 
-  if(tt->outfunc) {
+  if(tt->outfunc && !tt->outbuffer) {
     char *buffer = get_tmpbuffer(tt, len * repeat + 1);
     char *s = buffer;
     for(int i = 0; i < repeat; i++) {
@@ -436,10 +485,9 @@ static void write_str_rep(TickitTerm *tt, const char *str, size_t len, int repea
     }
     (*tt->outfunc)(tt, buffer, len * repeat, tt->outfunc_user);
   }
-  else if(tt->outfd != -1) {
-    for(int i = 0; i < repeat; i++) {
-      write(tt->outfd, str, len);
-    }
+  else {
+    for(int i = 0; i < repeat; i++)
+      write_str(tt, str, len);
   }
 }
 
