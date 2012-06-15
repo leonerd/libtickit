@@ -1,0 +1,22 @@
+.TH TICKIT_PEN_NEW 3
+.SH NAME
+tickit_pen_new, tickit_pen_destroy \- create or destroy a pen instance
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitPen *tickit_pen_new(void);"
+.BI "void tickit_pen_destroy(TickitPen *" pen );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_pen_new\fP() creates a new \fBTickitPen\fP instance. It initially has no attributes set.
+.PP
+\fBtickit_pen_destroy\fP() destroys the given instance and releases any resources controlled by it. It will unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate.
+.SH "RETURN VALUE"
+If successful, \fBtickit_pen_new\fP() returns a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure. \fBtickit_pen_destroy\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_pen_bind_event (3),
+.BR tickit_pen (7),
+.BR tickit (7)

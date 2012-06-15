@@ -1,0 +1,28 @@
+.TH TICKIT_PEN_COPY 3
+.SH NAME
+tickit_pen_copy, tickit_pen_copy_attr \- copy attributes from one pen to another
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_pen_copy(TickitPen *" dst ", TickitPen *" src ,
+.BI "    int " overwrite );
+.BI "void tickit_pen_copy_attr(TickitPen *" dst ", TickitPen *" src ,
+.BI "    TickitPenAttr " attr );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_pen_copy\fP() copies attributes that are defined on \fIsrc\fP into \fIdst\fP. If an attribute is already defined on \fIdst\fP then it will only be changed if \fIoverwrite\fP is true; otherwise the existing value will be left alone. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the \fIdst\fP pen instance if the value of at least one attribute has actually changed.
+.PP
+\fBtickit_pen_copy_attr\fP() copies the value of a single attribute from \fIsrc\fP into \fIdst\fP, or clears it in \fIdst\fP if it is not present in \fIsrc\fP. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the \fIdst\fP pen instance.
+.SH "RETURN VALUE"
+\fBtickit_pen_copy\fP() and \fBtickit_pen_copy_attr\fP() return no value.
+.SH "SEE ALSO"
+.BR tickit_pen_new (3),
+.BR tickit_pen_set_bool_attr (3),
+.BR tickit_pen_set_int_attr (3),
+.BR tickit_pen_set_colour_attr (3),
+.BR tickit_pen_clear_attr (3),
+.BR tickit_pen (7),
+.BR tickit (7)

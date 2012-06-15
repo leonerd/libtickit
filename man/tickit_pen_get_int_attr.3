@@ -1,0 +1,26 @@
+.TH TICKIT_PEN_GET_INT_ATTR 3
+.SH NAME
+tickit_pen_get_int_attr, tickit_pen_set_int_attr \- manipulate an integer pen attribute
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_pen_get_int_attr(TickitPen *" pen ", TickitPenAttr " attr );
+.BI "void tickit_pen_set_int_attr(TickitPen *" pen ", TickitPenAttr " attr ", int " val );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_pen_get_int_attr\fP() returns the current value of the given integer attribute on the pen, or -1 if that attribute is not defined.
+.PP
+\fBtickit_pen_set_int_attr\fP() provides a new value for the given integer attribute on the pen. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance.
+.SH "RETURN VALUE"
+\fBtickit_pen_get_int_attr\fP() returns an integer value. \fBtickit_pen_set_int_attr\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_pen_new (3),
+.BR tickit_pen_has_attr (3),
+.BR tickit_pen_set_bool_attr (3),
+.BR tickit_pen_set_colour_attr (3),
+.BR tickit_pen_clear_attr (3),
+.BR tickit_pen (7),
+.BR tickit (7)

@@ -13,9 +13,9 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_term_chpen\fP() changes the rendering attributes currently in effect in the terminal by setting those attributes specified in the given \fBTickitPen\fP instance. Attributes not present in \fIpen\fP remain unmodified by this operation.
 .PP
-\fBtickit_pen_setpen\fP() changes the rendering attributes currently in effect in the terminal by setting all of the attributes to those given in the \fBTickitPen\fP instance. Any attribute not present in \fIpen\fP is reset back to its default value.
+\fBtickit_term_setpen\fP() changes the rendering attributes currently in effect in the terminal by setting all of the attributes to those given in the \fBTickitPen\fP instance. Any attribute not present in \fIpen\fP is reset back to its default value.
 .SH "RETURN VALUE"
-\fBtickit_term_chpen\fP() and \fBtickit_pen_setpen\fP() return no value.
+\fBtickit_term_chpen\fP() and \fBtickit_term_setpen\fP() return no value.
 .SH "SEE ALSO"
 .BR tickit_term_new (3),
 .BR tickit_term_set_output_fd (3),
@@ -23,4 +23,5 @@ Link with \fI\-ltickit\fP.
 .BR tickit_term_goto (3),
 .BR tickit_term_print (3),
 .BR tickit_term (7),
+.BR tickit_pen (7),
 .BR tickit (7)
