@@ -48,6 +48,9 @@ struct TickitTerm {
   TermKey              *termkey;
   struct timeval        input_timeout_at; /* absolute time */
 
+  char *tmpbuffer;
+  size_t tmpbuffer_len;
+
   struct {
     unsigned int bce:1;
   } cap;
@@ -106,6 +109,9 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->termkey_flags = 0;
   tt->input_timeout_at.tv_sec = -1;
 
+  tt->tmpbuffer = NULL;
+  tt->tmpbuffer_len = 0;
+
   tt->mode.altscreen = 0;
   tt->mode.cursorvis = 1;
   tt->mode.mouse     = 0;
@@ -159,6 +165,9 @@ void tickit_term_free(TickitTerm *tt)
   if(tt->termkey)
     termkey_destroy(tt->termkey);
 
+  if(tt->tmpbuffer)
+    free(tt->tmpbuffer);
+
   free(tt);
 }
 
@@ -172,6 +181,18 @@ void tickit_term_destroy(TickitTerm *tt)
     tickit_term_set_mode_altscreen(tt, 0);
 
   tickit_term_free(tt);
+}
+
+static void *get_tmpbuffer(TickitTerm *tt, size_t len)
+{
+  if(tt->tmpbuffer_len < len) {
+    if(tt->tmpbuffer)
+      free(tt->tmpbuffer);
+    tt->tmpbuffer = malloc(len);
+    tt->tmpbuffer_len = len;
+  }
+
+  return tt->tmpbuffer;
 }
 
 void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols)
@@ -407,14 +428,13 @@ static void write_str_rep(TickitTerm *tt, const char *str, size_t len, int repea
     return;
 
   if(tt->outfunc) {
-    char *buffer = malloc(len * repeat + 1);
+    char *buffer = get_tmpbuffer(tt, len * repeat + 1);
     char *s = buffer;
     for(int i = 0; i < repeat; i++) {
       strncpy(s, str, len);
       s += len;
     }
     (*tt->outfunc)(tt, buffer, len * repeat, tt->outfunc_user);
-    free(buffer);
   }
   else if(tt->outfd != -1) {
     for(int i = 0; i < repeat; i++) {
@@ -434,12 +454,10 @@ static void write_vstrf(TickitTerm *tt, const char *fmt, va_list args)
     return;
   }
 
-  char *morebuffer = malloc(len + 1);
+  char *morebuffer = get_tmpbuffer(tt, len + 1);
   vsnprintf(morebuffer, len + 1, fmt, args);
 
   write_str(tt, morebuffer, len);
-
-  free(morebuffer);
 }
 
 static void write_strf(TickitTerm *tt, const char *fmt, ...)
@@ -629,7 +647,7 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
   if(pindex > 0)
     len--; /* Last one has no final separator */
 
-  char *buffer = malloc(len + 1);
+  char *buffer = get_tmpbuffer(tt, len + 1);
   char *s = buffer;
 
   s += sprintf(s, "\e[");
@@ -641,8 +659,6 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
   sprintf(s, "m");
 
   write_str(tt, buffer, len);
-
-  free(buffer);
 }
 
 void tickit_term_chpen(TickitTerm *tt, TickitPen *pen)
