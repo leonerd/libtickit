@@ -11,7 +11,7 @@ tickit_term_set_input_fd, tickit_term_get_input_fd \- manage terminal input
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_set_input_fd\fP() associates an input file descriptor with the terminal instance. This file descriptor will be used by \fBtickit_term_input_readable\fP(3) to read more data from the terminal, that may provide key or mouse events. The value -1 may be set to indicate an absence of a file descriptor.
+\fBtickit_term_set_input_fd\fP() associates an input file descriptor with the terminal instance. This file descriptor will be used by \fBtickit_term_input_readable\fP(3) to read more data from the terminal. The value -1 may be set to indicate an absence of a file descriptor. If no file descriptor is provided, input data may still be given by calling \fBtickit_term_input_push_bytes\fP(3).
 .PP
 \fBtickit_term_get_input_fd\fP() returns the currently associated input file descriptor, or -1 if none has been set.
 .SH "RETURN VALUE"

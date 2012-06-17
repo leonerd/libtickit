@@ -12,7 +12,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_term_erasech\fP() erases \fIcount\fP character cells forward from the current cursor location, using the current pen background colour.
 .PP
-Because some terminals cannot erase using the background colour, this operation may be implemented by printing spaces. The \fImoveend\fP parameter controls the behaviour of the cursor location when this function returns. If set to 1, the cursor will be moved to the end of the erased region. If set to 0, the cursor will be moved back to its original location. If set to -1, this function will take whichever behaviour is more optimal on the given terminal.
+Some terminals cannot erase using the background colour, so this operation may be implemented by printing spaces on such terminals. This will move the cursor to the end of the erased region. Other terminals that do erase with background colour can be erased without moving the cursor. The \fImoveend\fP parameter controls the behaviour of the cursor location when this function returns. If set to 1, the cursor will be moved to the end of the erased region if required. If set to 0, the cursor will be moved back to its original location if required. If set to -1, this function will take whichever behaviour is more optimal on the given terminal.
 .SH "RETURN VALUE"
 \fBtickit_term_erasech\fP() returns no value.
 .SH "SEE ALSO"

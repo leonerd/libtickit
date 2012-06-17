@@ -28,9 +28,12 @@ sequence, nor will it split a grapheme between its codepoints; it is therefore p
 .PP
 The \fIbytes\fP member counts
 .SM UTF-8
-bytes which encode individual codepoints; each codepoint is counted by the \fIcodepoints\fP member. For example the Unicode character
+bytes which encode individual codepoints. For example the Unicode character
 .SM U+00E9
 is encoded by two bytes 0xc3, 0xa9; it would increment the \fIbytes\fP counter by 2 and the \fIcodepoints\fP counter by 1.
+.PP
+.PP
+The \fIcodepoints\fP member counts individual Unicode codepoints.
 .PP
 The \fIgraphemes\fP member counts whole composed grahical clusters of codepoints, where combining accents which count as individual codepoints do not count as separate graphemes. For example, the codepoint sequence
 .SM "U+0065 U+0301"
@@ -42,7 +45,7 @@ The \fIcolumns\fP member counts the number of screen columns consumed by the gra
 .SM UTF-8
 sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold.
 .SH USAGE
-Typically, these function would be used either of two ways.
+Typically, these functions would be used either of two ways.
 .PP
 When given a value in \fIlimit.bytes\fP (or no limit and simply using string termination), \fBtickit_string_count\fP() will yield the width of the given string in terminal columns, in the \fIlimit.columns\fP field.
 .PP
