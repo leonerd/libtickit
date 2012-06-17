@@ -120,7 +120,7 @@ void tickit_term_flush(TickitTerm *tt);
 void tickit_term_set_input_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_input_fd(TickitTerm *tt);
 
-void tickit_term_utf8(TickitTerm *tt, int utf8);
+void tickit_term_set_utf8(TickitTerm *tt, int utf8);
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
 void tickit_term_input_readable(TickitTerm *tt);
