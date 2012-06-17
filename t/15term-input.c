@@ -27,10 +27,12 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  plan_tests(26);
+  plan_tests(27);
 
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_utf8(tt, 1);
+
+  ok(tickit_term_get_utf8(tt), "get_utf8 true");
 
   tickit_term_bind_event(tt, TICKIT_EV_KEY,   on_key,   NULL);
   tickit_term_bind_event(tt, TICKIT_EV_MOUSE, on_mouse, NULL);

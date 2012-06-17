@@ -281,6 +281,11 @@ int tickit_term_get_input_fd(TickitTerm *tt)
   return tt->infd;
 }
 
+int tickit_term_get_utf8(TickitTerm *tt)
+{
+  return tt->termkey_flags & TERMKEY_FLAG_UTF8;
+}
+
 void tickit_term_set_utf8(TickitTerm *tt, int utf8)
 {
   /* TODO: See what we can think of for the output side */

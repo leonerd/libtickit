@@ -1,6 +1,6 @@
 .TH TICKIT_TERM_SET_UTF8 3
 .SH NAME
-tickit_term_set_utf8 \- control
+tickit_term_set_utf8, tickit_term_get_utf8 \- control
 .SM UTF-8
 mode
 .SH SYNOPSIS
@@ -8,6 +8,7 @@ mode
 .B #include <tickit.h>
 .sp
 .BI "void tickit_term_set_utf8(TickitTerm *" tt ", int " utf8 );
+.BI "int tickit_term_get_utf8(TickitTerm *" tt );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
@@ -15,8 +16,12 @@ Link with \fI\-ltickit\fP.
 \fBtickit_term_set_utf8\fP() controls whether terminal input is processed according to
 .SM UTF-8
 rules, or legacy 8-bit single byte rules. If this function is not called explicitly, it will be detected automatically by inspecting locale variables.
+.PP
+\fBtickit_term_get_utf8\fP() returns the current value for
+.SM UTF-8
+support.
 .SH "RETURN VALUE"
-\fBtickit_term_set_utf8\fP() returns no value.
+\fBtickit_term_set_utf8\fP() returns no value. \fBtickit_term_get_utf8\fP() returns a boolean integer value.
 .SH "SEE ALSO"
 .BR tickit_term_new (3),
 .BR tickit_term (7),
