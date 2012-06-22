@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
   TickitStringPos pos, limit;
 
-  plan_tests(46);
+  plan_tests(48);
 
   is_int(tickit_string_count("hello", &pos, NULL), 5, "tickit_string_count ASCII");
   is_int(pos.bytes,      5, "tickit_string_count ASCII bytes");
@@ -88,6 +88,12 @@ int main(int argc, char *argv[])
   limit.columns = 2;
   is_int(tickit_string_count("A\xef\xbc\xa1", &pos, &limit), 1, "tickit_string_count column-limit split");
   is_int(pos.columns,    1, "tickit_string_count column-limit split grapheme");
+
+  /* C0 and C1 controls are errors */
+  tickit_stringpos_limit_bytes(&limit, -1);
+
+  is_int(tickit_string_count("\x1b", &pos, &limit), -1, "tickit_string_count -1 for C0");
+  is_int(tickit_string_count("\x9b", &pos, &limit), -1, "tickit_string_count -1 for C0");
 
   return exit_status();
 }
