@@ -124,34 +124,31 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->mode.cursorvis = 1;
   tt->mode.mouse     = 0;
 
-  tt->lines = 0;
-  tt->cols  = 0;
+  tt->cap.bce = 1;
+  tt->lines = 25;
+  tt->cols  = 80;
 
 #ifdef HAVE_UNIBILIUM
   {
     unibi_term *ut = unibi_from_term(termtype);
-    if(!ut) {
-      tickit_term_free(tt);
-      return NULL;
+    if(ut) {
+      tt->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
+
+      tt->lines = unibi_get_num(ut, unibi_lines);
+      tt->cols  = unibi_get_num(ut, unibi_columns);
+
+      unibi_destroy(ut);
     }
-
-    tt->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
-
-    tt->lines = unibi_get_num(ut, unibi_lines);
-    tt->cols  = unibi_get_num(ut, unibi_columns);
-
-    unibi_destroy(ut);
   }
 #else
   {
     int err;
-    if(setupterm((char*)termtype, 1, &err) != OK)
-      return 0;
+    if(setupterm((char*)termtype, 1, &err) == OK) {
+      tt->cap.bce = terminfo_bce();
 
-    tt->cap.bce = terminfo_bce();
-
-    tt->lines = terminfo_lines();
-    tt->cols  = terminfo_columns();
+      tt->lines = terminfo_lines();
+      tt->cols  = terminfo_columns();
+    }
   }
 #endif
 
