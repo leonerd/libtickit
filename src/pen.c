@@ -275,9 +275,8 @@ void tickit_pen_copy(TickitPen *dst, TickitPen *src, int overwrite)
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(!tickit_pen_has_attr(src, attr))
       continue;
-    if(tickit_pen_has_attr(dst, attr) && !overwrite)
-      continue;
-    if(tickit_pen_equiv_attr(src, dst, attr))
+    if(tickit_pen_has_attr(dst, attr) &&
+       (!overwrite || tickit_pen_equiv_attr(src, dst, attr)))
       continue;
 
     /* Avoid using copy_attr so it doesn't invoke change events yet */

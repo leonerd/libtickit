@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(39);
+  plan_tests(40);
 
   pen = tickit_pen_new();
 
@@ -104,6 +104,12 @@ int main(int argc, char *argv[])
   tickit_pen_copy(pen2, pen, 0);
 
   ok(!tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have non-equiv bold attribute after copy no overwrite");
+
+  tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 0);
+  tickit_pen_clear_attr(pen2, TICKIT_PEN_UNDER);
+  tickit_pen_copy(pen2, pen, 1);
+
+  ok(tickit_pen_has_attr(pen2, TICKIT_PEN_UNDER), "pen copy still copies present but default-value attributes");
 
   tickit_pen_destroy(pen);
   tickit_pen_destroy(pen2);
