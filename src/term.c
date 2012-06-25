@@ -203,7 +203,7 @@ static void *get_tmpbuffer(TickitTerm *tt, size_t len)
   return tt->tmpbuffer;
 }
 
-void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols)
+void tickit_term_get_size(const TickitTerm *tt, int *lines, int *cols)
 {
   if(lines)
     *lines = tt->lines;
@@ -241,7 +241,7 @@ void tickit_term_set_output_fd(TickitTerm *tt, int fd)
   tickit_term_refresh_size(tt);
 }
 
-int tickit_term_get_output_fd(TickitTerm *tt)
+int tickit_term_get_output_fd(const TickitTerm *tt)
 {
   return tt->outfd;
 }
@@ -273,12 +273,12 @@ void tickit_term_set_input_fd(TickitTerm *tt, int fd)
   (void)get_termkey(tt);
 }
 
-int tickit_term_get_input_fd(TickitTerm *tt)
+int tickit_term_get_input_fd(const TickitTerm *tt)
 {
   return tt->infd;
 }
 
-int tickit_term_get_utf8(TickitTerm *tt)
+int tickit_term_get_utf8(const TickitTerm *tt)
 {
   return tt->termkey_flags & TERMKEY_FLAG_UTF8;
 }
@@ -622,7 +622,7 @@ struct SgrOnOff { int on, off; } sgr_onoff[] = {
   { 10, 10 }, /* altfont */
 };
 
-static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
+static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
 {
   /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
    * 6 single attributes
@@ -711,12 +711,12 @@ static void do_pen(TickitTerm *tt, TickitPen *pen, int ignoremissing)
   write_str(tt, buffer, len);
 }
 
-void tickit_term_chpen(TickitTerm *tt, TickitPen *pen)
+void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
 {
   do_pen(tt, pen, 1);
 }
 
-void tickit_term_setpen(TickitTerm *tt, TickitPen *pen)
+void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
 {
   do_pen(tt, pen, 0);
 }

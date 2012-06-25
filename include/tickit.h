@@ -70,26 +70,26 @@ typedef enum {
 TickitPen *tickit_pen_new(void);
 void       tickit_pen_destroy(TickitPen *pen);
 
-int tickit_pen_has_attr(TickitPen *pen, TickitPenAttr attr);
-int tickit_pen_is_nonempty(TickitPen *pen);
-int tickit_pen_is_nondefault(TickitPen *pen);
+int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr);
+int tickit_pen_is_nonempty(const TickitPen *pen);
+int tickit_pen_is_nondefault(const TickitPen *pen);
 
-int  tickit_pen_get_bool_attr(TickitPen *pen, TickitPenAttr attr);
+int  tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
-int  tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr);
+int  tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
-int  tickit_pen_get_colour_attr(TickitPen *pen, TickitPenAttr attr);
+int  tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int value);
 int  tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *value);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 
-int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr);
+int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr);
 
-void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr);
-void tickit_pen_copy(TickitPen *dst, TickitPen *src, int overwrite);
+void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr);
+void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite);
 
 typedef void TickitPenEventFn(TickitPen *tt, TickitEventType ev, TickitEvent *args, void *data);
 
@@ -110,7 +110,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_destroy(TickitTerm *tt);
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
-int  tickit_term_get_output_fd(TickitTerm *tt);
+int  tickit_term_get_output_fd(const TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
 void tickit_term_set_output_buffer(TickitTerm *tt, size_t len);
 
@@ -118,9 +118,9 @@ void tickit_term_flush(TickitTerm *tt);
 
 /* fd is allowed to be unset (-1); works abstractly */
 void tickit_term_set_input_fd(TickitTerm *tt, int fd);
-int  tickit_term_get_input_fd(TickitTerm *tt);
+int  tickit_term_get_input_fd(const TickitTerm *tt);
 
-int  tickit_term_get_utf8(TickitTerm *tt);
+int  tickit_term_get_utf8(const TickitTerm *tt);
 void tickit_term_set_utf8(TickitTerm *tt, int utf8);
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
@@ -128,7 +128,7 @@ void tickit_term_input_readable(TickitTerm *tt);
 int  tickit_term_input_check_timeout(TickitTerm *tt);
 void tickit_term_input_wait(TickitTerm *tt);
 
-void tickit_term_get_size(TickitTerm *tt, int *lines, int *cols);
+void tickit_term_get_size(const TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
 void tickit_term_refresh_size(TickitTerm *tt);
 
@@ -142,8 +142,8 @@ void tickit_term_goto(TickitTerm *tt, int line, int col);
 void tickit_term_move(TickitTerm *tt, int downward, int rightward);
 int  tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward);
 
-void tickit_term_chpen(TickitTerm *tt, TickitPen *pen);
-void tickit_term_setpen(TickitTerm *tt, TickitPen *pen);
+void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen);
+void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen);
 
 void tickit_term_clear(TickitTerm *tt);
 void tickit_term_erasech(TickitTerm *tt, int count, int moveend);

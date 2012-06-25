@@ -53,7 +53,7 @@ void tickit_pen_destroy(TickitPen *pen)
   free(pen);
 }
 
-int tickit_pen_has_attr(TickitPen *pen, TickitPenAttr attr)
+int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   switch(attr) {
     case TICKIT_PEN_FG:      return pen->valid.fg;
@@ -72,7 +72,7 @@ int tickit_pen_has_attr(TickitPen *pen, TickitPenAttr attr)
   return 0;
 }
 
-int tickit_pen_is_nonempty(TickitPen *pen)
+int tickit_pen_is_nonempty(const TickitPen *pen)
 {
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(tickit_pen_has_attr(pen, attr))
@@ -81,7 +81,7 @@ int tickit_pen_is_nonempty(TickitPen *pen)
   return 0;
 }
 
-int tickit_pen_is_nondefault(TickitPen *pen)
+int tickit_pen_is_nondefault(const TickitPen *pen)
 {
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(!tickit_pen_has_attr(pen, attr))
@@ -104,7 +104,7 @@ int tickit_pen_is_nondefault(TickitPen *pen)
   return 0;
 }
 
-int tickit_pen_get_bool_attr(TickitPen *pen, TickitPenAttr attr)
+int tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
     return 0;
@@ -134,7 +134,7 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val)
   run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
-int tickit_pen_get_int_attr(TickitPen *pen, TickitPenAttr attr)
+int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
     return -1;
@@ -157,7 +157,7 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
 }
 
 /* Cheat and pretend the index of a colour attribute is a number attribute */
-int tickit_pen_get_colour_attr(TickitPen *pen, TickitPenAttr attr)
+int tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
     return -1;
@@ -238,7 +238,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
   run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
-int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr)
+int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr)
 {
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_BOOL:
@@ -252,7 +252,7 @@ int tickit_pen_equiv_attr(TickitPen *a, TickitPen *b, TickitPenAttr attr)
   return 0;
 }
 
-void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr)
+void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr)
 {
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_BOOL:
@@ -269,7 +269,7 @@ void tickit_pen_copy_attr(TickitPen *dst, TickitPen *src, TickitPenAttr attr)
   return;
 }
 
-void tickit_pen_copy(TickitPen *dst, TickitPen *src, int overwrite)
+void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite)
 {
   int changed = 0;
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
