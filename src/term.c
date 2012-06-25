@@ -731,7 +731,10 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
   if(count < 1)
     return;
 
-  if(tt->cap.bce) {
+  /* Even if the terminal can do bce, only use ECH if we're not in
+   * reverse-video mode. Most terminals don't do rv+ECH properly
+   */
+  if(tt->cap.bce && !tickit_pen_get_bool_attr(tt->pen, TICKIT_PEN_REVERSE)) {
     if(count == 1)
       write_str(tt, "\e[X", 3);
     else
