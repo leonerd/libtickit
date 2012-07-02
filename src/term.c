@@ -60,10 +60,6 @@ struct TickitTerm {
   TickitTermDriver *driver;
 
   struct {
-    unsigned int bce:1;
-  } cap;
-
-  struct {
     unsigned int altscreen:1;
     unsigned int cursorvis:1;
     unsigned int mouse:1;
@@ -134,7 +130,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->mode.cursorvis = 1;
   tt->mode.mouse     = 0;
 
-  tt->cap.bce = 1;
+  tt->driver->cap.bce = 1;
   tt->lines = 25;
   tt->cols  = 80;
 
@@ -142,7 +138,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   {
     unibi_term *ut = unibi_from_term(termtype);
     if(ut) {
-      tt->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
+      tt->driver->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
 
       tt->lines = unibi_get_num(ut, unibi_lines);
       tt->cols  = unibi_get_num(ut, unibi_columns);
@@ -154,7 +150,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   {
     int err;
     if(setupterm((char*)termtype, 1, &err) == OK) {
-      tt->cap.bce = terminfo_bce();
+      tt->driver->cap.bce = terminfo_bce();
 
       tt->lines = terminfo_lines();
       tt->cols  = terminfo_columns();
@@ -214,6 +210,12 @@ static void *get_tmpbuffer(TickitTerm *tt, size_t len)
   }
 
   return tt->tmpbuffer;
+}
+
+/* Driver API */
+void *tickit_termdrv_get_tmpbuffer(TickitTermDriver *ttd, size_t len)
+{
+  return get_tmpbuffer(ttd->tt, len);
 }
 
 void tickit_term_get_size(const TickitTerm *tt, int *lines, int *cols)
@@ -482,6 +484,11 @@ static void write_str(TickitTerm *tt, const char *str, size_t len)
     write(tt->outfd, str, len);
   }
 }
+/* Driver API */
+void tickit_termdrv_write_str(TickitTermDriver *ttd, const char *str, size_t len)
+{
+  write_str(ttd->tt, str, len);
+}
 
 static void write_vstrf(TickitTerm *tt, const char *fmt, va_list args)
 {
@@ -500,200 +507,33 @@ static void write_vstrf(TickitTerm *tt, const char *fmt, va_list args)
   write_str(tt, morebuffer, len);
 }
 
-static void write_strf(TickitTerm *tt, const char *fmt, ...)
+/* Driver API */
+void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
-  write_vstrf(tt, fmt, args);
+  write_vstrf(ttd->tt, fmt, args);
   va_end(args);
 }
 
 void tickit_term_print(TickitTerm *tt, const char *str)
 {
-  write_str(tt, str, strlen(str));
+  (*tt->driver->vtable->print)(tt->driver, str);
 }
 
 void tickit_term_goto(TickitTerm *tt, int line, int col)
 {
-  if(line != -1 && col > 0)
-    write_strf(tt, "\e[%d;%dH", line+1, col+1);
-  else if(line != -1 && col == 0)
-    write_strf(tt, "\e[%dH", line+1);
-  else if(line != -1)
-    write_strf(tt, "\e[%dd", line+1);
-  else if(col > 0)
-    write_strf(tt, "\e[%dG", col+1);
-  else if(col != -1)
-    write_str(tt, "\e[G", 3);
+  (*tt->driver->vtable->goto_abs)(tt->driver, line, col);
 }
 
 void tickit_term_move(TickitTerm *tt, int downward, int rightward)
 {
-  if(downward > 1)
-    write_strf(tt, "\e[%dB", downward);
-  else if(downward == 1)
-    write_str(tt, "\e[B", 3);
-  else if(downward == -1)
-    write_str(tt, "\e[A", 3);
-  else if(downward < -1)
-    write_strf(tt, "\e[%dA", -downward);
-
-  if(rightward > 1)
-    write_strf(tt, "\e[%dC", rightward);
-  else if(rightward == 1)
-    write_str(tt, "\e[C", 3);
-  else if(rightward == -1)
-    write_str(tt, "\e[D", 3);
-  else if(rightward < -1)
-    write_strf(tt, "\e[%dD", -rightward);
-}
-
-static void insertch(TickitTerm *tt, int count)
-{
-  if(count == 1)
-    write_str(tt, "\e[@", 3);
-  else if(count > 1)
-    write_strf(tt, "\e[%d@", count);
-}
-
-static void deletech(TickitTerm *tt, int count)
-{
-  if(count == 1)
-    write_str(tt, "\e[P", 3);
-  else if(count > 1)
-    write_strf(tt, "\e[%dP", count);
+  (*tt->driver->vtable->move_rel)(tt->driver, downward, rightward);
 }
 
 int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
 {
-  if(!downward && !rightward)
-    return 1;
-
-  if(left == 0 && cols == tt->cols && rightward == 0) {
-    write_strf(tt, "\e[%d;%dr", top + 1, top + lines);
-    tickit_term_goto(tt, top, left);
-    if(downward > 0) {
-      if(downward > 1)
-        write_strf(tt, "\e[%dM", downward); /* DL */
-      else
-        write_str(tt, "\e[M", 3);
-    }
-    else {
-      if(downward < -1)
-        write_strf(tt, "\e[%dL", -downward); /* IL */
-      else
-        write_str(tt, "\e[L", 3);
-    }
-    write_str(tt, "\e[r", 3);
-    return 1;
-  }
-
-  if(left + cols == tt->cols && downward == 0) {
-    for(int line = top; line < top + lines; line++) {
-      tickit_term_goto(tt, line, left);
-      if(rightward > 0)
-        insertch(tt,  rightward);
-      else
-        deletech(tt, -rightward);
-    }
-  }
-
-  return 0;
-}
-
-struct SgrOnOff { int on, off; } sgr_onoff[] = {
-  { 30, 39 }, /* fg */
-  { 40, 49 }, /* bg */
-  {  1, 22 }, /* bold */
-  {  4, 24 }, /* under */
-  {  3, 23 }, /* italic */
-  {  7, 27 }, /* reverse */
-  {  9, 29 }, /* strike */
-  { 10, 10 }, /* altfont */
-};
-
-static void do_pen(TickitTerm *tt, const TickitPen *delta)
-{
-  /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
-   * 6 single attributes
-   */
-  int params[12];
-  int pindex = 0;
-
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
-    if(!tickit_pen_has_attr(delta, attr))
-      continue;
-
-    struct SgrOnOff *onoff = &sgr_onoff[attr];
-
-    int val;
-
-    switch(attr) {
-    case TICKIT_PEN_FG:
-    case TICKIT_PEN_BG:
-      val = tickit_pen_get_colour_attr(delta, attr);
-      if(val < 0)
-        params[pindex++] = onoff->off;
-      else if(val < 8)
-        params[pindex++] = onoff->on + val;
-      else if(val < 16)
-        params[pindex++] = onoff->on+60 + val-8;
-      else {
-        params[pindex++] = (onoff->on+8) | 0x80000000;
-        params[pindex++] = 5 | 0x80000000;
-        params[pindex++] = val;
-      }
-      break;
-
-    case TICKIT_PEN_ALTFONT:
-      val = tickit_pen_get_int_attr(delta, attr);
-      if(val < 0 || val >= 10)
-        params[pindex++] = onoff->off;
-      else
-        params[pindex++] = onoff->on + val;
-      break;
-
-    case TICKIT_PEN_BOLD:
-    case TICKIT_PEN_UNDER:
-    case TICKIT_PEN_ITALIC:
-    case TICKIT_PEN_REVERSE:
-    case TICKIT_PEN_STRIKE:
-      val = tickit_pen_get_bool_attr(delta, attr);
-      params[pindex++] = val ? onoff->on : onoff->off;
-      break;
-
-    case TICKIT_N_PEN_ATTRS:
-      break;
-    }
-  }
-
-  if(pindex == 0)
-    return;
-
-  /* If we're going to clear all the attributes then empty SGR is neater */
-  if(!tickit_pen_is_nondefault(tt->pen))
-    pindex = 0;
-
-  /* Render params[] into a CSI string */
-
-  size_t len = 3; /* ESC [ ... m */
-  for(int i = 0; i < pindex; i++)
-    len += snprintf(NULL, 0, "%d", params[i]&0x7fffffff) + 1;
-  if(pindex > 0)
-    len--; /* Last one has no final separator */
-
-  char *buffer = get_tmpbuffer(tt, len + 1);
-  char *s = buffer;
-
-  s += sprintf(s, "\e[");
-  for(int i = 0; i < pindex-1; i++)
-    /* TODO: Work out what terminals support :s */
-    s += sprintf(s, "%d%c", params[i]&0x7fffffff, ';');
-  if(pindex > 0)
-    s += sprintf(s, "%d", params[pindex-1]&0x7fffffff);
-  sprintf(s, "m");
-
-  write_str(tt, buffer, len);
+  return (*tt->driver->vtable->scrollrect)(tt->driver, top, left, lines, cols, downward, rightward);
 }
 
 void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
@@ -711,7 +551,7 @@ void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
     tickit_pen_copy_attr(delta, pen, attr);
   }
 
-  do_pen(tt, delta);
+  (*tt->driver->vtable->chpen)(tt->driver, delta, tt->pen);
 
   tickit_pen_destroy(delta);
 }
@@ -728,44 +568,25 @@ void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
     tickit_pen_copy_attr(delta, pen, attr);
   }
 
-  do_pen(tt, delta);
+  (*tt->driver->vtable->chpen)(tt->driver, delta, tt->pen);
 
   tickit_pen_destroy(delta);
 }
 
+/* Driver API */
+TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd)
+{
+  return ttd->tt->pen;
+}
+
 void tickit_term_clear(TickitTerm *tt)
 {
-  write_strf(tt, "\e[2J", 4);
+  (*tt->driver->vtable->clear)(tt->driver);
 }
 
 void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
 {
-  if(count < 1)
-    return;
-
-  /* Even if the terminal can do bce, only use ECH if we're not in
-   * reverse-video mode. Most terminals don't do rv+ECH properly
-   */
-  if(tt->cap.bce && !tickit_pen_get_bool_attr(tt->pen, TICKIT_PEN_REVERSE)) {
-    if(count == 1)
-      write_str(tt, "\e[X", 3);
-    else
-      write_strf(tt, "\e[%dX", count);
-
-    if(moveend == 1)
-      tickit_term_move(tt, 0, count);
-  }
-  else {
-     /* TODO: benchmark it and find out a suitable number for 20
-     */
-    if(count > 20)
-      write_strf(tt, "%*s", count, "");
-    else 
-      write_str(tt, "                    ", count);
-
-    if(moveend == 0)
-      tickit_term_move(tt, 0, -count);
-  }
+  (*tt->driver->vtable->erasech)(tt->driver, count, moveend);
 }
 
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on)
