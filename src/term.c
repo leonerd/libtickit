@@ -483,29 +483,6 @@ static void write_str(TickitTerm *tt, const char *str, size_t len)
   }
 }
 
-static void write_str_rep(TickitTerm *tt, const char *str, size_t len, int repeat)
-{
-  if(len == 0)
-    len = strlen(str);
-
-  if(repeat < 1)
-    return;
-
-  if(tt->outfunc && !tt->outbuffer) {
-    char *buffer = get_tmpbuffer(tt, len * repeat + 1);
-    char *s = buffer;
-    for(int i = 0; i < repeat; i++) {
-      strncpy(s, str, len);
-      s += len;
-    }
-    (*tt->outfunc)(tt, buffer, len * repeat, tt->outfunc_user);
-  }
-  else {
-    for(int i = 0; i < repeat; i++)
-      write_str(tt, str, len);
-  }
-}
-
 static void write_vstrf(TickitTerm *tt, const char *fmt, va_list args)
 {
   /* It's likely the output will fit in, say, 64 bytes */
@@ -779,13 +756,12 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
       tickit_term_move(tt, 0, count);
   }
   else {
-    /* For small counts this is probably more efficient than write_str_rep()
-     * TODO: benchmark it and find out
+     /* TODO: benchmark it and find out a suitable number for 20
      */
-    if(count <= 8)
-      write_str(tt, "        ", count);
-    else
-      write_str_rep(tt, " ", 1, count);
+    if(count > 20)
+      write_strf(tt, "%*s", count, "");
+    else 
+      write_str(tt, "                    ", count);
 
     if(moveend == 0)
       tickit_term_move(tt, 0, -count);
