@@ -1,5 +1,7 @@
 #include "tickit.h"
+
 #include "hooklists.h"
+#include "termdriver.h"
 
 /* We need C99 vsnprintf() semantics */
 #define _ISOC99_SOURCE
@@ -54,6 +56,8 @@ struct TickitTerm {
 
   char *tmpbuffer;
   size_t tmpbuffer_len;
+
+  TickitTermDriver *driver;
 
   struct {
     unsigned int bce:1;
@@ -120,6 +124,12 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->tmpbuffer = NULL;
   tt->tmpbuffer_len = 0;
 
+  /* TODO: driver integration */
+  tt->driver = malloc(sizeof(TickitTermDriver));
+  tt->driver->vtable = &xterm_vtable;
+  tt->driver->tt = tt;
+  /* /TODO */
+
   tt->mode.altscreen = 0;
   tt->mode.cursorvis = 1;
   tt->mode.mouse     = 0;
@@ -175,6 +185,9 @@ void tickit_term_free(TickitTerm *tt)
 
   if(tt->tmpbuffer)
     free(tt->tmpbuffer);
+
+  if(tt->driver)
+    (*tt->driver->vtable->destroy)(tt->driver);
 
   free(tt);
 }
