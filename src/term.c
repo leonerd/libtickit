@@ -622,7 +622,7 @@ struct SgrOnOff { int on, off; } sgr_onoff[] = {
   { 10, 10 }, /* altfont */
 };
 
-static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
+static void do_pen(TickitTerm *tt, const TickitPen *delta)
 {
   /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
    * 6 single attributes
@@ -631,13 +631,8 @@ static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
   int pindex = 0;
 
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
-    if(!tickit_pen_has_attr(pen, attr) && ignoremissing)
+    if(!tickit_pen_has_attr(delta, attr))
       continue;
-
-    if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
-      continue;
-
-    tickit_pen_copy_attr(tt->pen, pen, attr);
 
     struct SgrOnOff *onoff = &sgr_onoff[attr];
 
@@ -646,7 +641,7 @@ static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
     switch(attr) {
     case TICKIT_PEN_FG:
     case TICKIT_PEN_BG:
-      val = tickit_pen_get_colour_attr(pen, attr);
+      val = tickit_pen_get_colour_attr(delta, attr);
       if(val < 0)
         params[pindex++] = onoff->off;
       else if(val < 8)
@@ -661,7 +656,7 @@ static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
       break;
 
     case TICKIT_PEN_ALTFONT:
-      val = tickit_pen_get_int_attr(pen, attr);
+      val = tickit_pen_get_int_attr(delta, attr);
       if(val < 0 || val >= 10)
         params[pindex++] = onoff->off;
       else
@@ -673,7 +668,7 @@ static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
     case TICKIT_PEN_ITALIC:
     case TICKIT_PEN_REVERSE:
     case TICKIT_PEN_STRIKE:
-      val = tickit_pen_get_bool_attr(pen, attr);
+      val = tickit_pen_get_bool_attr(delta, attr);
       params[pindex++] = val ? onoff->on : onoff->off;
       break;
 
@@ -713,12 +708,39 @@ static void do_pen(TickitTerm *tt, const TickitPen *pen, int ignoremissing)
 
 void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
 {
-  do_pen(tt, pen, 1);
+  TickitPen *delta = tickit_pen_new();
+
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    if(!tickit_pen_has_attr(pen, attr))
+      continue;
+
+    if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
+      continue;
+
+    tickit_pen_copy_attr(tt->pen, pen, attr);
+    tickit_pen_copy_attr(delta, pen, attr);
+  }
+
+  do_pen(tt, delta);
+
+  tickit_pen_destroy(delta);
 }
 
 void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
 {
-  do_pen(tt, pen, 0);
+  TickitPen *delta = tickit_pen_new();
+
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
+      continue;
+
+    tickit_pen_copy_attr(tt->pen, pen, attr);
+    tickit_pen_copy_attr(delta, pen, attr);
+  }
+
+  do_pen(tt, delta);
+
+  tickit_pen_destroy(delta);
 }
 
 void tickit_term_clear(TickitTerm *tt)
