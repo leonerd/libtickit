@@ -59,12 +59,6 @@ struct TickitTerm {
 
   TickitTermDriver *driver;
 
-  struct {
-    unsigned int altscreen:1;
-    unsigned int cursorvis:1;
-    unsigned int mouse:1;
-  } mode;
-
   int lines;
   int cols;
 
@@ -124,11 +118,11 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->driver = malloc(sizeof(TickitTermDriver));
   tt->driver->vtable = &xterm_vtable;
   tt->driver->tt = tt;
-  /* /TODO */
 
-  tt->mode.altscreen = 0;
-  tt->mode.cursorvis = 1;
-  tt->mode.mouse     = 0;
+  tt->driver->mode.altscreen = 0;
+  tt->driver->mode.cursorvis = 1;
+  tt->driver->mode.mouse     = 0;
+  /* /TODO */
 
   tt->driver->cap.bce = 1;
   tt->lines = 25;
@@ -173,6 +167,9 @@ void tickit_term_free(TickitTerm *tt)
   tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
   tickit_pen_destroy(tt->pen);
 
+  if(tt->driver)
+    (*tt->driver->vtable->destroy)(tt->driver);
+
   if(tt->termkey)
     termkey_destroy(tt->termkey);
 
@@ -182,21 +179,11 @@ void tickit_term_free(TickitTerm *tt)
   if(tt->tmpbuffer)
     free(tt->tmpbuffer);
 
-  if(tt->driver)
-    (*tt->driver->vtable->destroy)(tt->driver);
-
   free(tt);
 }
 
 void tickit_term_destroy(TickitTerm *tt)
 {
-  if(tt->mode.mouse)
-    tickit_term_set_mode_mouse(tt, 0);
-  if(!tt->mode.cursorvis)
-    tickit_term_set_mode_cursorvis(tt, 1);
-  if(tt->mode.altscreen)
-    tickit_term_set_mode_altscreen(tt, 0);
-
   tickit_term_free(tt);
 }
 
@@ -591,27 +578,15 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
 
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on)
 {
-  if(!tt->mode.altscreen == !on)
-    return;
-
-  write_str(tt, on ? "\e[?1049h" : "\e[?1049l", 0);
-  tt->mode.altscreen = !!on;
+  (*tt->driver->vtable->set_mode)(tt->driver, TICKIT_TERMMODE_ALTSCREEN, on);
 }
 
 void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on)
 {
-  if(!tt->mode.cursorvis == !on)
-    return;
-
-  write_str(tt, on ? "\e[?25h" : "\e[?25l", 0);
-  tt->mode.cursorvis = !!on;
+  (*tt->driver->vtable->set_mode)(tt->driver, TICKIT_TERMMODE_CURSORVIS, on);
 }
 
 void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
 {
-  if(!tt->mode.mouse == !on)
-    return;
-
-  write_str(tt, on ? "\e[?1002h" : "\e[?1002l", 0);
-  tt->mode.mouse = !!on;
+  (*tt->driver->vtable->set_mode)(tt->driver, TICKIT_TERMMODE_MOUSE, on);
 }

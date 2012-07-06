@@ -4,11 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void destroy(TickitTermDriver *ttd)
-{
-  free(ttd);
-}
-
 static void print(TickitTermDriver *ttd, const char *str)
 {
   tickit_termdrv_write_str(ttd, str, strlen(str));
@@ -235,6 +230,44 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   tickit_termdrv_write_str(ttd, buffer, len);
 }
 
+void set_mode(TickitTermDriver *ttd, TickitTermDriverMode mode, int value)
+{
+  switch(mode) {
+    case TICKIT_TERMMODE_ALTSCREEN:
+      if(!ttd->mode.altscreen == !value)
+        return;
+
+      tickit_termdrv_write_str(ttd, value ? "\e[?1049h" : "\e[?1049l", 0);
+      ttd->mode.altscreen = !!value;
+      break;
+    case TICKIT_TERMMODE_CURSORVIS:
+      if(!ttd->mode.cursorvis == !value)
+        return;
+
+      tickit_termdrv_write_str(ttd, value ? "\e[?25h" : "\e[?25l", 0);
+      ttd->mode.cursorvis = !!value;
+      break;
+    case TICKIT_TERMMODE_MOUSE:
+      if(!ttd->mode.mouse == !value)
+        return;
+
+      tickit_termdrv_write_str(ttd, value ? "\e[?1002h" : "\e[?1002l", 0);
+      ttd->mode.mouse = !!value;
+  }
+}
+
+static void destroy(TickitTermDriver *ttd)
+{
+  if(ttd->mode.mouse)
+    set_mode(ttd, TICKIT_TERMMODE_MOUSE, 0);
+  if(!ttd->mode.cursorvis)
+    set_mode(ttd, TICKIT_TERMMODE_CURSORVIS, 1);
+  if(ttd->mode.altscreen)
+    set_mode(ttd, TICKIT_TERMMODE_ALTSCREEN, 0);
+
+  free(ttd);
+}
+
 TickitTermDriverVTable xterm_vtable = {
   .destroy    = destroy,
   .print      = print,
@@ -244,4 +277,5 @@ TickitTermDriverVTable xterm_vtable = {
   .erasech    = erasech,
   .clear      = clear,
   .chpen      = chpen,
+  .set_mode   = set_mode,
 };
