@@ -289,7 +289,7 @@ void set_mode(TickitTermDriver *ttd, TickitTermDriverMode mode, int value)
       if(!xd->mode.mouse == !value)
         return;
 
-      tickit_termdrv_write_str(ttd, value ? "\e[?1002h" : "\e[?1002l", 0);
+      tickit_termdrv_write_str(ttd, value ? "\e[?1002h\e[?1006h" : "\e[?1002l\e[?1006l", 0);
       xd->mode.mouse = !!value;
   }
 }
