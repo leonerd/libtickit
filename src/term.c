@@ -115,9 +115,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->tmpbuffer_len = 0;
 
   /* TODO: driver integration */
-  tt->driver = malloc(sizeof(TickitTermDriver));
-  tt->driver->vtable = &xterm_vtable;
-  tt->driver->tt = tt;
+  tt->driver = (*xterm_probe.new)(tt);
 
   tt->driver->mode.altscreen = 0;
   tt->driver->mode.cursorvis = 1;

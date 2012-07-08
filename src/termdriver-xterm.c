@@ -279,3 +279,16 @@ TickitTermDriverVTable xterm_vtable = {
   .chpen      = chpen,
   .set_mode   = set_mode,
 };
+
+static TickitTermDriver *new(TickitTerm *tt)
+{
+  TickitTermDriver *ttd = malloc(sizeof(TickitTermDriver));
+  ttd->vtable = &xterm_vtable;
+  ttd->tt = tt;
+
+  return ttd;
+}
+
+TickitTermDriverProbe xterm_probe = {
+  .new = new,
+};

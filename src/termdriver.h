@@ -40,4 +40,8 @@ void tickit_termdrv_write_str(TickitTermDriver *ttd, const char *str, size_t len
 void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...);
 TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd);
 
-extern TickitTermDriverVTable xterm_vtable;
+typedef struct {
+  TickitTermDriver *(*new)(TickitTerm *tt);
+} TickitTermDriverProbe;
+
+extern TickitTermDriverProbe xterm_probe;
