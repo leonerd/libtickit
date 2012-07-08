@@ -19,25 +19,6 @@
 #define MSEC      1000
 #define SECOND 1000000
 
-#ifdef HAVE_UNIBILIUM
-# include "unibilium.h"
-#else
-# include <curses.h>
-# include <term.h>
-
-/* term.h has defined 'lines' as a macro. Eugh. We'd really rather prefer it
- * didn't pollute our namespace so we'll provide some functions here and then
- * #undef the name pollution
- */
-static inline int terminfo_bce(void)     { return back_color_erase; }
-static inline int terminfo_lines(void)   { return lines; }
-static inline int terminfo_columns(void) { return columns; }
-
-# undef back_color_erase
-# undef lines
-# undef columns
-#endif
-
 #include <termkey.h>
 
 struct TickitTerm {
@@ -114,41 +95,13 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->tmpbuffer = NULL;
   tt->tmpbuffer_len = 0;
 
-  /* TODO: driver integration */
-  tt->driver = (*xterm_probe.new)(tt);
-
-  tt->driver->mode.altscreen = 0;
-  tt->driver->mode.cursorvis = 1;
-  tt->driver->mode.mouse     = 0;
-  /* /TODO */
-
-  tt->driver->cap.bce = 1;
+  /* Initially; the driver may provide a more accurate value */
   tt->lines = 25;
   tt->cols  = 80;
 
-#ifdef HAVE_UNIBILIUM
-  {
-    unibi_term *ut = unibi_from_term(termtype);
-    if(ut) {
-      tt->driver->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
-
-      tt->lines = unibi_get_num(ut, unibi_lines);
-      tt->cols  = unibi_get_num(ut, unibi_columns);
-
-      unibi_destroy(ut);
-    }
-  }
-#else
-  {
-    int err;
-    if(setupterm((char*)termtype, 1, &err) == OK) {
-      tt->driver->cap.bce = terminfo_bce();
-
-      tt->lines = terminfo_lines();
-      tt->cols  = terminfo_columns();
-    }
-  }
-#endif
+  /* TODO: driver integration */
+  tt->driver = (*xterm_probe.new)(tt, termtype);
+  /* /TODO */
 
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal

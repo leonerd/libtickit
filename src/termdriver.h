@@ -23,16 +23,6 @@ typedef struct {
 struct TickitTermDriver {
   TickitTerm *tt;
   TickitTermDriverVTable *vtable;
-
-  struct {
-    unsigned int altscreen:1;
-    unsigned int cursorvis:1;
-    unsigned int mouse:1;
-  } mode;
-
-  struct {
-    unsigned int bce:1;
-  } cap;
 };
 
 void *tickit_termdrv_get_tmpbuffer(TickitTermDriver *ttd, size_t len);
@@ -41,7 +31,7 @@ void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...);
 TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd);
 
 typedef struct {
-  TickitTermDriver *(*new)(TickitTerm *tt);
+  TickitTermDriver *(*new)(TickitTerm *tt, const char *termtype);
 } TickitTermDriverProbe;
 
 extern TickitTermDriverProbe xterm_probe;
