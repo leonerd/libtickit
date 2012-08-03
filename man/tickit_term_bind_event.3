@@ -8,9 +8,9 @@ tickit_term_bind_event, tickit_term_unbind_event_id \- add or remove event handl
 .BI "typedef void " TickitTermEventFn "(TickitTerm *" tt ", TickitEventType " ev ,
 .BI "    TickitEvent *" args ", void *" user );
 .sp
-.BI "int tickit_pen_bind_event(TickitPen *" tt ", TickitEventType " ev ,
-.BI "    TickitPenEventFn *" fn ", void *" user );
-.BI "void tickit_pen_unbind_event_id(TickitTerm *" tt ", int " id );
+.BI "int tickit_term_bind_event(TickitTerm *" tt ", TickitEventType " ev ,
+.BI "    TickitTermEventFn *" fn ", void *" user );
+.BI "void tickit_term_unbind_event_id(TickitTerm *" tt ", int " id );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
