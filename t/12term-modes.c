@@ -40,14 +40,14 @@ int main(int argc, char *argv[])
   buffer[0] = 0;
   tickit_term_set_mode_mouse(tt, 1);
 
-  is_str_escape(buffer, "\e[?1002h", "buffer after set_mode_mouse on");
+  is_str_escape(buffer, "\e[?1002h\e[?1006h", "buffer after set_mode_mouse on");
 
   buffer[0] = 0;
   tickit_term_destroy(tt);
 
   ok(1, "tickit_term_destroy");
 
-  is_str_escape(buffer, "\e[?1002l\e[?25h\e[?1049l", "buffer after termkey_term_destroy resets modes");
+  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l", "buffer after termkey_term_destroy resets modes");
 
   return exit_status();
 }
