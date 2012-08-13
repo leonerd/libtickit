@@ -99,16 +99,16 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->lines = 25;
   tt->cols  = 80;
 
-  /* TODO: driver integration */
-  tt->driver = (*xterm_probe.new)(tt, termtype);
-  /* /TODO */
-
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
    */
   tt->pen = tickit_pen_new();
 
   tt->hooks = NULL;
+
+  /* TODO: driver integration */
+  tt->driver = (*xterm_probe.new)(tt, termtype);
+  /* /TODO */
 
   return tt;
 }
