@@ -154,12 +154,15 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
       move_rel(ttd, 0, count);
   }
   else {
-     /* TODO: benchmark it and find out a suitable number for 20
+     /* TODO: consider tickit_termdrv_write_chrfill(ttd, c, n)
      */
-    if(count > 20)
-      tickit_termdrv_write_strf(ttd, "%*s", count, "");
-    else 
-      tickit_termdrv_write_str(ttd, "                    ", count);
+    char *spaces = tickit_termdrv_get_tmpbuffer(ttd, 64);
+    memset(spaces, ' ', 64);
+    while(count > 64) {
+      tickit_termdrv_write_str(ttd, spaces, 64);
+      count -= 64;
+    }
+    tickit_termdrv_write_str(ttd, spaces, count);
 
     if(moveend == 0)
       move_rel(ttd, 0, -count);

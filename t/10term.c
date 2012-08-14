@@ -161,7 +161,6 @@ int main(int argc, char *argv[])
   tickit_term_erasech(tt, 3, 1);
   is_str_escape(buffer, "   ", "buffer after tickit_term_erasech 3 move");
 
-  /* also test write_str_rep() */
   buffer[0] = 0;
   tickit_term_erasech(tt, 10, 1);
 
