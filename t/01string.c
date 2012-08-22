@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
   TickitStringPos pos, limit;
 
-  plan_tests(48);
+  plan_tests(58);
 
   is_int(tickit_string_count("hello", &pos, NULL), 5, "tickit_string_count ASCII");
   is_int(pos.bytes,      5, "tickit_string_count ASCII bytes");
@@ -31,6 +31,15 @@ int main(int argc, char *argv[])
   is_int(pos.graphemes,  4, "tickit_string_count UTF-8 combining graphemes");
   is_int(pos.columns,    4, "tickit_string_count UTF-8 combining columns");
 
+  /* U+5F61 - CJK UNIFIED IDEOGRAPH-5F61
+   * 0xe5 0xbd 0xa1
+   */
+  is_int(tickit_string_count("\xe5\xbd\xa1", &pos, NULL), 3, "tickit_string_count UTF-8 CJK");
+  is_int(pos.bytes,      3, "tickit_string_count UTF-8 CJK bytes");
+  is_int(pos.codepoints, 1, "tickit_string_count UTF-8 CJK codepoints");
+  is_int(pos.graphemes,  1, "tickit_string_count UTF-8 CJK graphemes");
+  is_int(pos.columns,    2, "tickit_string_count UTF-8 CJK columns");
+
   /* U+FF21 - FULLWIDTH LATIN CAPITAL LETTER A
    * 0xef 0xbc 0xa1
    */
@@ -39,6 +48,14 @@ int main(int argc, char *argv[])
   is_int(pos.codepoints, 1, "tickit_string_count UTF-8 fullwidth codepoints");
   is_int(pos.graphemes,  1, "tickit_string_count UTF-8 fullwidth graphemes");
   is_int(pos.columns,    2, "tickit_string_count UTF-8 fullwidth columns");
+
+  /* And now a nice long string */
+  is_int(tickit_string_count("(\xe3\x83\x8e\xe0\xb2\x0a\xe7\xb2\xa0)\xe3\x83\x8e\xe5\xbd\xa1\xe2\x94\xbb\xe2\x94\x81\xe2\x94\xbb", &pos, NULL),
+      26, "tickit_string_count UTF-8 string");
+  is_int(pos.bytes,      26, "tickit_string_count UTF-8 string bytes");
+  is_int(pos.codepoints, 10, "tickit_string_count UTF-8 string codepoints");
+  is_int(pos.graphemes,  10, "tickit_string_count UTF-8 string graphemes");
+  is_int(pos.columns,    14, "tickit_string_count UTF-8 string columns");
 
   /* Now with some limits */
 
