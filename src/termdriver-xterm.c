@@ -21,6 +21,7 @@ static inline int terminfo_columns(void) { return columns; }
 # undef back_color_erase
 # undef lines
 # undef columns
+# undef clear
 #endif
 
 
