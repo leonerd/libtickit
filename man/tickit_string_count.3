@@ -43,7 +43,7 @@ The \fIcolumns\fP member counts the number of screen columns consumed by the gra
 .PP
 \fBtickit_string_countmore\fP() is similar to \fBtickit_string_count\fP() except it will not zero any of the counters before it starts. It can continue counting where a previous call finished. In particular, it will assume that it is starting at the beginning of a
 .SM UTF-8
-sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold.
+sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold. It will still begin at the start of \fIstr\fP, not at the offset given by \fIpos.bytes\fP.
 .SH USAGE
 Typically, these functions would be used either of two ways.
 .PP
@@ -51,7 +51,7 @@ When given a value in \fIlimit.bytes\fP (or no limit and simply using string ter
 .PP
 When given a value in \fIlimit.columns\fP, \fBtickit_string_count\fP() will yield the number of bytes of that string that will consume the given space on the terminal.
 .SH "RETURN VALUE"
-\fBtickit_string_count\fP() and \fBtickit_string_countmore\fP() return the number of bytes they have skipped over.
+\fBtickit_string_count\fP() and \fBtickit_string_countmore\fP() return the number of bytes they have skipped over this call.
 .SH "SEE ALSO"
 .BR tickit_stringpos_zero (3),
 .BR tickit_stringpos_limit_bytes (3),

@@ -49,10 +49,11 @@ size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitSt
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
   TickitStringPos here = *pos;
+  size_t start_bytes = pos->bytes;
 
-  while(str[here.bytes]) {
+  while(*str) {
     uint32_t cp;
-    int bytes = next_utf8(str + here.bytes, &cp);
+    int bytes = next_utf8(str, &cp);
     if(bytes == -1)
       return -1;
 
@@ -77,14 +78,16 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
     if(limit && limit->columns != -1 && here.columns + width > limit->columns)
       break;
 
+    str += bytes;
+
     here.bytes += bytes;
     here.codepoints += 1;
     here.graphemes += is_grapheme;
     here.columns += width;
   }
 
-  if(str[here.bytes] == 0) // Commit on the final grapheme
+  if(*str == 0) // Commit on the final grapheme
     *pos = here;
 
-  return pos->bytes;
+  return pos->bytes - start_bytes;
 }
