@@ -2,12 +2,6 @@
 
 typedef struct TickitTermDriver TickitTermDriver;
 
-typedef enum {
-  TICKIT_TERMCTL_ALTSCREEN = 1,
-  TICKIT_TERMCTL_CURSORVIS,
-  TICKIT_TERMCTL_MOUSE,
-} TickitTermDriverCtl;
-
 typedef struct {
   void (*destroy)(TickitTermDriver *ttd);
   void (*print)(TickitTermDriver *ttd, const char *str);

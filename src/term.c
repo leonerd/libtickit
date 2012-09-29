@@ -539,17 +539,22 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
   (*tt->driver->vtable->erasech)(tt->driver, count, moveend);
 }
 
+int tickit_term_setctl_int(TickitTerm *tt, TickitTermDriverCtl ctl, int value)
+{
+  return (*tt->driver->vtable->setctl_int)(tt->driver, ctl, value);
+}
+
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on)
 {
-  (*tt->driver->vtable->setctl_int)(tt->driver, TICKIT_TERMCTL_ALTSCREEN, on);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, on);
 }
 
 void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on)
 {
-  (*tt->driver->vtable->setctl_int)(tt->driver, TICKIT_TERMCTL_CURSORVIS, on);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, on);
 }
 
 void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
 {
-  (*tt->driver->vtable->setctl_int)(tt->driver, TICKIT_TERMCTL_MOUSE, on);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, on);
 }
