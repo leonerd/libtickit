@@ -541,15 +541,15 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
 
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on)
 {
-  (*tt->driver->vtable->set_mode)(tt->driver, TICKIT_TERMMODE_ALTSCREEN, on);
+  (*tt->driver->vtable->setctl_int)(tt->driver, TICKIT_TERMCTL_ALTSCREEN, on);
 }
 
 void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on)
 {
-  (*tt->driver->vtable->set_mode)(tt->driver, TICKIT_TERMMODE_CURSORVIS, on);
+  (*tt->driver->vtable->setctl_int)(tt->driver, TICKIT_TERMCTL_CURSORVIS, on);
 }
 
 void tickit_term_set_mode_mouse(TickitTerm *tt, int on)
 {
-  (*tt->driver->vtable->set_mode)(tt->driver, TICKIT_TERMMODE_MOUSE, on);
+  (*tt->driver->vtable->setctl_int)(tt->driver, TICKIT_TERMCTL_MOUSE, on);
 }
