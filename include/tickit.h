@@ -109,6 +109,8 @@ TickitTerm *tickit_term_new(void);
 TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_destroy(TickitTerm *tt);
 
+const char *tickit_term_get_termtype(TickitTerm *tt);
+
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_output_fd(const TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);

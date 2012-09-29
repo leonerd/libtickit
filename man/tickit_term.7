@@ -19,7 +19,7 @@ if enabled; either by detection of a
 .SM UTF-8
 locale, explicitly by calling \fBtickit_term_set_utf8\fP(3).
 .PP
-The size of the terminal can be queried using \fBtickit_term_get_size\fP(3), or forced to a given size by \fBtickit_term_set_size\fP(3). If the application is aware that the size of a terminal represented by a \fBtty\fP(7) filehandle has changed (for example due to receipt of a \fBSIGWINCH\fP signal), it can call \fBtickit_term_refresh_size\fP(3) to update it.
+The size of the terminal can be queried using \fBtickit_term_get_size\fP(3), or forced to a given size by \fBtickit_term_set_size\fP(3). If the application is aware that the size of a terminal represented by a \fBtty\fP(7) filehandle has changed (for example due to receipt of a \fBSIGWINCH\fP signal), it can call \fBtickit_term_refresh_size\fP(3) to update it. The type of the terminal is set at construction time but can be queried later using \fBtickit_term_get_termtype\fP(3).
 .SH OUTPUT
 Once an output method is defined, a terminal instance can be used for outputting drawing and other commands. For drawing, the functions \fBtickit_term_print\fP(3), \fBtickit_term_goto\fP(3), \fBtickit_term_move\fP(3), \fBtickit_term_scrollrect\fP(3), \fBtickit_term_chpen\fP(3), \fBtickit_term_setpen\fP(3), \fBtickit_term_clear\fP(3) and \fBtickit_term_erasech\fP(3) can be used. Additionally for setting modes, the functions \fBtickit_term_set_mode_altscreen\fP(3), \fBtickit_term_set_mode_cursorvis\fP(3) and \fBtickit_term_set_mode_mouse\fP(3) can be used. If an output buffer is defined it will need to be flushed when drawing is complete by calling \fBtickit_term_flush\fP(3).
 .SH INPUT
