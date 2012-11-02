@@ -21,7 +21,6 @@ static inline int terminfo_columns(void) { return columns; }
 # undef back_color_erase
 # undef lines
 # undef columns
-# undef clear
 #endif
 
 
@@ -170,7 +169,8 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
   }
 }
 
-static void clear(TickitTermDriver *ttd)
+/* clear() may collide with something from curses.h or term.h */
+static void ttd_clear(TickitTermDriver *ttd)
 {
   tickit_termdrv_write_strf(ttd, "\e[2J", 4);
 }
@@ -322,7 +322,7 @@ TickitTermDriverVTable xterm_vtable = {
   .move_rel   = move_rel,
   .scrollrect = scrollrect,
   .erasech    = erasech,
-  .clear      = clear,
+  .clear      = ttd_clear,
   .chpen      = chpen,
   .setctl_int = setctl_int,
 };
