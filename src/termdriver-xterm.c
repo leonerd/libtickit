@@ -270,7 +270,7 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   tickit_termdrv_write_str(ttd, buffer, len);
 }
 
-static int setctl_int(TickitTermDriver *ttd, TickitTermDriverCtl ctl, int value)
+static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 

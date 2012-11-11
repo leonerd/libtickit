@@ -154,9 +154,9 @@ typedef enum {
   TICKIT_TERMCTL_ALTSCREEN = 1,
   TICKIT_TERMCTL_CURSORVIS,
   TICKIT_TERMCTL_MOUSE,
-} TickitTermDriverCtl;
+} TickitTermCtl;
 
-int tickit_term_setctl_int(TickitTerm *tt, TickitTermDriverCtl ctl, int value);
+int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
 
 void tickit_term_set_mode_altscreen(TickitTerm *tt, int on);
 void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on);
