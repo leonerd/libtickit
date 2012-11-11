@@ -30,6 +30,7 @@ struct XTermDriver {
   struct {
     unsigned int altscreen:1;
     unsigned int cursorvis:1;
+    unsigned int cursorblink:1;
     unsigned int mouse:1;
   } mode;
 
@@ -282,6 +283,7 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       tickit_termdrv_write_str(ttd, value ? "\e[?1049h" : "\e[?1049l", 0);
       xd->mode.altscreen = !!value;
       return 1;
+
     case TICKIT_TERMCTL_CURSORVIS:
       if(!xd->mode.cursorvis == !value)
         return 1;
@@ -289,6 +291,15 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       tickit_termdrv_write_str(ttd, value ? "\e[?25h" : "\e[?25l", 0);
       xd->mode.cursorvis = !!value;
       return 1;
+
+    case TICKIT_TERMCTL_CURSORBLINK:
+      /* We don't actually know whether this was enabled initially, so best
+       * just to always apply this
+       */
+      tickit_termdrv_write_str(ttd, value ? "\e[?12h" : "\e[?12l", 0);
+      xd->mode.cursorblink = !!value;
+      return 1;
+
     case TICKIT_TERMCTL_MOUSE:
       if(!xd->mode.mouse == !value)
         return 1;

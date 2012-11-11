@@ -151,9 +151,11 @@ void tickit_term_clear(TickitTerm *tt);
 void tickit_term_erasech(TickitTerm *tt, int count, int moveend);
 
 typedef enum {
+  /* This is part of the API so additions must go at the end only */
   TICKIT_TERMCTL_ALTSCREEN = 1,
   TICKIT_TERMCTL_CURSORVIS,
   TICKIT_TERMCTL_MOUSE,
+  TICKIT_TERMCTL_CURSORBLINK,
 } TickitTermCtl;
 
 int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);

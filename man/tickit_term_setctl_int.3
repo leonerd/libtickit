@@ -21,6 +21,9 @@ The value is a boolean indicating whether the terminal alternate buffer mode sho
 .B TICKIT_TERMCTL_CURSORVIS
 The value is a boolean indicating whether the terminal text cursor should be visible. When disabled the cursor position is not visible. Typically applications will hide the cursor while performing redrawing operations so as not to show a flickering effect as the cursor moves, and show it again when drawing is complete.
 .TP
+.B TICKIT_TERMCTL_CURSORBLINK
+The value is a boolean indicating whether the terminal text cursor should blink. When disabled, the cursor will appear in a steady state, if visible. When enabled, the cursor will appear blinking, if visible. If the cursor is invisible, this should not have any effect.
+.TP
 .B TICKIT_TERMCTL_MOUSE
 The value is a boolean controlling the terminal's mouse tracking mode. When enabled, mouse button clicks, drags, releases and wheel scrolls are reported via \fBTICKIT_EV_MOUSE\fP events.
 .SH "RETURN VALUE"
