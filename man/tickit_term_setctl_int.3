@@ -1,0 +1,31 @@
+.TH TICKIT_TERM_SETCTL_INT 3
+.SH NAME
+tickit_term_setctl_int \- set an integer terminal control
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ",int " value );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. The options are given in an enumeration called \fBTickitTermCtl\fP.
+.PP
+The following control values are recognised:
+.in
+.TP
+.B TICKIT_TERMCTL_ALTSCREEN
+The value is a boolean indicating whether the terminal alternate buffer mode should be enabled. When enabled, a temporary buffer is used for drawing, preserving the original contents of the screen. This mode is usually used by full-screen applications to preserve the shell's scrollback state.
+.TP
+.B TICKIT_TERMCTL_CURSORVIS
+The value is a boolean indicating whether the terminal text cursor should be visible. When disabled the cursor position is not visible. Typically applications will hide the cursor while performing redrawing operations so as not to show a flickering effect as the cursor moves, and show it again when drawing is complete.
+.TP
+.B TICKIT_TERMCTL_MOUSE
+The value is a boolean controlling the terminal's mouse tracking mode. When enabled, mouse button clicks, drags, releases and wheel scrolls are reported via \fBTICKIT_EV_MOUSE\fP events.
+.SH "RETURN VALUE"
+\fBtickit_term_setctl_int\fP() returns a true value if it recognised the requested control and managed to request the terminal to change it; false if not.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term (7),
+.BR tickit (7)
