@@ -48,6 +48,8 @@ struct TickitTerm {
   int lines;
   int cols;
 
+  int started;
+
   TickitPen *pen;
 
   struct TickitEventHook *hooks;
@@ -117,8 +119,8 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->driver = (*xterm_probe.new)(tt, termtype);
   /* /TODO */
 
-  if(tt->driver->vtable->start)
-    (*tt->driver->vtable->start)(tt->driver);
+  // Can't 'start' yet until we have an output method
+  tt->started = 0;
 
   return tt;
 }
@@ -211,6 +213,12 @@ void tickit_term_set_output_fd(TickitTerm *tt, int fd)
   tt->outfd = fd;
 
   tickit_term_refresh_size(tt);
+
+  if(!tt->started) {
+    if(tt->driver->vtable->start)
+      (*tt->driver->vtable->start)(tt->driver);
+    tt->started = 1;
+  }
 }
 
 int tickit_term_get_output_fd(const TickitTerm *tt)
@@ -222,6 +230,12 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
 {
   tt->outfunc      = fn;
   tt->outfunc_user = user;
+
+  if(!tt->started) {
+    if(tt->driver->vtable->start)
+      (*tt->driver->vtable->start)(tt->driver);
+    tt->started = 1;
+  }
 }
 
 void tickit_term_set_output_buffer(TickitTerm *tt, size_t len)
