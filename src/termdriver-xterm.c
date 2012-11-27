@@ -307,6 +307,10 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       tickit_termdrv_write_str(ttd, value ? "\e[?1002h\e[?1006h" : "\e[?1002l\e[?1006l", 0);
       xd->mode.mouse = !!value;
       return 1;
+
+    case TICKIT_TERMCTL_CURSORSHAPE:
+      tickit_termdrv_write_strf(ttd, "\e[%d q", value * 2 + (xd->mode.cursorblink ? -1 : 0));
+      return 1;
   }
 
   return 0;

@@ -156,7 +156,14 @@ typedef enum {
   TICKIT_TERMCTL_CURSORVIS,
   TICKIT_TERMCTL_MOUSE,
   TICKIT_TERMCTL_CURSORBLINK,
+  TICKIT_TERMCTL_CURSORSHAPE,
 } TickitTermCtl;
+
+typedef enum {
+  TICKIT_TERM_CURSORSHAPE_BLOCK = 1,
+  TICKIT_TERM_CURSORSHAPE_UNDER,
+  TICKIT_TERM_CURSORSHAPE_LEFT_BAR,
+} TickitTermCursorShape;
 
 int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
 
