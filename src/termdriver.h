@@ -4,6 +4,8 @@ typedef struct TickitTermDriver TickitTermDriver;
 
 typedef struct {
   void (*destroy)(TickitTermDriver *ttd);
+  void (*start)(TickitTermDriver *ttd);
+  void (*stop)(TickitTermDriver *ttd);
   void (*print)(TickitTermDriver *ttd, const char *str);
   void (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   void (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);

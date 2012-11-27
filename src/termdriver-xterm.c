@@ -316,7 +316,7 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
   return 0;
 }
 
-static void destroy(TickitTermDriver *ttd)
+static void stop(TickitTermDriver *ttd)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
@@ -326,12 +326,18 @@ static void destroy(TickitTermDriver *ttd)
     setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
   if(xd->mode.altscreen)
     setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
+}
+
+static void destroy(TickitTermDriver *ttd)
+{
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   free(xd);
 }
 
 TickitTermDriverVTable xterm_vtable = {
   .destroy    = destroy,
+  .stop       = stop,
   .print      = print,
   .goto_abs   = goto_abs,
   .move_rel   = move_rel,

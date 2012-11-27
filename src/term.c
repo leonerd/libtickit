@@ -117,6 +117,9 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->driver = (*xterm_probe.new)(tt, termtype);
   /* /TODO */
 
+  if(tt->driver->vtable->start)
+    (*tt->driver->vtable->start)(tt->driver);
+
   return tt;
 }
 
@@ -125,8 +128,12 @@ void tickit_term_free(TickitTerm *tt)
   tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
   tickit_pen_destroy(tt->pen);
 
-  if(tt->driver)
+  if(tt->driver) {
+    if(tt->driver->vtable->stop)
+      (*tt->driver->vtable->stop)(tt->driver);
+
     (*tt->driver->vtable->destroy)(tt->driver);
+  }
 
   if(tt->termkey)
     termkey_destroy(tt->termkey);
