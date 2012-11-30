@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
    * pipe() can make us one */
   pipe(fd);
 
-  plan_tests(8);
+  plan_tests(9);
 
   tt = tickit_term_new_for_termtype("xterm");
 
@@ -23,6 +23,12 @@ int main(int argc, char *argv[])
   tickit_term_set_output_fd(tt, fd[1]);
 
   is_int(tickit_term_get_output_fd(tt), fd[1], "tickit_term_get_output_fd");
+
+  /* Already it should have written its DECSLRM probe string */
+  len = read(fd[0], buffer, sizeof buffer);
+  buffer[len] = 0;
+
+  is_str_escape(buffer, "\e[?69h\e[?69$p", "buffer after initialisation contains DECSLRM probe");
 
   tickit_term_print(tt, "Hello world!");
 

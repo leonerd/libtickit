@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(38);
+  plan_tests(46);
 
   tt = tickit_term_new_for_termtype("xterm");
   ok(!!tt, "tickit_term_new_for_termtype");
@@ -122,7 +122,22 @@ int main(int argc, char *argv[])
 
   is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 1, 0), 0, "tickit_term cannot scroll partial lines vertically");
 
-  is_int(tickit_term_scrollrect(tt, 3, 10, 1, 60, 0, 1), 0, "tickit_term cannot scroll partial lines horizontally");
+  is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 0, 1), 0, "tickit_term cannot scroll partial lines horizontally");
+
+  /* Now (belatedly) respond to the DECSLRM probe to enable more scrollrect options */
+  tickit_term_input_push_bytes(tt, "\e[?69;1$y", 9);
+
+  buffer[0] = 0;
+  is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 1, 0), 1, "tickit_term can scroll partial lines vertically with DECSLRM enabled");
+  is_str_escape(buffer, "\e[4;8r\e[11;70s\e[4;11H\e[M\e[r\e[s", "buffer after tickit_term_scroll lines 3-7 cols 10-69 down");
+
+  buffer[0] = 0;
+  is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 0, 1), 1, "tickit_term can scroll partial lines horizontally with DECSLRM enabled");
+  is_str_escape(buffer, "\e[4;8r\e[11;70s\e[4;11H\e['~\e[r\e[s", "buffer after tickit_term_scroll lines 3-7 cols 10-69 right");
+
+  buffer[0] = 0;
+  is_int(tickit_term_scrollrect(tt, 3, 10, 1, 60, 0, 1), 1, "tickit_term can scroll partial lines horizontally with DECSLRM enabled");
+  is_str_escape(buffer, "\e[;70s\e[4;11H\e[@\e[s", "buffer after tickit_term_scroll line 3 cols 10-69 right");
 
   buffer[0] = 0;
   tickit_term_clear(tt);
