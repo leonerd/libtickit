@@ -33,7 +33,7 @@ The event types recognised are:
 The terminal has been resized. The \fIargs\fP structure gives the new size of the terminal in the \fIlines\fP and \fIcols\fP fields.
 .TP
 .B TICKIT_EV_KEY
-A key has been pressed on the keyboard. The \fIargs\fP structure gives details of the key event with \fItype\fP taking the value \fBTICKIT_KEYEV_KEY\fP for symbolic or function keys, or \fBTICKIT_KEYEV_TEXT\fP for regular Unicode characters. \fIstr\fB will contain the name of the special key, including any applied modifiers, or a
+A key has been pressed on the keyboard. The \fIargs\fP structure gives details of the key event with \fItype\fP taking the value \fBTICKIT_KEYEV_KEY\fP for symbolic or function keys, or \fBTICKIT_KEYEV_TEXT\fP for regular Unicode characters. \fIstr\fP will contain the name of the special key, including any applied modifiers, or a
 .SM UTF-8
 string of the Unicode character.
 .TP
