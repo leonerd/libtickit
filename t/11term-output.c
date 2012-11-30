@@ -120,6 +120,10 @@ int main(int argc, char *argv[])
   tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, -5);
   is_str_escape(buffer, "\e[7;11H\e[5P\e[8;11H\e[5P", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 left");
 
+  is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 1, 0), 0, "tickit_term cannot scroll partial lines vertically");
+
+  is_int(tickit_term_scrollrect(tt, 3, 10, 1, 60, 0, 1), 0, "tickit_term cannot scroll partial lines horizontally");
+
   buffer[0] = 0;
   tickit_term_clear(tt);
   is_str_escape(buffer, "\e[2J", "buffer after tickit_term_clear");
