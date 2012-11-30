@@ -1,5 +1,7 @@
 #include "tickit.h"
 
+#include "termkey.h"
+
 typedef struct TickitTermDriver TickitTermDriver;
 
 typedef struct {
@@ -14,6 +16,7 @@ typedef struct {
   void (*clear)(TickitTermDriver *ttd);
   void (*chpen)(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final);
   int  (*setctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int value);
+  void (*gotkey)(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key);
 } TickitTermDriverVTable;
 
 struct TickitTermDriver {

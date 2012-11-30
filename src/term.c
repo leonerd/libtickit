@@ -316,7 +316,9 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 
     run_events(tt, TICKIT_EV_KEY, &args);
   }
-  else {
+  else if(key->type == TERMKEY_TYPE_UNICODE ||
+          key->type == TERMKEY_TYPE_FUNCTION ||
+          key->type == TERMKEY_TYPE_KEYSYM) {
     char buffer[64]; // TODO: should be long enough
     termkey_strfkey(tk, buffer, sizeof buffer, key, TERMKEY_FORMAT_ALTISMETA);
 
@@ -324,6 +326,10 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     args.str  = buffer;
 
     run_events(tt, TICKIT_EV_KEY, &args);
+  }
+  else {
+    if(tt->driver->vtable->gotkey)
+      (*tt->driver->vtable->gotkey)(tt->driver, tk, key);
   }
 }
 
