@@ -79,22 +79,6 @@ static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
     tickit_termdrv_write_strf(ttd, "\e[%dD", -rightward);
 }
 
-static void insertch(TickitTermDriver *ttd, int count)
-{
-  if(count == 1)
-    tickit_termdrv_write_str(ttd, "\e[@", 3);
-  else if(count > 1)
-    tickit_termdrv_write_strf(ttd, "\e[%d@", count);
-}
-
-static void deletech(TickitTermDriver *ttd, int count)
-{
-  if(count == 1)
-    tickit_termdrv_write_str(ttd, "\e[P", 3);
-  else if(count > 1)
-    tickit_termdrv_write_strf(ttd, "\e[%dP", count);
-}
-
 static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int cols, int downward, int rightward)
 {
   if(!downward && !rightward)
@@ -103,33 +87,33 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
   int term_cols;
   tickit_term_get_size(ttd->tt, NULL, &term_cols);
 
-  if(left == 0 && cols == term_cols && rightward == 0) {
-    tickit_termdrv_write_strf(ttd, "\e[%d;%dr", top + 1, top + lines);
-    goto_abs(ttd, top, left);
-    if(downward > 0) {
-      if(downward > 1)
-        tickit_termdrv_write_strf(ttd, "\e[%dM", downward); /* DL */
-      else
-        tickit_termdrv_write_str(ttd, "\e[M", 3);
-    }
-    else {
-      if(downward < -1)
-        tickit_termdrv_write_strf(ttd, "\e[%dL", -downward); /* IL */
-      else
-        tickit_termdrv_write_str(ttd, "\e[L", 3);
-    }
-    tickit_termdrv_write_str(ttd, "\e[r", 3);
-    return 1;
-  }
-
   if(left + cols == term_cols && downward == 0) {
     for(int line = top; line < top + lines; line++) {
       goto_abs(ttd, line, left);
-      if(rightward > 0)
-        insertch(ttd,  rightward);
-      else
-        deletech(ttd, -rightward);
+      if(rightward > 1)
+        tickit_termdrv_write_strf(ttd, "\e[%d@", rightward);  /* DCH */
+      else if(rightward == 1)
+        tickit_termdrv_write_str(ttd, "\e[@", 3);             /* DCH1 */
+      else if(rightward == -1)
+        tickit_termdrv_write_str(ttd, "\e[P", 3);             /* ICH1 */
+      else if(rightward < -1)
+        tickit_termdrv_write_strf(ttd, "\e[%dP", -rightward); /* ICH */
     }
+  }
+
+  if(left == 0 && cols == term_cols && rightward == 0) {
+    tickit_termdrv_write_strf(ttd, "\e[%d;%dr", top + 1, top + lines);
+    goto_abs(ttd, top, left);
+    if(downward > 1)
+      tickit_termdrv_write_strf(ttd, "\e[%dM", downward);  /* DL */
+    else if(downward == 1)
+      tickit_termdrv_write_str(ttd, "\e[M", 3);            /* DL1 */
+    else if(downward == -1)
+      tickit_termdrv_write_str(ttd, "\e[L", 3);            /* IL1 */
+    else if(downward < -1)
+      tickit_termdrv_write_strf(ttd, "\e[%dL", -downward); /* IL */
+    tickit_termdrv_write_str(ttd, "\e[r", 3);
+    return 1;
   }
 
   return 0;
