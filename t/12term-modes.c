@@ -23,22 +23,22 @@ int main(int argc, char *argv[])
   tickit_term_set_output_func(tt, output, buffer);
 
   buffer[0] = 0;
-  tickit_term_set_mode_altscreen(tt, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
 
   is_str_escape(buffer, "\e[?1049h", "buffer after set_mode_altscreen on");
 
   buffer[0] = 0;
-  tickit_term_set_mode_altscreen(tt, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
 
   is_str_escape(buffer, "", "set_mode_altscreen a second time is idempotent");
 
   buffer[0] = 0;
-  tickit_term_set_mode_cursorvis(tt, 0);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
 
   is_str_escape(buffer, "\e[?25l", "buffer after set_mode_cursorvis off");
 
   buffer[0] = 0;
-  tickit_term_set_mode_mouse(tt, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, 1);
 
   is_str_escape(buffer, "\e[?1002h\e[?1006h", "buffer after set_mode_mouse on");
 
