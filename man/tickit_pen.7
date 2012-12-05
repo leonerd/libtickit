@@ -13,15 +13,15 @@ A \fBTickitPen\fP instance stores a collection of terminal rendering attributes.
 .SH FUNCTIONS
 A new \fBTickitPen\fP instance is created using the \fBtickit_pen_new\fP(3) function, and destroyed using \fBtickit_pen_destroy\fP(3).
 .SH ATTRIBUTES
-The \fBTickitPenAttr\fP enumeration lists the attributes known by a pen. Each attribute has a type, as given by the \fBTickitPenAttrType\fP enumeration. The \fBtickit_pen_attrtype\fP(3) function gives the type of a given attribute.
+The \fBTickitPenAttr\fP enumeration lists the attributes known by a pen. Each attribute has a type, as given by the \fBTickitPenAttrType\fP enumeration. The \fBtickit_pen_attrtype\fP(3) function gives the type of a given attribute. The \fBtickit_pen_attrname\fP(3) function gives the name of a given attribute, which is also given below in parentheses. The \fBtickit_pen_lookup_attr\fP(3) function looks up an attribute constant from a string containing the name.
 .TP
-\fBTICKIT_PEN_FG\fP, \fBTICKIT_PEN_BG\fP
+\fBTICKIT_PEN_FG\fP ("fg"), \fBTICKIT_PEN_BG\fP ("bg")
 foreground and background colours. These are of type \fBTICKIT_PENTYPE_COLOUR\fP. This gives an integer from 0 to 255 to use as the colour index. It may also be set to the value -1, which sets the terminal's default, which may be a colour distinct from any of the others. Some terminals may not support more than 8 or 16 colours, however.
 .TP
-\fBTICKIT_PEN_BOLD\fP, \fBTICKIT_PEN_UNDER\fP, \fBTICKIT_PEN_ITALIC\fP, \fBTICKIT_PEN_REVERSE\fP, \fBTICKIT_PEN_STRIKE\fP
+\fBTICKIT_PEN_BOLD\fP ("b"), \fBTICKIT_PEN_UNDER\fP ("u"), \fBTICKIT_PEN_ITALIC\fP ("i"), \fBTICKIT_PEN_REVERSE\fP ("rv"), \fBTICKIT_PEN_STRIKE\fP ("strike")
 boolean rendering attributes. These are of type \fBTICKIT_PENTYPE_BOOL\fP. They are either true or false. Most terminals should support at least bold, underline and reverse, though italic and strikethrough are less commonly supported. Applications are advised not to use these two alone to distinguish significant parts of the user interface.
 .TP
-\fBTICKIT_PEN_ALTFONT\fP
+\fBTICKIT_PEN_ALTFONT\fP ("af")
 alternate font index. This is of type \fBTICKIT_PENTYPE_INT\fP. It is a value 0 to 9, which selects from the terminal's available fonts. Few terminals actually support this in practice.
 .SH FUNCTIONS
 The values of attributes are set or queried on a pen instance by using functions depending on the type of the attribute. Boolean attributes use \fBtickit_pen_set_bool_attr\fP(3) and \fBtickit_pen_get_bool_attr\fP(3). Integer attributes use \fBtickit_pen_set_int_attr\fP(3) and \fBtickit_pen_get_int_attr\fP(3). Colour attributes use \fBtickit_pen_set_colour_attr\fP(3), \fBtickit_pen_set_colour_attr_desc\fP(3) and \fBtickit_pen_get_colour_attr\fP(3).

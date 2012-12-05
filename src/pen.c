@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define streq(a,b) (!strcmp(a,b))
+
 struct TickitPen {
   signed   int fg      : 9, /* 0 - 255 or -1 */
                bg      : 9; /* 0 - 255 or -1 */
@@ -345,5 +347,51 @@ TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
       return -1;
   }
 
+  return -1;
+}
+
+const char *tickit_pen_attrname(TickitPenAttr attr)
+{
+  switch(attr) {
+    case TICKIT_PEN_FG:      return "fg";
+    case TICKIT_PEN_BG:      return "bg";
+    case TICKIT_PEN_BOLD:    return "b";
+    case TICKIT_PEN_UNDER:   return "u";
+    case TICKIT_PEN_ITALIC:  return "i";
+    case TICKIT_PEN_REVERSE: return "rv";
+    case TICKIT_PEN_STRIKE:  return "strike";
+    case TICKIT_PEN_ALTFONT: return "af";
+
+    case TICKIT_N_PEN_ATTRS: ;
+  }
+  return NULL;
+}
+
+TickitPenAttr tickit_pen_lookup_attr(const char *name)
+{
+  switch(name[0]) {
+    case 'a':
+      return streq(name+1,"f") ? TICKIT_PEN_ALTFONT
+                               : -1;
+    case 'b':
+      return name[1] == 0      ? TICKIT_PEN_BOLD
+           : streq(name+1,"g") ? TICKIT_PEN_BG
+                               : -1;
+    case 'f':
+      return streq(name+1,"g") ? TICKIT_PEN_FG
+                               : -1;
+    case 'i':
+      return name[1] == 0      ? TICKIT_PEN_ITALIC
+                               : -1;
+    case 'r':
+      return streq(name+1,"v") ? TICKIT_PEN_REVERSE
+                               : -1;
+    case 's':
+      return streq(name+1,"trike") ? TICKIT_PEN_STRIKE
+                               : -1;
+    case 'u':
+      return name[1] == 0      ? TICKIT_PEN_UNDER
+                               : -1;
+  }
   return -1;
 }

@@ -97,6 +97,8 @@ int  tickit_pen_bind_event(TickitPen *tt, TickitEventType ev, TickitPenEventFn *
 void tickit_pen_unbind_event_id(TickitPen *tt, int id);
 
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
+const char *tickit_pen_attrname(TickitPenAttr attr);
+TickitPenAttr tickit_pen_lookup_attr(const char *name);
 
 /*
  * TickitTerm

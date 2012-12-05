@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(40);
+  plan_tests(42);
 
   pen = tickit_pen_new();
 
@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
   tickit_pen_bind_event(pen, TICKIT_EV_CHANGE, on_changed, NULL);
 
   is_int(tickit_pen_attrtype(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
+
+  is_int(tickit_pen_lookup_attr("b"), TICKIT_PEN_BOLD, "lookup_attr \"b\" gives bold");
+  is_str(tickit_pen_attrname(TICKIT_PEN_BOLD), "b", "pen_attrname bold gives \"b\"");
 
   is_int(changed, 0, "change counter 0 initially");
 
