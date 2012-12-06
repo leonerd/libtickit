@@ -169,11 +169,6 @@ typedef enum {
 
 int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
 
-/* These are deprecated, don't use them */
-void tickit_term_set_mode_altscreen(TickitTerm *tt, int on);
-void tickit_term_set_mode_cursorvis(TickitTerm *tt, int on);
-void tickit_term_set_mode_mouse(TickitTerm *tt, int on);
-
 /*
  * String handling utilities
  */
