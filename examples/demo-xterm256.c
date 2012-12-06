@@ -1,10 +1,18 @@
 #include "tickit.h"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+int still_running = 1;
+
+static void sigint(int sig)
+{
+  still_running = 0;
+}
 
 /* TODO: Consider if this would be useful in Tickit itself */
 void tickit_term_printf(TickitTerm *tt, const char *fmt, ...)
@@ -82,8 +90,10 @@ int main(int argc, char *argv[])
     tickit_term_printf(tt, "g%02d", i);
   }
 
-  /* Wait for any key to exit */
-  tickit_term_input_wait(tt);
+  signal(SIGINT, sigint);
+
+  while(still_running)
+    tickit_term_input_wait(tt);
 
   tickit_term_destroy(tt);
 
