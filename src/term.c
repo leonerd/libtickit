@@ -570,3 +570,8 @@ int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value)
 {
   return (*tt->driver->vtable->setctl_int)(tt->driver, ctl, value);
 }
+
+int tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value)
+{
+  return (*tt->driver->vtable->setctl_str)(tt->driver, ctl, value);
+}

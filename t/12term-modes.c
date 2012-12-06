@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt;
   char buffer[1024];
 
-  plan_tests(7);
+  plan_tests(8);
 
   tt = tickit_term_new_for_termtype("xterm");
 
@@ -41,6 +41,11 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, 1);
 
   is_str_escape(buffer, "\e[?1002h\e[?1006h", "buffer after set_mode_mouse on");
+
+  buffer[0] = 0;
+  tickit_term_setctl_str(tt, TICKIT_TERMCTL_TITLE_TEXT, "title here");
+
+  is_str_escape(buffer, "\e]2;title here\e\\", "buffer after set title");
 
   buffer[0] = 0;
   tickit_term_destroy(tt);

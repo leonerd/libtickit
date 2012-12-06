@@ -1,34 +1,44 @@
 .TH TICKIT_TERM_SETCTL_INT 3
 .SH NAME
-tickit_term_setctl_int \- set an integer terminal control
+tickit_term_setctl_int, tickit_term_setctl_str \- set an integer or string terminal control
 .SH SYNOPSIS
 .nf
 .B #include <tickit.h>
 .sp
-.BI "int tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ",int " value );
+.BI "int tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int " value );
+.BI "int tickit_term_setctl_str(TickitTerm *" tt ", TickitTermCtl " ctl ", const char *" value );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. The options are given in an enumeration called \fBTickitTermCtl\fP.
+\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. \fBtickit_term_setctl_str\fP() sets the value of a string terminal control option. The options are given in an enumeration called \fBTickitTermCtl\fP.
 .PP
 The following control values are recognised:
 .in
 .TP
-.B TICKIT_TERMCTL_ALTSCREEN
+.B TICKIT_TERMCTL_ALTSCREEN (int)
 The value is a boolean indicating whether the terminal alternate buffer mode should be enabled. When enabled, a temporary buffer is used for drawing, preserving the original contents of the screen. This mode is usually used by full-screen applications to preserve the shell's scrollback state.
 .TP
-.B TICKIT_TERMCTL_CURSORVIS
+.B TICKIT_TERMCTL_CURSORVIS (int)
 The value is a boolean indicating whether the terminal text cursor should be visible. When disabled the cursor position is not visible. Typically applications will hide the cursor while performing redrawing operations so as not to show a flickering effect as the cursor moves, and show it again when drawing is complete.
 .TP
-.B TICKIT_TERMCTL_CURSORBLINK
+.B TICKIT_TERMCTL_CURSORBLINK (int)
 The value is a boolean indicating whether the terminal text cursor should blink. When disabled, the cursor will appear in a steady state, if visible. When enabled, the cursor will appear blinking, if visible. If the cursor is invisible, this should not have any effect.
 .TP
-.B TICKIT_TERMCTL_CURSORSHAPE
+.B TICKIT_TERMCTL_CURSORSHAPE (int)
 The value is an integer from the \fBTickitTermCursorShape\fP enumeration indicating what shape the terminal's text cursor should be. Values are \fBTICKIT_TERM_CURSORSHAPE_BLOCK\fP for a solid block filling the entire cell, \fBTICKIT_TERM_CURSORSHAPE_UNDER\fP for an underline below the character, or \fBTICKIT_TERM_CURSORSHAPE_LEFT_BAR\fP for a vertical bar to the left of the character. Note that not all terminals support setting it, nor to all of the possible values.
 .TP
-.B TICKIT_TERMCTL_MOUSE
+.B TICKIT_TERMCTL_ICON_TEXT (str)
+The value is a string for the terminal to use as its minimised icon text.
+.TP
+.B TICKIT_TERMCTL_ICONTITLE_TEXT (str)
+The value is a string for the terminal to use as its minimised icon text and main window title.
+.TP
+.B TICKIT_TERMCTL_MOUSE (int)
 The value is a boolean controlling the terminal's mouse tracking mode. When enabled, mouse button clicks, drags, releases and wheel scrolls are reported via \fBTICKIT_EV_MOUSE\fP events.
+.TP
+.B TICKIT_TERMCTL_TITLE_TEXT (str)
+The value is a string for the terminal to use as its main window title.
 .SH "RETURN VALUE"
 \fBtickit_term_setctl_int\fP() returns a true value if it recognised the requested control and managed to request the terminal to change it; false if not.
 .SH "SEE ALSO"

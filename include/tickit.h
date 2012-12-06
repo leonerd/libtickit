@@ -159,6 +159,9 @@ typedef enum {
   TICKIT_TERMCTL_MOUSE,
   TICKIT_TERMCTL_CURSORBLINK,
   TICKIT_TERMCTL_CURSORSHAPE,
+  TICKIT_TERMCTL_ICON_TEXT,
+  TICKIT_TERMCTL_TITLE_TEXT,
+  TICKIT_TERMCTL_ICONTITLE_TEXT,
 } TickitTermCtl;
 
 typedef enum {
@@ -168,6 +171,7 @@ typedef enum {
 } TickitTermCursorShape;
 
 int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
+int tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value);
 
 /*
  * String handling utilities
