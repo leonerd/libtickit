@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
   tickit_term_clear(tt);
 
   tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, event, NULL);
