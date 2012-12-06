@@ -34,6 +34,11 @@ The value is a string for the terminal to use as its minimised icon text.
 .B TICKIT_TERMCTL_ICONTITLE_TEXT (str)
 The value is a string for the terminal to use as its minimised icon text and main window title.
 .TP
+.B TICKIT_TERMCTL_KEYPAD_APP (int)
+The value is a boolean controlling the terminal's keypad mode. When enabled, the terminal is in keypad application mode; in this mode the numerical keypad will send different sequences that can be detected as distinct from regular
+.SM ASCII
+text. When disabled, the keypad will send normal text.
+.TP
 .B TICKIT_TERMCTL_MOUSE (int)
 The value is a boolean controlling the terminal's mouse tracking mode. When enabled, mouse button clicks, drags, releases and wheel scrolls are reported via \fBTICKIT_EV_MOUSE\fP events.
 .TP
