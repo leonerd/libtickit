@@ -101,6 +101,31 @@ const char *tickit_pen_attrname(TickitPenAttr attr);
 TickitPenAttr tickit_pen_lookup_attr(const char *name);
 
 /*
+ * TickitRect
+ */
+
+typedef struct {
+  int top;
+  int left;
+  int lines;
+  int cols;
+} TickitRect;
+
+void tickit_rect_init_sized(TickitRect *rect, int top, int left, int lines, int cols);
+void tickit_rect_init_bounds(TickitRect *rect, int top, int left, int bottom, int right);
+
+static inline int tickit_rect_bottom(const TickitRect *rect)
+{ return rect->top + rect->lines; }
+
+static inline int tickit_rect_right (const TickitRect *rect)
+{ return rect->left + rect->cols; }
+
+int tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b);
+
+int tickit_rect_intersects(const TickitRect *a, const TickitRect *b);
+int tickit_rect_contains(const TickitRect *large, const TickitRect *small);
+
+/*
  * TickitTerm
  */
 

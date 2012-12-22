@@ -1,0 +1,24 @@
+.TH TICKIT_RECT_INTERSECT 3
+.SH NAME
+tickit_rect_intersect \- obtain the intersection of two rectangles
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_rect_intersect(TickitRect *" dst ,
+.BI "    const TickitRect *" a ", const TickitRect *" b );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rect_intersect\fP() tests if the two rectangles given by \fIa\fP and \fIb\fP intersect and if so, initialises the rectangle structure given by \fIdst\fP to contain it. It returns true if it did this. If the two given rectangles do not intersect then it returns false and does not modify the structure given by \fIdst\fP.
+.PP
+To simply test if two given rectangles intersect without obtaining the actual intersection region, use \fBtickit_rect_intersects\fP(3).
+.SH "RETURN VALUE"
+\fBtickit_rect_intersect\fP() returns true if the rectangles intersect, and false if not.
+.SH "SEE ALSO"
+.BR tickit_rect_init_sized (3),
+.BR tickit_rect_init_bounded (3),
+.BR tickit_rect_intersects (3),
+.BR tickit_rect (7),
+.BR tickit (7)

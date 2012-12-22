@@ -1,0 +1,21 @@
+.TH TICKIT_RECT_CONTAINS 3
+.SH NAME
+tickit_rect_contains \- test if one rectangle entirely contains another
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_rect_contains(const TickitRect *" large ", const TickitRect *" small );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rect_contains\fP() tests whether the rectangle given by \fIlarge\fP entirely contains the rectangle given by \fIsmall\fP.
+.SH "RETURN VALUE"
+\fBtickit_rect_contains\fP() returns a boolean value.
+.SH "SEE ALSO"
+.BR tickit_rect_init_sized (3),
+.BR tickit_rect_init_bounded (3),
+.BR tickit_rect_intersects (3),
+.BR tickit_rect (7),
+.BR tickit (7)
