@@ -52,8 +52,8 @@ int tickit_rect_intersects(const TickitRect *a, const TickitRect *b)
 
 int tickit_rect_contains(const TickitRect *large, const TickitRect *small)
 {
-  return small->top                >= large->top                &&
-         tickit_rect_bottom(small) <= tickit_rect_bottom(large) &&
-         small->left               >= large->top                &&
-         tickit_rect_right(small)  <= tickit_rect_right(large);
+  return (small->top                >= large->top               ) &&
+         (tickit_rect_bottom(small) <= tickit_rect_bottom(large)) &&
+         (small->left               >= large->left              ) &&
+         (tickit_rect_right(small)  <= tickit_rect_right(large) );
 }
