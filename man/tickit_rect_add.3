@@ -1,0 +1,25 @@
+.TH TICKIT_RECT_ADD 3
+.SH NAME
+tickit_rect_add \- obtain the union sum of two rectangles
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_rect_add(TickitRect " dst [3],
+.BI "    const TickitRect *" a ", const TickitRect *" b );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rect_add\fP() initialises the rectangle structures given by \fIdst\fP (which must be an array capable of containing at least three rectangle structures) with a set of non-overlapping rectangles covering the same area as the two given by \fIa\fP and \fIb\fP. Depending on the geometry of the given rectangles it may create one, two, or three resultant rectangles. It returns the number of rectangular regions initialised into the result array.
+.PP
+If the original rectangles do not touch then the result will contain just those two. If they touch then the result will contain the one to three non-overlapping horizontal stripes that cover the same area, in order of increasing line number.
+.SH "RETURN VALUE"
+\fBtickit_rect_add\fP() returns the number of rectangles written to \fIdst\fP.
+.SH "SEE ALSO"
+.BR tickit_rect_init_sized (3),
+.BR tickit_rect_init_bounded (3),
+.BR tickit_rect_intersect (3),
+.BR tickit_rect_subtract (3),
+.BR tickit_rect (7),
+.BR tickit (7)

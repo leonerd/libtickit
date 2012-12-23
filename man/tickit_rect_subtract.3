@@ -1,0 +1,25 @@
+.TH TICKIT_RECT_SUBTRACT 3
+.SH NAME
+tickit_rect_subtract \- obtain the difference of two rectangles
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_rect_subtract(TickitRect " dst [4],
+.BI "    const TickitRect *" orig ", const TickitRect *" hole );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rect_subtract\fP() initialises the rectangle structures given by \fIdst\fP (which must be an array capable of containing at least four rectangle structures) with a set of non-overlapping rectangles covering the same area as that given by \fIorig\fP without covering \fIhole\fP. Depending on the geometry of the given rectangles it will create from zero to four resultant rectangles. It returns the number of rectangular regions initialised into the result array.
+.PP
+If \fIhole\fP completely covers \fIorig\fP then the result will contain no rectangles. If they do not intersect then just \fIorig\fP will be returned. Otherwise, the result will contain non-overlapping horizontal stripes of \fIorig\fP without \fIhole\fP.
+.SH "RETURN VALUE"
+\fBtickit_rect_subtract\fP() returns the number of rectangles written to \fIdst\fP.
+.SH "SEE ALSO"
+.BR tickit_rect_init_sized (3),
+.BR tickit_rect_init_bounded (3),
+.BR tickit_rect_intersect (3),
+.BR tickit_rect_add (3),
+.BR tickit_rect (7),
+.BR tickit (7)
