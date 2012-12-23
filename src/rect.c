@@ -111,3 +111,47 @@ int tickit_rect_add(TickitRect ret[3], const TickitRect *a, const TickitRect *b)
 
   return rects;
 }
+
+int tickit_rect_subtract(TickitRect ret[5], const TickitRect *orig, const TickitRect *hole)
+{
+  if(tickit_rect_contains(hole, orig))
+    return 0;
+
+  if(!tickit_rect_intersects(hole, orig)) {
+    ret[0] = *orig;
+    return 1;
+  }
+
+  int rects = 0;
+
+  int orig_right = tickit_rect_right(orig);
+  int hole_right = tickit_rect_right(hole);
+
+  if(orig->top < hole->top) {
+    tickit_rect_init_bounded(ret + rects, orig->top, orig->left, hole->top, orig_right);
+    rects++;
+  }
+
+  int orig_bottom = tickit_rect_bottom(orig);
+  int hole_bottom = tickit_rect_bottom(hole);
+
+  int mid_top    = maxint(orig->top,   hole->top);
+  int mid_bottom = minint(orig_bottom, hole_bottom);
+
+  if(orig->left < hole->left) {
+    tickit_rect_init_bounded(ret + rects, mid_top, orig->left, mid_bottom, hole->left);
+    rects++;
+  }
+
+  if(orig_right > hole_right) {
+    tickit_rect_init_bounded(ret + rects, mid_top, hole_right, mid_bottom, orig_right);
+    rects++;
+  }
+
+  if(orig_bottom > hole_bottom) {
+    tickit_rect_init_bounded(ret + rects, hole_bottom, orig->left, orig_bottom, orig_right);
+    rects++;
+  }
+
+  return rects;
+}

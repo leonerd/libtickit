@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 {
   TickitRect rect1, rect2, rectOut;
 
-  plan_tests(68);
+  plan_tests(104);
 
   tickit_rect_init_sized(&rect1, 5, 10, 7, 20);
 
@@ -162,6 +162,68 @@ int main(int argc, char *argv[])
   is_int(n_rects, 2, "rect_add non-overlap vertical");
   is_rect(rects + 0, "(10,10)..(20,20)", "rects[0] for rect_add non-overlap vertical");
   is_rect(rects + 1, "(30,10)..(40,20)", "rects[1] for rect_add non-overlap vertical");
+
+  // Rectangle subtraction
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(10,10)..(20,20)"));
+  is_int(n_rects, 0, "rect_subtract self");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(5,10)..(15,20)"));
+  is_int(n_rects, 1, "rect_subtract truncate left");
+  is_rect(rects + 0, "(15,10)..(20,20)", "rects[0] for rect_subtract truncate left");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(15,10)..(25,20)"));
+  is_int(n_rects, 1, "rect_subtract truncate right");
+  is_rect(rects + 0, "(10,10)..(15,20)", "rects[0] for rect_subtract truncate right");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(10,5)..(20,15)"));
+  is_int(n_rects, 1, "rect_subtract truncate top");
+  is_rect(rects + 0, "(10,15)..(20,20)", "rects[0] for rect_subtract truncate top");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(10,15)..(20,25)"));
+  is_int(n_rects, 1, "rect_subtract truncate bottom");
+  is_rect(rects + 0, "(10,10)..(20,15)", "rects[0] for rect_subtract truncate bottom");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(5,12)..(25,18)"));
+  is_int(n_rects, 2, "rect_subtract slice horizontal");
+  is_rect(rects + 0, "(10,10)..(20,12)", "rects[0] for rect_subtract slice horizontal");
+  is_rect(rects + 1, "(10,18)..(20,20)", "rects[1] for rect_subtract slice horizontal");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(12,5)..(18,25)"));
+  is_int(n_rects, 2, "rect_subtract slice vertical");
+  is_rect(rects + 0, "(10,10)..(12,20)", "rects[0] for rect_subtract slice vertical");
+  is_rect(rects + 1, "(18,10)..(20,20)", "rects[1] for rect_subtract slice vertical");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(5,12)..(15,18)"));
+  is_int(n_rects, 3, "rect_subtract U left");
+  is_rect(rects + 0, "(10,10)..(20,12)", "rects[0] for rect_subtract U left");
+  is_rect(rects + 1, "(15,12)..(20,18)", "rects[1] for rect_subtract U left");
+  is_rect(rects + 2, "(10,18)..(20,20)", "rects[2] for rect_subtract U left");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(15,12)..(25,18)"));
+  is_int(n_rects, 3, "rect_subtract U right");
+  is_rect(rects + 0, "(10,10)..(20,12)", "rects[0] for rect_subtract U right");
+  is_rect(rects + 1, "(10,12)..(15,18)", "rects[1] for rect_subtract U right");
+  is_rect(rects + 2, "(10,18)..(20,20)", "rects[2] for rect_subtract U right");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(12,5)..(18,15)"));
+  is_int(n_rects, 3, "rect_subtract U top");
+  is_rect(rects + 0, "(10,10)..(12,15)", "rects[0] for rect_subtract U top");
+  is_rect(rects + 1, "(18,10)..(20,15)", "rects[1] for rect_subtract U top");
+  is_rect(rects + 2, "(10,15)..(20,20)", "rects[2] for rect_subtract U top");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(12,15)..(18,25)"));
+  is_int(n_rects, 3, "rect_subtract U bottom");
+  is_rect(rects + 0, "(10,10)..(20,15)", "rects[0] for rect_subtract U bottom");
+  is_rect(rects + 1, "(10,15)..(12,20)", "rects[1] for rect_subtract U bottom");
+  is_rect(rects + 2, "(18,15)..(20,20)", "rects[2] for rect_subtract U bottom");
+
+  n_rects = tickit_rect_subtract(rects, &rect1, rect_init_strp(&rect2, "(12,12)..(18,18)"));
+  is_int(n_rects, 4, "rect_subtract hole");
+  is_rect(rects + 0, "(10,10)..(20,12)", "rects[0] for rect_subtract hole");
+  is_rect(rects + 1, "(10,12)..(12,18)", "rects[1] for rect_subtract hole");
+  is_rect(rects + 2, "(18,12)..(20,18)", "rects[2] for rect_subtract hole");
+  is_rect(rects + 3, "(10,18)..(20,20)", "rects[3] for rect_subtract hole");
 
   return exit_status();
 }
