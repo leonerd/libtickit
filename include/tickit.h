@@ -125,6 +125,8 @@ int tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect
 int tickit_rect_intersects(const TickitRect *a, const TickitRect *b);
 int tickit_rect_contains(const TickitRect *large, const TickitRect *small);
 
+int tickit_rect_add(TickitRect ret[3], const TickitRect *a, const TickitRect *b);
+
 /*
  * TickitTerm
  */
