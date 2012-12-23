@@ -1,5 +1,8 @@
 #include "tickit.h"
 
+static inline int minint(int a, int b) { return a < b ? a : b; }
+static inline int maxint(int a, int b) { return a > b ? a : b; }
+
 void tickit_rect_init_sized(TickitRect *rect, int top, int left, int lines, int cols)
 {
   rect->top   = top;
@@ -18,22 +21,14 @@ void tickit_rect_init_bounded(TickitRect *rect, int top, int left, int bottom, i
 
 int tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b)
 {
-  int top, bottom, left, right;
-
-  top = a->top;
-  if(b->top > top) top = b->top;
-
-  bottom = tickit_rect_bottom(a);
-  if(tickit_rect_bottom(b) < bottom) bottom = tickit_rect_bottom(b);
+  int top    = maxint(a->top, b->top);
+  int bottom = minint(tickit_rect_bottom(a), tickit_rect_bottom(b));
 
   if(top >= bottom)
     return 0;
 
-  left = a->left;
-  if(b->left > left) left = b->left;
-
-  right = tickit_rect_right(a);
-  if(tickit_rect_right(b) < right) right = tickit_rect_right(b);
+  int left  = maxint(a->left, b->left);
+  int right = minint(tickit_rect_right(a), tickit_rect_right(b));
 
   if(left >= right)
     return 0;
