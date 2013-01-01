@@ -112,7 +112,7 @@ typedef struct {
 } TickitRect;
 
 void tickit_rect_init_sized(TickitRect *rect, int top, int left, int lines, int cols);
-void tickit_rect_init_bounds(TickitRect *rect, int top, int left, int bottom, int right);
+void tickit_rect_init_bounded(TickitRect *rect, int top, int left, int bottom, int right);
 
 static inline int tickit_rect_bottom(const TickitRect *rect)
 { return rect->top + rect->lines; }
