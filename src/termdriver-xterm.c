@@ -94,7 +94,7 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
   /* Use DECSLRM only for 1 line of insert/delete, because any more and it's
    * likely better to use the generic system below
    */
-  if((xd->cap.slrm && lines == 1 || left + cols == term_cols) 
+  if(((xd->cap.slrm && lines == 1) || (left + cols == term_cols))
       && downward == 0) {
     if(left + cols < term_cols)
       tickit_termdrv_write_strf(ttd, "\e[;%ds", left + cols);
