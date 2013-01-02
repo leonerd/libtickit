@@ -13,11 +13,23 @@ void plan_tests(int n)
   printf("1..%d\n", n);
 }
 
+void pass(char *name)
+{
+  printf("ok %d - %s\n", nexttest++, name);
+}
+
+void fail(char *name)
+{
+  printf("not ok %d - %s\n", nexttest++, name);
+  _exit_status = 1;
+}
+
 void ok(int cmp, char *name)
 {
-  printf("%s %d - %s\n", cmp ? "ok" : "not ok", nexttest++, name);
-  if(!cmp)
-    _exit_status = 1;
+  if(cmp)
+    pass(name);
+  else
+    fail(name);
 }
 
 void diag(char *fmt, ...)
