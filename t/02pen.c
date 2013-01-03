@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
   tickit_pen_destroy(pen);
   tickit_pen_destroy(pen2);
 
-  ok(1, "tickit_pen_destroy");
+  pass("tickit_pen_destroy");
 
   return exit_status();
 }

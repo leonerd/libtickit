@@ -21,13 +21,13 @@ int is_rect(TickitRect *got, const char *expect, char *name)
      got->left  != exp.left  ||
      got->lines != exp.lines ||
      got->cols  != exp.cols) {
-    ok(0, name);
+    fail(name);
     diag("got (%d,%d)..(%d,%d) expected (%d,%d)..(%d,%d)",
         got->left, got->top, tickit_rect_right(got),  tickit_rect_bottom(got),
         exp.left,  exp.top,  tickit_rect_right(&exp), tickit_rect_bottom(&exp));
   }
   else {
-    ok(1, name);
+    pass(name);
   }
 }
 

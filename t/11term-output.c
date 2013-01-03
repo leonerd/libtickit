@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
   is_str_escape(buffer, "\e[3X\e[3C", "buffer after tickit_term_erasech 3 move");
 
   tickit_term_destroy(tt);
-  ok(1, "tickit_term_destroy");
+  pass("tickit_term_destroy");
 
   /* Test erasech without bce */
   tt = tickit_term_new_for_termtype("screen");
