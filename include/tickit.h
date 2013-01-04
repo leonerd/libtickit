@@ -140,7 +140,7 @@ void tickit_rectset_destroy(TickitRectSet *trs);
 void tickit_rectset_clear(TickitRectSet *trs);
 
 size_t tickit_rectset_rects(const TickitRectSet *trs);
-size_t tickit_rectset_get_rects(const TickitRectSet *trs, TickitRect *rects, size_t n);
+size_t tickit_rectset_get_rects(const TickitRectSet *trs, TickitRect rects[], size_t n);
 
 void tickit_rectset_add(TickitRectSet *trs, const TickitRect *rect);
 void tickit_rectset_subtract(TickitRectSet *trs, const TickitRect *rect);

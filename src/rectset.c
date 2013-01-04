@@ -44,7 +44,7 @@ size_t tickit_rectset_rects(const TickitRectSet *trs)
   return trs->count;
 }
 
-size_t tickit_rectset_get_rects(const TickitRectSet *trs, TickitRect *rects, size_t n)
+size_t tickit_rectset_get_rects(const TickitRectSet *trs, TickitRect rects[], size_t n)
 {
   if(n > trs->count)
     n = trs->count;
