@@ -64,7 +64,7 @@ void is_str(const char *got, const char *expect, char *name)
   }
 }
 
-static const char *strescape(const char *s)
+static char *strescape(const char *s)
 {
   size_t len = 0;
   char *ret;
@@ -109,8 +109,8 @@ void is_str_escape(const char *got, const char *expect, char *name)
   if(strcmp(got, expect) == 0)
     ok(1, name);
   else {
-    const char *got_e    = strescape(got);
-    const char *expect_e = strescape(expect);
+    char *got_e    = strescape(got);
+    char *expect_e = strescape(expect);
     ok(0, name);
     diag("got \"%s\" expected \"%s\"", got_e, expect_e);
     free(got_e);
