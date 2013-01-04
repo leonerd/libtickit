@@ -1,0 +1,20 @@
+.TH TICKIT_RECTSET_SUBTRACT 3
+.SH NAME
+tickit_rectset_subtract \- subtract a region from a rectangle set
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_rectset_subtract(TickitRectSet *" trs ", const TickitRect *" rect );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rectset_subtract\fP() ensures that the regions stored by the rectangle set do not include the area given by \fIrect\fP. To do this, it may have to split one or more of the existing regions into smaller fragments, and so may result in more regions being stored.
+.SH "RETURN VALUE"
+\fBtickit_rectset_subtract\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_rectset_new (3),
+.BR tickit_rectset (7),
+.BR tickit_rect (7),
+.BR tickit (7)

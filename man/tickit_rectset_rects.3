@@ -1,0 +1,23 @@
+.TH TICKIT_RECTSET_RECTS 3
+.SH NAME
+tickit_rectset_rects, tickit_rectset_get_rects \- obtain the regions from a rectangle set
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_rectset_rects(const TickitRectSet *" trs );
+.BI "int tickit_rectset_get_rects(const TickitRectSet *" trs ", TickitRect " rects [],
+.BI "    size_t " n );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rectset_rects\fP() returns the number of rectangular regions stored by the rectangle set.
+.PP
+\fBtickit_rectset_get_rects\fP() copies at most \fIn\fP regions into the array given by \fIrects\fP, and returns the number of regions it copied (which may be fewer than the total stored, if the array was of insufficient size).
+.SH "RETURN VALUE"
+\fBtickit_rectset_rects\fP() returns an integer giving the number of stored regions. \fBtickit_rectset_get_rects\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_rectset_new (3),
+.BR tickit_rectset (7),
+.BR tickit (7)

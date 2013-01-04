@@ -1,0 +1,16 @@
+.TH TICKIT_RECTSET 7
+.SH NAME
+TickitRectSet \- store a collection of rectangular areas
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "typedef struct " TickitRectSet ;
+.fi
+.sp
+.SH DESCRIPTION
+A \fBTickitRectSet\fP instance stores a collection of rectangular areas as non-overlapping regions. Mutation operations allow areas to be added or subtracted. Query operations allow testing for area containment, intersection, or iterating the stored regions.
+.SH FUNCTIONS
+A new \fBTickitRectSet\fP instance is created using the \fBtickit_rectset_new\fP(3) function, and destroyed using \fBtickit_rectset_destroy\fP(3).
+.PP
+Rectangular areas can be added using \fBtickit_rectset_add\fP(3) and subtracted using \fBtickit_rectset_subtract\fP(3). The \fBTickitRectSet\fP can be emptied of regions entirely by using \fBtickit_rectset_clear\fP(3). The stored regions can be queried by using \fBtickit_rectset_rects\fP(3) and \fBtickit_rectset_get_rects\fP(3). An area can be tested to see if it is entirely contained in the set using \fBtickit_rectset_contains\fP(3), or that it intersects at all using \fBtickit_rectset_intersects\fP(3).

@@ -1,0 +1,20 @@
+.TH TICKIT_RECTSET_INTERSECTS 3
+.SH NAME
+tickit_rectset_intersects \- test if a region intersects with a rectangle set
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_rectset_intersects(const TickitRectSet *" trs ", const TickitRect *" rect );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rectset_intersects\fP() tests whether the area given by \fIrect\fP intersects with one or more regions in the rectangle set.
+.SH "RETURN VALUE"
+\fBtickit_rectset_intersects\fP() returns a true value if the the given area intersects with one or more regions, or false if it does not intersect with any.
+.SH "SEE ALSO"
+.BR tickit_rectset_new (3),
+.BR tickit_rectset (7),
+.BR tickit_rect (7),
+.BR tickit (7)

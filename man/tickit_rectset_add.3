@@ -1,0 +1,20 @@
+.TH TICKIT_RECTSET_ADD 3
+.SH NAME
+tickit_rectset_add \- add an area to a rectangle set
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_rectset_add(TickitRectSet *" trs ", const TickitRect *" rect );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rectset_add\fP() ensures that the regions stored by the rectangle set includes the area given by \fIrect\fP. Since the rectangle set stores a set of non-overlapping regions, it may have to split the newly-added area into smaller pieces, to ensure the regions do not overlap. Since it merges neigbours where possible it can also result in fewer regions being stored.
+.SH "RETURN VALUE"
+\fBtickit_rectset_add\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_rectset_new (3),
+.BR tickit_rectset (7),
+.BR tickit_rect (7),
+.BR tickit (7)

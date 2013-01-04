@@ -1,0 +1,25 @@
+.TH TICKIT_RECTSET_NEW 3
+.SH NAME
+tickit_rectset_new, tickit_rectset_destroy \- create or destroy a rectangle set
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitRectSet *tickit_rectset_new(void);"
+.BI "void tickit_rectset_destroy(TickitRectSet *" trs );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rectset_new\fP() creates a new \fBTickitRectSet\fP instance. It will be initially empty, containing no regions.
+.PP
+\fBtickit_rectset_destroy\fP() destroys the given instances and releases any resources controlled by it.
+.SH "RETURN VALUE"
+If successful, \fBtickit_rectset_new\fP() returns a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure. \fBtickit_rectset_destroy\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_rectset_add (3),
+.BR tickit_rectset_subtract (3),
+.BR tickit_rectset_rects (3),
+.BR tickit_rectset_get_rects (3),
+.BR tickit_rectset (7),
+.BR tickit (7)
