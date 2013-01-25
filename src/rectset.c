@@ -62,7 +62,7 @@ static int cmprect(const TickitRect *a, const TickitRect *b)
 
 static int insert_rect(TickitRectSet *trs, const TickitRect *r)
 {
-  if(trs->count + 1 < trs->size) {
+  if(trs->count + 1 > trs->size) {
     TickitRect *newrects = realloc(trs->rects, trs->size * 2 * sizeof(trs->rects[0]));
     if(!newrects)
       return 0;
