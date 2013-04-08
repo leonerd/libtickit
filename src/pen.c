@@ -192,6 +192,12 @@ static struct { const char *name; int colour; } colournames[] = {
   { "magenta", 5 },
   { "cyan",    6 },
   { "white",   7 },
+  // 256-colour palette
+  { "grey",     8 },
+  { "brown",   94 },
+  { "orange", 208 },
+  { "pink",   212 },
+  { "purple", 128 },
 };
 
 int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *desc)
