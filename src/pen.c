@@ -183,15 +183,15 @@ void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
   run_events(pen, TICKIT_EV_CHANGE, NULL);
 }
 
-static const char *colournames[] = {
-  "black",
-  "red",
-  "green",
-  "yellow",
-  "blue",
-  "magenta",
-  "cyan",
-  "white",
+static struct { const char *name; int colour; } colournames[] = {
+  { "black",   0 },
+  { "red",     1 },
+  { "green",   2 },
+  { "yellow",  3 },
+  { "blue",    4 },
+  { "magenta", 5 },
+  { "cyan",    6 },
+  { "white",   7 },
 };
 
 int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *desc)
@@ -211,11 +211,15 @@ int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const ch
     return 1;
   }
 
-  for(val = 0; val < sizeof(colournames)/sizeof(colournames[0]); val++) {
-    if(strcmp(desc, colournames[val]) != 0)
+  for(int i = 0; i < sizeof(colournames)/sizeof(colournames[0]); i++) {
+    if(strcmp(desc, colournames[i].name) != 0)
       continue;
 
-    tickit_pen_set_colour_attr(pen, attr, val + hi);
+    val = colournames[i].colour;
+    if(val < 8 && hi)
+      val += hi;
+
+    tickit_pen_set_colour_attr(pen, attr, val);
     return 1;
   }
 
