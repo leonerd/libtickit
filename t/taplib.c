@@ -72,6 +72,7 @@ static char *strescape(const char *s)
 
   for(const char *p = s; p[0]; p++)
     switch(p[0]) {
+      case '\b':
       case '\n':
       case '\r':
       case '\x1b':
@@ -87,6 +88,8 @@ static char *strescape(const char *s)
   q = ret;
   for(const char *p = s; p[0]; p++)
     switch(p[0]) {
+      case '\b':
+        q[0] = '\\'; q[1] = 'b'; q += 2; break;
       case '\n':
         q[0] = '\\'; q[1] = 'n'; q += 2; break;
       case '\r':
