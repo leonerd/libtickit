@@ -1,6 +1,7 @@
 #include "tickit.h"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -25,6 +26,13 @@ struct {
   { "strikethrough", TICKIT_PEN_STRIKE },
   { "reverse video", TICKIT_PEN_REVERSE },
 };
+
+int still_running = 1;
+
+static void sigint(int sig)
+{
+  still_running = 0;
+}
 
 int main(int argc, char *argv[])
 {
@@ -121,8 +129,10 @@ int main(int argc, char *argv[])
   tickit_term_setpen(tt, pen);
   tickit_term_print(tt, "alternate font");
 
-  /* Wait for any key to exit */
-  tickit_term_input_wait(tt);
+  signal(SIGINT, sigint);
+
+  while(still_running)
+    tickit_term_input_wait(tt);
 
   tickit_term_destroy(tt);
 
