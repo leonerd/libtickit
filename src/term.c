@@ -27,6 +27,7 @@
 
 static TickitTermDriverProbe *driver_probes[] = {
   &xterm_probe,
+  &ti_probe,
   NULL,
 };
 

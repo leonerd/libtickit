@@ -431,6 +431,16 @@ TickitTermDriverVTable xterm_vtable = {
 
 static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
 {
+  if(strncmp(termtype, "xterm", 5) != 0)
+    return NULL;
+
+  switch(termtype[5]) {
+    case 0: case '-':
+      break;
+    default:
+      return NULL;
+  }
+
   struct XTermDriver *xd = malloc(sizeof(struct XTermDriver));
   xd->driver.vtable = &xterm_vtable;
   xd->driver.tt = tt;

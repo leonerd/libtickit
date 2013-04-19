@@ -35,3 +35,4 @@ typedef struct {
 } TickitTermDriverProbe;
 
 extern TickitTermDriverProbe xterm_probe;
+extern TickitTermDriverProbe ti_probe;

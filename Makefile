@@ -19,7 +19,7 @@ ifeq ($(PROFILE),1)
   LDFLAGS+=-pg
 endif
 
-ifeq ($(shell pkg-config --atleast-version=0.1.0 unibilium && echo 1),1)
+ifeq ($(shell pkg-config --atleast-version=1.1.0 unibilium && echo 1),1)
   CFLAGS +=$(shell pkg-config --cflags unibilium) -DHAVE_UNIBILIUM
   LDFLAGS+=$(shell pkg-config --libs   unibilium)
 else ifeq ($(shell pkg-config ncursesw && echo 1),1)
