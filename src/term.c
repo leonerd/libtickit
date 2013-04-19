@@ -307,12 +307,15 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
       args.button -= (4 - TICKIT_MOUSEWHEEL_UP);
     }
 
+    args.mod = key->modifiers;
+
     run_events(tt, TICKIT_EV_MOUSE, &args);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
     args.type = TICKIT_KEYEV_TEXT;
     args.str  = key->utf8;
+    args.mod  = key->modifiers;
 
     run_events(tt, TICKIT_EV_KEY, &args);
   }
@@ -324,6 +327,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 
     args.type = TICKIT_KEYEV_KEY;
     args.str  = buffer;
+    args.mod  = key->modifiers;
 
     run_events(tt, TICKIT_EV_KEY, &args);
   }

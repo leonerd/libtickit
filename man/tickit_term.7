@@ -35,7 +35,7 @@ The terminal has been resized. The \fIargs\fP structure gives the new size of th
 .B TICKIT_EV_KEY
 A key has been pressed on the keyboard. The \fIargs\fP structure gives details of the key event with \fItype\fP taking the value \fBTICKIT_KEYEV_KEY\fP for symbolic or function keys, or \fBTICKIT_KEYEV_TEXT\fP for regular Unicode characters. \fIstr\fP will contain the name of the special key, including any applied modifiers, or a
 .SM UTF-8
-string of the Unicode character.
+string of the Unicode character. \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
 .TP
 .B TICKIT_EV_MOUSE
-A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled. The \fIargs\fP structure gives details, with \fItype\fP taking one of the values \fBTICKIT_MOUSEEV_PRESS\fP, \fBTICKIT_MOUSEEV_DRAG\fP, \fBTICKIT_MOUSEEV_RELEASE\fP or \fBTICKIT_MOUSEEV_WHEEL\fP. \fIbutton\fP gives the button index for button events, or one of \fBTICKIT_MOUSEWHEEL_UP\fP or \fBTICKIT_MOUSEWHEEL_DOWN\fP for wheel events. \fIline\fP and \fIcol\fP give the position of the mouse cursor for this event.
+A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled. The \fIargs\fP structure gives details, with \fItype\fP taking one of the values \fBTICKIT_MOUSEEV_PRESS\fP, \fBTICKIT_MOUSEEV_DRAG\fP, \fBTICKIT_MOUSEEV_RELEASE\fP or \fBTICKIT_MOUSEEV_WHEEL\fP. \fIbutton\fP gives the button index for button events, or one of \fBTICKIT_MOUSEWHEEL_UP\fP or \fBTICKIT_MOUSEWHEEL_DOWN\fP for wheel events. \fIline\fP and \fIcol\fP give the position of the mouse cursor for this event. \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.

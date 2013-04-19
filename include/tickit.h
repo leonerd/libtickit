@@ -34,12 +34,19 @@ enum {
   TICKIT_MOUSEWHEEL_DOWN,
 };
 
+enum {
+  TICKIT_MOD_SHIFT = 0x01,
+  TICKIT_MOD_ALT   = 0x02,
+  TICKIT_MOD_CTRL  = 0x04,
+};
+
 typedef struct {
   int         lines, cols; // RESIZE
   int         type;        // KEY, MOUSE
   const char *str;         // KEY
   int         button;      // MOUSE
   int         line, col;   // MOUSE
+  int         mod;         // KEY, MOUSE
 } TickitEvent;
 
 /*
