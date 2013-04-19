@@ -13,7 +13,27 @@ static void sigint(int sig)
   still_running = 0;
 }
 
-static void render_key(TickitTerm *tt, TickitKeyEventType type, const char *str)
+static void render_modifier(TickitTerm *tt, int mod)
+{
+  if(!mod)
+    return;
+
+  int pipe = 0;
+
+  tickit_term_erasech(tt, 3, 1);
+  tickit_term_print(tt, "<");
+
+  if(mod & TICKIT_MOD_SHIFT)
+    tickit_term_print(tt, pipe++ ? "|SHIFT" : "SHIFT");
+  if(mod & TICKIT_MOD_ALT)
+    tickit_term_print(tt, pipe++ ? "|ALT" : "ALT");
+  if(mod & TICKIT_MOD_CTRL)
+    tickit_term_print(tt, pipe++ ? "|CTRL" : "CTRL");
+
+  tickit_term_print(tt, ">");
+}
+
+static void render_key(TickitTerm *tt, TickitKeyEventType type, const char *str, int mod)
 {
   tickit_term_goto(tt, 2, 2);
   tickit_term_print(tt, "Key:");
@@ -25,10 +45,11 @@ static void render_key(TickitTerm *tt, TickitKeyEventType type, const char *str)
     default: return;
   }
   tickit_term_print(tt, str);
-  tickit_term_erasech(tt, 16, -1);
+  render_modifier(tt, mod);
+  tickit_term_erasech(tt, 30, -1);
 }
 
-static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, int line, int col)
+static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, int line, int col, int mod)
 {
   tickit_term_goto(tt, 8, 2);
   tickit_term_print(tt, "Mouse:");
@@ -52,13 +73,16 @@ static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, 
     snprintf(buffer, sizeof buffer, "button %d at (%d,%d)", button, line, col);
   }
   tickit_term_print(tt, buffer);
-  tickit_term_erasech(tt, 8, -1);
+  render_modifier(tt, mod);
+  tickit_term_erasech(tt, 20, -1);
 }
 
 static void event(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
 {
   switch(ev) {
   case TICKIT_EV_RESIZE:
+  case TICKIT_EV_CHANGE:
+  case TICKIT_EV_UNBIND:
     break;
 
   case TICKIT_EV_KEY:
@@ -67,11 +91,11 @@ static void event(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *d
       return;
     }
 
-    render_key(tt, args->type, args->str);
+    render_key(tt, args->type, args->str, args->mod);
     break;
 
   case TICKIT_EV_MOUSE:
-    render_mouse(tt, args->type, args->button, args->line, args->col);
+    render_mouse(tt, args->type, args->button, args->line, args->col, args->mod);
     break;
   }
 }
@@ -96,8 +120,8 @@ int main(int argc, char *argv[])
 
   tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, event, NULL);
 
-  render_key(tt, -1, "");
-  render_mouse(tt, -1, 0, 0, 0);
+  render_key(tt, -1, "", 0);
+  render_mouse(tt, -1, 0, 0, 0, 0);
 
   signal(SIGINT, sigint);
 
