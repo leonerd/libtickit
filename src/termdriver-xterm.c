@@ -45,7 +45,7 @@ static void print(TickitTermDriver *ttd, const char *str)
   tickit_termdrv_write_str(ttd, str, strlen(str));
 }
 
-static void goto_abs(TickitTermDriver *ttd, int line, int col)
+static int goto_abs(TickitTermDriver *ttd, int line, int col)
 {
   if(line != -1 && col > 0)
     tickit_termdrv_write_strf(ttd, "\e[%d;%dH", line+1, col+1);
@@ -57,6 +57,8 @@ static void goto_abs(TickitTermDriver *ttd, int line, int col)
     tickit_termdrv_write_strf(ttd, "\e[%dG", col+1);
   else if(col != -1)
     tickit_termdrv_write_str(ttd, "\e[G", 3);
+
+  return 1;
 }
 
 static void move_rel(TickitTermDriver *ttd, int downward, int rightward)

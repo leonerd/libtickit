@@ -9,7 +9,7 @@ typedef struct {
   void (*start)(TickitTermDriver *ttd);
   void (*stop)(TickitTermDriver *ttd);
   void (*print)(TickitTermDriver *ttd, const char *str);
-  void (*goto_abs)(TickitTermDriver *ttd, int line, int col);
+  int  (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   void (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);
   int  (*scrollrect)(TickitTermDriver *ttd, int top, int left, int lines, int cols, int downward, int rightward);
   void (*erasech)(TickitTermDriver *ttd, int count, int moveend);

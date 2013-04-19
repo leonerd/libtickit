@@ -522,9 +522,9 @@ void tickit_term_print(TickitTerm *tt, const char *str)
   (*tt->driver->vtable->print)(tt->driver, str);
 }
 
-void tickit_term_goto(TickitTerm *tt, int line, int col)
+int tickit_term_goto(TickitTerm *tt, int line, int col)
 {
-  (*tt->driver->vtable->goto_abs)(tt->driver, line, col);
+  return (*tt->driver->vtable->goto_abs)(tt->driver, line, col);
 }
 
 void tickit_term_move(TickitTerm *tt, int downward, int rightward)
