@@ -9,6 +9,7 @@
 #include "hooklists.h"
 #include "termdriver.h"
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,11 @@
 #define SECOND 1000000
 
 #include <termkey.h>
+
+static TickitTermDriverProbe *driver_probes[] = {
+  &xterm_probe,
+  NULL,
+};
 
 struct TickitTerm {
   int                   outfd;
@@ -106,23 +112,37 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->lines = 25;
   tt->cols  = 80;
 
+  tt->hooks = NULL;
+
+  for(int i = 0; driver_probes[i]; i++) {
+    TickitTermDriver *driver = (*driver_probes[i]->new)(tt, termtype);
+    if(!driver)
+      continue;
+
+    tt->driver = driver;
+    break;
+  }
+
+  if(!tt->driver) {
+    errno = ENOENT;
+    goto abort_free;
+  }
+
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
    */
   tt->pen = tickit_pen_new();
 
-  tt->hooks = NULL;
-
   tt->termtype = strdup(termtype);
-
-  /* TODO: driver integration */
-  tt->driver = (*xterm_probe.new)(tt, termtype);
-  /* /TODO */
 
   // Can't 'start' yet until we have an output method
   tt->started = 0;
 
   return tt;
+
+abort_free:
+  free(tt);
+  return NULL;
 }
 
 void tickit_term_free(TickitTerm *tt)
