@@ -23,7 +23,6 @@ static inline int terminfo_columns(void) { return columns; }
 # undef columns
 #endif
 
-
 struct XTermDriver {
   TickitTermDriver driver;
 
@@ -109,10 +108,10 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
         tickit_termdrv_write_str(ttd, "\e[P", 3);             /* ICH1 */
       else if(rightward < -1)
         tickit_termdrv_write_strf(ttd, "\e[%dP", -rightward); /* ICH */
+    }
 
     if(left + cols < term_cols)
       tickit_termdrv_write_strf(ttd, "\e[s");
-    }
 
     return 1;
   }
