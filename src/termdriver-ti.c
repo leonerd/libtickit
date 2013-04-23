@@ -349,7 +349,7 @@ static void destroy(TickitTermDriver *ttd)
   free(td);
 }
 
-TickitTermDriverVTable ti_vtable = {
+static TickitTermDriverVTable ti_vtable = {
   .destroy    = destroy,
   .start      = start,
   .stop       = stop,
