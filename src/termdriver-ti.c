@@ -331,8 +331,12 @@ static void stop(TickitTermDriver *ttd)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
+  if(td->mode.mouse)
+    setctl_int(ttd, TICKIT_TERMCTL_MOUSE, 0);
   if(!td->mode.cursorvis)
     setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
+  if(td->mode.altscreen)
+    setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
 }
 
 static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
