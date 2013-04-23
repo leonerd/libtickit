@@ -26,8 +26,8 @@
 #include <termkey.h>
 
 static TickitTermDriverProbe *driver_probes[] = {
-  &xterm_probe,
-  &ti_probe,
+  &tickit_termdrv_probe_xterm,
+  &tickit_termdrv_probe_ti,
   NULL,
 };
 

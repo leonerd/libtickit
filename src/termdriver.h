@@ -34,5 +34,5 @@ typedef struct {
   TickitTermDriver *(*new)(TickitTerm *tt, const char *termtype);
 } TickitTermDriverProbe;
 
-extern TickitTermDriverProbe xterm_probe;
-extern TickitTermDriverProbe ti_probe;
+extern TickitTermDriverProbe tickit_termdrv_probe_xterm;
+extern TickitTermDriverProbe tickit_termdrv_probe_ti;

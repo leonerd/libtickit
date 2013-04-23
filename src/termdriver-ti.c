@@ -431,6 +431,6 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
 
 #endif
 
-TickitTermDriverProbe ti_probe = {
+TickitTermDriverProbe tickit_termdrv_probe_ti = {
   .new = new,
 };

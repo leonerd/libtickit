@@ -470,6 +470,6 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   return (TickitTermDriver*)xd;
 }
 
-TickitTermDriverProbe xterm_probe = {
+TickitTermDriverProbe tickit_termdrv_probe_xterm = {
   .new = new,
 };
