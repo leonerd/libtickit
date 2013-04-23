@@ -408,7 +408,7 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   td->str.sgr_fg = unibi_get_str(ut, unibi_set_a_foreground);
   td->str.sgr_bg = unibi_get_str(ut, unibi_set_a_background);
 
-  td->str.sm_csr = unibi_get_str(ut, unibi_cursor_visible);
+  td->str.sm_csr = unibi_get_str(ut, unibi_cursor_normal);
   td->str.rm_csr = unibi_get_str(ut, unibi_cursor_invisible);
 
   tickit_term_set_size(tt, unibi_get_num(ut, unibi_lines), unibi_get_num(ut, unibi_columns));
