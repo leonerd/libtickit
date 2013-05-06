@@ -264,6 +264,18 @@ int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr 
   return 0;
 }
 
+int tickit_pen_equiv(const TickitPen *a, const TickitPen *b)
+{
+  if(a == b)
+    return 1;
+
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
+    if(!tickit_pen_equiv_attr(a, b, attr))
+      return 0;
+
+  return 1;
+}
+
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr)
 {
   switch(tickit_pen_attrtype(attr)) {

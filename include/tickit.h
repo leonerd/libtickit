@@ -94,6 +94,7 @@ int  tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 
 int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr);
+int tickit_pen_equiv(const TickitPen *a, const TickitPen *b);
 
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr);
 void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite);
