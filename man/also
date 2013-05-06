@@ -19,6 +19,7 @@ tickit_pen_set_colour_attr.3 = tickit_pen_get_colour_attr.3
 tickit_pen_set_colour_attr_desc.3 = tickit_pen_get_colour_attr.3
 tickit_pen_copy_attr.3 = tickit_pen_copy.3
 tickit_pen_lookup_attr.3 = tickit_pen_attrname.3
+tickit_pen_equiv.3 = tickit_pen_equiv_attr.3
 
 tickit_string_countmore.3 = tickit_string_count.3
 
