@@ -277,6 +277,28 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
     run_ti(ttd, td->str.sgr_bg, 1, c);
 }
 
+static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
+{
+  struct TIDriver *td = (struct TIDriver *)ttd;
+
+  switch(ctl) {
+    case TICKIT_TERMCTL_ALTSCREEN:
+      *value = td->mode.altscreen;
+      return 1;
+
+    case TICKIT_TERMCTL_CURSORVIS:
+      *value = td->mode.cursorvis;
+      return 1;
+
+    case TICKIT_TERMCTL_MOUSE:
+      *value = td->mode.mouse;
+      return 1;
+
+    default:
+      return 0;
+  }
+}
+
 static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
@@ -364,6 +386,7 @@ static TickitTermDriverVTable ti_vtable = {
   .erasech    = erasech,
   .clear      = clear,
   .chpen      = chpen,
+  .getctl_int = getctl_int,
   .setctl_int = setctl_int,
   .setctl_str = setctl_str,
   .gotkey     = gotkey,

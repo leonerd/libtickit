@@ -5,15 +5,16 @@ tickit_term_setctl_int, tickit_term_setctl_str \- set an integer or string termi
 .nf
 .B #include <tickit.h>
 .sp
+.BI "int tickit_term_getctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int *" value );
 .BI "int tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int " value );
 .BI "int tickit_term_setctl_str(TickitTerm *" tt ", TickitTermCtl " ctl ", const char *" value );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. \fBtickit_term_setctl_str\fP() sets the value of a string terminal control option. The options are given in an enumeration called \fBTickitTermCtl\fP.
+\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. \fBtickit_term_setctl_str\fP() sets the value of a string terminal control option. \fBtickit_term_getctl_int\fP() returns the value of a terminal control setting.
 .PP
-The following control values are recognised:
+The options are given in an enumeration called \fBTickitTermCtl\fP. The following control values are recognised:
 .in
 .TP
 .B TICKIT_TERMCTL_ALTSCREEN (int)
@@ -45,7 +46,7 @@ The value is a boolean controlling the terminal's mouse tracking mode. When enab
 .B TICKIT_TERMCTL_TITLE_TEXT (str)
 The value is a string for the terminal to use as its main window title.
 .SH "RETURN VALUE"
-\fBtickit_term_setctl_int\fP() returns a true value if it recognised the requested control and managed to request the terminal to change it; false if not.
+\fBtickit_term_getctl_int\fP() returns a true value if it recognised the requested control and managed to return the current value of it; fales if not.\fBtickit_term_setctl_int\fP() and \fBtickit_term_setctl_str\fP() return a true value if it recognised the requested control and managed to request the terminal to change it; false if not.
 .SH "SEE ALSO"
 .BR tickit_term_new (3),
 .BR tickit_term (7),

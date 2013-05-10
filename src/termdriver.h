@@ -15,6 +15,7 @@ typedef struct {
   void (*erasech)(TickitTermDriver *ttd, int count, int moveend);
   void (*clear)(TickitTermDriver *ttd);
   void (*chpen)(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final);
+  int  (*getctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int *value);
   int  (*setctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int value);
   int  (*setctl_str)(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value);
   void (*gotkey)(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key);

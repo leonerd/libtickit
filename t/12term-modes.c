@@ -13,8 +13,9 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
   char buffer[1024];
+  int value;
 
-  plan_tests(8);
+  plan_tests(9);
 
   tt = tickit_term_new_for_termtype("xterm");
 
@@ -26,6 +27,9 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
 
   is_str_escape(buffer, "\e[?1049h", "buffer after set_mode_altscreen on");
+
+  tickit_term_getctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, &value);
+  is_int(value, 1, "get_mode_altscreen returns value");
 
   buffer[0] = 0;
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
