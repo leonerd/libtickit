@@ -294,6 +294,10 @@ static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
       *value = td->mode.mouse;
       return 1;
 
+    case TICKIT_TERMCTL_COLORS:
+      *value = td->cap.colours;
+      return 1;
+
     default:
       return 0;
   }

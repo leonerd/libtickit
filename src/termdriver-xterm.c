@@ -312,6 +312,10 @@ static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
       *value = xd->mode.keypad;
       return 1;
 
+    case TICKIT_TERMCTL_COLORS:
+      *value = 256;
+      return 1;
+
     default:
       return 0;
   }

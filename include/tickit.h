@@ -219,6 +219,7 @@ typedef enum {
   TICKIT_TERMCTL_TITLE_TEXT,
   TICKIT_TERMCTL_ICONTITLE_TEXT,
   TICKIT_TERMCTL_KEYPAD_APP,
+  TICKIT_TERMCTL_COLORS, // read-only
 } TickitTermCtl;
 
 typedef enum {

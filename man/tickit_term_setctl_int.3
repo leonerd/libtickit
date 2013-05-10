@@ -45,6 +45,9 @@ The value is a boolean controlling the terminal's mouse tracking mode. When enab
 .TP
 .B TICKIT_TERMCTL_TITLE_TEXT (str)
 The value is a string for the terminal to use as its main window title.
+.TP
+.B TICKIT_TERMCTL_COLORS (int, read-only)
+The value indicates how many colors are available. This value is read-only; it can be requested but not set.
 .SH "RETURN VALUE"
 \fBtickit_term_getctl_int\fP() returns a true value if it recognised the requested control and managed to return the current value of it; fales if not.\fBtickit_term_setctl_int\fP() and \fBtickit_term_setctl_str\fP() return a true value if it recognised the requested control and managed to request the terminal to change it; false if not.
 .SH "SEE ALSO"
