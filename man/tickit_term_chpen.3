@@ -14,6 +14,8 @@ Link with \fI\-ltickit\fP.
 \fBtickit_term_chpen\fP() changes the rendering attributes currently in effect in the terminal by setting those attributes specified in the given \fBTickitPen\fP instance. Attributes not present in \fIpen\fP remain unmodified by this operation.
 .PP
 \fBtickit_term_setpen\fP() changes the rendering attributes currently in effect in the terminal by setting all of the attributes to those given in the \fBTickitPen\fP instance. Any attribute not present in \fIpen\fP is reset back to its default value.
+.PP
+If the foreground or background colour is set to an index higher than the terminal can support, it will be converted to the best choice that is available from the palette of 8 or 16 colors.
 .SH "RETURN VALUE"
 \fBtickit_term_chpen\fP() and \fBtickit_term_setpen\fP() return no value.
 .SH "SEE ALSO"

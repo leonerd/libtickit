@@ -64,6 +64,10 @@ $(LIBRARY): $(OBJECTS)
 src/%.lo: src/%.c $(HFILES_INT)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
+src/term.lo: src/xterm-palette.inc
+src/xterm-palette.inc: src/xterm-palette.inc.PL
+	perl $^ > $@
+
 t/%.t: t/%.c $(LIBRARY) t/taplib.lo
 	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude $^
 

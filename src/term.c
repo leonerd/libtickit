@@ -9,6 +9,8 @@
 #include "hooklists.h"
 #include "termdriver.h"
 
+#include "xterm-palette.inc"
+
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -57,6 +59,7 @@ struct TickitTerm {
 
   int started;
 
+  int colors;
   TickitPen *pen;
 
   struct TickitEventHook *hooks;
@@ -135,6 +138,8 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->pen = tickit_pen_new();
 
   tt->termtype = strdup(termtype);
+
+  tickit_term_getctl_int(tt, TICKIT_TERMCTL_COLORS, &tt->colors);
 
   // Can't 'start' yet until we have an output method
   tt->started = 0;
@@ -538,6 +543,14 @@ int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int col
   return (*tt->driver->vtable->scrollrect)(tt->driver, top, left, lines, cols, downward, rightward);
 }
 
+static int convert_colour(int index, int colours)
+{
+  if(colours >= 16)
+    return xterm256[index].as16;
+  else
+    return xterm256[index].as8;
+}
+
 void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
 {
   TickitPen *delta = tickit_pen_new();
@@ -549,8 +562,17 @@ void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
     if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
       continue;
 
-    tickit_pen_copy_attr(tt->pen, pen, attr);
-    tickit_pen_copy_attr(delta, pen, attr);
+    int index;
+    if((attr == TICKIT_PEN_FG || attr == TICKIT_PEN_BG) &&
+       (index = tickit_pen_get_colour_attr(pen, attr)) >= tt->colors) {
+      index = convert_colour(index, tt->colors);
+      tickit_pen_set_colour_attr(tt->pen, attr, index);
+      tickit_pen_set_colour_attr(delta, attr, index);
+    }
+    else {
+      tickit_pen_copy_attr(tt->pen, pen, attr);
+      tickit_pen_copy_attr(delta, pen, attr);
+    }
   }
 
   (*tt->driver->vtable->chpen)(tt->driver, delta, tt->pen);
@@ -566,8 +588,17 @@ void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
     if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
       continue;
 
-    tickit_pen_copy_attr(tt->pen, pen, attr);
-    tickit_pen_copy_attr(delta, pen, attr);
+    int index;
+    if((attr == TICKIT_PEN_FG || attr == TICKIT_PEN_BG) &&
+       (index = tickit_pen_get_colour_attr(pen, attr)) >= tt->colors) {
+      index = convert_colour(index, tt->colors);
+      tickit_pen_set_colour_attr(tt->pen, attr, index);
+      tickit_pen_set_colour_attr(delta, attr, index);
+    }
+    else {
+      tickit_pen_copy_attr(tt->pen, pen, attr);
+      tickit_pen_copy_attr(delta, pen, attr);
+    }
   }
 
   (*tt->driver->vtable->chpen)(tt->driver, delta, tt->pen);
