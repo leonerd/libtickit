@@ -13,6 +13,8 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_rect_intersect\fP() tests if the two rectangles given by \fIa\fP and \fIb\fP intersect and if so, initialises the rectangle structure given by \fIdst\fP to contain it. It returns true if it did this. If the two given rectangles do not intersect then it returns false and does not modify the structure given by \fIdst\fP.
 .PP
+\fIdst\fP may be equal to either \fIa\fP or \fIb\fP, or it may refer to a distinct rectangle structure. The two source rectangles are read before the result is written.
+.PP
 To simply test if two given rectangles intersect without obtaining the actual intersection region, use \fBtickit_rect_intersects\fP(3).
 .SH "RETURN VALUE"
 \fBtickit_rect_intersect\fP() returns true if the rectangles intersect, and false if not.
