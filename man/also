@@ -12,6 +12,7 @@ tickit_term_getctl_int.3 = tickit_term_setctl_int.3
 tickit_term_setctl_str.3 = tickit_term_setctl_int.3
 
 tickit_pen_destroy.3 = tickit_pen_new.3
+tickit_pen_clone.3 = tickit_pen_new.3
 tickit_pen_unbind_event_id.3 = tickit_pen_bind_event.3
 tickit_pen_is_nondefault.3 = tickit_pen_is_nonempty.3
 tickit_pen_set_bool_attr.3 = tickit_pen_get_bool_attr.3

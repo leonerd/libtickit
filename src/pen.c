@@ -49,6 +49,13 @@ TickitPen *tickit_pen_new(void)
   return pen;
 }
 
+TickitPen *tickit_pen_clone(TickitPen *orig)
+{
+  TickitPen *pen = tickit_pen_new();
+  tickit_pen_copy(pen, orig, 1);
+  return pen;
+}
+
 void tickit_pen_destroy(TickitPen *pen)
 {
   tickit_hooklist_unbind_and_destroy(pen->hooks, pen);
