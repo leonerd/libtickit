@@ -439,7 +439,7 @@ int tickit_term_input_check_timeout(TickitTerm *tt)
   return -1;
 }
 
-void tickit_term_input_wait(TickitTerm *tt)
+void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout)
 {
   TermKey *tk = get_termkey(tt);
   TermKeyKey key;

@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
   signal(SIGINT, sigint);
 
   while(still_running)
-    tickit_term_input_wait(tt);
+    tickit_term_input_wait(tt, NULL);
 
   tickit_term_destroy(tt);
 

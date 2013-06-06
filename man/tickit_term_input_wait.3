@@ -5,7 +5,7 @@ tickit_term_input_wait \- read more data from the terminal
 .nf
 .B #include <tickit.h>
 .sp
-.BI "void tickit_term_input_wait(TickitTerm *" tt );
+.BI "void tickit_term_input_wait(TickitTerm *" tt ", const struct timeval *" timeout );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
