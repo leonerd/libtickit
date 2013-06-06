@@ -444,8 +444,16 @@ void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout)
   TermKey *tk = get_termkey(tt);
   TermKeyKey key;
 
-  termkey_waitkey(tk, &key);
-  got_key(tt, tk, &key);
+  struct timeval to_copy;
+  if(timeout)
+    to_copy = *timeout;
+
+  fd_set readfds;
+  int fd = termkey_get_fd(tk);
+  FD_SET(fd, &readfds);
+  if(select(fd + 1, &readfds, NULL, NULL, timeout ? &to_copy : NULL) == 1) {
+    termkey_advisereadable(tk);
+  }
 
   /* Might as well get any more that are ready */
   while(termkey_getkey(tk, &key) == TERMKEY_RES_KEY) {

@@ -10,7 +10,7 @@ tickit_term_input_wait \- read more data from the terminal
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_input_wait\fP() waits for at least one input event to be received. Calling this function may block if the underlying file descriptor is in blocking mode. It may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked.
+\fBtickit_term_input_wait\fP() waits for at least one input event to be received, up until the maximum time given. Calling this function may block if the underlying file descriptor is in blocking mode. It may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked. If \fItimeout\fP is \fBNULL\fP then no timeout is applied and it will wait indefinitely.
 .SH "RETURN VALUE"
 \fBtickit_term_input_wait\fP() returns no value.
 .SH "SEE ALSO"
