@@ -331,9 +331,9 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       return 1;
 
     case TICKIT_TERMCTL_CURSORBLINK:
-      /* We don't actually know whether this was enabled initially, so best
-       * just to always apply this
-       */
+      if(xd->initialised.cursorblink && !xd->mode.cursorblink == !value)
+        return 1;
+
       tickit_termdrv_write_str(ttd, value ? "\e[?12h" : "\e[?12l", 0);
       xd->mode.cursorblink = !!value;
       return 1;
