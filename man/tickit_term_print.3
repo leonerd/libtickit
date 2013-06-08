@@ -6,13 +6,17 @@ tickit_term_print \- send text to the terminal
 .B #include <tickit.h>
 .sp
 .BI "void tickit_term_print(TickitTerm *" tt ", const char *" str );
+.BI "void tickit_term_printf(TickitTerm *" tt ", const char *" fmt ", ...);"
+.BI "void tickit_term_vprintf(TickitTerm *" tt ", const char *" fmt ", va_list " args );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_term_print\fP() sends a string of text to the terminal to be printed at the current cursor location. The string must be free from any control characters.
+.PP
+\fBtickit_term_printf\fP() sends a string of text built by formatting the given arguments in the same way that \fBprintf\fP(3) does. \fBtickit_term_vprintf\fP() is similar, taking its arguments instead in a \fBva_list\fP as \fPvprintf\fP(3) does.
 .SH "RETURN VALUE"
-\fBtickit_term_print\fP() returns no value.
+\fBtickit_term_print\fP(), \fBtickit_term_printf\fP() and \fBtickit_term_vprintf\fP() return no value.
 .SH "SEE ALSO"
 .BR tickit_term_new (3),
 .BR tickit_term_set_output_fd (3),

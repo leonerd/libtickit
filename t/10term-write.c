@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
    * pipe() can make us one */
   pipe(fd);
 
-  plan_tests(9);
+  plan_tests(11);
 
   tt = tickit_term_new_for_termtype("xterm");
 
@@ -37,6 +37,14 @@ int main(int argc, char *argv[])
 
   is_int(len, 12, "read() length after tickit_term_print");
   is_str_escape(buffer, "Hello world!", "buffer after tickit_term_print");
+
+  tickit_term_printf(tt, "%s %s!", "More", "messages");
+
+  len = read(fd[0], buffer, sizeof buffer);
+  buffer[len] = 0;
+
+  is_int(len, 14, "read() length after tickit_term_printf");
+  is_str_escape(buffer, "More messages!", "buffer after tickit_term_printf");
 
   tickit_term_goto(tt, 2, 5);
 

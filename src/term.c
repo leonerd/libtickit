@@ -536,6 +536,27 @@ void tickit_term_print(TickitTerm *tt, const char *str)
   (*tt->driver->vtable->print)(tt->driver, str);
 }
 
+void tickit_term_printf(TickitTerm *tt, const char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  tickit_term_vprintf(tt, fmt, args);
+  va_end(args);
+}
+
+void tickit_term_vprintf(TickitTerm *tt, const char *fmt, va_list args)
+{
+  va_list args2;
+  va_copy(args2, args);
+
+  size_t len = vsnprintf(NULL, 0, fmt, args) + 1;
+  char *buf = get_tmpbuffer(tt, len);
+  vsnprintf(buf, len, fmt, args2);
+  (*tt->driver->vtable->print)(tt->driver, buf);
+
+  va_end(args2);
+}
+
 int tickit_term_goto(TickitTerm *tt, int line, int col)
 {
   return (*tt->driver->vtable->goto_abs)(tt->driver, line, col);
