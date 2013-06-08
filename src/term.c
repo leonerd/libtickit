@@ -57,7 +57,7 @@ struct TickitTerm {
   int lines;
   int cols;
 
-  int started;
+  enum { UNSTARTED, STARTING, STARTED } state;
 
   int colors;
   TickitPen *pen;
@@ -142,7 +142,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tickit_term_getctl_int(tt, TICKIT_TERMCTL_COLORS, &tt->colors);
 
   // Can't 'start' yet until we have an output method
-  tt->started = 0;
+  tt->state = UNSTARTED;
 
   return tt;
 
@@ -240,10 +240,10 @@ void tickit_term_set_output_fd(TickitTerm *tt, int fd)
 
   tickit_term_refresh_size(tt);
 
-  if(!tt->started) {
+  if(tt->state == UNSTARTED) {
     if(tt->driver->vtable->start)
       (*tt->driver->vtable->start)(tt->driver);
-    tt->started = 1;
+    tt->state = STARTING;
   }
 }
 
@@ -257,10 +257,10 @@ void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void 
   tt->outfunc      = fn;
   tt->outfunc_user = user;
 
-  if(!tt->started) {
+  if(tt->state == UNSTARTED) {
     if(tt->driver->vtable->start)
       (*tt->driver->vtable->start)(tt->driver);
-    tt->started = 1;
+    tt->state = STARTING;
   }
 }
 
@@ -309,6 +309,51 @@ void tickit_term_set_utf8(TickitTerm *tt, int utf8)
 
   if(tt->termkey)
     termkey_set_flags(tt->termkey, tt->termkey_flags);
+}
+
+void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout)
+{
+  if(tt->state == STARTED)
+    return;
+
+  struct timeval until;
+  gettimeofday(&until, NULL);
+
+  // until += timeout
+  if(until.tv_usec + timeout->tv_usec >= 1E6) {
+    until.tv_sec  += timeout->tv_sec + 1;
+    until.tv_usec += timeout->tv_usec - 1E6;
+  }
+  else {
+    until.tv_sec  += timeout->tv_sec;
+    until.tv_usec += timeout->tv_usec;
+  }
+
+  while(tt->state != STARTED) {
+    if(!tt->driver->vtable->started ||
+       (*tt->driver->vtable->started)(tt->driver))
+      break;
+
+    struct timeval timeout;
+    gettimeofday(&timeout, NULL);
+
+    // timeout = until - timeout
+    if(until.tv_usec < timeout.tv_usec) {
+      timeout.tv_sec  = until.tv_sec  - timeout.tv_sec - 1;
+      timeout.tv_usec = until.tv_usec - timeout.tv_usec + 1E6;
+    }
+    else {
+      timeout.tv_sec  = until.tv_sec  - timeout.tv_sec;
+      timeout.tv_usec = until.tv_usec - timeout.tv_usec;
+    }
+
+    if(timeout.tv_sec < 0)
+      break;
+
+    tickit_term_input_wait(tt, &timeout);
+  }
+
+  tt->state = STARTED;
 }
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)

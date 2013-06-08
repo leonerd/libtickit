@@ -16,6 +16,7 @@ struct XTermDriver {
   } mode;
 
   struct {
+    unsigned int initialised:1;
     unsigned int slrm:1;
   } cap;
 };
@@ -385,6 +386,13 @@ static void start(TickitTermDriver *ttd)
   tickit_termdrv_write_strf(ttd, "\e[?69$p");
 }
 
+static int started(TickitTermDriver *ttd)
+{
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
+  return xd->cap.initialised;
+}
+
 static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
@@ -398,6 +406,7 @@ static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
         case 69: // DECVSSM
           if(value == 1 || value == 2)
             xd->cap.slrm = 1;
+          xd->cap.initialised = 1;
           break;
       }
   }
@@ -427,6 +436,7 @@ static void destroy(TickitTermDriver *ttd)
 static TickitTermDriverVTable xterm_vtable = {
   .destroy    = destroy,
   .start      = start,
+  .started    = started,
   .stop       = stop,
   .print      = print,
   .goto_abs   = goto_abs,
@@ -464,6 +474,7 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   /* This will be set to 1 later if the terminal responds appropriately to the
    * DECRQM on DECVSSM
    */
+  xd->cap.initialised = 0;
   xd->cap.slrm = 0;
 
   return (TickitTermDriver*)xd;

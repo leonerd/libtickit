@@ -178,6 +178,7 @@ int  tickit_term_get_output_fd(const TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
 void tickit_term_set_output_buffer(TickitTerm *tt, size_t len);
 
+void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout);
 void tickit_term_flush(TickitTerm *tt);
 
 /* fd is allowed to be unset (-1); works abstractly */

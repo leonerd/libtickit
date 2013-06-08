@@ -14,10 +14,13 @@ Link with \fI\-ltickit\fP.
 \fBtickit_term_set_input_fd\fP() associates an input file descriptor with the terminal instance. This file descriptor will be used by \fBtickit_term_input_readable\fP(3) to read more data from the terminal. The value -1 may be set to indicate an absence of a file descriptor. If no file descriptor is provided, input data may still be given by calling \fBtickit_term_input_push_bytes\fP(3).
 .PP
 \fBtickit_term_get_input_fd\fP() returns the currently associated input file descriptor, or -1 if none has been set.
+.PP
+After both an input and output method have been defined, it is recommended to call \fBtickit_term_await_input\fP(3) to wait for the terminal to be set up.
 .SH "RETURN VALUE"
 \fBtickit_term_set_input_fd\fP() returns no value. \fBtickit_term_get_input_fd\fP() returns a file descriptor or -1.
 .SH "SEE ALSO"
 .BR tickit_term_new (3),
+.BR tickit_term_await_started (3),
 .BR tickit_term_bind_event (3),
 .BR tickit_term (7),
 .BR tickit (7)
