@@ -4,13 +4,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define strneq(a,b,n) (strncmp(a,b,n)==0)
+
 struct XTermDriver {
   TickitTermDriver driver;
+
+  int dcs_offset;
+  char dcs_buffer[16];
 
   struct {
     unsigned int altscreen:1;
     unsigned int cursorvis:1;
     unsigned int cursorblink:1;
+    unsigned int cursorshape:2;
     unsigned int mouse:1;
     unsigned int keypad:1;
   } mode;
@@ -22,6 +28,7 @@ struct XTermDriver {
   struct {
     unsigned int cursorvis:1;
     unsigned int cursorblink:1;
+    unsigned int cursorshape:2;
     unsigned int slrm:1;
   } initialised;
 };
@@ -296,6 +303,10 @@ static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
       *value = xd->mode.mouse;
       return 1;
 
+    case TICKIT_TERMCTL_CURSORSHAPE:
+      *value = xd->mode.cursorshape;
+      return 1;
+
     case TICKIT_TERMCTL_KEYPAD_APP:
       *value = xd->mode.keypad;
       return 1;
@@ -347,7 +358,11 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       return 1;
 
     case TICKIT_TERMCTL_CURSORSHAPE:
+      if(xd->initialised.cursorshape && xd->mode.cursorshape == value)
+        return 1;
+
       tickit_termdrv_write_strf(ttd, "\e[%d q", value * 2 + (xd->mode.cursorblink ? -1 : 0));
+      xd->mode.cursorshape = value;
       return 1;
 
     case TICKIT_TERMCTL_KEYPAD_APP:
@@ -390,8 +405,8 @@ static void start(TickitTermDriver *ttd)
   // Find out if DECSLRM is actually supported
   tickit_termdrv_write_strf(ttd, "\e[?69$p");
 
-  // Also query the current cursor visibility and blink status
-  tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p");
+  // Also query the current cursor visibility, blink status, and shape
+  tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p\eP$q q\e\\");
 }
 
 static int started(TickitTermDriver *ttd)
@@ -400,7 +415,43 @@ static int started(TickitTermDriver *ttd)
 
   return xd->initialised.cursorvis &&
          xd->initialised.cursorblink &&
+         xd->initialised.cursorshape &&
          xd->initialised.slrm;
+}
+
+static void gotkey_modereport(struct XTermDriver *xd, int initial, int mode, int value)
+{
+  if(initial == '?') // DEC mode
+    switch(mode) {
+      case 12: // Cursor blink
+        if(value == 1)
+          xd->mode.cursorblink = 1;
+        xd->initialised.cursorblink = 1;
+        break;
+      case 25: // DECTCEM == Cursor visibility
+        if(value == 1)
+          xd->mode.cursorvis = 1;
+        xd->initialised.cursorvis = 1;
+        break;
+      case 69: // DECVSSM
+        if(value == 1 || value == 2)
+          xd->cap.slrm = 1;
+        xd->initialised.slrm = 1;
+        break;
+    }
+}
+
+static void gotkey_decrqss(struct XTermDriver *xd, char status, char *args, size_t arglen)
+{
+  if(strneq(args + arglen - 2, " q", 2)) { // DECSCUSR
+    int value;
+    if(status == '1' && sscanf(args, "%d", &value)) {
+      // value==1 or 2 => shape == 1, 3 or 4 => 2, etc..
+      int shape = (value+1) / 2;
+      xd->mode.cursorshape = shape;
+    }
+    xd->initialised.cursorshape = 1;
+  }
 }
 
 static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
@@ -410,25 +461,38 @@ static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
   if(key->type == TERMKEY_TYPE_MODEREPORT) {
     int initial, mode, value;
     termkey_interpret_modereport(tk, key, &initial, &mode, &value);
+    gotkey_modereport(xd, initial, mode, value);
 
-    if(initial == '?') // DEC mode
-      switch(mode) {
-        case 12: // Cursor blink
-          if(value == 1)
-            xd->mode.cursorblink = 1;
-          xd->initialised.cursorblink = 1;
-          break;
-        case 25: // DECTCEM == Cursor visibility
-          if(value == 1)
-            xd->mode.cursorvis = 1;
-          xd->initialised.cursorvis = 1;
-          break;
-        case 69: // DECVSSM
-          if(value == 1 || value == 2)
-            xd->cap.slrm = 1;
-          xd->initialised.slrm = 1;
-          break;
-      }
+    return 1;
+  }
+  // TODO: Long term we'll move libtermkey's code into terminal drivers and
+  // stop using it. Until then we'll have to have our own DCS parser
+  else if(key->type == TERMKEY_TYPE_UNICODE &&
+          key->modifiers == TERMKEY_KEYMOD_ALT &&
+          key->code.codepoint == 'P') {
+    xd->dcs_offset = 0;
+    return 1;
+  }
+  else if(xd->dcs_offset != -1 &&
+          key->type == TERMKEY_TYPE_UNICODE &&
+          key->modifiers == 0) {
+    if(xd->dcs_offset < sizeof xd->dcs_buffer)
+      xd->dcs_buffer[xd->dcs_offset++] = key->utf8[0]; // TODO: UTF-8 in DCS?
+    return 1;
+  }
+  else if(key->type == TERMKEY_TYPE_UNICODE &&
+          key->modifiers == TERMKEY_KEYMOD_ALT &&
+          key->code.codepoint == '\\') {
+    if(xd->dcs_offset == -1)
+      return 1;
+
+    size_t cmdlen = 1;
+    while(cmdlen < xd->dcs_offset &&
+          xd->dcs_buffer[cmdlen-1] < 0x40)
+      cmdlen++;
+
+    if(cmdlen == 3 && strneq(xd->dcs_buffer + 1, "$r", 2))
+      gotkey_decrqss(xd, xd->dcs_buffer[0], xd->dcs_buffer + cmdlen, xd->dcs_offset - cmdlen);
 
     return 1;
   }
@@ -490,6 +554,8 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   struct XTermDriver *xd = malloc(sizeof(struct XTermDriver));
   xd->driver.vtable = &xterm_vtable;
   xd->driver.tt = tt;
+
+  xd->dcs_offset = -1;
 
   xd->mode.altscreen = 0;
   xd->mode.cursorvis = 1;
