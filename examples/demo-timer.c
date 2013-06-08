@@ -38,11 +38,7 @@ int main(int argc, char *argv[])
     tickit_term_input_wait(tt, &to);
 
     tickit_term_goto(tt, 5, 5);
-
-    // TODO: we want a tickit_term_printf()
-    char buffer[32];
-    snprintf(buffer, sizeof buffer, "Counter %d", counter++);
-    tickit_term_print(tt, buffer);
+    tickit_term_printf(tt, "Counter %d", counter++);
   }
 
   tickit_term_destroy(tt);

@@ -63,16 +63,12 @@ static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, 
     default: return;
   }
 
-  /* TODO: want a tickit_term_printf()
-   */
-  char buffer[64];
   if(type == TICKIT_MOUSEEV_WHEEL) {
-    snprintf(buffer, sizeof buffer, "%s at (%d,%d)", button == TICKIT_MOUSEWHEEL_DOWN ? "down" : "up", line, col);
+    tickit_term_printf(tt, "%s at (%d,%d)", button == TICKIT_MOUSEWHEEL_DOWN ? "down" : "up", line, col);
   }
   else {
-    snprintf(buffer, sizeof buffer, "button %d at (%d,%d)", button, line, col);
+    tickit_term_printf(tt, "button %d at (%d,%d)", button, line, col);
   }
-  tickit_term_print(tt, buffer);
   render_modifier(tt, mod);
   tickit_term_erasech(tt, 20, -1);
 }
