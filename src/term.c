@@ -360,6 +360,10 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 {
   TickitEvent args;
 
+  if(tt->driver->vtable->gotkey &&
+     (*tt->driver->vtable->gotkey)(tt->driver, tk, key))
+    return;
+
   if(key->type == TERMKEY_TYPE_MOUSE) {
     TermKeyMouseEvent ev;
     termkey_interpret_mouse(tk, key, &ev, &args.button, &args.line, &args.col);
@@ -401,10 +405,6 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     args.mod  = key->modifiers;
 
     run_events(tt, TICKIT_EV_KEY, &args);
-  }
-  else {
-    if(tt->driver->vtable->gotkey)
-      (*tt->driver->vtable->gotkey)(tt->driver, tk, key);
   }
 }
 

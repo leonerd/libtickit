@@ -403,7 +403,7 @@ static int started(TickitTermDriver *ttd)
          xd->initialised.slrm;
 }
 
-static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
+static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
@@ -429,7 +429,11 @@ static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
           xd->initialised.slrm = 1;
           break;
       }
+
+    return 1;
   }
+
+  return 0;
 }
 
 static void stop(TickitTermDriver *ttd)

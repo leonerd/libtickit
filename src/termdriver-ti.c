@@ -365,11 +365,6 @@ static void stop(TickitTermDriver *ttd)
     setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
 }
 
-static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
-{
-  // Nothing of interest
-}
-
 static void destroy(TickitTermDriver *ttd)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
@@ -393,7 +388,6 @@ static TickitTermDriverVTable ti_vtable = {
   .getctl_int = getctl_int,
   .setctl_int = setctl_int,
   .setctl_str = setctl_str,
-  .gotkey     = gotkey,
 };
 
 static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
