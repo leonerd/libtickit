@@ -22,6 +22,7 @@ struct XTermDriver {
   } mode;
 
   struct {
+    unsigned int cursorshape:1;
     unsigned int slrm:1;
   } cap;
 
@@ -361,7 +362,8 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       if(xd->initialised.cursorshape && xd->mode.cursorshape == value)
         return 1;
 
-      tickit_termdrv_write_strf(ttd, "\e[%d q", value * 2 + (xd->mode.cursorblink ? -1 : 0));
+      if(xd->cap.cursorshape)
+        tickit_termdrv_write_strf(ttd, "\e[%d q", value * 2 + (xd->mode.cursorblink ? -1 : 0));
       xd->mode.cursorshape = value;
       return 1;
 
@@ -449,6 +451,7 @@ static void gotkey_decrqss(struct XTermDriver *xd, char status, char *args, size
       // value==1 or 2 => shape == 1, 3 or 4 => 2, etc..
       int shape = (value+1) / 2;
       xd->mode.cursorshape = shape;
+      xd->cap.cursorshape = 1;
     }
     xd->initialised.cursorshape = 1;
   }
