@@ -4,23 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_UNIBILIUM
-# include "unibilium.h"
-#else
-# include <curses.h>
-# include <term.h>
-
-/* term.h has defined 'lines' as a macro. Eugh. We'd really rather prefer it
- * didn't pollute our namespace so we'll provide some functions here and then
- * #undef the name pollution
- */
-static inline int terminfo_lines(void)   { return lines; }
-static inline int terminfo_columns(void) { return columns; }
-
-# undef lines
-# undef columns
-#endif
-
 struct XTermDriver {
   TickitTermDriver driver;
 
@@ -186,8 +169,7 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
   }
 }
 
-/* clear() may collide with something from curses.h or term.h */
-static void ttd_clear(TickitTermDriver *ttd)
+static void clear(TickitTermDriver *ttd)
 {
   tickit_termdrv_write_strf(ttd, "\e[2J", 4);
 }
@@ -451,7 +433,7 @@ static TickitTermDriverVTable xterm_vtable = {
   .move_rel   = move_rel,
   .scrollrect = scrollrect,
   .erasech    = erasech,
-  .clear      = ttd_clear,
+  .clear      = clear,
   .chpen      = chpen,
   .getctl_int = getctl_int,
   .setctl_int = setctl_int,
@@ -483,24 +465,6 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
    * DECRQM on DECVSSM
    */
   xd->cap.slrm = 0;
-
-#ifdef HAVE_UNIBILIUM
-  {
-    unibi_term *ut = unibi_from_term(termtype);
-    if(ut) {
-      tickit_term_set_size(tt, unibi_get_num(ut, unibi_lines), unibi_get_num(ut, unibi_columns));
-
-      unibi_destroy(ut);
-    }
-  }
-#else
-  {
-    int err;
-    if(setupterm((char*)termtype, 1, &err) == OK) {
-      tickit_term_set_size(tt, terminfo_lines(), terminfo_columns());
-    }
-  }
-#endif
 
   return (TickitTermDriver*)xd;
 }

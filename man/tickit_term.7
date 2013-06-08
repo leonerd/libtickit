@@ -13,7 +13,9 @@ A \fBTickitTerm\fP instance represents an interactive user terminal. It provides
 .SH FUNCTIONS
 A new \fBTickitTerm\fP instance is created using the \fBtickit_term_new\fP(3) or \fBtickit_term_new_for_termtype\fP(3) functions, and destroyed using \fBtickit_term_destroy\fP(3).
 .PP
-A terminal instance will need either an output function or an output filehandle set before it can send output. This can be performed by either \fBtickit_term_set_output_func\fP(3) or \fBtickit_term_set_output_fd\fP(3). An output buffer can be defined by \fBtickit_term_set_output_buffer\fP(3). An input filehandle can be set using \fBtickit_term_set_input_fd\fP(3), or input can be sent from a byte buffer using \fBtickit_term_input_push_bytes\fP(3). It supports
+A terminal instance will need either an output function or an output filehandle set before it can send output. This can be performed by either \fBtickit_term_set_output_func\fP(3) or \fBtickit_term_set_output_fd\fP(3). An output buffer can be defined by \fBtickit_term_set_output_buffer\fP(3). If output is via a filehandle, then the size of that will be queried if it is a
+.SM TTY.
+If output is via an output function only then the size must be set using \fBtickit_term_set_size\fP(3). An input filehandle can be set using \fBtickit_term_set_input_fd\fP(3), or input can be sent from a byte buffer using \fBtickit_term_input_push_bytes\fP(3). It supports
 .SM UTF-8
 if enabled; either by detection of a
 .SM UTF-8
