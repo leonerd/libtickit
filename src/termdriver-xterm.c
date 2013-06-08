@@ -560,14 +560,12 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
 
   xd->dcs_offset = -1;
 
-  xd->mode.altscreen = 0;
+  memset(&xd->mode, 0, sizeof xd->mode);
   xd->mode.cursorvis = 1;
-  xd->mode.mouse     = 0;
 
-  /* This will be set to 1 later if the terminal responds appropriately to the
-   * DECRQM on DECVSSM
-   */
-  xd->cap.slrm = 0;
+  memset(&xd->cap, 0, sizeof xd->cap);
+
+  memset(&xd->initialised, 0, sizeof xd->initialised);
 
   return (TickitTermDriver*)xd;
 }
