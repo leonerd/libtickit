@@ -497,6 +497,8 @@ static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
     if(cmdlen == 3 && strneq(xd->dcs_buffer + 1, "$r", 2))
       gotkey_decrqss(xd, xd->dcs_buffer[0], xd->dcs_buffer + cmdlen, xd->dcs_offset - cmdlen);
 
+    xd->dcs_offset = -1;
+
     return 1;
   }
 
