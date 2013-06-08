@@ -16,9 +16,14 @@ struct XTermDriver {
   } mode;
 
   struct {
-    unsigned int initialised:1;
     unsigned int slrm:1;
   } cap;
+
+  struct {
+    unsigned int cursorvis:1;
+    unsigned int cursorblink:1;
+    unsigned int slrm:1;
+  } initialised;
 };
 
 static void print(TickitTermDriver *ttd, const char *str)
@@ -384,13 +389,18 @@ static void start(TickitTermDriver *ttd)
 
   // Find out if DECSLRM is actually supported
   tickit_termdrv_write_strf(ttd, "\e[?69$p");
+
+  // Also query the current cursor visibility and blink status
+  tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p");
 }
 
 static int started(TickitTermDriver *ttd)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
-  return xd->cap.initialised;
+  return xd->initialised.cursorvis &&
+         xd->initialised.cursorblink &&
+         xd->initialised.slrm;
 }
 
 static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
@@ -403,10 +413,20 @@ static void gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
 
     if(initial == '?') // DEC mode
       switch(mode) {
+        case 12: // Cursor blink
+          if(value == 1)
+            xd->mode.cursorblink = 1;
+          xd->initialised.cursorblink = 1;
+          break;
+        case 25: // DECTCEM == Cursor visibility
+          if(value == 1)
+            xd->mode.cursorvis = 1;
+          xd->initialised.cursorvis = 1;
+          break;
         case 69: // DECVSSM
           if(value == 1 || value == 2)
             xd->cap.slrm = 1;
-          xd->cap.initialised = 1;
+          xd->initialised.slrm = 1;
           break;
       }
   }
@@ -474,7 +494,6 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   /* This will be set to 1 later if the terminal responds appropriately to the
    * DECRQM on DECVSSM
    */
-  xd->cap.initialised = 0;
   xd->cap.slrm = 0;
 
   return (TickitTermDriver*)xd;

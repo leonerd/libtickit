@@ -28,7 +28,8 @@ int main(int argc, char *argv[])
   len = read(fd[0], buffer, sizeof buffer);
   buffer[len] = 0;
 
-  is_str_escape(buffer, "\e[?69h\e[?69$p", "buffer after initialisation contains DECSLRM probe");
+  is_str_escape(buffer, "\e[?69h\e[?69$p\e[?25$p\e[?12$p",
+      "buffer after initialisation contains DECSLRM and cursor status probes");
 
   tickit_term_print(tt, "Hello world!");
 
