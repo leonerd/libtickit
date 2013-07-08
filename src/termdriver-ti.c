@@ -35,6 +35,54 @@ static const struct TermInfoExtraStrings extra_strings_vt200_mouse = {
   .exit_mouse_mode  = "\e[?1002l\e[?1006l",
 };
 
+/* Also, some terminfo databases are incomplete or outright lie about
+ * terminals' abilities. Lets provide some overrides
+ */
+struct TermInfoMore {
+  enum unibi_string cap;
+  const char *value;
+};
+struct TermInfoMoreList {
+  const char *term;
+  struct TermInfoMore *info;
+};
+
+const static struct TermInfoMoreList terminfo_more[] = {
+  { "screen", (struct TermInfoMore []){
+      { unibi_erase_chars, "\e[%dX" },
+      { 0 },
+    }},
+  { NULL },
+};
+
+static int streq_until(const char *a, const char *b, char term)
+{
+  for( ; *a || *b; a++, b++) {
+    if(*a == *b)
+      continue;
+    if(!*a)
+      return *b == term;
+    if(!*b)
+      return *a == term;
+  }
+
+  return 1;
+}
+
+static const char *lookup_ti_string(unibi_term *ut, const char *termtype, enum unibi_string s)
+{
+  for(const struct TermInfoMoreList *listp = terminfo_more; listp->term; listp++) {
+    if(!streq_until(termtype, listp->term, '-'))
+      continue;
+
+    for(struct TermInfoMore *info = listp->info; info->cap; info++)
+      if(info->cap == s)
+        return info->value;
+  }
+
+  return unibi_get_str(ut, s);
+}
+
 struct TIDriver {
   TickitTermDriver driver;
 
@@ -407,38 +455,38 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   td->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
   td->cap.colours = unibi_get_num(ut, unibi_max_colors);
 
-  td->str.cup    = unibi_get_str(ut, unibi_cursor_address);
-  td->str.vpa    = unibi_get_str(ut, unibi_row_address);
-  td->str.hpa    = unibi_get_str(ut, unibi_column_address);
-  td->str.cuu    = unibi_get_str(ut, unibi_parm_up_cursor);
-  td->str.cuu1   = unibi_get_str(ut, unibi_cursor_up);
-  td->str.cud    = unibi_get_str(ut, unibi_parm_down_cursor);
-  td->str.cud1   = unibi_get_str(ut, unibi_cursor_down);
-  td->str.cuf    = unibi_get_str(ut, unibi_parm_right_cursor);
-  td->str.cuf1   = unibi_get_str(ut, unibi_cursor_right);
-  td->str.cub    = unibi_get_str(ut, unibi_parm_left_cursor);
-  td->str.cub1   = unibi_get_str(ut, unibi_cursor_left);
-  td->str.ich    = unibi_get_str(ut, unibi_parm_ich);
-  td->str.ich1   = unibi_get_str(ut, unibi_insert_character);
-  td->str.dch    = unibi_get_str(ut, unibi_parm_dch);
-  td->str.dch1   = unibi_get_str(ut, unibi_delete_character);
-  td->str.il     = unibi_get_str(ut, unibi_parm_insert_line);
-  td->str.il1    = unibi_get_str(ut, unibi_insert_line);
-  td->str.dl     = unibi_get_str(ut, unibi_parm_delete_line);
-  td->str.dl1    = unibi_get_str(ut, unibi_delete_line);
-  td->str.ech    = unibi_get_str(ut, unibi_erase_chars);
-  td->str.ed2    = unibi_get_str(ut, unibi_clear_screen);
-  td->str.stbm   = unibi_get_str(ut, unibi_change_scroll_region);
-  td->str.sgr    = unibi_get_str(ut, unibi_set_attributes);
-  td->str.sgr_fg = unibi_get_str(ut, unibi_set_a_foreground);
-  td->str.sgr_bg = unibi_get_str(ut, unibi_set_a_background);
+  td->str.cup    = lookup_ti_string(ut, termtype, unibi_cursor_address);
+  td->str.vpa    = lookup_ti_string(ut, termtype, unibi_row_address);
+  td->str.hpa    = lookup_ti_string(ut, termtype, unibi_column_address);
+  td->str.cuu    = lookup_ti_string(ut, termtype, unibi_parm_up_cursor);
+  td->str.cuu1   = lookup_ti_string(ut, termtype, unibi_cursor_up);
+  td->str.cud    = lookup_ti_string(ut, termtype, unibi_parm_down_cursor);
+  td->str.cud1   = lookup_ti_string(ut, termtype, unibi_cursor_down);
+  td->str.cuf    = lookup_ti_string(ut, termtype, unibi_parm_right_cursor);
+  td->str.cuf1   = lookup_ti_string(ut, termtype, unibi_cursor_right);
+  td->str.cub    = lookup_ti_string(ut, termtype, unibi_parm_left_cursor);
+  td->str.cub1   = lookup_ti_string(ut, termtype, unibi_cursor_left);
+  td->str.ich    = lookup_ti_string(ut, termtype, unibi_parm_ich);
+  td->str.ich1   = lookup_ti_string(ut, termtype, unibi_insert_character);
+  td->str.dch    = lookup_ti_string(ut, termtype, unibi_parm_dch);
+  td->str.dch1   = lookup_ti_string(ut, termtype, unibi_delete_character);
+  td->str.il     = lookup_ti_string(ut, termtype, unibi_parm_insert_line);
+  td->str.il1    = lookup_ti_string(ut, termtype, unibi_insert_line);
+  td->str.dl     = lookup_ti_string(ut, termtype, unibi_parm_delete_line);
+  td->str.dl1    = lookup_ti_string(ut, termtype, unibi_delete_line);
+  td->str.ech    = lookup_ti_string(ut, termtype, unibi_erase_chars);
+  td->str.ed2    = lookup_ti_string(ut, termtype, unibi_clear_screen);
+  td->str.stbm   = lookup_ti_string(ut, termtype, unibi_change_scroll_region);
+  td->str.sgr    = lookup_ti_string(ut, termtype, unibi_set_attributes);
+  td->str.sgr_fg = lookup_ti_string(ut, termtype, unibi_set_a_foreground);
+  td->str.sgr_bg = lookup_ti_string(ut, termtype, unibi_set_a_background);
 
-  td->str.sm_csr = unibi_get_str(ut, unibi_cursor_normal);
-  td->str.rm_csr = unibi_get_str(ut, unibi_cursor_invisible);
+  td->str.sm_csr = lookup_ti_string(ut, termtype, unibi_cursor_normal);
+  td->str.rm_csr = lookup_ti_string(ut, termtype, unibi_cursor_invisible);
 
   tickit_term_set_size(tt, unibi_get_num(ut, unibi_lines), unibi_get_num(ut, unibi_columns));
 
-  const char *key_mouse = unibi_get_str(ut, unibi_key_mouse);
+  const char *key_mouse = lookup_ti_string(ut, termtype, unibi_key_mouse);
   if(key_mouse && strcmp(key_mouse, "\e[M") == 0)
     td->extra = &extra_strings_vt200_mouse;
   else
