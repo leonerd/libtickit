@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   tickit_term_await_started(tt, &(const struct timeval){ .tv_sec = 0, .tv_usec = 50000 });
 
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_CLICK);
   tickit_term_clear(tt);
 
   tickit_term_bind_event(tt, TICKIT_EV_MOUSE, event, NULL);

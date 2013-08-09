@@ -17,7 +17,7 @@ struct XTermDriver {
     unsigned int cursorvis:1;
     unsigned int cursorblink:1;
     unsigned int cursorshape:2;
-    unsigned int mouse:1;
+    unsigned int mouse:2;
     unsigned int keypad:1;
   } mode;
 
@@ -321,6 +321,19 @@ static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
   }
 }
 
+static int mode_for_mouse(TickitTermMouseMode mode)
+{
+  switch(mode) {
+    case TICKIT_TERM_MOUSEMODE_CLICK: return 1000;
+    case TICKIT_TERM_MOUSEMODE_DRAG:  return 1002;
+    case TICKIT_TERM_MOUSEMODE_MOVE:  return 1003;
+
+    case TICKIT_TERM_MOUSEMODE_OFF:
+      break;
+  }
+  return 0;
+}
+
 static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
@@ -351,11 +364,18 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
       return 1;
 
     case TICKIT_TERMCTL_MOUSE:
-      if(!xd->mode.mouse == !value)
+      if(xd->mode.mouse == value)
         return 1;
 
-      tickit_termdrv_write_str(ttd, value ? "\e[?1002h\e[?1006h" : "\e[?1002l\e[?1006l", 0);
-      xd->mode.mouse = !!value;
+      /* Modes 1000, 1002 and 1003 are mutually exclusive; enabling any one
+       * disables the other two
+       */
+      if(!value)
+        tickit_termdrv_write_strf(ttd, "\e[?%dl\e[?1006l", mode_for_mouse(xd->mode.mouse));
+      else
+        tickit_termdrv_write_strf(ttd, "\e[?%dh\e[?1006h", mode_for_mouse(value));
+
+      xd->mode.mouse = value;
       return 1;
 
     case TICKIT_TERMCTL_CURSORSHAPE:
@@ -510,7 +530,7 @@ static void stop(TickitTermDriver *ttd)
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   if(xd->mode.mouse)
-    setctl_int(ttd, TICKIT_TERMCTL_MOUSE, 0);
+    setctl_int(ttd, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_OFF);
   if(!xd->mode.cursorvis)
     setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
   if(xd->mode.altscreen)
