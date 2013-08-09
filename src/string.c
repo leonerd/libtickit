@@ -91,3 +91,26 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
 
   return pos->bytes - start_bytes;
 }
+
+int tickit_string_mbswidth(const char *str)
+{
+  TickitStringPos pos;
+  tickit_string_count(str, &pos, NULL);
+  return pos.columns;
+}
+
+int tickit_string_byte2col(const char *str, size_t byte)
+{
+  TickitStringPos limit = INIT_TICKIT_STRINGPOS_LIMIT_BYTES(byte);
+  TickitStringPos pos;
+  tickit_string_count(str, &pos, &limit);
+  return pos.columns;
+}
+
+size_t tickit_string_col2byte(const char *str, int col)
+{
+  TickitStringPos limit = INIT_TICKIT_STRINGPOS_LIMIT_COLUMNS(col);
+  TickitStringPos pos;
+  tickit_string_count(str, &pos, &limit);
+  return pos.bytes;
+}

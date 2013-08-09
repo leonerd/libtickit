@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
   TickitStringPos pos, limit;
 
-  plan_tests(59);
+  plan_tests(62);
 
   is_int(tickit_string_count("hello", &pos, NULL), 5, "tickit_string_count ASCII");
   is_int(pos.bytes,      5, "tickit_string_count ASCII bytes");
@@ -112,6 +112,11 @@ int main(int argc, char *argv[])
   is_int(tickit_string_count("\x1b", &pos, &limit), -1, "tickit_string_count -1 for C0");
   is_int(tickit_string_count("\x9b", &pos, &limit), -1, "tickit_string_count -1 for C0");
   is_int(tickit_string_count("\x7f", &pos, &limit), -1, "tickit_string_count -1 for DEL");
+
+  /* convenience utilities */
+  is_int(tickit_string_mbswidth("caf\xc3\xa9 time"), 9, "tickit_string_mbswidth");
+  is_int(tickit_string_byte2col("caf\xc3\xa9 time", 7), 6, "tickit_string_byte2col");
+  is_int(tickit_string_col2byte("caf\xc3\xa9 time", 6), 7, "tickit_string_col2byte");
 
   return exit_status();
 }
