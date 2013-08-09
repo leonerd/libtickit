@@ -1,18 +1,21 @@
-.TH TICKIT_PEN_CLEAR_ATTR 3
+.TH TICKIT_PEN_CLEAR 3
 .SH NAME
-tickit_pen_clear_attr \- remove an attribute from a pen
+tickit_pen_clear, tickit_pen_clear_attr \- remove pen attributes
 .SH SYNOPSIS
 .nf
 .B #include <tickit.h>
 .sp
+.BI "void tickit_pen_clear(TickitPen *" pen );
 .BI "void tickit_pen_clear_attr(TickitPen *" pen ", TickitPenAttr " attr );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
+\fBtickit_pen_clear\fP() removes all the attributes from the pen instance.
+.PP
 \fBtickit_pen_clear_attr\fP() removes the given attribute from the pen instance. After calling this function, \fBtickit_pen_has_attr\fP(3) will return false for this attribute.
 .SH "RETURN VALUE"
-\fBtickit_pen_clear_attr\fP() returns no value.
+These functions return no value.
 .SH "SEE ALSO"
 .BR tickit_pen_new (3),
 .BR tickit_pen_has_attr (3),

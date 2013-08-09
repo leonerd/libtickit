@@ -43,8 +43,7 @@ TickitPen *tickit_pen_new(void)
 
   pen->hooks = NULL;
 
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
-    tickit_pen_clear_attr(pen, attr);
+  tickit_pen_clear(pen);
 
   return pen;
 }
@@ -255,6 +254,12 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
       return;
   }
   run_events(pen, TICKIT_EV_CHANGE, NULL);
+}
+
+void tickit_pen_clear(TickitPen *pen)
+{
+  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
+    tickit_pen_clear_attr(pen, attr);
 }
 
 int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr)
