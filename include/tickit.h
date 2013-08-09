@@ -259,21 +259,25 @@ static inline void tickit_stringpos_zero(TickitStringPos *pos) {
   pos->bytes = pos->codepoints = pos->graphemes = pos->columns = 0;
 }
 
+#define INIT_TICKIT_STRINGPOS_LIMIT_BYTES(v) { .bytes = (v), .codepoints = -1, .graphemes = -1, .columns = -1 }
 static inline void tickit_stringpos_limit_bytes(TickitStringPos *pos, size_t bytes) {
   pos->codepoints = pos->graphemes = pos->columns = -1;
   pos->bytes = bytes;
 }
 
+#define INIT_TICKIT_STRINGPOS_LIMIT_CODEPOINTS(v) { .bytes = -1, .codepoints = (v), .graphemes = -1, .columns = -1 }
 static inline void tickit_stringpos_limit_codepoints(TickitStringPos *pos, int codepoints) {
   pos->bytes = pos->graphemes = pos->columns = -1;
   pos->codepoints = codepoints;
 }
 
+#define INIT_TICKIT_STRINGPOS_LIMIT_GRAPHEMES(v) { .bytes = -1, .codepoints = -1, .graphemes = (v), .columns = -1 }
 static inline void tickit_stringpos_limit_graphemes(TickitStringPos *pos, int graphemes) {
   pos->bytes = pos->codepoints = pos->columns = -1;
   pos->graphemes = graphemes;
 }
 
+#define INIT_TICKIT_STRINGPOS_LIMIT_COLUMNS(v) { .bytes = -1, .codepoints = -1, .graphemes = -1, .columns = (v) }
 static inline void tickit_stringpos_limit_columns(TickitStringPos *pos, int columns) {
   pos->bytes = pos->codepoints = pos->graphemes = -1;
   pos->columns = columns;
