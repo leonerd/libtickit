@@ -429,6 +429,12 @@ static void start(TickitTermDriver *ttd)
 
   // Also query the current cursor visibility, blink status, and shape
   tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p\eP$q q\e\\");
+
+  /* Some terminals (e.g. xfce4-terminal) don't understand DECRQM and print
+   * the raw bytes directly as output, while still claiming to be TERM=xterm
+   * It doens't hurt at this point to clear the current line just in case.
+   */
+  tickit_termdrv_write_strf(ttd, "\e[G\e[K");
 }
 
 static int started(TickitTermDriver *ttd)
