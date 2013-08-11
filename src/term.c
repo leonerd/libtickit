@@ -1,8 +1,8 @@
 /* We need C99 vsnprintf() semantics */
 #define _ISOC99_SOURCE
 
-/* We need strdup */
-#define _XOPEN_SOURCE 500
+/* We need strdup and va_copy */
+#define _XOPEN_SOURCE 600
 
 #include "tickit.h"
 
