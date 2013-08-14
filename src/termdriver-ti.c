@@ -176,10 +176,20 @@ static int goto_abs(TickitTermDriver *ttd, int line, int col)
     run_ti(ttd, td->str.vpa, 1, line);
   }
   else if(col != -1) {
-    if(!td->str.hpa)
-      return 0;
+    if(col == 0) {
+      tickit_termdrv_write_str(ttd, "\r", 1);
+      return 1;
+    }
 
-    run_ti(ttd, td->str.hpa, 1, col);
+    if(td->str.hpa)
+      run_ti(ttd, td->str.hpa, 1, col);
+    else if(td->str.cuf) {
+      // Emulate HPA by CR + CUF
+      tickit_termdrv_write_str(ttd, "\r", 1);
+      run_ti(ttd, td->str.cuf, 1, col);
+    }
+    else
+      return 0;
   }
 
   return 1;

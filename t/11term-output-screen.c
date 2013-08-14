@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(28);
+  plan_tests(29);
 
   tt = tickit_term_new_for_termtype("screen");
   ok(!!tt, "tickit_term_new_for_termtype");
@@ -48,6 +48,10 @@ int main(int argc, char *argv[])
   buffer[0] = 0;
   tickit_term_goto(tt, 2, 5);
   is_str_escape(buffer, "\e[3;6H", "buffer after tickit_term_goto line+col");
+
+  buffer[0] = 0;
+  tickit_term_goto(tt, -1, 0);
+  is_str_escape(buffer, "\r", "buffer after tickit_term_goto col=0");
 
   buffer[0] = 0;
   tickit_term_move(tt, 2, 0);
