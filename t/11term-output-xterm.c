@@ -106,19 +106,19 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, 3);
-  is_str_escape(buffer, "\e[6H\e[3@", "buffer after tickit_term_scrollrect line 5 3 right");
+  is_str_escape(buffer, "\e[6H\e[3P", "buffer after tickit_term_scrollrect line 5 3 right");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, 5);
-  is_str_escape(buffer, "\e[7;11H\e[5@\e[8;11H\e[5@", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 right");
+  is_str_escape(buffer, "\e[7;11H\e[5P\e[8;11H\e[5P", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 right");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, -3);
-  is_str_escape(buffer, "\e[6H\e[3P", "buffer after tickit_term_scrollrect line 5 3 left");
+  is_str_escape(buffer, "\e[6H\e[3@", "buffer after tickit_term_scrollrect line 5 3 left");
 
   buffer[0] = 0;
   tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, -5);
-  is_str_escape(buffer, "\e[7;11H\e[5P\e[8;11H\e[5P", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 left");
+  is_str_escape(buffer, "\e[7;11H\e[5@\e[8;11H\e[5@", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 left");
 
   is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 1, 0), 0, "tickit_term cannot scroll partial lines vertically");
 
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
   buffer[0] = 0;
   is_int(tickit_term_scrollrect(tt, 3, 10, 1, 60, 0, 1), 1, "tickit_term can scroll partial lines horizontally with DECSLRM enabled");
-  is_str_escape(buffer, "\e[;70s\e[4;11H\e[@\e[s", "buffer after tickit_term_scroll line 3 cols 10-69 right");
+  is_str_escape(buffer, "\e[;70s\e[4;11H\e[P\e[s", "buffer after tickit_term_scroll line 3 cols 10-69 right");
 
   buffer[0] = 0;
   tickit_term_clear(tt);

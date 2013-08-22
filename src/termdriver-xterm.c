@@ -97,13 +97,13 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
     for(int line = top; line < top + lines; line++) {
       goto_abs(ttd, line, left);
       if(rightward > 1)
-        tickit_termdrv_write_strf(ttd, "\e[%d@", rightward);  /* DCH */
+        tickit_termdrv_write_strf(ttd, "\e[%dP", rightward);  /* DCH */
       else if(rightward == 1)
-        tickit_termdrv_write_str(ttd, "\e[@", 3);             /* DCH1 */
+        tickit_termdrv_write_str(ttd, "\e[P", 3);             /* DCH1 */
       else if(rightward == -1)
-        tickit_termdrv_write_str(ttd, "\e[P", 3);             /* ICH1 */
+        tickit_termdrv_write_str(ttd, "\e[@", 3);             /* ICH1 */
       else if(rightward < -1)
-        tickit_termdrv_write_strf(ttd, "\e[%dP", -rightward); /* ICH */
+        tickit_termdrv_write_strf(ttd, "\e[%d@", -rightward); /* ICH */
     }
 
     if(left + cols < term_cols)
