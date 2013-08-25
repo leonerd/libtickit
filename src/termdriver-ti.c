@@ -232,14 +232,14 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
     for(int line = top; line < top + lines; line++) {
       goto_abs(ttd, line, left);
 
-      if(rightward == 1 && td->str.ich1)
-        run_ti(ttd, td->str.ich1, 0);
-      else if(rightward == -1 && td->str.dch1)
+      if(rightward == 1 && td->str.dch1)
         run_ti(ttd, td->str.dch1, 0);
+      else if(rightward == -1 && td->str.ich1)
+        run_ti(ttd, td->str.ich1, 0);
       else if(rightward > 0)
-        run_ti(ttd, td->str.ich, 1, rightward);
+        run_ti(ttd, td->str.dch, 1, rightward);
       else if(rightward < 0)
-        run_ti(ttd, td->str.dch, 1, -rightward);
+        run_ti(ttd, td->str.ich, 1, -rightward);
     }
 
     return 1;
