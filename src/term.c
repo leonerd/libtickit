@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <sys/time.h>
 
 /* unit multipliers for working in microseconds */
