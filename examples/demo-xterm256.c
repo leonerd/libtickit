@@ -14,24 +14,6 @@ static void sigint(int sig)
   still_running = 0;
 }
 
-/* TODO: Consider if this would be useful in Tickit itself */
-void tickit_term_printf(TickitTerm *tt, const char *fmt, ...)
-{
-  va_list args;
-
-  va_start(args, fmt);
-  size_t len = vsnprintf(NULL, 0, fmt, args);
-
-  char *buffer = malloc(len + 1);
-
-  va_start(args, fmt);
-  vsnprintf(buffer, len + 1, fmt, args);
-
-  tickit_term_print(tt, buffer);
-
-  free(buffer);
-}
-
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
