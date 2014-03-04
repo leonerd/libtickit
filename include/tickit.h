@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef __TICKIT_H__
 #define __TICKIT_H__
 
@@ -295,4 +299,8 @@ int    tickit_string_mbswidth(const char *str);
 int    tickit_string_byte2col(const char *str, size_t byte);
 size_t tickit_string_col2byte(const char *str, int col);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
