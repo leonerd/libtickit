@@ -406,6 +406,14 @@ static int setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *valu
   return 0;
 }
 
+static void attach(TickitTermDriver *ttd, TickitTerm *tt)
+{
+  struct TIDriver *td = (struct TIDriver *)ttd;
+  unibi_term *ut = td->ut;
+
+  tickit_term_set_size(tt, unibi_get_num(ut, unibi_lines), unibi_get_num(ut, unibi_columns));
+}
+
 static void start(TickitTermDriver *ttd)
 {
   // Nothing needed
@@ -433,6 +441,7 @@ static void destroy(TickitTermDriver *ttd)
 }
 
 static TickitTermDriverVTable ti_vtable = {
+  .attach     = attach,
   .destroy    = destroy,
   .start      = start,
   .stop       = stop,
@@ -448,7 +457,7 @@ static TickitTermDriverVTable ti_vtable = {
   .setctl_str = setctl_str,
 };
 
-static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
+static TickitTermDriver *new(const char *termtype)
 {
   unibi_term *ut = unibi_from_term(termtype);
   if(!ut)
@@ -456,7 +465,6 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
 
   struct TIDriver *td = malloc(sizeof(struct TIDriver));
   td->driver.vtable = &ti_vtable;
-  td->driver.tt = tt;
 
   td->ut = ut;
 
@@ -494,8 +502,6 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
   td->str.sm_csr = lookup_ti_string(ut, termtype, unibi_cursor_normal);
   td->str.rm_csr = lookup_ti_string(ut, termtype, unibi_cursor_invisible);
 
-  tickit_term_set_size(tt, unibi_get_num(ut, unibi_lines), unibi_get_num(ut, unibi_columns));
-
   const char *key_mouse = lookup_ti_string(ut, termtype, unibi_key_mouse);
   if(key_mouse && strcmp(key_mouse, "\e[M") == 0)
     td->extra = &extra_strings_vt200_mouse;
@@ -507,7 +513,7 @@ static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
 
 #else /* not HAVE_UNIBILIUM */
 
-static TickitTermDriver *new(TickitTerm *tt, const char *termtype)
+static TickitTermDriver *new(const char *termtype)
 {
   return NULL;
 }

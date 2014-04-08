@@ -120,7 +120,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->hooks = NULL;
 
   for(int i = 0; driver_probes[i]; i++) {
-    TickitTermDriver *driver = (*driver_probes[i]->new)(tt, termtype);
+    TickitTermDriver *driver = (*driver_probes[i]->new)(termtype);
     if(!driver)
       continue;
 
@@ -139,6 +139,10 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->pen = tickit_pen_new();
 
   tt->termtype = strdup(termtype);
+
+  tt->driver->tt = tt;
+  if(tt->driver->vtable->attach)
+    (*tt->driver->vtable->attach)(tt->driver, tt);
 
   tickit_term_getctl_int(tt, TICKIT_TERMCTL_COLORS, &tt->colors);
 

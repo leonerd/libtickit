@@ -2,7 +2,7 @@
 #include "tickit-termdrv.h"
 
 typedef struct {
-  TickitTermDriver *(*new)(TickitTerm *tt, const char *termtype);
+  TickitTermDriver *(*new)(const char *termtype);
 } TickitTermDriverProbe;
 
 extern TickitTermDriverProbe tickit_termdrv_probe_xterm;

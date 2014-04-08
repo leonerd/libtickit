@@ -17,6 +17,7 @@ extern "C" {
 typedef struct TickitTermDriver TickitTermDriver;
 
 typedef struct {
+  void (*attach)(TickitTermDriver *ttd, TickitTerm *tt);
   void (*destroy)(TickitTermDriver *ttd);
   void (*start)(TickitTermDriver *ttd);
   int  (*started)(TickitTermDriver *ttd);
