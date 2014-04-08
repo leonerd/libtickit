@@ -94,6 +94,25 @@ void tickit_term_free(TickitTerm *tt);
 
 TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 {
+  for(int i = 0; driver_probes[i]; i++) {
+    TickitTermDriver *driver = (*driver_probes[i]->new)(termtype);
+    if(!driver)
+      continue;
+
+    TickitTerm *tt = tickit_term_new_for_driver(driver);
+
+    if(tt)
+      tt->termtype = strdup(termtype);
+
+    return tt;
+  }
+
+  errno = ENOENT;
+  return NULL;
+}
+
+TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
+{
   TickitTerm *tt = malloc(sizeof(TickitTerm));
   if(!tt)
     return NULL;
@@ -119,28 +138,16 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 
   tt->hooks = NULL;
 
-  for(int i = 0; driver_probes[i]; i++) {
-    TickitTermDriver *driver = (*driver_probes[i]->new)(termtype);
-    if(!driver)
-      continue;
-
-    tt->driver = driver;
-    break;
-  }
-
-  if(!tt->driver) {
-    errno = ENOENT;
-    goto abort_free;
-  }
-
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
    */
   tt->pen = tickit_pen_new();
 
-  tt->termtype = strdup(termtype);
+  tt->termtype = NULL;
 
+  tt->driver = ttd;
   tt->driver->tt = tt;
+
   if(tt->driver->vtable->attach)
     (*tt->driver->vtable->attach)(tt->driver, tt);
 
@@ -150,10 +157,6 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
   tt->state = UNSTARTED;
 
   return tt;
-
-abort_free:
-  free(tt);
-  return NULL;
 }
 
 void tickit_term_free(TickitTerm *tt)

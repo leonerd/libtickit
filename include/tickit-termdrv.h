@@ -45,6 +45,11 @@ void tickit_termdrv_write_str(TickitTermDriver *ttd, const char *str, size_t len
 void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...);
 TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd);
 
+/*
+ * Function to construct a new TickitTerm directly from a TickitTermDriver
+ */
+TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd);
+
 #endif
 
 #ifdef __cplusplus
