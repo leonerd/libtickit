@@ -619,7 +619,13 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
 
 int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
 {
-  return (*tt->driver->vtable->scrollrect)(tt->driver, top, left, lines, cols, downward, rightward);
+  TickitRect rect = {
+    .top   = top,
+    .left  = left,
+    .lines = lines,
+    .cols  = cols,
+  };
+  return (*tt->driver->vtable->scrollrect)(tt->driver, &rect, downward, rightward);
 }
 
 static int convert_colour(int index, int colours)

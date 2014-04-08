@@ -76,7 +76,7 @@ static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
     tickit_termdrv_write_strf(ttd, "\e[%dD", -rightward);
 }
 
-static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int cols, int downward, int rightward)
+static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
@@ -86,16 +86,18 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
   int term_cols;
   tickit_term_get_size(ttd->tt, NULL, &term_cols);
 
+  int right = tickit_rect_right(rect);
+
   /* Use DECSLRM only for 1 line of insert/delete, because any more and it's
    * likely better to use the generic system below
    */
-  if(((xd->cap.slrm && lines == 1) || (left + cols == term_cols))
+  if(((xd->cap.slrm && rect->lines == 1) || (right == term_cols))
       && downward == 0) {
-    if(left + cols < term_cols)
-      tickit_termdrv_write_strf(ttd, "\e[;%ds", left + cols);
+    if(right < term_cols)
+      tickit_termdrv_write_strf(ttd, "\e[;%ds", right);
 
-    for(int line = top; line < top + lines; line++) {
-      goto_abs(ttd, line, left);
+    for(int line = rect->top; line < tickit_rect_bottom(rect); line++) {
+      goto_abs(ttd, line, rect->left);
       if(rightward > 1)
         tickit_termdrv_write_strf(ttd, "\e[%dP", rightward);  /* DCH */
       else if(rightward == 1)
@@ -106,20 +108,20 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
         tickit_termdrv_write_strf(ttd, "\e[%d@", -rightward); /* ICH */
     }
 
-    if(left + cols < term_cols)
+    if(right < term_cols)
       tickit_termdrv_write_strf(ttd, "\e[s");
 
     return 1;
   }
 
   if(xd->cap.slrm ||
-     (left == 0 && cols == term_cols && rightward == 0)) {
-    tickit_termdrv_write_strf(ttd, "\e[%d;%dr", top + 1, top + lines);
+     (rect->left == 0 && rect->cols == term_cols && rightward == 0)) {
+    tickit_termdrv_write_strf(ttd, "\e[%d;%dr", rect->top + 1, tickit_rect_bottom(rect));
 
-    if(left > 0 || left + cols < term_cols)
-      tickit_termdrv_write_strf(ttd, "\e[%d;%ds", left + 1, left + cols);
+    if(rect->left > 0 || right < term_cols)
+      tickit_termdrv_write_strf(ttd, "\e[%d;%ds", rect->left + 1, right);
 
-    goto_abs(ttd, top, left);
+    goto_abs(ttd, rect->top, rect->left);
 
     if(downward > 1)
       tickit_termdrv_write_strf(ttd, "\e[%dM", downward);  /* DL */
@@ -141,7 +143,7 @@ static int scrollrect(TickitTermDriver *ttd, int top, int left, int lines, int c
 
     tickit_termdrv_write_str(ttd, "\e[r", 3);
 
-    if(left > 0 || left + cols < term_cols)
+    if(rect->left > 0 || right < term_cols)
       tickit_termdrv_write_str(ttd, "\e[s", 3);
 
     return 1;

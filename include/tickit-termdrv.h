@@ -25,7 +25,7 @@ typedef struct {
   void (*print)(TickitTermDriver *ttd, const char *str);
   int  (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   void (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);
-  int  (*scrollrect)(TickitTermDriver *ttd, int top, int left, int lines, int cols, int downward, int rightward);
+  int  (*scrollrect)(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward);
   void (*erasech)(TickitTermDriver *ttd, int count, int moveend);
   void (*clear)(TickitTermDriver *ttd);
   void (*chpen)(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final);
