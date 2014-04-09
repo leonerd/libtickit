@@ -48,7 +48,7 @@ TickitPen *tickit_pen_new(void)
   return pen;
 }
 
-TickitPen *tickit_pen_clone(TickitPen *orig)
+TickitPen *tickit_pen_clone(const TickitPen *orig)
 {
   TickitPen *pen = tickit_pen_new();
   tickit_pen_copy(pen, orig, 1);
