@@ -22,7 +22,7 @@ typedef struct {
   void (*start)(TickitTermDriver *ttd); /* optional */
   int  (*started)(TickitTermDriver *ttd); /* optional */
   void (*stop)(TickitTermDriver *ttd); /* optional */
-  void (*print)(TickitTermDriver *ttd, const char *str);
+  void (*print)(TickitTermDriver *ttd, const char *str, size_t len);
   int  (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   void (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);
   int  (*scrollrect)(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward);

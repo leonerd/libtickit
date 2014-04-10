@@ -34,9 +34,9 @@ struct XTermDriver {
   } initialised;
 };
 
-static void print(TickitTermDriver *ttd, const char *str)
+static void print(TickitTermDriver *ttd, const char *str, size_t len)
 {
-  tickit_termdrv_write_str(ttd, str, strlen(str));
+  tickit_termdrv_write_str(ttd, str, len);
 }
 
 static int goto_abs(TickitTermDriver *ttd, int line, int col)

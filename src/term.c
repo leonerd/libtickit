@@ -586,7 +586,7 @@ void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...)
 
 void tickit_term_print(TickitTerm *tt, const char *str)
 {
-  (*tt->driver->vtable->print)(tt->driver, str);
+  (*tt->driver->vtable->print)(tt->driver, str, strlen(str));
 }
 
 void tickit_term_printf(TickitTerm *tt, const char *fmt, ...)
@@ -602,10 +602,10 @@ void tickit_term_vprintf(TickitTerm *tt, const char *fmt, va_list args)
   va_list args2;
   va_copy(args2, args);
 
-  size_t len = vsnprintf(NULL, 0, fmt, args) + 1;
-  char *buf = get_tmpbuffer(tt, len);
-  vsnprintf(buf, len, fmt, args2);
-  (*tt->driver->vtable->print)(tt->driver, buf);
+  size_t len = vsnprintf(NULL, 0, fmt, args);
+  char *buf = get_tmpbuffer(tt, len + 1);
+  vsnprintf(buf, len + 1, fmt, args2);
+  (*tt->driver->vtable->print)(tt->driver, buf, len);
 
   va_end(args2);
 }

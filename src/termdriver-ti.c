@@ -132,9 +132,9 @@ struct TIDriver {
   const struct TermInfoExtraStrings *extra;
 };
 
-static void print(TickitTermDriver *ttd, const char *str)
+static void print(TickitTermDriver *ttd, const char *str, size_t len)
 {
-  tickit_termdrv_write_str(ttd, str, strlen(str));
+  tickit_termdrv_write_str(ttd, str, len);
 }
 
 static void run_ti(TickitTermDriver *ttd, const char *str, int n_params, ...)
