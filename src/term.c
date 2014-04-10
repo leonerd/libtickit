@@ -193,6 +193,11 @@ const char *tickit_term_get_termtype(TickitTerm *tt)
   return tt->termtype;
 }
 
+TickitTermDriver *tickit_term_get_driver(TickitTerm *tt)
+{
+  return tt->driver;
+}
+
 static void *get_tmpbuffer(TickitTerm *tt, size_t len)
 {
   if(tt->tmpbuffer_len < len) {

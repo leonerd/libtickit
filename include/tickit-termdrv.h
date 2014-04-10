@@ -50,6 +50,12 @@ TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd);
  */
 TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd);
 
+/*
+ * Intended for "subclass" terminal methods, to obtain their custom driver
+ * when given a TT instance
+ */
+TickitTermDriver *tickit_term_get_driver(TickitTerm *tt);
+
 #endif
 
 #ifdef __cplusplus
