@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #include <sys/time.h>
 
@@ -208,6 +209,7 @@ int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventF
 void tickit_term_unbind_event_id(TickitTerm *tt, int id);
 
 void tickit_term_print(TickitTerm *tt, const char *str);
+void tickit_term_printn(TickitTerm *tt, const char *str, size_t len);
 void tickit_term_printf(TickitTerm *tt, const char *fmt, ...);
 void tickit_term_vprintf(TickitTerm *tt, const char *fmt, va_list args);
 int  tickit_term_goto(TickitTerm *tt, int line, int col);

@@ -589,6 +589,11 @@ void tickit_term_print(TickitTerm *tt, const char *str)
   (*tt->driver->vtable->print)(tt->driver, str, strlen(str));
 }
 
+void tickit_term_printn(TickitTerm *tt, const char *str, size_t len)
+{
+  (*tt->driver->vtable->print)(tt->driver, str, len);
+}
+
 void tickit_term_printf(TickitTerm *tt, const char *fmt, ...)
 {
   va_list args;

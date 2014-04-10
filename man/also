@@ -6,6 +6,7 @@ tickit_term_get_input_fd.3 = tickit_term_set_input_fd.3
 tickit_term_set_size.3 = tickit_term_get_size.3
 tickit_term_refresh_size.3 = tickit_term_get_size.3
 tickit_term_move.3 = tickit_term_goto.3
+tickit_term_printn.3 = tickit_term_print.3
 tickit_term_printf.3 = tickit_term_print.3
 tickit_term_vprintf.3 = tickit_term_print.3
 tickit_term_setpen.3 = tickit_term_chpen.3
