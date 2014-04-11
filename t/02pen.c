@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(42);
+  plan_tests(45);
 
   pen = tickit_pen_new();
 
@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
   is_int(changed, 0, "change counter 0 initially");
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen lacks bold initially");
+  ok(!tickit_pen_nondefault_attr(pen, TICKIT_PEN_BOLD), "pen bold attr is default initially");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 0, "bold 0 initially");
 
   ok(!tickit_pen_is_nonempty(pen), "pen initially empty");
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
 
   ok(tickit_pen_has_attr(pen, TICKIT_PEN_BOLD), "pen has bold after set");
+  ok(tickit_pen_nondefault_attr(pen, TICKIT_PEN_BOLD), "pen bold attr is nondefault after set");
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 1, "bold 1 after set");
 
   ok(tickit_pen_is_nonempty(pen), "pen non-empty after set bold on");
@@ -45,6 +47,8 @@ int main(int argc, char *argv[])
   is_int(changed, 1, "change counter 1 after set bold on");
 
   tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
+
+  ok(!tickit_pen_nondefault_attr(pen, TICKIT_PEN_BOLD), "pen bold attr is default after set bold off");
 
   ok(tickit_pen_is_nonempty(pen), "pen non-empty after set bold off");
   ok(!tickit_pen_is_nondefault(pen), "pen default after set bold off");

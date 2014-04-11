@@ -80,6 +80,29 @@ int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
   return 0;
 }
 
+int tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
+{
+  if(!tickit_pen_has_attr(pen, attr))
+    return 0;
+
+  switch(tickit_pen_attrtype(attr)) {
+  case TICKIT_PENTYPE_BOOL:
+    if(tickit_pen_get_bool_attr(pen, attr))
+      return 1;
+    break;
+  case TICKIT_PENTYPE_INT:
+    if(tickit_pen_get_int_attr(pen, attr) > -1)
+      return 1;
+    break;
+  case TICKIT_PENTYPE_COLOUR:
+    if(tickit_pen_get_colour_attr(pen, attr) > -1)
+      return 1;
+    break;
+  }
+
+  return 0;
+}
+
 int tickit_pen_is_nonempty(const TickitPen *pen)
 {
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
@@ -92,22 +115,8 @@ int tickit_pen_is_nonempty(const TickitPen *pen)
 int tickit_pen_is_nondefault(const TickitPen *pen)
 {
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
-    if(!tickit_pen_has_attr(pen, attr))
-      continue;
-    switch(tickit_pen_attrtype(attr)) {
-    case TICKIT_PENTYPE_BOOL:
-      if(tickit_pen_get_bool_attr(pen, attr))
-        return 1;
-      break;
-    case TICKIT_PENTYPE_INT:
-      if(tickit_pen_get_int_attr(pen, attr) > -1)
-        return 1;
-      break;
-    case TICKIT_PENTYPE_COLOUR:
-      if(tickit_pen_get_colour_attr(pen, attr) > -1)
-        return 1;
-      break;
-    }
+    if(tickit_pen_nondefault_attr(pen, attr))
+      return 1;
   }
   return 0;
 }

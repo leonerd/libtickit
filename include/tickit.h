@@ -88,6 +88,7 @@ void       tickit_pen_destroy(TickitPen *pen);
 
 int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr);
 int tickit_pen_is_nonempty(const TickitPen *pen);
+int tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr);
 int tickit_pen_is_nondefault(const TickitPen *pen);
 
 int  tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr);
