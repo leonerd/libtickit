@@ -152,6 +152,7 @@ static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
 
   TickitStringPos limit;
   tickit_stringpos_limit_columns(&limit, pos.columns);
+  limit.bytes = len;
 
   while(pos.bytes < len) {
     TickitStringPos start = pos;
