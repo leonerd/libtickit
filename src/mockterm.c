@@ -538,6 +538,9 @@ void tickit_mockterm_clearlog(TickitMockTerm *mt)
 {
   MockTermDriver *mtd = (MockTermDriver *)tickit_term_get_driver((TickitTerm *)mt);
 
+  for(int i = 0; i < mtd->logi; i++)
+    mtd_free_logentry(mtd->log + i);
+
   mtd->logi = 0;
 }
 
