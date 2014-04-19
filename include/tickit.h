@@ -83,6 +83,7 @@ typedef enum {
 } TickitPenAttrType;
 
 TickitPen *tickit_pen_new(void);
+TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...);
 TickitPen *tickit_pen_clone(const TickitPen *orig);
 void       tickit_pen_destroy(TickitPen *pen);
 

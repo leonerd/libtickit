@@ -14,6 +14,7 @@ tickit_term_get_utf8.3 = tickit_term_set_utf8.3
 tickit_term_getctl_int.3 = tickit_term_setctl_int.3
 tickit_term_setctl_str.3 = tickit_term_setctl_int.3
 
+tickit_pen_new_attrs.3 = tickit_pen_new.3
 tickit_pen_destroy.3 = tickit_pen_new.3
 tickit_pen_clone.3 = tickit_pen_new.3
 tickit_pen_unbind_event_id.3 = tickit_pen_bind_event.3

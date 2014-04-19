@@ -1,6 +1,7 @@
 #include "tickit.h"
 #include "hooklists.h"
 
+#include <stdarg.h>
 #include <stdio.h>   /* sscanf */
 #include <stdlib.h>
 #include <string.h>
@@ -44,6 +45,45 @@ TickitPen *tickit_pen_new(void)
   pen->hooks = NULL;
 
   tickit_pen_clear(pen);
+
+  return pen;
+}
+
+TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...)
+{
+  TickitPen *pen = tickit_pen_new();
+  if(!pen)
+    return NULL;
+
+  va_list args;
+  va_start(args, attr);
+  int first = 1;
+  int val;
+
+  while(1) {
+    int a = first ? attr : va_arg(args, TickitPenAttr);
+    first = 0;
+    if(a < 0)
+      break;
+
+    // TODO: accept colour descs
+    switch(tickit_pen_attrtype(a)) {
+    case TICKIT_PENTYPE_BOOL:
+      val = va_arg(args, int);
+      tickit_pen_set_bool_attr(pen, a, val);
+      break;
+    case TICKIT_PENTYPE_INT:
+      val = va_arg(args, int);
+      tickit_pen_set_int_attr(pen, a, val);
+      break;
+    case TICKIT_PENTYPE_COLOUR:
+      val = va_arg(args, int);
+      tickit_pen_set_colour_attr(pen, a, val);
+      break;
+    }
+  }
+
+  va_end(args);
 
   return pen;
 }
