@@ -13,8 +13,6 @@ int main(int argc, char *argv[])
   TickitPen *pen, *pen2;
   TickitPenAttr attr;
 
-  plan_tests(45);
-
   pen = tickit_pen_new();
 
   ok(!!pen, "tickit_pen_new");

@@ -57,8 +57,6 @@ int main(int argc, char *argv[])
   TickitTerm *tt;
   char   buffer[1024];
 
-  plan_tests(2);
-
   TickitTermDriver *ttd = malloc(sizeof(TickitTermDriver));
   ttd->vtable = &vtable;
 

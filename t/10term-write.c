@@ -14,8 +14,6 @@ int main(int argc, char *argv[])
    * pipe() can make us one */
   pipe(fd);
 
-  plan_tests(13);
-
   tt = tickit_term_new_for_termtype("xterm");
 
   ok(!!tt, "tickit_term_new_for_termtype");

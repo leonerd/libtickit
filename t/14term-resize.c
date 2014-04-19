@@ -31,8 +31,6 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  plan_tests(12);
-
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_size(tt, 25, 80);
 

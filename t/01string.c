@@ -5,8 +5,6 @@ int main(int argc, char *argv[])
 {
   TickitStringPos pos, limit;
 
-  plan_tests(62);
-
   is_int(tickit_string_count("hello", &pos, NULL), 5, "tickit_string_count ASCII");
   is_int(pos.bytes,      5, "tickit_string_count ASCII bytes");
   is_int(pos.codepoints, 5, "tickit_string_count ASCII codepoints");

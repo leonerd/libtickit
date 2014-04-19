@@ -15,8 +15,6 @@ int main(int argc, char *argv[])
   char buffer[1024];
   TickitPen *pen;
 
-  plan_tests(12);
-
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_output_func(tt, output, buffer);
 

@@ -21,8 +21,6 @@ int main(int argc, char *argv[])
    * pipe() can make us one */
   pipe(fd);
 
-  plan_tests(9);
-
   tt = tickit_term_new_for_termtype("xterm");
 
   tickit_term_set_input_fd(tt, fd[0]);

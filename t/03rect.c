@@ -35,8 +35,6 @@ int main(int argc, char *argv[])
 {
   TickitRect rect1, rect2, rectOut;
 
-  plan_tests(104);
-
   tickit_rect_init_sized(&rect1, 5, 10, 7, 20);
 
   is_int(rect1.top,    5, "rect1.top");

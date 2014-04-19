@@ -15,8 +15,6 @@ int main(int argc, char *argv[])
   int    fd[2];
   char   buffer[1024];
 
-  plan_tests(4);
-
   tt = tickit_term_new_for_termtype("xterm");
 
   ok(!!tt, "tickit_term_new_for_termtype");

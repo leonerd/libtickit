@@ -5,12 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int plan_printed = 0;
 static int nexttest = 1;
 static int _exit_status = 0;
 
 void plan_tests(int n)
 {
   printf("1..%d\n", n);
+  plan_printed = 1;
 }
 
 void pass(char *name)
@@ -123,5 +125,7 @@ void is_str_escape(const char *got, const char *expect, char *name)
 
 int exit_status(void)
 {
+  if(!plan_printed)
+    printf("1..%d\n", nexttest-1);
   return _exit_status;
 }

@@ -15,8 +15,6 @@ int main(int argc, char *argv[])
   char buffer[1024];
   int lines, cols;
 
-  plan_tests(29);
-
   tt = tickit_term_new_for_termtype("screen");
   ok(!!tt, "tickit_term_new_for_termtype");
 

@@ -168,8 +168,6 @@ fail:
 
 int main(int argc, char *argv[])
 {
-  plan_tests(109);
-
   {
     TickitRectSet *trs = tickit_rectset_new();
     TickitRect tmp;
