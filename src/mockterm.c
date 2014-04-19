@@ -29,7 +29,6 @@ typedef struct
   TickitPen *pen;
   int line;
   int col;
-  int changed;
   int cursorvis;
   int cursorshape;
 } MockTermDriver;
@@ -184,8 +183,6 @@ static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
   }
 
   mtd->col = pos.columns;
-
-  mtd->changed = 1;
 }
 
 static int mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
@@ -199,8 +196,6 @@ static int mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
 
   mtd->line = line;
   mtd->col  = col;
-
-  mtd->changed = 1;
 
   return 1;
 }
@@ -262,7 +257,6 @@ static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int dow
       }
     }
 
-    mtd->changed = 1;
     return 1;
   }
 
@@ -304,7 +298,6 @@ static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int dow
       }
     }
 
-    mtd->changed = 1;
     return 1;
   }
 
@@ -324,8 +317,6 @@ static void mtd_erasech(TickitTermDriver *ttd, int count, int moveend)
 
   if(moveend)
     mtd->col += count;
-
-  mtd->changed = 1;
 }
 
 static void mtd_clear(TickitTermDriver *ttd)
@@ -337,8 +328,6 @@ static void mtd_clear(TickitTermDriver *ttd)
 
   for(int line = 0; line < mtd->lines; line++)
     mtd_clear_cells(mtd, line, 0, mtd->cols);
-
-  mtd->changed = 1;
 }
 
 static void mtd_chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
@@ -355,7 +344,13 @@ static void mtd_chpen(TickitTermDriver *ttd, const TickitPen *delta, const Ticki
 
 static int mtd_getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
+  MockTermDriver *mtd = (MockTermDriver *)ttd;
+
   switch(ctl) {
+    case TICKIT_TERMCTL_CURSORVIS:
+      *value = mtd->cursorvis; return 1;
+    case TICKIT_TERMCTL_CURSORSHAPE:
+      *value = mtd->cursorshape; return 1;
     case TICKIT_TERMCTL_COLORS:
       *value = 256;
       return 1;
@@ -411,7 +406,6 @@ TickitMockTerm *tickit_mockterm_new(int lines, int cols)
   mtd->cols        = cols;
   mtd->line        = -1;
   mtd->col         = -1;
-  mtd->changed     = 0;
   mtd->cursorvis   = 0;
   mtd->cursorshape = 0;
 
@@ -545,4 +539,14 @@ void tickit_mockterm_clearlog(TickitMockTerm *mt)
   MockTermDriver *mtd = (MockTermDriver *)tickit_term_get_driver((TickitTerm *)mt);
 
   mtd->logi = 0;
+}
+
+void tickit_mockterm_get_position(TickitMockTerm *mt, int *line, int *col)
+{
+  MockTermDriver *mtd = (MockTermDriver *)tickit_term_get_driver((TickitTerm *)mt);
+
+  if(line)
+    *line = mtd->line;
+  if(col)
+    *col = mtd->col;
 }
