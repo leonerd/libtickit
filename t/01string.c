@@ -111,6 +111,11 @@ int main(int argc, char *argv[])
   tickit_string_countmore("cafe\xcc\x81", &pos, &limit);
   is_int(pos.bytes, 6, "tickit_string_countmore continues after count");
 
+  /* ncount should commit on the first codepoint even though there's the start of another one after it */
+  tickit_stringpos_limit_bytes(&limit, -1);
+  tickit_string_ncount("a\xcc", 1, &pos, &limit);
+  is_int(pos.bytes, 1, "tickit_string_ncount stops at len");
+
   /* C0 and C1 controls and ASCII DEL are errors */
   tickit_stringpos_limit_bytes(&limit, -1);
 

@@ -4,10 +4,13 @@
 
 #include "unicode.h"
 
-static int next_utf8(const char *str, uint32_t *cp)
+static int next_utf8(const char *str, size_t len, uint32_t *cp)
 {
   unsigned char b0 = (str++)[0];
   int nbytes;
+
+  if(!len)
+    return -1;
 
   if(!b0)
     return -1;
@@ -28,6 +31,9 @@ static int next_utf8(const char *str, uint32_t *cp)
   else
     return -1;
 
+  if(len < nbytes)
+    return -1;
+
   for(int i = 1; i < nbytes; i++) {
     b0 = (str++)[0];
     if(!b0)
@@ -43,19 +49,32 @@ static int next_utf8(const char *str, uint32_t *cp)
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
   tickit_stringpos_zero(pos);
-  return tickit_string_countmore(str, pos, limit);
+  return tickit_string_ncountmore(str, (size_t)-1, pos, limit);
 }
 
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
+{
+  return tickit_string_ncountmore(str, (size_t)-1, pos, limit);
+}
+
+size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
+{
+  tickit_stringpos_zero(pos);
+  return tickit_string_ncountmore(str, len, pos, limit);
+}
+
+size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
 {
   TickitStringPos here = *pos;
   size_t start_bytes = pos->bytes;
 
   str += pos->bytes;
+  if(len != (size_t)-1)
+    len -= pos->bytes;
 
-  while(*str) {
+  while((len == (size_t)-1) ? *str : (len > 0)) {
     uint32_t cp;
-    int bytes = next_utf8(str, &cp);
+    int bytes = next_utf8(str, len, &cp);
     if(bytes == -1)
       return -1;
 
@@ -81,6 +100,8 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
       break;
 
     str += bytes;
+    if(len != (size_t)-1)
+      len -= bytes;
 
     here.bytes += bytes;
     here.codepoints += 1;
@@ -88,7 +109,7 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
     here.columns += width;
   }
 
-  if(*str == 0) // Commit on the final grapheme
+  if(len == 0 || *str == 0) // Commit on the final grapheme
     *pos = here;
 
   return pos->bytes - start_bytes;

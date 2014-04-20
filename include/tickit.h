@@ -268,6 +268,8 @@ typedef struct {
 
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
 
 // Some convenient mutators for TickitStringPos structs
 

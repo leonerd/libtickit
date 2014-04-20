@@ -30,6 +30,8 @@ tickit_pen_equiv.3 = tickit_pen_equiv_attr.3
 tickit_pen_clear_attr.3 = tickit_pen_clear.3
 
 tickit_string_countmore.3 = tickit_string_count.3
+tickit_string_ncount.3 = tickit_string_count.3
+tickit_string_ncountmore.3 = tickit_string_count.3
 tickit_string_byte2col.3 = tickit_string_mbswidth.3
 tickit_string_col2byte.3 = tickit_string_mbswidth.3
 

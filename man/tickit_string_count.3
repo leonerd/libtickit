@@ -16,6 +16,11 @@ tickit_string_count, tickit_string_countmore \- count characters in Unicode stri
 .BI "    const TickitStringPos *" limit );
 .BI "size_t tickit_string_countmore(const char *" str ", TickitStringPos *" pos ,
 .BI "    const TickitStringPos *" limit );
+.sp
+.BI "size_t tickit_string_ncount(const char *" str ", size_t " len ,
+.BI "    TickitStringPos *" pos ", const TickitStringPos *" limit );
+.BI "size_t tickit_string_ncountmore(const char *" str ,
+.BI "    TickitStringPos *" pos ", const TickitStringPos *" limit );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
@@ -44,6 +49,11 @@ The \fIcolumns\fP member counts the number of screen columns consumed by the gra
 \fBtickit_string_countmore\fP() is similar to \fBtickit_string_count\fP() except it will not zero any of the counters before it starts. It can continue counting where a previous call finished. In particular, it will assume that it is starting at the beginning of a
 .SM UTF-8
 sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold. It will begin at the offset given by \fIpos.bytes\fP.
+.PP
+The \fBtickit_string_ncount\fP() and \fBtickit_string_ncountmore\fP() variants are similar except that they read no more than \fIlen\fP bytes from the string and do not require it to be
+.SM
+NUL
+terminated.
 .SH USAGE
 Typically, these functions would be used either of two ways.
 .PP
