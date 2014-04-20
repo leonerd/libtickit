@@ -104,6 +104,13 @@ int main(int argc, char *argv[])
   is_int(tickit_string_count("A\xef\xbc\xa1", &pos, &limit), 1, "tickit_string_count column-limit split");
   is_int(pos.columns,    1, "tickit_string_count column-limit split grapheme");
 
+  /* countmore should continue where count left off */
+  tickit_stringpos_limit_columns(&limit, 3);
+  tickit_string_count("cafe\xcc\x81", &pos, &limit);
+  limit.columns++;
+  tickit_string_countmore("cafe\xcc\x81", &pos, &limit);
+  is_int(pos.bytes, 6, "tickit_string_countmore continues after count");
+
   /* C0 and C1 controls and ASCII DEL are errors */
   tickit_stringpos_limit_bytes(&limit, -1);
 

@@ -51,6 +51,8 @@ size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const Tick
   TickitStringPos here = *pos;
   size_t start_bytes = pos->bytes;
 
+  str += pos->bytes;
+
   while(*str) {
     uint32_t cp;
     int bytes = next_utf8(str, &cp);

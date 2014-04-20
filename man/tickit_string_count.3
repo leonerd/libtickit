@@ -43,7 +43,7 @@ The \fIcolumns\fP member counts the number of screen columns consumed by the gra
 .PP
 \fBtickit_string_countmore\fP() is similar to \fBtickit_string_count\fP() except it will not zero any of the counters before it starts. It can continue counting where a previous call finished. In particular, it will assume that it is starting at the beginning of a
 .SM UTF-8
-sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold. It will still begin at the start of \fIstr\fP, not at the offset given by \fIpos.bytes\fP.
+sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold. It will begin at the offset given by \fIpos.bytes\fP.
 .SH USAGE
 Typically, these functions would be used either of two ways.
 .PP
