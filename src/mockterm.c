@@ -158,7 +158,7 @@ static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
     TickitStringPos start = pos;
 
     limit.columns++;
-    tickit_string_countmore(str, &pos, &limit);
+    tickit_string_ncountmore(str, len, &pos, &limit);
 
     if(pos.columns == start.columns)
       continue;

@@ -214,6 +214,17 @@ int main(int argc, char *argv[])
       "     foo  ",
       "          ");
 
+  char c = 'l';
+  tickit_term_printn(TT, &c, 1);
+
+  is_termlog(mt, "Display after printn 1",
+      PRINT("l"),
+      NULL);
+  is_display_text(mt, "Display after printn 1",
+      "          ",
+      "     fool ",
+      "          ");
+
   tickit_term_clear(TT);
 
   is_termlog(mt, "Termlog after clear",
