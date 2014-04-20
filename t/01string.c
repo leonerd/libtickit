@@ -112,17 +112,17 @@ int main(int argc, char *argv[])
   is_int(pos.bytes, 6, "tickit_string_countmore continues after count");
 
   /* ncount */
-  tickit_stringpos_limit_bytes(&limit, -1);
+  tickit_stringpos_limit_none(&limit);
   tickit_string_ncount("ABCDEF", 3, &pos, &limit);
   is_int(pos.bytes, 3, "tickit_string_ncount stops at len");
 
   /* ncount should commit on the first codepoint even though there's the start of another one after it */
-  tickit_stringpos_limit_bytes(&limit, -1);
+  tickit_stringpos_limit_none(&limit);
   tickit_string_ncount("a\xcc", 1, &pos, &limit);
   is_int(pos.bytes, 1, "tickit_string_ncount ignores partial UTF-8 past len");
 
   /* C0 and C1 controls and ASCII DEL are errors */
-  tickit_stringpos_limit_bytes(&limit, -1);
+  tickit_stringpos_limit_none(&limit);
 
   is_int(tickit_string_count("\x1b", &pos, &limit), -1, "tickit_string_count -1 for C0");
   is_int(tickit_string_count("\x9b", &pos, &limit), -1, "tickit_string_count -1 for C0");

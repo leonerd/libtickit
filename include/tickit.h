@@ -277,6 +277,12 @@ static inline void tickit_stringpos_zero(TickitStringPos *pos) {
   pos->bytes = pos->codepoints = pos->graphemes = pos->columns = 0;
 }
 
+#define INIT_TICKIT_STRINGPOS_LIMIT_NONE { .bytes = -1, .codepoints = -1, .graphemes = -1, .columns = -1 }
+static inline void tickit_stringpos_limit_none(TickitStringPos *pos)
+{
+  pos->bytes = pos->codepoints = pos->graphemes = pos->columns = -1;
+}
+
 #define INIT_TICKIT_STRINGPOS_LIMIT_BYTES(v) { .bytes = (v), .codepoints = -1, .graphemes = -1, .columns = -1 }
 static inline void tickit_stringpos_limit_bytes(TickitStringPos *pos, size_t bytes) {
   pos->codepoints = pos->graphemes = pos->columns = -1;

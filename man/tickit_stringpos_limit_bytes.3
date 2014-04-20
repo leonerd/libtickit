@@ -9,16 +9,18 @@ tickit_stringpos_limit_... \- set limit fields in string position counters
 .BI "void tickit_stringpos_limit_codepoints(TickitStringPos *" pos ", int " codepoints );
 .BI "void tickit_stringpos_limit_graphemes(TickitStringPos *" pos ", int " graphemes );
 .BI "void tickit_stringpos_limit_columns(TickitStringPos *" pos ", int " columns );
+.BI "void tickit_stringpos_limit_none(TickitStringPos *" pos );
 .sp
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_BYTES(" bytes )
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_CODEPOINTS(" codepoints )
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_GRAPHEMES(" grahpemes )
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_COLUMNS(" columns )
+.BI "#define INIT_TICKIT_STRINGPOS_LIMIT_NONE"
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-These four functions each set one of the counter fields in \fIpos\fP to the given value, and the other three to -1. This is useful to create a limit counter to stop \fBtickit_string_count\fP(3) or \fBtickit_string_countmore\fP(3) at the given position.
+The first four of these functions each set one of the counter fields in \fIpos\fP to the given value, and the other three to -1. This is useful to create a limit counter to stop \fBtickit_string_count\fP(3) or \fBtickit_string_countmore\fP(3) at the given position. The final function initialises all four fields to -1.
 .PP
 Each is also available as a macro which can be used to initialise a new \fBTickitStringPos\fP variable.
 .PP
