@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BOUND(var,min,max) \
+  if(var < (min)) var = (min); \
+  if(var > (max)) var = (max)
+
 typedef struct
 {
   char      *str;
@@ -158,6 +162,15 @@ static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
     if(pos.columns == start.columns)
       continue;
 
+    // Wrap but don't scroll - for now. This shouldn't cause scrolling anyway
+    if(start.columns >= mtd->cols) {
+      start.columns = 0;
+      if(mtd->line < mtd->lines-1) {
+        mtd->line++;
+        linecells = mtd->cells[mtd->line];
+      }
+    }
+
     MockTermCell *cell = linecells[start.columns];
 
     if(cell->str)
@@ -189,6 +202,9 @@ static int mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
+  BOUND(line, 0, mtd->lines-1);
+  BOUND(col,  0, mtd->cols-1);
+
   TickitMockTermLogEntry *entry = mtd_nextlog(mtd);
   entry->type = LOG_GOTO;
   entry->val1 = line;
@@ -219,7 +235,15 @@ static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int dow
   int bottom = tickit_rect_bottom(rect);
   int right  = tickit_rect_right(rect);
 
-  if(rect->left == 0 && rect->cols == mtd->cols && rightward == 0) {
+  BOUND(top,    0,   mtd->lines-1);
+  BOUND(bottom, top, mtd->lines);
+  BOUND(left,  0,    mtd->cols-1);
+  BOUND(right, left, mtd->cols);
+
+  if((abs(downward) >= (bottom - top)) || (abs(rightward) >= (right - left)))
+    return 0;
+
+  if(left == 0 && right == mtd->cols && rightward == 0) {
     MockTermCell ***cells = mtd->cells;
 
     TickitMockTermLogEntry *entry = mtd_nextlog(mtd);
@@ -313,10 +337,13 @@ static void mtd_erasech(TickitTermDriver *ttd, int count, int moveend)
   entry->val1 = count;
   entry->val2 = moveend;
 
-  mtd_clear_cells(mtd, mtd->line, mtd->col, mtd->col + count);
+  int right = mtd->col + count;
+  BOUND(right, 0, mtd->cols);
+
+  mtd_clear_cells(mtd, mtd->line, mtd->col, right);
 
   if(moveend)
-    mtd->col += count;
+    mtd->col = right;
 }
 
 static void mtd_clear(TickitTermDriver *ttd)
@@ -515,6 +542,9 @@ void tickit_mockterm_resize(TickitMockTerm *mt, int newlines, int newcols)
     mtd_clear_cells(mtd, line, 0, newcols);
 
   tickit_term_set_size((TickitTerm *)mt, newlines, newcols);
+
+  BOUND(mtd->line, 0, mtd->lines-1);
+  BOUND(mtd->col,  0, mtd->cols-1);
 }
 
 int tickit_mockterm_loglen(TickitMockTerm *mt)
