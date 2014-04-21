@@ -68,10 +68,10 @@ src/term.lo: src/xterm-palette.inc
 src/xterm-palette.inc: src/xterm-palette.inc.PL
 	perl $^ > $@
 
-t/%.t: t/%.c $(LIBRARY) t/taplib.lo
+t/%.t: t/%.c $(LIBRARY) t/taplib.lo t/mockterm.lo
 	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude -std=c99 -ggdb $^
 
-t/taplib.lo: t/taplib.c
+t/%.lo: t/%.c
 	$(LIBTOOL) --mode=compile --tag=CC gcc $(CFLAGS) -o $@ -c $^
 
 .PHONY: test
@@ -80,7 +80,7 @@ test: $(TESTFILES)
 
 .PHONY: clean-test
 clean-test:
-	$(LIBTOOL) --mode=clean rm -f $(TESTFILES) t/taplib.lo
+	$(LIBTOOL) --mode=clean rm -f $(TESTFILES) t/taplib.lo t/mockterm.lo
 
 .PHONY: clean
 clean: clean-test
