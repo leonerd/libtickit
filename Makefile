@@ -68,6 +68,10 @@ src/term.lo: src/xterm-palette.inc
 src/xterm-palette.inc: src/xterm-palette.inc.PL
 	perl $^ > $@
 
+src/renderbuffer.lo: src/linechars.inc
+src/linechars.inc: src/linechars.inc.PL
+	perl $^ > $@
+
 t/%.t: t/%.c $(LIBRARY) t/taplib.lo t/mockterm.lo
 	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude -std=c99 -ggdb $^
 
