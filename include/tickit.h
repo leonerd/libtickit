@@ -259,6 +259,10 @@ int tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value)
  * String handling utilities
  */
 
+int tickit_string_seqlen(long codepoint);
+/* Does NOT NUL-terminate the buffer */
+size_t tickit_string_putchar(char *str, size_t len, long codepoint);
+
 typedef struct {
   size_t bytes;
   int    codepoints;

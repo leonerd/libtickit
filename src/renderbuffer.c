@@ -8,8 +8,6 @@
 
 #include "linechars.inc"
 
-#include "utf8.h"
-
 /* must match .pm file */
 enum TickitRenderBufferCellState {
   SKIP  = 0,
@@ -241,13 +239,13 @@ static TickitPen *merge_pen(TickitRenderBuffer *rb, TickitPen *direct_pen)
 
 static void tmp_cat_utf8(TickitRenderBuffer *rb, long codepoint)
 {
-  int seqlen = utf8_seqlen(codepoint);
+  int seqlen = tickit_string_seqlen(codepoint);
   if(rb->tmpsize < rb->tmplen + seqlen) {
     rb->tmpsize *= 2;
     rb->tmp = realloc(rb->tmp, rb->tmpsize);
   }
 
-  fill_utf8(codepoint, rb->tmp + rb->tmplen);
+  tickit_string_putchar(rb->tmp + rb->tmplen, rb->tmpsize - rb->tmplen, codepoint);
   rb->tmplen += seqlen;
 
   /* rb->tmp remains NOT nul-terminated */

@@ -1,0 +1,22 @@
+.TH TICKIT_STRING_PUTCHAR 3
+.SH NAME
+tickit_string_putchar \- append a UTF-8 encoded codepoint to a buffer
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "size_t tickit_string_putchar(char *" str ", size_t " len ", long " codepoint );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_string_putchar\fP() appends bytes into a buffer to represent the given codepoint. The
+.SM UTF-8
+bytes will be appended directly starting from \fIstr\fP, and the function then returns the total number of bytes appended. The length of the buffer should be given to as \fIlen\fP; if the buffer is not long enough then it is left unmodified and -1 is returned instead.
+.PP
+This function does not expect the buffer to be NUL-terminated, and it will not terminate the buffer with a NUL byte on completion.
+.SH "RETURN VALUE"
+\fBtickit_string_putchar\fP() returns the number of bytes appended to the buffer, or -1 if the buffer was not long enough.
+.SH "SEE ALSO"
+.BR tickit_string_seqlen (3),
+.BR tickit (7)

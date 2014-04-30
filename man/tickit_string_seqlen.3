@@ -1,0 +1,20 @@
+.TH TICKIT_STRING_SEQLEN 3
+.SH NAME
+tickit_string_seqlen \- determine the length of a UTF-8 codepoint encoding
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_string_seqlen(long " codepoint );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_string_seqlen\fP() determines the number of bytes required in the
+.SM UTF-8
+encoding of the given codepoint and returns it.
+.SH "RETURN VALUE"
+\fBtickit_string_seqlen\fP() returns a byte count.
+.SH "SEE ALSO"
+.BR tickit_string_put_char (3),
+.BR tickit (7)
