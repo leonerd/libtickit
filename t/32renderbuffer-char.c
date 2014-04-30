@@ -6,6 +6,7 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
   TickitRenderBuffer *rb;
+  char buffer[256];
 
   rb = tickit_renderbuffer_new(10, 20);
 
@@ -16,6 +17,9 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_char_at(rb, 5, 5, 0x41, fg_pen);
     tickit_renderbuffer_char_at(rb, 5, 6, 0x42, fg_pen);
     tickit_renderbuffer_char_at(rb, 5, 7, 0x43, fg_pen);
+
+    is_int(tickit_renderbuffer_get_cell_text(rb, 5, 5, buffer, sizeof buffer), 1, "get_cell_text CHAR at 5,5");
+    is_str(buffer, "A", "buffer text at 5,5");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer renders char_at to terminal",

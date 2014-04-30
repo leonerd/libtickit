@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitRenderBuffer *rb;
   int lines, cols;
+  char buffer[256];
 
   rb = tickit_renderbuffer_new(10, 20);
 
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
   is_termlog("Empty RenderBuffer renders nothing to term",
       NULL);
 
-  // TODO: get_cell
+  ok(!tickit_renderbuffer_get_cell_active(rb, 0, 0), "get_cell_active SKIP");
 
   // Absolute spans
   {
@@ -39,7 +40,15 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_text_at(rb, 4, 1, "third span", fg_pen);
     tickit_renderbuffer_erase_at(rb, 5, 1, 7, fg_pen);
 
-    // TODO: get_cell
+    is_int(tickit_renderbuffer_get_cell_text(rb, 0, 1, buffer, sizeof buffer), 1, "get_cell_text TEXT at 0,1");
+    is_str(buffer, "t", "buffer text at TEXT 0,1");
+    is_int(tickit_pen_get_colour_attr(tickit_renderbuffer_get_cell_pen(rb, 0, 1), TICKIT_PEN_FG), 1,
+        "get_cell_pen FG at 0,1");
+
+    is_int(tickit_renderbuffer_get_cell_text(rb, 0, 2, buffer, sizeof buffer), 1, "get_cell_text TEXT at 0,2");
+    is_str(buffer, "e", "buffer text at TEXT 0,2");
+
+    is_int(tickit_renderbuffer_get_cell_text(rb, 1, 1, buffer, sizeof buffer), 0, "get_cell_text ERASE at 1,1");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer renders text to terminal",

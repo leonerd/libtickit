@@ -51,7 +51,11 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_hline_at(rb, 10, 8, 12, TICKIT_LINE_SINGLE, NULL, 0);
     tickit_renderbuffer_vline_at(rb, 8, 12, 10, TICKIT_LINE_SINGLE, NULL, 0);
 
-    // TODO: get_cell
+    TickitRenderBufferLineMask mask = tickit_renderbuffer_get_cell_linemask(rb, 9, 10);
+    is_int(mask.north, TICKIT_LINE_SINGLE, "get_cell_linemask north");
+    is_int(mask.south, TICKIT_LINE_SINGLE, "get_cell_linemask south");
+    is_int(mask.east,  0,                  "get_cell_linemask east");
+    is_int(mask.west,  0,                  "get_cell_linemask west");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer renders lines with stored pen",

@@ -880,3 +880,115 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
 
   tickit_renderbuffer_reset(rb);
 }
+
+static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
+{
+  if(line < 0 || line >= rb->lines)
+    return NULL;
+  if(col < 0 || col >= rb->cols)
+    return NULL;
+
+  *offset = 0;
+  RBCell *cell = &rb->cells[line][col];
+  if(cell->state == CONT) {
+    *offset = col - cell->len; // startcol
+    cell = &rb->cells[line][cell->len];
+  }
+
+  return cell;
+}
+
+int tickit_renderbuffer_get_cell_active(TickitRenderBuffer *rb, int line, int col)
+{
+  int offset;
+  RBCell *span = get_span(rb, line, col, &offset);
+  if(!span)
+    return -1;
+
+  return span->state != SKIP;
+}
+
+size_t tickit_renderbuffer_get_cell_text(TickitRenderBuffer *rb, int line, int col, char *buffer, size_t len)
+{
+  int offset;
+  RBCell *span = get_span(rb, line, col, &offset);
+  if(!span)
+    return -1;
+
+  switch(span->state) {
+    case CONT: // should be unreachable
+      /* fallthrough */
+    case SKIP:
+      return -1;
+    case ERASE:
+      return 0;
+    case TEXT:
+      {
+        char *text = rb->texts[span->v.text.idx];
+        TickitStringPos start, end, limit;
+
+        tickit_stringpos_limit_columns(&limit, span->v.text.offs + offset);
+        tickit_string_count(text, &start, &limit);
+
+        tickit_stringpos_limit_graphemes(&limit, start.graphemes + 1);
+        end = start;
+        tickit_string_countmore(text, &end, &limit);
+
+        size_t bytes = end.bytes - start.bytes;
+
+        if(buffer) {
+          if(len < bytes)
+            return -1;
+          strncpy(buffer, text + start.bytes, bytes);
+          if(len > bytes)
+            buffer[bytes] = 0;
+        }
+
+        return bytes;
+      }
+    case LINE:
+    case CHAR:
+      {
+        long codepoint = span->state == LINE ? linemask_to_char[span->v.line.mask]
+                                             : span->v.chr.codepoint;
+        if(buffer) {
+          size_t bytes = tickit_string_putchar(buffer, len, codepoint);
+
+          if(bytes < 0)
+            return bytes;
+          if(len > bytes)
+            buffer[bytes] = 0;
+          return bytes;
+        }
+        else
+          return tickit_string_seqlen(codepoint);
+      }
+  }
+
+  return -1;
+}
+
+TickitRenderBufferLineMask tickit_renderbuffer_get_cell_linemask(TickitRenderBuffer *rb, int line, int col)
+{
+  int offset;
+  RBCell *span = get_span(rb, line, col, &offset);
+  if(!span || span->state != LINE)
+    return (TickitRenderBufferLineMask){ 0 };
+
+  return (TickitRenderBufferLineMask){
+    .north = (span->v.line.mask >> NORTH_SHIFT) & 0x03,
+    .south = (span->v.line.mask >> SOUTH_SHIFT) & 0x03,
+    .east  = (span->v.line.mask >> EAST_SHIFT ) & 0x03,
+    .west  = (span->v.line.mask >> WEST_SHIFT ) & 0x03,
+  };
+}
+
+TickitPen *tickit_renderbuffer_get_cell_pen(TickitRenderBuffer *rb, int line, int col)
+{
+  int offset;
+  RBCell *span = get_span(rb, line, col, &offset);
+  if(!span || span->state == SKIP)
+    return NULL;
+
+  return span->pen;
+}

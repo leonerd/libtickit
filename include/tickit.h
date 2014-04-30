@@ -374,6 +374,22 @@ void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int end
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt);
 
+// This API is still somewhat experimental
+
+typedef struct {
+  char north;
+  char south;
+  char east;
+  char west;
+} TickitRenderBufferLineMask;
+
+int tickit_renderbuffer_get_cell_active(TickitRenderBuffer *rb, int line, int col);
+size_t tickit_renderbuffer_get_cell_text(TickitRenderBuffer *rb, int line, int col, char *buffer, size_t len);
+TickitRenderBufferLineMask tickit_renderbuffer_get_cell_linemask(TickitRenderBuffer *rb, int line, int col);
+
+// returns a direct pointer - do not free or modify
+TickitPen *tickit_renderbuffer_get_cell_pen(TickitRenderBuffer *rb, int line, int col);
+
 #endif
 
 #ifdef __cplusplus
