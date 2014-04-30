@@ -2,6 +2,7 @@
 #include "taplib.h"
 
 #include <string.h>
+#include <stdio.h>
 
 void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
 {

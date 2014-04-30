@@ -39,7 +39,7 @@ void is_termlog(char *name, ...)
       break;
     TickitMockTermLogEntry *got = tickit_mockterm_peeklog(mt, logi);
 
-    if(exp->type != got->type) {
+    if((int)exp->type != (int)got->type) {
       fail(name);
       diag("Expected %s(), got %s()", lognames[exp->type], lognames[got->type]);
       goto failed;
@@ -110,7 +110,7 @@ void is_termlog(char *name, ...)
   }
 
   struct TermLogExpectation *exp;
-  if(exp = va_arg(args, void *)) {
+  if((exp = va_arg(args, void *))) {
     fail(name);
     diag("Expected a %s() termlog entry; got none", lognames[exp->type]);
     goto failed;

@@ -1,7 +1,10 @@
+#define _XOPEN_SOURCE 500 // usleep
+
 #include "tickit.h"
 #include "taplib.h"
 
 #include <string.h>
+#include <unistd.h>
 
 TickitKeyEventType keytype;
 char               keystr[16];
