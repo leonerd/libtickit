@@ -468,7 +468,9 @@ static TickitTermDriver *new(const char *termtype)
 
   td->ut = ut;
 
+  td->mode.mouse = 0;
   td->mode.cursorvis = 1;
+  td->mode.altscreen = 0;
 
   td->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
   td->cap.colours = unibi_get_num(ut, unibi_max_colors);
