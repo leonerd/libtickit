@@ -55,7 +55,7 @@ void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
-  char   buffer[1024];
+  char   buffer[1024] = { 0 };
 
   TickitTermDriver *ttd = malloc(sizeof(TickitTermDriver));
   ttd->vtable = &vtable;

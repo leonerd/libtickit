@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
   int    fd[2];
-  char   buffer[1024];
+  char   buffer[1024] = { 0 };
 
   tt = tickit_term_new_for_termtype("xterm");
 

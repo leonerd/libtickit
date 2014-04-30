@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
   int    fd[2];
-  char   buffer[1024];
+  char   buffer[1024] = { 0 };
   size_t len;
 
   /* We'll need a real filehandle we can write/read.
