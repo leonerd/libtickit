@@ -6,10 +6,15 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
   TickitRenderBuffer *rb;
+  int lines, cols;
 
   rb = tickit_renderbuffer_new(10, 20);
 
   ok(!!rb, "tickit_renderbuffer_new");
+
+  tickit_renderbuffer_get_size(rb, &lines, &cols);
+  is_int(lines, 10, "get_size lines");
+  is_int(cols,  20, "get_size cols");
 
   tickit_renderbuffer_flush_to_term(rb, tt);
   is_termlog("Empty RenderBuffer renders nothing to term",

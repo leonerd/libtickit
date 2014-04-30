@@ -335,6 +335,15 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
   free(rb);
 }
 
+void tickit_renderbuffer_get_size(TickitRenderBuffer *rb, int *lines, int *cols)
+{
+  if(lines)
+    *lines = rb->lines;
+
+  if(cols)
+    *cols = rb->cols;
+}
+
 void tickit_renderbuffer_translate(TickitRenderBuffer *rb, int downward, int rightward)
 {
   rb->xlate_line += downward;

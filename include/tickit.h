@@ -320,6 +320,8 @@ typedef struct TickitRenderBuffer TickitRenderBuffer;
 TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols);
 void tickit_renderbuffer_destroy(TickitRenderBuffer *rb);
 
+void tickit_renderbuffer_get_size(TickitRenderBuffer *rb, int *lines, int *cols);
+
 void tickit_renderbuffer_translate(TickitRenderBuffer *rb, int downward, int rightward);
 void tickit_renderbuffer_clip(TickitRenderBuffer *rb, TickitRect *rect);
 void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask);
