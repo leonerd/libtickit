@@ -27,6 +27,7 @@ enum {
   WEST_SHIFT  = 6,
 };
 
+// Internal cell structure definition
 typedef struct {
   enum TickitRenderBufferCellState state;
   int len; // or "startcol" for state == CONT
@@ -37,11 +38,11 @@ typedef struct {
     struct { int mask;          } line; // state == LINE
     struct { int codepoint;     } chr;  // state == CHAR
   } v;
-} TickitRenderBufferCell;
+} RBCell;
 
-typedef struct TickitRenderBufferStack TickitRenderBufferStack;
-struct TickitRenderBufferStack {
-  TickitRenderBufferStack *prev;
+typedef struct RBStack RBStack;
+struct RBStack {
+  RBStack *prev;
 
   int vc_line, vc_col;
   int xlate_line, xlate_col;
@@ -52,7 +53,7 @@ struct TickitRenderBufferStack {
 
 struct TickitRenderBuffer {
   int lines, cols; // Size
-  TickitRenderBufferCell **cells;
+  RBCell **cells;
 
   unsigned int vc_pos_set : 1;
   int vc_line, vc_col;
@@ -61,7 +62,7 @@ struct TickitRenderBuffer {
   TickitPen *pen;
 
   int depth;
-  TickitRenderBufferStack *stack;
+  RBStack *stack;
 
   char **texts;
   size_t n_texts;    // number actually valid
@@ -72,10 +73,10 @@ struct TickitRenderBuffer {
   size_t tmpsize; // allocated size
 };
 
-static void free_stack(TickitRenderBufferStack *stack)
+static void free_stack(RBStack *stack)
 {
   while(stack) {
-    TickitRenderBufferStack *prev = stack->prev;
+    RBStack *prev = stack->prev;
     if(stack->pen)
       tickit_pen_destroy(stack->pen);
     free(stack);
@@ -132,7 +133,7 @@ static int xlate_and_clip(TickitRenderBuffer *rb, int *line, int *col, int *len,
   return 1;
 }
 
-static void cont_cell(TickitRenderBufferCell *cell, int startcol)
+static void cont_cell(RBCell *cell, int startcol)
 {
   switch(cell->state) {
     case TEXT:
@@ -153,18 +154,18 @@ static void cont_cell(TickitRenderBufferCell *cell, int startcol)
   cell->pen       = NULL;
 }
 
-static TickitRenderBufferCell *make_span(TickitRenderBuffer *rb, int line, int col, int len)
+static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int len)
 {
   int end = col + len;
-  TickitRenderBufferCell **cells = rb->cells;
+  RBCell **cells = rb->cells;
 
   // If the following cell is a CONT, it needs to become a new start
   if(end < rb->cols && cells[line][end].state == CONT) {
     int spanstart = cells[line][end].len;
-    TickitRenderBufferCell *spancell = &cells[line][spanstart];
+    RBCell *spancell = &cells[line][spanstart];
     int spanend = spanstart + spancell->len;
     int afterlen = spanend - end;
-    TickitRenderBufferCell *endcell = &cells[line][end];
+    RBCell *endcell = &cells[line][end];
 
     switch(spancell->state) {
       case SKIP:
@@ -197,7 +198,7 @@ static TickitRenderBufferCell *make_span(TickitRenderBuffer *rb, int line, int c
   // If the initial cell is a CONT, shorten its start
   if(cells[line][col].state == CONT) {
     int beforestart = cells[line][col].len;
-    TickitRenderBufferCell *spancell = &cells[line][beforestart];
+    RBCell *spancell = &cells[line][beforestart];
     int beforelen = col - beforestart;
 
     switch(spancell->state) {
@@ -259,9 +260,9 @@ TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols)
   rb->lines = lines;
   rb->cols  = cols;
 
-  rb->cells = malloc(rb->lines * sizeof(TickitRenderBufferCell *));
+  rb->cells = malloc(rb->lines * sizeof(RBCell *));
   for(int line = 0; line < rb->lines; line++) {
-    rb->cells[line] = malloc(rb->cols * sizeof(TickitRenderBufferCell));
+    rb->cells[line] = malloc(rb->cols * sizeof(RBCell));
 
     rb->cells[line][0].state     = SKIP;
     rb->cells[line][0].maskdepth = -1;
@@ -302,7 +303,7 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
 {
   for(int line = 0; line < rb->lines; line++) {
     for(int col = 0; col < rb->cols; col++) {
-      TickitRenderBufferCell *cell = &rb->cells[line][col];
+      RBCell *cell = &rb->cells[line][col];
       switch(cell->state) {
         case TEXT:
         case ERASE:
@@ -381,7 +382,7 @@ void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask)
 
   for(int line = hole.top; line < hole.top + hole.lines && line < rb->lines; line++) {
     for(int col = hole.left; col < hole.left + hole.cols && col < rb->cols; col++) {
-      TickitRenderBufferCell *cell = &rb->cells[line][col];
+      RBCell *cell = &rb->cells[line][col];
       if(cell->maskdepth == -1)
         cell->maskdepth = rb->depth;
     }
@@ -479,7 +480,7 @@ void tickit_renderbuffer_clear(TickitRenderBuffer *rb, TickitPen *pen)
 
 void tickit_renderbuffer_save(TickitRenderBuffer *rb)
 {
-  TickitRenderBufferStack *stack = malloc(sizeof(struct TickitRenderBufferStack));
+  RBStack *stack = malloc(sizeof(struct RBStack));
 
   stack->vc_line    = rb->vc_line;
   stack->vc_col     = rb->vc_col;
@@ -496,7 +497,7 @@ void tickit_renderbuffer_save(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_savepen(TickitRenderBuffer *rb)
 {
-  TickitRenderBufferStack *stack = malloc(sizeof(struct TickitRenderBufferStack));
+  RBStack *stack = malloc(sizeof(struct RBStack));
 
   stack->pen      = rb->pen ? tickit_pen_clone(rb->pen) : NULL;
   stack->pen_only = 1;
@@ -508,7 +509,7 @@ void tickit_renderbuffer_savepen(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_restore(TickitRenderBuffer *rb)
 {
-  TickitRenderBufferStack *stack;
+  RBStack *stack;
 
   if(!rb->stack)
     return;
@@ -546,7 +547,7 @@ void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int 
   if(!xlate_and_clip(rb, &line, &col, &len, NULL))
     return;
 
-  TickitRenderBufferCell *linecells = rb->cells[line];
+  RBCell *linecells = rb->cells[line];
 
   while(len) {
     while(len && linecells[col].maskdepth > -1) {
@@ -564,7 +565,7 @@ void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int 
     if(!spanlen)
       break;
 
-    TickitRenderBufferCell *cell = make_span(rb, line, col, spanlen);
+    RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state = SKIP;
 
     col += spanlen;
@@ -610,7 +611,7 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
 
   rb->texts[rb->n_texts] = strdup(text);
 
-  TickitRenderBufferCell *linecells = rb->cells[line];
+  RBCell *linecells = rb->cells[line];
 
   int ret = len;
   while(len) {
@@ -630,7 +631,7 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
     if(!spanlen)
       break;
 
-    TickitRenderBufferCell *cell = make_span(rb, line, col, spanlen);
+    RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state       = TEXT;
     cell->pen         = merge_pen(rb, pen);
     cell->v.text.idx  = rb->n_texts;
@@ -661,7 +662,7 @@ void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int
   if(!xlate_and_clip(rb, &line, &col, &len, NULL))
     return;
 
-  TickitRenderBufferCell *linecells = rb->cells[line];
+  RBCell *linecells = rb->cells[line];
 
   while(len) {
     while(len && linecells[col].maskdepth > -1) {
@@ -679,7 +680,7 @@ void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int
     if(!spanlen)
       break;
 
-    TickitRenderBufferCell *cell = make_span(rb, line, col, spanlen);
+    RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state = ERASE;
     cell->pen   = merge_pen(rb, pen);
 
@@ -723,7 +724,7 @@ void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long
   if(rb->cells[line][col].maskdepth > -1)
     return;
 
-  TickitRenderBufferCell *cell = make_span(rb, line, col, len);
+  RBCell *cell = make_span(rb, line, col, len);
   cell->state           = CHAR;
   cell->pen             = merge_pen(rb, pen);
   cell->v.chr.codepoint = codepoint;
@@ -741,7 +742,7 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, Tickit
 
   TickitPen *cellpen = merge_pen(rb, pen);
 
-  TickitRenderBufferCell *cell = &rb->cells[line][col];
+  RBCell *cell = &rb->cells[line][col];
   if(cell->state != LINE) {
     make_span(rb, line, col, len);
     cell->state       = LINE;
@@ -793,7 +794,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
     int phycol = -1; /* column where the terminal cursor physically is */
 
     for(int col = 0; col < rb->cols; /**/) {
-      TickitRenderBufferCell *cell = &rb->cells[line][col];
+      RBCell *cell = &rb->cells[line][col];
 
       if(cell->state == SKIP) {
         col += cell->len;
