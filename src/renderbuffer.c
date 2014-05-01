@@ -334,7 +334,7 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
   free(rb);
 }
 
-void tickit_renderbuffer_get_size(TickitRenderBuffer *rb, int *lines, int *cols)
+void tickit_renderbuffer_get_size(const TickitRenderBuffer *rb, int *lines, int *cols)
 {
   if(lines)
     *lines = rb->lines;
@@ -387,12 +387,12 @@ void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask)
   }
 }
 
-int tickit_renderbuffer_has_cursorpos(TickitRenderBuffer *rb)
+int tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb)
 {
   return rb->vc_pos_set;
 }
 
-void tickit_renderbuffer_get_cursorpos(TickitRenderBuffer *rb, int *line, int *col)
+void tickit_renderbuffer_get_cursorpos(const TickitRenderBuffer *rb, int *line, int *col)
 {
   if(line)
     *line = rb->vc_line;

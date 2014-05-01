@@ -324,14 +324,14 @@ typedef struct TickitRenderBuffer TickitRenderBuffer;
 TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols);
 void tickit_renderbuffer_destroy(TickitRenderBuffer *rb);
 
-void tickit_renderbuffer_get_size(TickitRenderBuffer *rb, int *lines, int *cols);
+void tickit_renderbuffer_get_size(const TickitRenderBuffer *rb, int *lines, int *cols);
 
 void tickit_renderbuffer_translate(TickitRenderBuffer *rb, int downward, int rightward);
 void tickit_renderbuffer_clip(TickitRenderBuffer *rb, TickitRect *rect);
 void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask);
 
-int tickit_renderbuffer_has_cursorpos(TickitRenderBuffer *rb);
-void tickit_renderbuffer_get_cursorpos(TickitRenderBuffer *rb, int *line, int *col);
+int tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb);
+void tickit_renderbuffer_get_cursorpos(const TickitRenderBuffer *rb, int *line, int *col);
 void tickit_renderbuffer_goto(TickitRenderBuffer *rb, int line, int col);
 void tickit_renderbuffer_ungoto(TickitRenderBuffer *rb);
 
