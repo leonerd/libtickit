@@ -398,8 +398,8 @@ struct TickitRenderBufferSpanInfo {
   TickitPen *pen;
 };
 
-// returns number of columns
-int tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *buffer, size_t len);
+// returns the text length or -1 on error
+size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *buffer, size_t len);
 
 #endif
 

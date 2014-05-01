@@ -995,27 +995,34 @@ TickitPen *tickit_renderbuffer_get_cell_pen(TickitRenderBuffer *rb, int line, in
   return span->pen;
 }
 
-int tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *text, size_t len)
+size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *text, size_t len)
 {
   int offset;
   RBCell *span = get_span(rb, line, startcol, &offset);
   if(!span || span->state == CONT)
     return -1;
 
-  info->is_active = 0;
-  info->n_columns = span->len - offset;
+  if(info)
+    info->n_columns = span->len - offset;
 
-  if(span->state == SKIP)
-    return info->n_columns;
+  if(span->state == SKIP) {
+    if(info)
+      info->is_active = 0;
+    return 0;
+  }
 
-  info->is_active = 1;
+  if(info)
+    info->is_active = 1;
 
-  if(info->pen) {
+  if(info && info->pen) {
     tickit_pen_clear(info->pen);
     tickit_pen_copy(info->pen, span->pen, 1);
   }
 
-  info->len = get_span_text(rb, span, offset, 0, text, len);
-  info->text = text;
-  return info->n_columns;
+  size_t retlen = get_span_text(rb, span, offset, 0, text, len);
+  if(info) {
+    info->len = retlen;
+    info->text = text;
+  }
+  return len;
 }
