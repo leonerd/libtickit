@@ -394,9 +394,9 @@ int tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_get_cursorpos(const TickitRenderBuffer *rb, int *line, int *col)
 {
-  if(line)
+  if(rb->vc_pos_set && line)
     *line = rb->vc_line;
-  if(col)
+  if(rb->vc_pos_set && col)
     *col = rb->vc_col;
 }
 
