@@ -390,16 +390,16 @@ TickitRenderBufferLineMask tickit_renderbuffer_get_cell_linemask(TickitRenderBuf
 // returns a direct pointer - do not free or modify
 TickitPen *tickit_renderbuffer_get_cell_pen(TickitRenderBuffer *rb, int line, int col);
 
-// returns number of columns
 struct TickitRenderBufferSpanInfo {
-  int is_active; // out
-  int n_columns; // out
-  char *text; size_t len; // in
-  size_t textlen; // out
+  int is_active;
+  int n_columns;
+  char *text;
+  size_t len;
   TickitPen *pen;
 };
 
-int tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info);
+// returns number of columns
+int tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *buffer, size_t len);
 
 #endif
 
