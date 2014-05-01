@@ -898,6 +898,58 @@ static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
   return cell;
 }
 
+static size_t get_span_text(TickitRenderBuffer *rb, RBCell *span, int offset, int one_grapheme, char *buffer, size_t len)
+{
+  size_t bytes;
+
+  switch(span->state) {
+    case CONT: // should be unreachable
+      return -1;
+
+    case SKIP:
+    case ERASE:
+      bytes = 0;
+      break;
+
+    case TEXT:
+      {
+        char *text = rb->texts[span->v.text.idx];
+        TickitStringPos start, end, limit;
+
+        tickit_stringpos_limit_columns(&limit, span->v.text.offs + offset);
+        tickit_string_count(text, &start, &limit);
+
+        if(one_grapheme)
+          tickit_stringpos_limit_graphemes(&limit, start.graphemes + 1);
+        else
+          tickit_stringpos_limit_columns(&limit, span->len);
+        end = start;
+        tickit_string_countmore(text, &end, &limit);
+
+        bytes = end.bytes - start.bytes;
+
+        if(buffer) {
+          if(len < bytes)
+            return -1;
+          strncpy(buffer, text + start.bytes, bytes);
+        }
+        break;
+      }
+    case LINE:
+      bytes = tickit_string_putchar(buffer, len, linemask_to_char[span->v.line.mask]);
+      break;
+
+    case CHAR:
+      bytes = tickit_string_putchar(buffer, len, span->v.chr.codepoint);
+      break;
+  }
+
+  if(buffer && len > bytes)
+    buffer[bytes] = 0;
+
+  return bytes;
+}
+
 int tickit_renderbuffer_get_cell_active(TickitRenderBuffer *rb, int line, int col)
 {
   int offset;
@@ -912,60 +964,10 @@ size_t tickit_renderbuffer_get_cell_text(TickitRenderBuffer *rb, int line, int c
 {
   int offset;
   RBCell *span = get_span(rb, line, col, &offset);
-  if(!span)
+  if(!span || span->state == CONT)
     return -1;
 
-  switch(span->state) {
-    case CONT: // should be unreachable
-      /* fallthrough */
-    case SKIP:
-      return -1;
-    case ERASE:
-      return 0;
-    case TEXT:
-      {
-        char *text = rb->texts[span->v.text.idx];
-        TickitStringPos start, end, limit;
-
-        tickit_stringpos_limit_columns(&limit, span->v.text.offs + offset);
-        tickit_string_count(text, &start, &limit);
-
-        tickit_stringpos_limit_graphemes(&limit, start.graphemes + 1);
-        end = start;
-        tickit_string_countmore(text, &end, &limit);
-
-        size_t bytes = end.bytes - start.bytes;
-
-        if(buffer) {
-          if(len < bytes)
-            return -1;
-          strncpy(buffer, text + start.bytes, bytes);
-          if(len > bytes)
-            buffer[bytes] = 0;
-        }
-
-        return bytes;
-      }
-    case LINE:
-    case CHAR:
-      {
-        long codepoint = span->state == LINE ? linemask_to_char[span->v.line.mask]
-                                             : span->v.chr.codepoint;
-        if(buffer) {
-          size_t bytes = tickit_string_putchar(buffer, len, codepoint);
-
-          if(bytes < 0)
-            return bytes;
-          if(len > bytes)
-            buffer[bytes] = 0;
-          return bytes;
-        }
-        else
-          return tickit_string_seqlen(codepoint);
-      }
-  }
-
-  return -1;
+  return get_span_text(rb, span, offset, 1, buffer, len);
 }
 
 TickitRenderBufferLineMask tickit_renderbuffer_get_cell_linemask(TickitRenderBuffer *rb, int line, int col)
@@ -991,4 +993,28 @@ TickitPen *tickit_renderbuffer_get_cell_pen(TickitRenderBuffer *rb, int line, in
     return NULL;
 
   return span->pen;
+}
+
+int tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info)
+{
+  int offset;
+  RBCell *span = get_span(rb, line, startcol, &offset);
+  if(!span || span->state == CONT)
+    return -1;
+
+  info->is_active = 0;
+  info->n_columns = span->len - offset;
+
+  if(span->state == SKIP)
+    return info->n_columns;
+
+  info->is_active = 1;
+
+  if(info->pen) {
+    tickit_pen_clear(info->pen);
+    tickit_pen_copy(info->pen, span->pen, 1);
+  }
+
+  info->textlen = get_span_text(rb, span, offset, 0, info->text, info->len);
+  return info->n_columns;
 }
