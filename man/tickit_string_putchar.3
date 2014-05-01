@@ -12,7 +12,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_string_putchar\fP() appends bytes into a buffer to represent the given codepoint. The
 .SM UTF-8
-bytes will be appended directly starting from \fIstr\fP, and the function then returns the total number of bytes appended. The length of the buffer should be given to as \fIlen\fP; if the buffer is not long enough then it is left unmodified and -1 is returned instead.
+bytes will be appended directly starting from \fIstr\fP, and the function then returns the total number of bytes appended. The length of the buffer should be given to as \fIlen\fP; if the buffer is not long enough then it is left unmodified and -1 is returned instead. If \fIstr\fP is NULL then the function will simply return the number of bytes it would need to append to represent the codepoint.
 .PP
 This function does not expect the buffer to be NUL-terminated, and it will not terminate the buffer with a NUL byte on completion.
 .SH "RETURN VALUE"

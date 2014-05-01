@@ -59,6 +59,8 @@ int tickit_string_seqlen(long codepoint)
 size_t tickit_string_putchar(char *str, size_t len, long codepoint)
 {
   int nbytes = tickit_string_seqlen(codepoint);
+  if(!str)
+    return nbytes;
   if(len < nbytes)
     return -1;
 
