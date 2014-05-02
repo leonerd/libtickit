@@ -601,7 +601,7 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
 
   int startcol;
   if(!xlate_and_clip(rb, &line, &col, &len, &startcol))
-    return len;
+    return ret;
 
   if(rb->n_texts == rb->size_texts) {
     rb->size_texts *= 2;
