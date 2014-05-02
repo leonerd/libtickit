@@ -55,7 +55,7 @@ The following functions all affect the stored content within the buffer, taking 
 .PP
 \fBtickit_renderbuffer_text_at\fP(3) and \fBtickit_renderbuffer_text\fP(3) create a text region; a place where normal text is output.
 .PP
-\fBtickit_renderbuffer_erase_at\fP(3), \fBtickit_renderbuffer_erase\fP(3) and \fBtickit_renderbuffer_erase_to\fP(3) create an erase region; a place where existing terminal content will be erased. \fBtickit_renderbuffer_clear\fP(3) clears the entire area by setting it all as an erase region.
+\fBtickit_renderbuffer_erase_at\fP(3), \fBtickit_renderbuffer_erase\fP(3) and \fBtickit_renderbuffer_erase_to\fP(3) create an erase region; a place where existing terminal content will be erased. \fBtickit_renderbuffer_eraserect\fP(3) is a convenient shortcut that erases a rectangle, and \fBtickit_renderbuffer_clear\fP(3) erases the entire buffer area.
 .PP
 \fBtickit_renderbuffer_char_at\fP(3) and \fBtickit_renderbuffer_char\fP(3) place a single Unicode character directly.
 .PP

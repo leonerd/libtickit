@@ -52,6 +52,6 @@ tickit_renderbuffer_skip_at.3 = tickit_renderbuffer_skip.3
 tickit_renderbuffer_text_at.3 = tickit_renderbuffer_text.3
 tickit_renderbuffer_erase_to.3 = tickit_renderbuffer_erase.3
 tickit_renderbuffer_erase_at.3 = tickit_renderbuffer_erase.3
-tickit_renderbuffer_clear.3 = tickit_renderbuffer_erase.3
+tickit_renderbuffer_clear.3 = tickit_renderbuffer_eraserect.3
 tickit_renderbuffer_char_at.3 = tickit_renderbuffer_char.3
 tickit_renderbuffer_vline_at.3 = tickit_renderbuffer_hline_at.3

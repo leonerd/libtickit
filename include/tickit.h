@@ -338,7 +338,6 @@ void tickit_renderbuffer_ungoto(TickitRenderBuffer *rb);
 void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, TickitPen *pen);
 
 void tickit_renderbuffer_reset(TickitRenderBuffer *rb);
-void tickit_renderbuffer_clear(TickitRenderBuffer *rb, TickitPen *pen);
 
 void tickit_renderbuffer_save(TickitRenderBuffer *rb);
 void tickit_renderbuffer_savepen(TickitRenderBuffer *rb);
@@ -353,6 +352,7 @@ void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int
 void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int len, TickitPen *pen);
 void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen);
 void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect, TickitPen *pen);
+void tickit_renderbuffer_clear(TickitRenderBuffer *rb, TickitPen *pen);
 void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint, TickitPen *pen);
 void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint, TickitPen *pen);
 
