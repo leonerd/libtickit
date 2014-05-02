@@ -3,9 +3,12 @@
 tickit \- Terminal Interface Construction KIT
 .SH DESCRIPTION
 \fBtickit\fP is a library for building full-screen interactive programs that use a terminal interface. Typically a program using \fBtickit\fP would consist of an instance of \fBTickitTerm\fP to represent the user's terminal, on which drawing operations are sent and input events are received.
+.PP
+The application would likely also maintain a \fBTickitRenderBuffer\fP instance into which to draw updates to the screen, before flushing them to the terminal in reaction to user input or other events.
 .SH "SEE ALSO"
 .BR tickit_term (7),
 .BR tickit_pen (7),
 .BR tickit_rect (7),
 .BR tickit_rectset (7),
+.BR tickit_renderbuffer (7),
 .BR tickit_string_count (3)
