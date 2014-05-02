@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
   rb = tickit_renderbuffer_new(10, 20);
 
-  // Characters
+  // Absolute characters
   {
     TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 4, -1);
 
@@ -47,6 +47,33 @@ int main(int argc, char *argv[])
                    SETPEN(.bg=5), PRINT("F"),
         NULL);
 
+    tickit_pen_destroy(bg_pen);
+  }
+
+  // VC characters
+  {
+    tickit_renderbuffer_goto(rb, 0, 4);
+
+    // Direct pen
+    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 5, -1);
+    tickit_renderbuffer_char(rb, 0x47, fg_pen);
+
+    // Stored pen
+    TickitPen *bg_pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 6, -1);
+    tickit_renderbuffer_setpen(rb, bg_pen);
+    tickit_renderbuffer_char(rb, 0x48, NULL);
+
+    // Combined pens
+    tickit_renderbuffer_char(rb, 0x49, fg_pen);
+
+    tickit_renderbuffer_flush_to_term(rb, tt);
+    is_termlog("RenderBuffer renders chars at VC",
+        GOTO(0,4), SETPEN(.fg=5), PRINT("G"),
+                   SETPEN(.bg=6), PRINT("H"),
+                   SETPEN(.fg=5,.bg=6), PRINT("I"),
+        NULL);
+
+    tickit_pen_destroy(fg_pen);
     tickit_pen_destroy(bg_pen);
   }
 

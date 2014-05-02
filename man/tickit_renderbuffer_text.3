@@ -13,7 +13,7 @@ tickit_renderbuffer_text, tickit_renderbuffer_text_at \- create text regions
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the given pen. It returns the number of columns that the text string occupies.
+\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the given pen. It returns the number of columns that the text string occupies. This function will update the virtual cursor position.
 .PP
 \fBtickit_renderbuffer_text_at\fP() creates a text region at the given position. This function does not use or update the virtual cursor position.
 .SH "RETURN VALUE"

@@ -728,6 +728,16 @@ void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long
   cell->v.chr.codepoint = codepoint;
 }
 
+void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint, TickitPen *pen)
+{
+  if(!rb->vc_pos_set)
+    return;
+
+  tickit_renderbuffer_char_at(rb, rb->vc_line, rb->vc_col, codepoint, pen);
+  // TODO: might not be 1; would have to look it up
+  rb->vc_col += 1;
+}
+
 static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, TickitPen *pen)
 {
   int len = 1;

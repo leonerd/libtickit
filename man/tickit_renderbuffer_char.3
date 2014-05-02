@@ -1,16 +1,20 @@
-.TH TICKIT_RENDERBUFFER_CHAR_AT 3
+.TH TICKIT_RENDERBUFFER_CHAR 3
 .SH NAME
-tickit_renderbuffer_char_at \- create character regions
+tickit_renderbuffer_char, tickit_renderbuffer_char_at \- create character regions
 .SH SYNOPSIS
 .nf
 .B #include <tickit.h>
 .sp
+.BI "int tickit_renderbuffer_char(TickitRenderBuffer *" rb ,
+.BI "        long " codepoint ", TickitPen *" pen );
 .BI "int tickit_renderbuffer_char_at(TickitRenderBuffer *" rb ,
 .BI "        int " line ", int " col ", long " codepoint ", TickitPen *" pen );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
+\fBtickit_renderbuffer_char\fP() creates a text region at the current virtual cursor position to contain the given Unicode character codepoint.
+.PP
 \fBtickit_renderbuffer_char_at\fP() creates a text region at the given position to contain the given Unicode character codepoint. This function does not use or update the virtual cursor position.
 .SH "RETURN VALUE"
 This function returns no value.

@@ -354,6 +354,7 @@ void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int len, TickitPen *pen);
 void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen);
 void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect, TickitPen *pen);
 void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint, TickitPen *pen);
+void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint, TickitPen *pen);
 
 typedef enum {
   TICKIT_LINE_SINGLE = 1,
