@@ -597,6 +597,7 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
   tickit_string_count(text, &endpos, NULL);
 
   int len = endpos.columns;
+  int ret = len;
 
   int startcol;
   if(!xlate_and_clip(rb, &line, &col, &len, &startcol))
@@ -611,7 +612,6 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
 
   RBCell *linecells = rb->cells[line];
 
-  int ret = len;
   while(len) {
     while(len && linecells[col].maskdepth > -1) {
       col++;

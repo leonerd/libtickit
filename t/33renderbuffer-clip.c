@@ -6,15 +6,20 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
   TickitRenderBuffer *rb;
+  int len;
 
   rb = tickit_renderbuffer_new(10, 20);
 
   // Clipping to edge
   {
-    tickit_renderbuffer_text_at(rb, -1, 5, "TTTTTTTTTT", NULL);
-    tickit_renderbuffer_text_at(rb, 11, 5, "BBBBBBBBBB", NULL);
-    tickit_renderbuffer_text_at(rb, 4, -3, "[LLLLLLLL]", NULL);
-    tickit_renderbuffer_text_at(rb, 5, 15, "[RRRRRRRR]", NULL);
+    len = tickit_renderbuffer_text_at(rb, -1, 5, "TTTTTTTTTT", NULL);
+    is_int(len, 10, "len from text_at clipped off top");
+    len = tickit_renderbuffer_text_at(rb, 11, 5, "BBBBBBBBBB", NULL);
+    is_int(len, 10, "len from text_at clipped off bottom");
+    len = tickit_renderbuffer_text_at(rb, 4, -3, "[LLLLLLLL]", NULL);
+    is_int(len, 10, "len from text_at clipped off left");
+    len = tickit_renderbuffer_text_at(rb, 5, 15, "[RRRRRRRR]", NULL);
+    is_int(len, 10, "len from text_at clipped off right");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer text rendering with clipping",
