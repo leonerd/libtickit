@@ -470,7 +470,7 @@ size_t tickit_mockterm_get_display_text(TickitMockTerm *mt, char *buffer, size_t
     MockTermCell *cell = linecells[col];
     size_t celllen = cell->str ? strlen(cell->str) : 0;
 
-    if(buffer && len >= celllen) {
+    if(buffer && celllen && len >= celllen) {
       strcpy(buffer, cell->str);
       buffer += celllen;
       len    -= celllen;

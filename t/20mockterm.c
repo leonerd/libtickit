@@ -78,13 +78,35 @@ int main(int argc, char *argv[])
   char c = 'l';
   tickit_term_printn(tt, &c, 1);
 
-  is_termlog("Display after printn 1",
+  is_termlog("Termlog after printn 1",
       PRINT("l"),
       NULL);
   is_display_text("Display after printn 1",
       "          ",
       "     fool ",
       "          ");
+
+  tickit_term_goto(tt, 2, 0);
+  tickit_term_print(tt, "Ĉu vi?");
+
+  is_termlog("Termlog after print UTF-8",
+      GOTO(2,0), PRINT("Ĉu vi?"),
+      NULL);
+  is_display_text("Display after print UTF-8",
+      "          ",
+      "     fool ",
+      "Ĉu vi?    ");
+
+  // U+FF10 = Fullwidth digit zero = EF BC 90
+  tickit_term_print(tt, "\xef\xbc\x90");
+
+  is_termlog("Termlog after print UTF-8 fullwidth",
+      PRINT("０"),
+      NULL);
+  is_display_text("Display after print UTF-8 fullwidth",
+      "          ",
+      "     fool ",
+      "Ĉu vi?０  ");
 
   tickit_term_clear(tt);
 
