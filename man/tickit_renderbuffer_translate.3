@@ -1,0 +1,23 @@
+.TH TICKIT_RENDERBUFFER_TRANSLATE 3
+.SH NAME
+tickit_renderbuffer_translate \- move the base of output functions
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_renderbuffer_translate(TickitRenderBuffer *" rb ", int " downward ", int " rightward );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_translate\fP() applies a translation to the co-ordinate system used by \fBtickit_renderbuffer_goto\fP(3) and the \fB_at\fP-suffixed absolute-position drawing functions, and returned by \fBtickit_renderbuffer_get_cursorpos\fP(3).
+.PP
+To undo the effects of any of this functions, it should be used within nested pairs of calls to \fBtickit_renderbuffer_save\fP(3) and \fBtickit_renderbuffer_restore\fP(3). This function only affects the subsequent drawing operations; it do not affect existing stored content, nor the behaviour of \fBtickit_renderbuffer_flush_to_term\fP(3).
+.SH "RETURN VALUE"
+These functions return no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_clip (3),
+.BR tickit_renderbuffer_mask (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

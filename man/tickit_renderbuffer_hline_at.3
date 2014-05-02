@@ -1,0 +1,60 @@
+.TH TICKIT_RENDERBUFFER_HLINE_AT 3
+.SH NAME
+tickit_renderbuffer_hline_at, tickit_renderbuffer_vline_at \- create line regions
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_renderbuffer_hline_at(TickitRenderBuffer *" rb ,
+.BI "        int " line ", int " startcol ", int " endcol ,
+.BI "        TickitLineStyle " style ", TickitPen *" pen ", TickitLineCaps " caps );
+.BI "int tickit_renderbuffer_vline_at(TickitRenderBuffer *" rb ,
+.BI "        int " startline ", int " endline ", int " col ,
+.BI "        TickitLineStyle " style ", TickitPen *" pen ", TickitLineCaps " caps );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_hline_at\fP() creates a horizontal line segment on the given line between the given columns; both inclusive. \fBtickit_renderbuffer_vline_at\fP() creates a vertical line segment on the given column between the given lines; both inclusive.
+.PP
+The \fIstyle\fP argument should be one of the following \fBTickitLineStyle\fP constants:
+.TP
+.B TICKIT_LINESTYLE_SINGLE
+A single thin line
+.TP
+.B TICKIT_LINESTYLE_DOUBLE
+A pair of double thin lines
+.TP
+.B TICKIT_LINESTYLE_THICK
+A single thick line
+.PP
+Note that as line drawing is performed using the Unicode line-drawing characters, not every possible combination of line segments of differing styles meeting in a cell is supported by Unicode. The following sets of styles may be relied upon:
+.IP *
+Any possible combination of only \fBSINGLE\fP segments, \fBTHICK\fP segments, or both.
+.IP *
+Any combination of only \fBDOUBLE\fP segments, except cells that only have one of the four borders occupied.
+.IP *
+Any combination of \fBSINGLE\fP and \fBDOUBLE\fP segments except where the style changes between \fBSINGLE\fP to \fBDOUBLE\fP on a vertical or horizontal run.
+.PP
+Other combinations are not directly supported (i.e. any combination of \fBDOUBLE\fP and \fBTHICK\fP in the same cell, or any attempt to change from \fBSINGLE\fP to \fBDOUBLE\fP in either the vertical or horizontal direction). To handle these cases, a cell may be rendered with a substitution character which replaces a \fBDOUBLE\fP or \fBTHICK\fP segment with a \fBSINGLE\fP one within that cell. The effect will be the overall shape of the line is retained, but close to the edge or corner it will have the wrong segment type.
+.PP
+Conceptually, every cell involved in line drawing has a potential line segment type at each of its four borders to its neighbours. Horizontal lines are drawn though the vertical centre of each cell, and vertical lines are drawn through the horizontal centre.
+.PP
+There is a choice of how to handle the ends of line segments, as to whether the segment should go to the centre of each cell, or should continue through the entire body of the cell and stop at the boundary. By default line segments will start and end at the centre of the cells, so that horizontal and vertical lines meeting in a cell will form a neat corner. When drawing isolated lines such as horizontal or vertical rules, it is preferrable that the line go right through the cells at the start and end. To control this behaviour, the \fIcaps\fP bitmask argument should be one of the following \fBTickitLineCaps\fP constants:
+.TP
+.B CAP_START
+indicates that the line should consume the entire start cell
+.TP
+.B CAP_END
+indicates that the line should consume the entire end cell
+.TP
+.B CAP_BOTH
+is a convenient shortcut specifying both behaviours
+.SH "RETURN VALUE"
+This function returns no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_flush_to_term (3),
+.BR tickit_renderbuffer (7),
+.BR tickit_pen (7),
+.BR tickit (7)

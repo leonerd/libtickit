@@ -1,0 +1,22 @@
+.TH TICKIT_RENDERBUFFER_GET_CURSORPOS 3
+.SH NAME
+tickit_renderbuffer_has_cursorpos, tickit_renderbuffer_get_cursorpos \- query the virtual cursor position
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *" rb );
+.BI "void tickit_renderbuffer_get_cursorpos(const TickitRenderBuffer *" rb ", int " lines ", int " cols );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_has_cursorpos\fP() returns a true value if the buffer's virtual cursor position has been set by \fBtickit_renderbuffer_goto\fP(3), or false if it has never been set, or was cleared by \fBtickit_renderbuffer_ungoto\fP(3) or \fBtickit_renderbuffer_reset\fP(3).
+.PP
+\fBtickit_renderbuffer_get_cursorpos\fP() retrieves the current position of the virtual cursor, by setting the integers pointed to by \fIline\fP and \fIcol\fP, if not NULL. If the virtual cursor position is not set then this function does nothing.
+.SH "RETURN VALUE"
+\fBtickit_renderbuffer_has_cursorpos\fP() returns a boolean integer. \fBtickit_renderbuffer_get_cursorpos\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

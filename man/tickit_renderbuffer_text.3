@@ -1,0 +1,26 @@
+.TH TICKIT_RENDERBUFFER_TEXT 3
+.SH NAME
+tickit_renderbuffer_text, tickit_renderbuffer_text_at \- create text regions
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "int tickit_renderbuffer_text(TickitRenderBuffer *" rb ,
+.BI "        char *" text ", TickitPen *" pen );
+.BI "int tickit_renderbuffer_text_at(TickitRenderBuffer *" rb ,
+.BI "        int " line ", int " col ", char *" text ", TickitPen *" pen );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the given pen. It returns the number of columns that the text string occupies.
+.PP
+\fBtickit_renderbuffer_text_at\fP() creates a text region at the given position. This function does not use or update the virtual cursor position.
+.SH "RETURN VALUE"
+These functions return an integer giving the number of columns the new region occupies.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_flush_to_term (3),
+.BR tickit_renderbuffer (7),
+.BR tickit_pen (7),
+.BR tickit (7)

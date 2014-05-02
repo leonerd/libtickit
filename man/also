@@ -40,3 +40,17 @@ tickit_rect_right.3 = tickit_rect_bottom.3
 
 tickit_rectset_destroy.3 = tickit_rectset_new.3
 tickit_rectset_get_rects.3 = tickit_rectset_rects.3
+
+tickit_renderbuffer_destroy.3 = tickit_renderbuffer_new.3
+tickit_renderbuffer_mask.3 = tickit_renderbuffer_clip.3
+tickit_renderbuffer_restore.3 = tickit_renderbuffer_save.3
+tickit_renderbuffer_savepen.3 = tickit_renderbuffer_save.3
+tickit_renderbuffer_ungoto.3 = tickit_renderbuffer_goto.3
+tickit_renderbuffer_has_cursorpos.3 = tickit_renderbuffer_get_cursorpos.3
+tickit_renderbuffer_skip_to.3 = tickit_renderbuffer_skip.3
+tickit_renderbuffer_skip_at.3 = tickit_renderbuffer_skip.3
+tickit_renderbuffer_text_at.3 = tickit_renderbuffer_text.3
+tickit_renderbuffer_erase_to.3 = tickit_renderbuffer_erase.3
+tickit_renderbuffer_erase_at.3 = tickit_renderbuffer_erase.3
+tickit_renderbuffer_clear.3 = tickit_renderbuffer_erase.3
+tickit_renderbuffer_vline_at.3 = tickit_renderbuffer_hline_at.3

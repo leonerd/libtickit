@@ -1,0 +1,21 @@
+.TH TICKIT_RENDERBUFFER_RESET 3
+.SH NAME
+tickit_renderbuffer_reset \- revert a render buffer back to initial state
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_renderbuffer_reset(TickitRenderBuffer *" rb );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_reset\fP() resets the render buffer back to its initial state. The pending content is erased, and all the cells are set back to the skipped state. The virtual cursor position is unset, the translation offset set back to zero, the clipping region set to the entire buffer and the pen removed if set. Also the saved state stack is cleared.
+.SH "RETURN VALUE"
+This function returns no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_save (3),
+.BR tickit_renderbuffer_restore (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

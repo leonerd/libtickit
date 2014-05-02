@@ -1,0 +1,19 @@
+.TH TICKIT_RENDERBUFFER_GET_SIZE 3
+.SH NAME
+tickit_renderbuffer_get_size \- return the size of a render buffer
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_renderbuffer_get_size(const TickitRenderBuffer *" rb ", int *" lines ", int *" cols );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_get_size\fP() sets the integers pointed to by \fIlines\fP and \fIcols\fP, if not \fBNULL\fP, to the size of the render buffer's content area.
+.SH "RETURN VALUE"
+\fBtickit_renderbuffer_get_size\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

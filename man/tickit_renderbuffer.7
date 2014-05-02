@@ -1,0 +1,67 @@
+.TH TICKIT_RENDERBUFFER 7
+.SH NAME
+TickitRenderBuffer \- store display content to be drawn to the terminal
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "typedef struct " TickitRenderBuffer ;
+.fi
+.sp
+.SH DESCRIPTION
+A \fBTickitRenderBuffer\fP instance stores content waiting to be drawn to the terminal. It provides an efficient place to build the eventual display, by applying drawing operations to it that can alter and overwrite the pending content, before eventually flushing it directly to the terminal in an efficient transfer of state. The buffer stores plain text content along with rendering attributes, and also stores line drawing information, allowing line segments to be merged correctly and rendered using Unicode characters.
+.PP
+The primary purpose for the render buffer is the storage of pending content to be displayed. The buffer consists of a grid of cells of the given size. Each cell has a state; neighbouring cells in the same state constitute a region. Each region is either in a skip state (where it will not affect the terminal display when it is flushed), or has either textual content or an instruction to erase the display. In both of these cases, the region has an associated \fBTickitPen\fP instance to give its display attributes. Text regions can be given either by
+.SM UTF-8
+strings, individual Unicode codepoint numbers, or are created as Unicode line-drawing characters by merging one or more effective line segments.
+.PP
+There are several advantages to using a \fBTickitRenderBuffer\fP over plain drawing requests directly to the terminal. Firstly, because the content is simply stored in memory until it is flushed to the terminal, it doesn't have to be rendered in screen order. It can be built up in any order that makes sense within the application, and when flushed to the terminal it will be performed in an efficient top-to-bottom, left-to-right order.
+.PP
+Secondly, the buffer understands horizontal and vertical line drawing using Unicode characters. While content is being built up, it will keep track of what kinds of lines meet in every cell in the buffer, so that when it is flushed to the terminal it can pick the appropriate Unicode line-drawing characters to render these with.
+.PP
+Thirdly, several features of the buffer are designed to easily support applications that divide the screen area into several possibly-overlapping regions that are managed by different parts of the application. Clipping, translation and masking support the concept of independent areas of the buffer, and stored pens and the state stack support the concept that these areas might be nested within each other, allowing rendering attributes to be inherited from outer regions into inner ones.
+.SS "VIRTUAL CURSOR"
+A \fBTickitRenderBuffer\fP instance maintains a virtual cursor position, that application code can use to render at. This is a virtual cursor, because it doesn't relate to the actual cursor in use on the terminal instance; it is simply a position stored by the buffer state.
+.PP
+Most of the content drawing functions come in pairs; one using and updating the cursor position, and a second that operates directly on the buffer contents, without regard to the virtual cursor. Functions of this latter form can be identified by the \fB_at\fP suffix on their name.
+.SS PEN
+A \fBTickitPen\fP instance can be set on a \fBTickitRenderBuffer\fP, acting as a default pen for subsequent drawing functions. This is optionally combined with a pen instance given to individual drawing functions; if both are present then the attributes are combined, with those of the given pen taking precidence over the ones in the stored pen.
+.SS TRANSLATION
+A translation offset can be applied to have the drawing functions store their output at some other location within the buffer. This translation only affects the drawing functions; the actual operation to flush the contents to the terminal is not affected.
+.SS CLIPPING AND MASKING
+All of the drawing functions are also subject to restriction of their output, to apply within a clipping region. Initially the entire buffer is available for drawing, but the area can be restricted to a smaller rectangular area at any time. Requests to draw content outside of this region will be ignored. 
+.PP
+In addition to clipping, a buffer can also mask out arbitrary additional rectangular areas within the clipping region. These areas act with the clipping region by ignoring requests to draw inside them while preserving any existing content within them.
+.PP
+Masking and clipping are related but separate concepts. Both place restrictions on where output functions can alter the pending content. Whereas the clipping region is the rectangular area within which all drawing occurs, masking regions are areas in which drawing does \fInot\fP occur.
+.PP
+When combined with translation, these two features allow possibly-overlapping regions of content to be independently managed by separate pieces of code. To render each region of the screen, a render buffer can be set up with a translation offset and clipping rectangle to suit that region, thus avoiding the rendering code having to care about the exact on-screen geometry. By using masking regions, addditionally these areas can be managed even when they overlap, by ensuring that areas already drawn by "higher" regions are masked off to ensure that "lower" regions do not overwrite them.
+.SS "SAVE STACK"
+As a further assistance to applications wishing to divide the screen area into nested regions, a set of functions exist to store the current auxilliary state of the buffer (that is, all of the mutable attributes listed above, but without the actual pending content) and later restore that state to its original values.
+.SH "FUNCTIONS"
+A new \fBTickitRenderBuffer\fP instance is created using \fBtickit_renderbuffer_new\fP(3) and destroyed using \fBtickit_renderbuffer_destroy\fP(3). Its size is fixed after creation and can be queried using \fBtickit_renderbuffer_get_size\fP(3). Its contents can be entirely reset back to its original state using \fBtickit_renderbuffer_reset\fP(3).
+.PP
+A translation offset can be set using \fBtickit_renderbuffer_translate\fP(3), and the clipping region restricted using \fBtickit_renderbuffer_clip\fP(3). Masks can be placed within the current clipping region using \fBtickit_renderbuffer_mask\fP(3).
+.PP
+The virtual cursor position can be set using \fBtickit_renderbuffer_goto\fP(3) and unset using \fBtickit_renderbuffer_ungoto\fP(3). It can be queried using \fBtickit_renderbuffer_has_cursorpos\fP(3) to determine if it is set, and \fBtickit_renderbuffer_get_cursorpos\fP(3) to return its position. A \fBTickitPen\fP instance can be set using \fBtickit_renderbuffer_setpen\fP(3).
+.PP
+The auxilliary state can be saved to the state stack using \fBtickit_renderbuffer_save\fP(3) and later restored using \fBtickit_renderbuffer_restore\fP(3). A stack state consisting of just the pen with no other state can be saved using \fBtickit_renderbuffer_savepen\fP(3).
+.PP
+The stored content can be flushed to a \fBTickitTerm\fP instance using \fBtickit_renderbuffer_flush_to_term\fP(3).
+.SH "DRAWING OPERATIONS"
+The following functions all affect the stored content within the buffer, taking into account the clipping, translation, masking, stored pen, and optionally the virtual cursor position.
+.PP
+\fBtickit_renderbuffer_skip_at\fP(3), \fBtickit_renderbuffer_skip\fP(3) and \fBtickit_renderbuffer_skip_to\fP(3) create a skipping region; a place where no output will be drawn.
+.PP
+\fBtickit_renderbuffer_text_at\fP(3) and \fBtickit_renderbuffer_text\fP(3) create a text region; a place where normal text is output.
+.PP
+\fBtickit_renderbuffer_erase_at\fP(3), \fBtickit_renderbuffer_erase\fP(3) and \fBtickit_renderbuffer_erase_to\fP(3) create an erase region; a place where existing terminal content will be erased. \fBtickit_renderbuffer_clear\fP(3) clears the entire area by setting it all as an erase region.
+.PP
+\fBtickit_renderbuffer_char_at\fP(3) places a single Unicode character directly.
+.PP
+\fBtickit_renderbuffer_hline_at\fP(3) and \fBtickit_renderbuffer_vline_at\fP(3) create horizontal and vertical line segments.
+.SH "SEE ALSO"
+.BR tickit (7),
+.BR tickit_pen (7),
+.BR tickit_rect (7)
+.BR tickit_term (7)

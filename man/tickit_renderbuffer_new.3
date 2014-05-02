@@ -1,0 +1,23 @@
+.TH TICKIT_RENDERBUFFER_NEW 3
+.SH NAME
+tickit_renderbuffer_new, tickit_renderbuffer_destroy \- create or destroy a render buffer instance
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitRenderBuffer *tickit_renderbuffer_new(int " lines ", int " cols );
+.BI "void tickit_renderbuffer_destroy(TickitRenderBuffer *" tt );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_new\fP() creates a new \fBTickitRenderBuffer\fP instance of the given size. Once constructed, the size is fixed. Initially it has a clipping region covering the entire area, a zero translation offset, no applied masks, no stored pen and no virtual cursor position. It can be reset back to this state at any time by calling \fBtickit_renderbuffer_reset\fP(3).
+.PP
+\fBtickit_renderbuffer_destroy\fP() destroys the given instance and releases any resources controlled by it.
+.SH "RETURN VALUE"
+If successful, \fBtickit_renderbuffer_new\fP() returns a pointer to the new instance.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_text (3),
+.BR tickit_renderbuffer_flush_to_term (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

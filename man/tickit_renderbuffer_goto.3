@@ -1,0 +1,26 @@
+.TH TICKIT_RENDERBUFFER_GOTO 3
+.SH NAME
+tickit_renderbuffer_goto, tickit_renderbuffer_ungoto \- set or clear the virtual cursor position
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_renderbuffer_goto(TickitRenderBuffer *" rb ", int " line ", int " col );
+.BI "void tickit_renderbuffer_ungoto(TickitRenderBuffer *" rb );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_goto\fP() sets the virtual cursor position to the given line and column. This does not have to be within the bounds of either the buffer's extent, nor the clipping region. If it is moved outside of the clipping region, then no drawing operations will take effect, but the position will still be updated by these operations to check when it moves into the area of effect once more. This position is affected by the translation offset given by \fBtickit_renderbuffer_translate\fP().
+.PP
+\fBtickit_renderbuffer_ungoto\fP() clears the virtual cursor position. After this call, the position is no longer defined, and the cursor-relative output functions will not operate.
+.SH "RETURN VALUE"
+These functions return no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_get_cursorpos (3),
+.BR tickit_renderbuffer_skip (3),
+.BR tickit_renderbuffer_text (3),
+.BR tickit_renderbuffer_erase (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

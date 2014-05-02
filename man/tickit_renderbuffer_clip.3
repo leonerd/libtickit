@@ -1,0 +1,25 @@
+.TH TICKIT_RENDERBUFFER_CLIP 3
+.SH NAME
+tickit_renderbuffer_clip, tickit_renderbuffer_mask \- restrict the drawing area of output functions
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_renderbuffer_clip(TickitRenderBuffer *" rb ", TickitRect *" rect );
+.BI "void tickit_renderbuffer_mask(TickitRenderBuffer *" rb ", TickitRect *" mask );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_clip\fP() restricts the clipping rectangle to the limits given, within the existing limits already set. This function cannot make the clipping region larger than it already was.
+.PP
+\fBtickit_renderbuffer_mask\fP() applies a rectangular mask within the clipping region, masking off extra cells that can no longer be modified by the output functions. Unlike \fBtickit_renderbuffer_clip\fP() these regions can be arbitrarily positioned and discontinuous; each new call adds another masking region, rather than affecting the existing ones.
+.PP
+To undo the effects of any of these functions, they should be used within nested pairs of calls to \fBtickit_renderbuffer_save\fP(3) and \fBtickit_renderbuffer_restore\fP(3). Both functions only affect the subsequent drawing operations; they do not affect existing stored content, nor the behaviour of \fBtickit_renderbuffer_flush_to_term\fP(3).
+.SH "RETURN VALUE"
+These functions return no value.
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_translate (3),
+.BR tickit_renderbuffer (7),
+.BR tickit (7)

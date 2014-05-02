@@ -1,0 +1,33 @@
+.TH TICKIT_RENDERBUFFER_ERASE 3
+.SH NAME
+tickit_renderbuffer_erase, tickit_renderbuffer_erase_to, tickit_renderbuffer_erase_at, tickit_renderbuffer_clear \- create erase regions
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_renderbuffer_erase(TickitRenderBuffer *" rb ,
+.BI "         int " len ", TickitPen *" pen );
+.BI "void tickit_renderbuffer_erase_to(TickitRenderBuffer *" rb ,
+.BI "         int " col ", TickitPen *" pen );
+.BI "void tickit_renderbuffer_erase_at(TickitRenderBuffer *" rb ,
+.BI "         int " line ", int " col ", int " len ", TickitPen *" pen );
+.sp
+.BI "void tickit_renderbuffer_clear(TickitRenderBuffer *" rb ",
+.BI "         TickitPen *" pen );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_renderbuffer_erase\fP() creates a erase region that starts at the current virtual cursor position, continuing on for \fIlen\fP cells set to the given pen. \fBtickit_renderbuffer_erase_to\fP() creates a erase region that continues until the given column if the cursor was before that, or has no effect if it was after. Both of these functions will update the virtual cursor position.
+.PP
+\fBtickit_renderbuffer_erase_at\fP() creates a erase region at the given position and length. This function does not use or update the virtual cursor position.
+.PP
+\fBtickit_renderbuffer_clear\fP() erases the entire buffer area within the current clipping region and masks, setting it all to be erase regions with the given pen.
+.SH "RETURN VALUE"
+These functions return nothing
+.SH "SEE ALSO"
+.BR tickit_renderbuffer_new (3),
+.BR tickit_renderbuffer_flush_to_term (3),
+.BR tickit_renderbuffer (7),
+.BR tickit_pen (7),
+.BR tickit (7)
