@@ -179,6 +179,10 @@ int main(int argc, char *argv[])
     len = tickit_renderbuffer_text_at(rb, 0, 0, "at 0,0", NULL);
     is_int(len, 6, "len from text_at translated");
 
+    is_int(tickit_renderbuffer_get_cell_text(rb, 0, 0, buffer, sizeof buffer), 1,
+        "get_cell_text TEXT at 0,0 translated");
+    is_str(buffer, "a", "buffer text at TEXT 0,0 translatd");
+
     tickit_renderbuffer_goto(rb, 1, 0);
 
     int line, col;

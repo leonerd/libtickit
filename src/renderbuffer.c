@@ -893,9 +893,8 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
 
 static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
 {
-  if(line < 0 || line >= rb->lines)
-    return NULL;
-  if(col < 0 || col >= rb->cols)
+  int len = 1;
+  if(!xlate_and_clip(rb, &line, &col, &len, NULL))
     return NULL;
 
   *offset = 0;
