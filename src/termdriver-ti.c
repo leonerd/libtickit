@@ -44,6 +44,7 @@ struct TermInfoFallback {
 
 const static struct TermInfoFallback terminfo_fallback[] = {
   { unibi_erase_chars, "\e[%dX" },
+  { unibi_parm_dch,    "\e[%dP" },
   { 0 },
 };
 
