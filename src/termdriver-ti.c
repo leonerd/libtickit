@@ -83,6 +83,16 @@ static const char *lookup_ti_string(unibi_term *ut, const char *termtype, enum u
   return unibi_get_str(ut, s);
 }
 
+static const char *require_ti_string(unibi_term *ut, const char *termtype, enum unibi_string s, const char *name)
+{
+  const char *ret = lookup_ti_string(ut, termtype, s);
+  if(ret)
+    return ret;
+
+  fprintf(stderr, "Required TI string '%s' is missing\n", name);
+  abort();
+}
+
 struct TIDriver {
   TickitTermDriver driver;
 
@@ -475,34 +485,34 @@ static TickitTermDriver *new(const char *termtype)
   td->cap.bce = unibi_get_bool(ut, unibi_back_color_erase);
   td->cap.colours = unibi_get_num(ut, unibi_max_colors);
 
-  td->str.cup    = lookup_ti_string(ut, termtype, unibi_cursor_address);
-  td->str.vpa    = lookup_ti_string(ut, termtype, unibi_row_address);
-  td->str.hpa    = lookup_ti_string(ut, termtype, unibi_column_address);
-  td->str.cuu    = lookup_ti_string(ut, termtype, unibi_parm_up_cursor);
-  td->str.cuu1   = lookup_ti_string(ut, termtype, unibi_cursor_up);
-  td->str.cud    = lookup_ti_string(ut, termtype, unibi_parm_down_cursor);
-  td->str.cud1   = lookup_ti_string(ut, termtype, unibi_cursor_down);
-  td->str.cuf    = lookup_ti_string(ut, termtype, unibi_parm_right_cursor);
-  td->str.cuf1   = lookup_ti_string(ut, termtype, unibi_cursor_right);
-  td->str.cub    = lookup_ti_string(ut, termtype, unibi_parm_left_cursor);
-  td->str.cub1   = lookup_ti_string(ut, termtype, unibi_cursor_left);
-  td->str.ich    = lookup_ti_string(ut, termtype, unibi_parm_ich);
-  td->str.ich1   = lookup_ti_string(ut, termtype, unibi_insert_character);
-  td->str.dch    = lookup_ti_string(ut, termtype, unibi_parm_dch);
-  td->str.dch1   = lookup_ti_string(ut, termtype, unibi_delete_character);
-  td->str.il     = lookup_ti_string(ut, termtype, unibi_parm_insert_line);
-  td->str.il1    = lookup_ti_string(ut, termtype, unibi_insert_line);
-  td->str.dl     = lookup_ti_string(ut, termtype, unibi_parm_delete_line);
-  td->str.dl1    = lookup_ti_string(ut, termtype, unibi_delete_line);
-  td->str.ech    = lookup_ti_string(ut, termtype, unibi_erase_chars);
-  td->str.ed2    = lookup_ti_string(ut, termtype, unibi_clear_screen);
-  td->str.stbm   = lookup_ti_string(ut, termtype, unibi_change_scroll_region);
-  td->str.sgr    = lookup_ti_string(ut, termtype, unibi_set_attributes);
-  td->str.sgr_fg = lookup_ti_string(ut, termtype, unibi_set_a_foreground);
-  td->str.sgr_bg = lookup_ti_string(ut, termtype, unibi_set_a_background);
+  td->str.cup    = require_ti_string(ut, termtype, unibi_cursor_address, "cup");
+  td->str.vpa    = lookup_ti_string (ut, termtype, unibi_row_address);
+  td->str.hpa    = lookup_ti_string (ut, termtype, unibi_column_address);
+  td->str.cuu    = require_ti_string(ut, termtype, unibi_parm_up_cursor, "cuu");
+  td->str.cuu1   = lookup_ti_string (ut, termtype, unibi_cursor_up);
+  td->str.cud    = require_ti_string(ut, termtype, unibi_parm_down_cursor, "cud");
+  td->str.cud1   = lookup_ti_string (ut, termtype, unibi_cursor_down);
+  td->str.cuf    = require_ti_string(ut, termtype, unibi_parm_right_cursor, "cuf");
+  td->str.cuf1   = lookup_ti_string (ut, termtype, unibi_cursor_right);
+  td->str.cub    = require_ti_string(ut, termtype, unibi_parm_left_cursor, "cub");
+  td->str.cub1   = lookup_ti_string (ut, termtype, unibi_cursor_left);
+  td->str.ich    = require_ti_string(ut, termtype, unibi_parm_ich, "ich");
+  td->str.ich1   = lookup_ti_string (ut, termtype, unibi_insert_character);
+  td->str.dch    = require_ti_string(ut, termtype, unibi_parm_dch, "dch");
+  td->str.dch1   = lookup_ti_string (ut, termtype, unibi_delete_character);
+  td->str.il     = require_ti_string(ut, termtype, unibi_parm_insert_line, "il");
+  td->str.il1    = lookup_ti_string (ut, termtype, unibi_insert_line);
+  td->str.dl     = require_ti_string(ut, termtype, unibi_parm_delete_line, "dl");
+  td->str.dl1    = lookup_ti_string (ut, termtype, unibi_delete_line);
+  td->str.ech    = require_ti_string(ut, termtype, unibi_erase_chars, "ech");
+  td->str.ed2    = require_ti_string(ut, termtype, unibi_clear_screen, "ed2");
+  td->str.stbm   = require_ti_string(ut, termtype, unibi_change_scroll_region, "stbm");
+  td->str.sgr    = require_ti_string(ut, termtype, unibi_set_attributes, "sgr");
+  td->str.sgr_fg = require_ti_string(ut, termtype, unibi_set_a_foreground, "sgr_fg");
+  td->str.sgr_bg = require_ti_string(ut, termtype, unibi_set_a_background, "sgr_bg");
 
-  td->str.sm_csr = lookup_ti_string(ut, termtype, unibi_cursor_normal);
-  td->str.rm_csr = lookup_ti_string(ut, termtype, unibi_cursor_invisible);
+  td->str.sm_csr = require_ti_string(ut, termtype, unibi_cursor_normal, "sm_csr");
+  td->str.rm_csr = require_ti_string(ut, termtype, unibi_cursor_invisible, "rm_csr");
 
   const char *key_mouse = lookup_ti_string(ut, termtype, unibi_key_mouse);
   if(key_mouse && strcmp(key_mouse, "\e[M") == 0)
