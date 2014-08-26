@@ -35,52 +35,29 @@ static const struct TermInfoExtraStrings extra_strings_vt200_mouse = {
   .exit_mouse_mode  = "\e[?1002l\e[?1006l",
 };
 
-/* Also, some terminfo databases are incomplete or outright lie about
- * terminals' abilities. Lets provide some overrides
+/* Also, some terminfo databases are incomplete. Lets provide some fallbacks
  */
-struct TermInfoMore {
+struct TermInfoFallback {
   enum unibi_string cap;
   const char *value;
 };
-struct TermInfoMoreList {
-  const char *term;
-  struct TermInfoMore *info;
+
+const static struct TermInfoFallback terminfo_fallback[] = {
+  { unibi_erase_chars, "\e[%dX" },
+  { 0 },
 };
-
-const static struct TermInfoMoreList terminfo_more[] = {
-  { "screen", (struct TermInfoMore []){
-      { unibi_erase_chars, "\e[%dX" },
-      { 0 },
-    }},
-  { NULL },
-};
-
-static int streq_until(const char *a, const char *b, char term)
-{
-  for( ; *a || *b; a++, b++) {
-    if(*a == *b)
-      continue;
-    if(!*a)
-      return *b == term;
-    if(!*b)
-      return *a == term;
-  }
-
-  return 1;
-}
 
 static const char *lookup_ti_string(unibi_term *ut, const char *termtype, enum unibi_string s)
 {
-  for(const struct TermInfoMoreList *listp = terminfo_more; listp->term; listp++) {
-    if(!streq_until(termtype, listp->term, '-'))
-      continue;
+  const char *ret = unibi_get_str(ut, s);
+  if(ret)
+    return ret;
 
-    for(struct TermInfoMore *info = listp->info; info->cap; info++)
-      if(info->cap == s)
-        return info->value;
-  }
+  for(const struct TermInfoFallback *fb = terminfo_fallback; fb->cap; fb++)
+    if(fb->cap == s)
+      return fb->value;
 
-  return unibi_get_str(ut, s);
+  return NULL;
 }
 
 static const char *require_ti_string(unibi_term *ut, const char *termtype, enum unibi_string s, const char *name)
