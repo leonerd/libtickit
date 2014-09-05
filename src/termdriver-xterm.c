@@ -199,6 +199,7 @@ static struct SgrOnOff { int on, off; } sgr_onoff[] = {
   {  7, 27 }, /* reverse */
   {  9, 29 }, /* strike */
   { 10, 10 }, /* altfont */
+  {  5, 25 }, /* blink */
 };
 
 static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
@@ -247,6 +248,7 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
     case TICKIT_PEN_ITALIC:
     case TICKIT_PEN_REVERSE:
     case TICKIT_PEN_STRIKE:
+    case TICKIT_PEN_BLINK:
       val = tickit_pen_get_bool_attr(delta, attr);
       params[pindex++] = val ? onoff->on : onoff->off;
       break;

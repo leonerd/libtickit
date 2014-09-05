@@ -18,8 +18,8 @@ The \fBTickitPenAttr\fP enumeration lists the attributes known by a pen. Each at
 \fBTICKIT_PEN_FG\fP ("fg"), \fBTICKIT_PEN_BG\fP ("bg")
 foreground and background colours. These are of type \fBTICKIT_PENTYPE_COLOUR\fP. This gives an integer from 0 to 255 to use as the colour index. It may also be set to the value -1, which sets the terminal's default, which may be a colour distinct from any of the others. Some terminals may not support more than 8 or 16 colours, however. When setting a pen colour on a terminal, it may be converted to one that is supported by the terminal \fBtickit_term_setpen\fP(3) or \fBtickit_term_chpen\fP(3) functions.
 .TP
-\fBTICKIT_PEN_BOLD\fP ("b"), \fBTICKIT_PEN_UNDER\fP ("u"), \fBTICKIT_PEN_ITALIC\fP ("i"), \fBTICKIT_PEN_REVERSE\fP ("rv"), \fBTICKIT_PEN_STRIKE\fP ("strike")
-boolean rendering attributes. These are of type \fBTICKIT_PENTYPE_BOOL\fP. They are either true or false. Most terminals should support at least bold, underline and reverse, though italic and strikethrough are less commonly supported. Applications are advised not to use these two alone to distinguish significant parts of the user interface.
+\fBTICKIT_PEN_BOLD\fP ("b"), \fBTICKIT_PEN_UNDER\fP ("u"), \fBTICKIT_PEN_ITALIC\fP ("i"), \fBTICKIT_PEN_REVERSE\fP ("rv"), \fBTICKIT_PEN_STRIKE\fP ("strike"), \fBTICKIT_PEN_BLINK\fP ("blink")
+boolean rendering attributes. These are of type \fBTICKIT_PENTYPE_BOOL\fP. They are either true or false. Most terminals should support at least bold, underline, reverse and blink, though italic and strikethrough are less commonly supported. Applications are advised not to use these two alone to distinguish significant parts of the user interface.
 .TP
 \fBTICKIT_PEN_ALTFONT\fP ("af")
 alternate font index. This is of type \fBTICKIT_PENTYPE_INT\fP. It is a value 0 to 9, which selects from the terminal's available fonts. Few terminals actually support this in practice.

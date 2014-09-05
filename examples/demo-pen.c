@@ -25,6 +25,7 @@ struct {
   { "italic",        TICKIT_PEN_ITALIC },
   { "strikethrough", TICKIT_PEN_STRIKE },
   { "reverse video", TICKIT_PEN_REVERSE },
+  { "blink",         TICKIT_PEN_BLINK },
 };
 
 int still_running = 1;
@@ -111,7 +112,7 @@ int main(int argc, char *argv[])
   tickit_pen_clear_attr(pen, TICKIT_PEN_BG);
 
   /* Some interesting rendering attributes */
-  for(int i = 0; i < 5; i++) {
+  for(int i = 0; i < 6; i++) {
     tickit_term_goto(tt, 8 + 2*i, 0);
 
     tickit_pen_set_bool_attr(pen, attrs[i].attr, 1);
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     tickit_pen_clear_attr(pen, attrs[i].attr);
   }
 
-  tickit_term_goto(tt, 18, 0);
+  tickit_term_goto(tt, 20, 0);
 
   tickit_pen_set_int_attr(pen, TICKIT_PEN_ALTFONT, 1);
   tickit_term_setpen(tt, pen);

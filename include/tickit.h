@@ -72,6 +72,7 @@ typedef enum {
   TICKIT_PEN_REVERSE,    /* bool */
   TICKIT_PEN_STRIKE,     /* bool */
   TICKIT_PEN_ALTFONT,    /* number */
+  TICKIT_PEN_BLINK,      /* bool */
 
   TICKIT_N_PEN_ATTRS
 } TickitPenAttr;

@@ -16,7 +16,8 @@ struct TickitPen {
                under   : 1,
                italic  : 1,
                reverse : 1,
-               strike  : 1;
+               strike  : 1,
+               blink   : 1;
 
   signed   int altfont : 5; /* 1 - 10 or -1 */
 
@@ -28,7 +29,8 @@ struct TickitPen {
                  italic  : 1,
                  reverse : 1,
                  strike  : 1,
-                 altfont : 1;
+                 altfont : 1,
+                 blink   : 1;
   } valid;
 
   struct TickitEventHook *hooks;
@@ -112,6 +114,7 @@ int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_REVERSE: return pen->valid.reverse;
     case TICKIT_PEN_STRIKE:  return pen->valid.strike;
     case TICKIT_PEN_ALTFONT: return pen->valid.altfont;
+    case TICKIT_PEN_BLINK:   return pen->valid.blink;
 
     case TICKIT_N_PEN_ATTRS:
       return 0;
@@ -172,6 +175,7 @@ int tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_ITALIC:  return pen->italic;
     case TICKIT_PEN_REVERSE: return pen->reverse;
     case TICKIT_PEN_STRIKE:  return pen->strike;
+    case TICKIT_PEN_BLINK:   return pen->blink;
     default:
       return 0;
   }
@@ -185,6 +189,7 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val)
     case TICKIT_PEN_ITALIC:  pen->italic  = !!val; pen->valid.italic  = 1; break;
     case TICKIT_PEN_REVERSE: pen->reverse = !!val; pen->valid.reverse = 1; break;
     case TICKIT_PEN_STRIKE:  pen->strike  = !!val; pen->valid.strike  = 1; break;
+    case TICKIT_PEN_BLINK:   pen->blink   = !!val; pen->valid.blink   = 1; break;
     default:
       return;
   }
@@ -298,6 +303,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_REVERSE: pen->valid.reverse = 0; break;
     case TICKIT_PEN_STRIKE:  pen->valid.strike  = 0; break;
     case TICKIT_PEN_ALTFONT: pen->valid.altfont = 0; break;
+    case TICKIT_PEN_BLINK:   pen->valid.blink   = 0; break;
 
     case TICKIT_N_PEN_ATTRS:
       return;
@@ -398,6 +404,10 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite)
       dst->altfont = src->altfont;
       dst->valid.altfont = 1;
       break;
+    case TICKIT_PEN_BLINK:
+      dst->blink = src->blink;
+      dst->valid.blink = 1;
+      break;
     case TICKIT_N_PEN_ATTRS:
       continue;
     }
@@ -424,6 +434,7 @@ TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
     case TICKIT_PEN_ITALIC:
     case TICKIT_PEN_REVERSE:
     case TICKIT_PEN_STRIKE:
+    case TICKIT_PEN_BLINK:
       return TICKIT_PENTYPE_BOOL;
 
     case TICKIT_N_PEN_ATTRS:
@@ -444,6 +455,7 @@ const char *tickit_pen_attrname(TickitPenAttr attr)
     case TICKIT_PEN_REVERSE: return "rv";
     case TICKIT_PEN_STRIKE:  return "strike";
     case TICKIT_PEN_ALTFONT: return "af";
+    case TICKIT_PEN_BLINK:   return "blink";
 
     case TICKIT_N_PEN_ATTRS: ;
   }
@@ -459,6 +471,7 @@ TickitPenAttr tickit_pen_lookup_attr(const char *name)
     case 'b':
       return name[1] == 0      ? TICKIT_PEN_BOLD
            : streq(name+1,"g") ? TICKIT_PEN_BG
+           : streq(name+1,"link") ? TICKIT_PEN_BLINK
                                : -1;
     case 'f':
       return streq(name+1,"g") ? TICKIT_PEN_FG

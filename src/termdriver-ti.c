@@ -306,7 +306,7 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       0, // standout
       tickit_pen_get_bool_attr(final, TICKIT_PEN_UNDER),
       tickit_pen_get_bool_attr(final, TICKIT_PEN_REVERSE),
-      0, // blink
+      tickit_pen_get_bool_attr(final, TICKIT_PEN_BLINK),
       0, // dim
       tickit_pen_get_bool_attr(final, TICKIT_PEN_BOLD),
       0, // invisible
