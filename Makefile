@@ -8,7 +8,7 @@ ifneq ($(VERBOSE),1)
   LIBTOOL +=--quiet
 endif
 
-CFLAGS +=-Wall -Iinclude -Isrc -std=c99
+override CFLAGS +=-Wall -Iinclude -Isrc -std=c99
 
 ifeq ($(DEBUG),1)
   CFLAGS +=-ggdb -DDEBUG
