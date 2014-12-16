@@ -25,7 +25,7 @@ A \fBTickitRenderBuffer\fP instance maintains a virtual cursor position, that ap
 .PP
 Most of the content drawing functions come in pairs; one using and updating the cursor position, and a second that operates directly on the buffer contents, without regard to the virtual cursor. Functions of this latter form can be identified by the \fB_at\fP suffix on their name.
 .SS PEN
-A \fBTickitPen\fP instance can be set on a \fBTickitRenderBuffer\fP, acting as a default pen for subsequent drawing functions. This is optionally combined with a pen instance given to individual drawing functions; if both are present then the attributes are combined, with those of the given pen taking precidence over the ones in the stored pen.
+A \fBTickitPen\fP instance can be set on a \fBTickitRenderBuffer\fP, acting as a default pen for subsequent drawing functions. This is optionally combined with a pen instance given to individual drawing functions; if both are present then the attributes are combined, with those of the given pen taking precedence over the ones in the stored pen.
 .SS TRANSLATION
 A translation offset can be applied to have the drawing functions store their output at some other location within the buffer. This translation only affects the drawing functions; the actual operation to flush the contents to the terminal is not affected.
 .SS CLIPPING AND MASKING
@@ -35,7 +35,7 @@ In addition to clipping, a buffer can also mask out arbitrary additional rectang
 .PP
 Masking and clipping are related but separate concepts. Both place restrictions on where output functions can alter the pending content. Whereas the clipping region is the rectangular area within which all drawing occurs, masking regions are areas in which drawing does \fInot\fP occur.
 .PP
-When combined with translation, these two features allow possibly-overlapping regions of content to be independently managed by separate pieces of code. To render each region of the screen, a render buffer can be set up with a translation offset and clipping rectangle to suit that region, thus avoiding the rendering code having to care about the exact on-screen geometry. By using masking regions, addditionally these areas can be managed even when they overlap, by ensuring that areas already drawn by "higher" regions are masked off to ensure that "lower" regions do not overwrite them.
+When combined with translation, these two features allow possibly-overlapping regions of content to be independently managed by separate pieces of code. To render each region of the screen, a render buffer can be set up with a translation offset and clipping rectangle to suit that region, thus avoiding the rendering code having to care about the exact on-screen geometry. By using masking regions, additionally these areas can be managed even when they overlap, by ensuring that areas already drawn by "higher" regions are masked off to ensure that "lower" regions do not overwrite them.
 .SS "SAVE STACK"
 As a further assistance to applications wishing to divide the screen area into nested regions, a set of functions exist to store the current auxilliary state of the buffer (that is, all of the mutable attributes listed above, but without the actual pending content) and later restore that state to its original values.
 .SH "FUNCTIONS"

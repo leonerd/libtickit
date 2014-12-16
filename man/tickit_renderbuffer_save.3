@@ -1,6 +1,6 @@
 .TH TICKIT_RENDERBUFFER_SAVE 3
 .SH NAME
-tickit_renderbuffer_save, tickit_renderbuffer_restore, tickit_renderbuffer_savepen \- save and restore auxilliary state
+tickit_renderbuffer_save, tickit_renderbuffer_restore, tickit_renderbuffer_savepen \- save and restore auxiliary state
 .SH SYNOPSIS
 .nf
 .B #include <tickit.h>
@@ -12,12 +12,12 @@ tickit_renderbuffer_save, tickit_renderbuffer_restore, tickit_renderbuffer_savep
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_save\fP() pushes a new entry to the buffer's saved state stack. This will capture the current values of the auxilliary state, which can be later restored using \fBtickit_renderbuffer_restore\fP().
+\fBtickit_renderbuffer_save\fP() pushes a new entry to the buffer's saved state stack. This will capture the current values of the auxiliary state, which can be later restored using \fBtickit_renderbuffer_restore\fP().
 .PP
-\fBtickit_renderbuffer_restore\fP() pops the most recent entry on the buffer's saved state stack and reverts the values of the auxilliary state back to the saved values.
+\fBtickit_renderbuffer_restore\fP() pops the most recent entry on the buffer's saved state stack and reverts the values of the auxiliary state back to the saved values.
 .PP
 \fBtickit_renderbuffer_savepen\fP() pushes a new entry to the stack containing just the current pen value. When it is restored, it will only restore the pen; the other attributes will be unaffected.
-.SH "AUXILLIARY STATE"
+.SH "AUXILIARY STATE"
 The state saved and restored by these functions is:
 .IP *
 the virtual cursor position
