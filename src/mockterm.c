@@ -199,7 +199,7 @@ static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
   mtd->col = pos.columns;
 }
 
-static int mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
+static bool mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -214,7 +214,7 @@ static int mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
   mtd->line = line;
   mtd->col  = col;
 
-  return 1;
+  return true;
 }
 
 static void mtd_move_rel(TickitTermDriver *ttd, int downward, int rightward)
@@ -224,12 +224,12 @@ static void mtd_move_rel(TickitTermDriver *ttd, int downward, int rightward)
   mtd_goto_abs(ttd, mtd->line + downward, mtd->col + rightward);
 }
 
-static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
+static bool mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
   if(!downward && !rightward)
-    return 1;
+    return true;
 
   int top    = rect->top;
   int left   = rect->left;
@@ -242,7 +242,7 @@ static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int dow
   BOUND(right, left, mtd->cols);
 
   if((abs(downward) >= (bottom - top)) || (abs(rightward) >= (right - left)))
-    return 0;
+    return false;
 
   if(left == 0 && right == mtd->cols && rightward == 0) {
     MockTermCell ***cells = mtd->cells;
@@ -282,7 +282,7 @@ static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int dow
       }
     }
 
-    return 1;
+    return true;
   }
 
   if(right == mtd->cols && downward == 0) {
@@ -323,10 +323,10 @@ static int mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int dow
       }
     }
 
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 static void mtd_erasech(TickitTermDriver *ttd, int count, int moveend)
@@ -387,7 +387,7 @@ static int mtd_getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
   }
 }
 
-static int mtd_setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
+static bool mtd_setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -400,10 +400,10 @@ static int mtd_setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
     case TICKIT_TERMCTL_MOUSE:
       break;
     default:
-      return 0;
+      return false;
   }
 
-  return 1;
+  return true;
 }
 
 static TickitTermDriverVTable mtd_vtable = {

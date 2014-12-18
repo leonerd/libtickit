@@ -8,6 +8,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <sys/time.h>
 
@@ -88,26 +89,26 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...);
 TickitPen *tickit_pen_clone(const TickitPen *orig);
 void       tickit_pen_destroy(TickitPen *pen);
 
-int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr);
-int tickit_pen_is_nonempty(const TickitPen *pen);
-int tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr);
-int tickit_pen_is_nondefault(const TickitPen *pen);
+bool tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr);
+bool tickit_pen_is_nonempty(const TickitPen *pen);
+bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr);
+bool tickit_pen_is_nondefault(const TickitPen *pen);
 
-int  tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr);
-void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val);
+bool tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr);
+void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, bool val);
 
 int  tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val);
 
 int  tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int value);
-int  tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *value);
+bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *value);
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr);
 void tickit_pen_clear(TickitPen *pen);
 
-int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr);
-int tickit_pen_equiv(const TickitPen *a, const TickitPen *b);
+bool tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr);
+bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b);
 
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr);
 void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite);
@@ -141,10 +142,10 @@ static inline int tickit_rect_bottom(const TickitRect *rect)
 static inline int tickit_rect_right (const TickitRect *rect)
 { return rect->left + rect->cols; }
 
-int tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b);
+bool tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b);
 
-int tickit_rect_intersects(const TickitRect *a, const TickitRect *b);
-int tickit_rect_contains(const TickitRect *large, const TickitRect *small);
+bool tickit_rect_intersects(const TickitRect *a, const TickitRect *b);
+bool tickit_rect_contains(const TickitRect *large, const TickitRect *small);
 
 int tickit_rect_add(TickitRect ret[3], const TickitRect *a, const TickitRect *b);
 int tickit_rect_subtract(TickitRect ret[4], const TickitRect *orig, const TickitRect *hole);
@@ -166,8 +167,8 @@ size_t tickit_rectset_get_rects(const TickitRectSet *trs, TickitRect rects[], si
 void tickit_rectset_add(TickitRectSet *trs, const TickitRect *rect);
 void tickit_rectset_subtract(TickitRectSet *trs, const TickitRect *rect);
 
-int tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect);
-int tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rect);
+bool tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect);
+bool tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rect);
 
 /*
  * TickitTerm
@@ -195,7 +196,7 @@ void tickit_term_set_input_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_input_fd(const TickitTerm *tt);
 
 int  tickit_term_get_utf8(const TickitTerm *tt);
-void tickit_term_set_utf8(TickitTerm *tt, int utf8);
+void tickit_term_set_utf8(TickitTerm *tt, bool utf8);
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
 void tickit_term_input_readable(TickitTerm *tt);
@@ -215,9 +216,9 @@ void tickit_term_print(TickitTerm *tt, const char *str);
 void tickit_term_printn(TickitTerm *tt, const char *str, size_t len);
 void tickit_term_printf(TickitTerm *tt, const char *fmt, ...);
 void tickit_term_vprintf(TickitTerm *tt, const char *fmt, va_list args);
-int  tickit_term_goto(TickitTerm *tt, int line, int col);
+bool tickit_term_goto(TickitTerm *tt, int line, int col);
 void tickit_term_move(TickitTerm *tt, int downward, int rightward);
-int  tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward);
+bool tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward);
 
 void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen);
 void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen);
@@ -253,8 +254,8 @@ typedef enum {
 } TickitTermCursorShape;
 
 int tickit_term_getctl_int(TickitTerm *tt, TickitTermCtl ctl, int *value);
-int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
-int tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value);
+bool tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
+bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value);
 
 /*
  * String handling utilities
@@ -331,7 +332,7 @@ void tickit_renderbuffer_translate(TickitRenderBuffer *rb, int downward, int rig
 void tickit_renderbuffer_clip(TickitRenderBuffer *rb, TickitRect *rect);
 void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask);
 
-int tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb);
+bool tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb);
 void tickit_renderbuffer_get_cursorpos(const TickitRenderBuffer *rb, int *line, int *col);
 void tickit_renderbuffer_goto(TickitRenderBuffer *rb, int line, int col);
 void tickit_renderbuffer_ungoto(TickitRenderBuffer *rb);

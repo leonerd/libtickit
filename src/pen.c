@@ -103,7 +103,7 @@ void tickit_pen_destroy(TickitPen *pen)
   free(pen);
 }
 
-int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
+bool tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   switch(attr) {
     case TICKIT_PEN_FG:      return pen->valid.fg;
@@ -117,57 +117,57 @@ int tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_BLINK:   return pen->valid.blink;
 
     case TICKIT_N_PEN_ATTRS:
-      return 0;
+      return false;
   }
 
-  return 0;
+  return false;
 }
 
-int tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
+bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
-    return 0;
+    return false;
 
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_BOOL:
     if(tickit_pen_get_bool_attr(pen, attr))
-      return 1;
+      return true;
     break;
   case TICKIT_PENTYPE_INT:
     if(tickit_pen_get_int_attr(pen, attr) > -1)
-      return 1;
+      return true;
     break;
   case TICKIT_PENTYPE_COLOUR:
     if(tickit_pen_get_colour_attr(pen, attr) > -1)
-      return 1;
+      return true;
     break;
   }
 
-  return 0;
+  return false;
 }
 
-int tickit_pen_is_nonempty(const TickitPen *pen)
+bool tickit_pen_is_nonempty(const TickitPen *pen)
 {
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(tickit_pen_has_attr(pen, attr))
-      return 1;
+      return true;
   }
-  return 0;
+  return false;
 }
 
-int tickit_pen_is_nondefault(const TickitPen *pen)
+bool tickit_pen_is_nondefault(const TickitPen *pen)
 {
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(tickit_pen_nondefault_attr(pen, attr))
-      return 1;
+      return true;
   }
-  return 0;
+  return false;
 }
 
-int tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr)
+bool tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
-    return 0;
+    return false;
 
   switch(attr) {
     case TICKIT_PEN_BOLD:    return pen->bold;
@@ -177,11 +177,11 @@ int tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_STRIKE:  return pen->strike;
     case TICKIT_PEN_BLINK:   return pen->blink;
     default:
-      return 0;
+      return false;
   }
 }
 
-void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, int val)
+void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, bool val)
 {
   switch(attr) {
     case TICKIT_PEN_BOLD:    pen->bold    = !!val; pen->valid.bold    = 1; break;
@@ -260,7 +260,7 @@ static struct { const char *name; int colour; } colournames[] = {
   { "purple", 128 },
 };
 
-int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *desc)
+bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const char *desc)
 {
   int hi = 0;
   int val;
@@ -271,10 +271,10 @@ int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const ch
 
   if(sscanf(desc, "%d", &val) == 1) {
     if(hi && val > 7)
-      return 0;
+      return false;
 
     tickit_pen_set_colour_attr(pen, attr, val + hi);
-    return 1;
+    return true;
   }
 
   for(int i = 0; i < sizeof(colournames)/sizeof(colournames[0]); i++) {
@@ -286,10 +286,10 @@ int tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const ch
       val += hi;
 
     tickit_pen_set_colour_attr(pen, attr, val);
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
@@ -317,7 +317,7 @@ void tickit_pen_clear(TickitPen *pen)
     tickit_pen_clear_attr(pen, attr);
 }
 
-int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr)
+bool tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr)
 {
   switch(tickit_pen_attrtype(attr)) {
   case TICKIT_PENTYPE_BOOL:
@@ -328,19 +328,19 @@ int tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr 
     return tickit_pen_get_colour_attr(a, attr) == tickit_pen_get_colour_attr(b, attr);
   }
 
-  return 0;
+  return false;
 }
 
-int tickit_pen_equiv(const TickitPen *a, const TickitPen *b)
+bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b)
 {
   if(a == b)
-    return 1;
+    return true;
 
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
     if(!tickit_pen_equiv_attr(a, b, attr))
-      return 0;
+      return false;
 
-  return 1;
+  return true;
 }
 
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr)

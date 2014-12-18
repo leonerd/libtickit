@@ -151,7 +151,7 @@ static void run_ti(TickitTermDriver *ttd, const char *str, int n_params, ...)
   tickit_termdrv_write_str(ttd, buf, len);
 }
 
-static int goto_abs(TickitTermDriver *ttd, int line, int col)
+static bool goto_abs(TickitTermDriver *ttd, int line, int col)
 {
   struct TIDriver *td = (struct TIDriver*)ttd;
 
@@ -159,14 +159,14 @@ static int goto_abs(TickitTermDriver *ttd, int line, int col)
     run_ti(ttd, td->str.cup, 2, line, col);
   else if(line != -1) {
     if(!td->str.vpa)
-      return 0;
+      return false;
 
     run_ti(ttd, td->str.vpa, 1, line);
   }
   else if(col != -1) {
     if(col == 0) {
       tickit_termdrv_write_str(ttd, "\r", 1);
-      return 1;
+      return true;
     }
 
     if(td->str.hpa)
@@ -177,10 +177,10 @@ static int goto_abs(TickitTermDriver *ttd, int line, int col)
       run_ti(ttd, td->str.cuf, 1, col);
     }
     else
-      return 0;
+      return false;
   }
 
-  return 1;
+  return true;
 }
 
 static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
@@ -206,12 +206,12 @@ static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
     run_ti(ttd, td->str.cub, 1, -rightward);
 }
 
-static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
+static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
 {
   struct TIDriver *td = (struct TIDriver*)ttd;
 
   if(!downward && !rightward)
-    return 1;
+    return true;
 
   int term_lines, term_cols;
   tickit_term_get_size(ttd->tt, &term_lines, &term_cols);
@@ -230,7 +230,7 @@ static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwar
         run_ti(ttd, td->str.ich, 1, -rightward);
     }
 
-    return 1;
+    return true;
   }
 
   if(rect->left == 0 && rect->cols == term_cols && rightward == 0) {
@@ -248,10 +248,10 @@ static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwar
       run_ti(ttd, td->str.il, 1, -downward);
 
     run_ti(ttd, td->str.stbm, 2, 0, term_lines - 1);
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 static void erasech(TickitTermDriver *ttd, int count, int moveend)

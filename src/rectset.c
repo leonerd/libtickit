@@ -180,16 +180,16 @@ void tickit_rectset_subtract(TickitRectSet *trs, const TickitRect *rect)
   }
 }
 
-int tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect)
+bool tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect)
 {
   for(int i = 0; i < trs->count; i++)
     if(tickit_rect_intersects(trs->rects + i, rect))
-      return 1;
+      return true;
 
-  return 0;
+  return false;
 }
 
-int tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rectptr)
+bool tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rectptr)
 {
   // We might want to modify it
   TickitRect rect = *rectptr;
@@ -203,7 +203,7 @@ int tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rectptr)
     // the left of here we know we didn't match it
     if(rect.top  < r->top ||
        rect.left < r->left)
-      return 0;
+      return false;
 
     int r_bottom = tickit_rect_bottom(r);
     int rect_bottom = tickit_rect_bottom(&rect);
@@ -215,7 +215,7 @@ int tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rectptr)
       tickit_rect_init_bounded(&lower, r_bottom, rect.left, rect_bottom, rect_right);
 
       if(!tickit_rectset_contains(trs, &lower))
-        return 0;
+        return false;
 
       // tickit_rect_init_bounded(&rect, rect.top, rect.left, r_bottom, r_right)
       rect.lines = r_bottom - rect.top;
@@ -224,5 +224,5 @@ int tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rectptr)
     return tickit_rect_contains(r, &rect);
   }
 
-  return 0;
+  return false;
 }

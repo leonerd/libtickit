@@ -39,7 +39,7 @@ static void print(TickitTermDriver *ttd, const char *str, size_t len)
   tickit_termdrv_write_str(ttd, str, len);
 }
 
-static int goto_abs(TickitTermDriver *ttd, int line, int col)
+static bool goto_abs(TickitTermDriver *ttd, int line, int col)
 {
   if(line != -1 && col > 0)
     tickit_termdrv_write_strf(ttd, "\e[%d;%dH", line+1, col+1);
@@ -52,7 +52,7 @@ static int goto_abs(TickitTermDriver *ttd, int line, int col)
   else if(col != -1)
     tickit_termdrv_write_str(ttd, "\e[G", 3);
 
-  return 1;
+  return true;
 }
 
 static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
@@ -76,12 +76,12 @@ static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
     tickit_termdrv_write_strf(ttd, "\e[%dD", -rightward);
 }
 
-static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
+static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   if(!downward && !rightward)
-    return 1;
+    return true;
 
   int term_cols;
   tickit_term_get_size(ttd->tt, NULL, &term_cols);
@@ -111,7 +111,7 @@ static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwar
     if(right < term_cols)
       tickit_termdrv_write_strf(ttd, "\e[s");
 
-    return 1;
+    return true;
   }
 
   if(xd->cap.slrm ||
@@ -146,10 +146,10 @@ static int scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwar
     if(rect->left > 0 || right < term_cols)
       tickit_termdrv_write_str(ttd, "\e[s", 3);
 
-    return 1;
+    return true;
   }
 
-  return 0;
+  return false;
 }
 
 static void erasech(TickitTermDriver *ttd, int count, int moveend)
@@ -338,38 +338,38 @@ static int mode_for_mouse(TickitTermMouseMode mode)
   return 0;
 }
 
-static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
+static bool setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       if(!xd->mode.altscreen == !value)
-        return 1;
+        return true;
 
       tickit_termdrv_write_str(ttd, value ? "\e[?1049h" : "\e[?1049l", 0);
       xd->mode.altscreen = !!value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORVIS:
       if(!xd->mode.cursorvis == !value)
-        return 1;
+        return true;
 
       tickit_termdrv_write_str(ttd, value ? "\e[?25h" : "\e[?25l", 0);
       xd->mode.cursorvis = !!value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORBLINK:
       if(xd->initialised.cursorblink && !xd->mode.cursorblink == !value)
-        return 1;
+        return true;
 
       tickit_termdrv_write_str(ttd, value ? "\e[?12h" : "\e[?12l", 0);
       xd->mode.cursorblink = !!value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_MOUSE:
       if(xd->mode.mouse == value)
-        return 1;
+        return true;
 
       /* Modes 1000, 1002 and 1003 are mutually exclusive; enabling any one
        * disables the other two
@@ -380,46 +380,46 @@ static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
         tickit_termdrv_write_strf(ttd, "\e[?%dh\e[?1006h", mode_for_mouse(value));
 
       xd->mode.mouse = value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORSHAPE:
       if(xd->initialised.cursorshape && xd->mode.cursorshape == value)
-        return 1;
+        return true;
 
       if(xd->cap.cursorshape)
         tickit_termdrv_write_strf(ttd, "\e[%d q", value * 2 + (xd->mode.cursorblink ? -1 : 0));
       xd->mode.cursorshape = value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_KEYPAD_APP:
       if(!xd->mode.keypad == !value)
-        return 1;
+        return true;
 
       tickit_termdrv_write_strf(ttd, value ? "\e=" : "\e>");
-      return 1;
+      return true;
 
     default:
-      return 0;
+      return false;
   }
 }
 
-static int setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value)
+static bool setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value)
 {
   switch(ctl) {
     case TICKIT_TERMCTL_ICON_TEXT:
       tickit_termdrv_write_strf(ttd, "\e]1;%s\e\\", value);
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_TITLE_TEXT:
       tickit_termdrv_write_strf(ttd, "\e]2;%s\e\\", value);
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_ICONTITLE_TEXT:
       tickit_termdrv_write_strf(ttd, "\e]0;%s\e\\", value);
-      return 1;
+      return true;
 
     default:
-      return 0;
+      return false;
   }
 }
 
@@ -441,7 +441,7 @@ static void start(TickitTermDriver *ttd)
   tickit_termdrv_write_strf(ttd, "\e[G\e[K");
 }
 
-static int started(TickitTermDriver *ttd)
+static bool started(TickitTermDriver *ttd)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 

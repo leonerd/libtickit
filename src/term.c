@@ -316,7 +316,7 @@ int tickit_term_get_utf8(const TickitTerm *tt)
   return tt->is_utf8;
 }
 
-void tickit_term_set_utf8(TickitTerm *tt, int utf8)
+void tickit_term_set_utf8(TickitTerm *tt, bool utf8)
 {
   tt->is_utf8 = !!utf8;
 
@@ -630,7 +630,7 @@ void tickit_term_vprintf(TickitTerm *tt, const char *fmt, va_list args)
   va_end(args2);
 }
 
-int tickit_term_goto(TickitTerm *tt, int line, int col)
+bool tickit_term_goto(TickitTerm *tt, int line, int col)
 {
   return (*tt->driver->vtable->goto_abs)(tt->driver, line, col);
 }
@@ -640,7 +640,7 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
   (*tt->driver->vtable->move_rel)(tt->driver, downward, rightward);
 }
 
-int tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
+bool tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
 {
   TickitRect rect = {
     .top   = top,
@@ -735,12 +735,12 @@ int tickit_term_getctl_int(TickitTerm *tt, TickitTermCtl ctl, int *value)
   return (*tt->driver->vtable->getctl_int)(tt->driver, ctl, value);
 }
 
-int tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value)
+bool tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value)
 {
   return (*tt->driver->vtable->setctl_int)(tt->driver, ctl, value);
 }
 
-int tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value)
+bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value)
 {
   return (*tt->driver->vtable->setctl_str)(tt->driver, ctl, value);
 }

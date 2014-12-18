@@ -5,8 +5,8 @@ tickit_pen_is_nonempty, tickit_pen_is_nondefault \- test if a pen has attributes
 .nf
 .B #include <tickit.h>
 .sp
-.BI "int tickit_pen_is_nonempty(TickitPen *" pen );
-.BI "int tickit_pen_is_nondefault(TickitPen *" pen );
+.BI "bool tickit_pen_is_nonempty(TickitPen *" pen );
+.BI "bool tickit_pen_is_nondefault(TickitPen *" pen );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
@@ -15,7 +15,7 @@ Link with \fI\-ltickit\fP.
 .PP
 \fBtickit_pen_is_nondefault\fP() tests whether a pen instance has any attribute with non-default values defined on it. It false if the pen has no defined attributes, or all of the defined attributes take only the default value for their type.
 .SH "RETURN VALUE"
-\fBtickit_pen_is_nonempty\fP() and \fBtickit_pen_is_nondefault\fP() return a boolean integer.
+\fBtickit_pen_is_nonempty\fP() and \fBtickit_pen_is_nondefault\fP() return a boolean.
 .SH "SEE ALSO"
 .BR tickit_pen_new (3),
 .BR tickit_pen_set_bool_attr (3),

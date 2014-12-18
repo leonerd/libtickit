@@ -19,14 +19,14 @@ static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
   return 0;
 }
 
-static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
+static bool setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
-  return 0;
+  return false;
 }
 
-static int setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value)
+static bool setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value)
 {
-  return 0;
+  return false;
 }
 
 static TickitTermDriverVTable vtable = {

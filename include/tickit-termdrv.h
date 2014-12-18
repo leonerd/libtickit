@@ -20,18 +20,18 @@ typedef struct {
   void (*attach)(TickitTermDriver *ttd, TickitTerm *tt); /* optional */
   void (*destroy)(TickitTermDriver *ttd);
   void (*start)(TickitTermDriver *ttd); /* optional */
-  int  (*started)(TickitTermDriver *ttd); /* optional */
+  bool (*started)(TickitTermDriver *ttd); /* optional */
   void (*stop)(TickitTermDriver *ttd); /* optional */
   void (*print)(TickitTermDriver *ttd, const char *str, size_t len);
-  int  (*goto_abs)(TickitTermDriver *ttd, int line, int col);
+  bool (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   void (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);
-  int  (*scrollrect)(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward);
+  bool (*scrollrect)(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward);
   void (*erasech)(TickitTermDriver *ttd, int count, int moveend);
   void (*clear)(TickitTermDriver *ttd);
   void (*chpen)(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final);
   int  (*getctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int *value);
-  int  (*setctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int value);
-  int  (*setctl_str)(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value);
+  bool (*setctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int value);
+  bool (*setctl_str)(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value);
   int  (*gotkey)(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key); /* optional */
 } TickitTermDriverVTable;
 

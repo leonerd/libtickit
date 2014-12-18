@@ -19,25 +19,25 @@ void tickit_rect_init_bounded(TickitRect *rect, int top, int left, int bottom, i
   rect->cols  = right - left;
 }
 
-int tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b)
+bool tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b)
 {
   int top    = maxint(a->top, b->top);
   int bottom = minint(tickit_rect_bottom(a), tickit_rect_bottom(b));
 
   if(top >= bottom)
-    return 0;
+    return false;
 
   int left  = maxint(a->left, b->left);
   int right = minint(tickit_rect_right(a), tickit_rect_right(b));
 
   if(left >= right)
-    return 0;
+    return false;
 
   tickit_rect_init_bounded(dst, top, left, bottom, right);
-  return 1;
+  return true;
 }
 
-int tickit_rect_intersects(const TickitRect *a, const TickitRect *b)
+bool tickit_rect_intersects(const TickitRect *a, const TickitRect *b)
 {
   return a->top < tickit_rect_bottom(b) &&
          b->top < tickit_rect_bottom(a) &&
@@ -45,7 +45,7 @@ int tickit_rect_intersects(const TickitRect *a, const TickitRect *b)
          b->left < tickit_rect_right(a);
 }
 
-int tickit_rect_contains(const TickitRect *large, const TickitRect *small)
+bool tickit_rect_contains(const TickitRect *large, const TickitRect *small)
 {
   return (small->top                >= large->top               ) &&
          (tickit_rect_bottom(small) <= tickit_rect_bottom(large)) &&

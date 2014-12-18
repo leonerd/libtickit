@@ -387,7 +387,7 @@ void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask)
   }
 }
 
-int tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb)
+bool tickit_renderbuffer_has_cursorpos(const TickitRenderBuffer *rb)
 {
   return rb->vc_pos_set;
 }

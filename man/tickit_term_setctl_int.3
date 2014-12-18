@@ -6,8 +6,8 @@ tickit_term_setctl_int, tickit_term_setctl_str \- set an integer or string termi
 .B #include <tickit.h>
 .sp
 .BI "int tickit_term_getctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int *" value );
-.BI "int tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int " value );
-.BI "int tickit_term_setctl_str(TickitTerm *" tt ", TickitTermCtl " ctl ", const char *" value );
+.BI "bool tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int " value );
+.BI "bool tickit_term_setctl_str(TickitTerm *" tt ", TickitTermCtl " ctl ", const char *" value );
 .fi
 .sp
 Link with \fI\-ltickit\fP.

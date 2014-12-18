@@ -5,7 +5,7 @@ tickit_term_goto, tickit_term_move \- move the terminal output cursor
 .nf
 .B #include <tickit.h>
 .sp
-.BI "int  tickit_term_goto(TickitTerm *" tt ", int " line ", int " col );
+.BI "bool tickit_term_goto(TickitTerm *" tt ", int " line ", int " col );
 .BI "void tickit_term_move(TickitTerm *" tt ", int " downward ", int " rightward );
 .fi
 .sp
