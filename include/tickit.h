@@ -111,7 +111,7 @@ bool tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr
 bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b);
 
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr);
-void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite);
+void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite);
 
 typedef void TickitPenEventFn(TickitPen *tt, TickitEventType ev, TickitEvent *args, void *data);
 
@@ -401,7 +401,7 @@ TickitRenderBufferLineMask tickit_renderbuffer_get_cell_linemask(TickitRenderBuf
 TickitPen *tickit_renderbuffer_get_cell_pen(TickitRenderBuffer *rb, int line, int col);
 
 struct TickitRenderBufferSpanInfo {
-  int is_active;
+  bool is_active;
   int n_columns;
   char *text;
   size_t len;

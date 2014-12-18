@@ -93,7 +93,7 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...)
 TickitPen *tickit_pen_clone(const TickitPen *orig)
 {
   TickitPen *pen = tickit_pen_new();
-  tickit_pen_copy(pen, orig, 1);
+  tickit_pen_copy(pen, orig, true);
   return pen;
 }
 
@@ -360,7 +360,7 @@ void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr at
   return;
 }
 
-void tickit_pen_copy(TickitPen *dst, const TickitPen *src, int overwrite)
+void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
 {
   int changed = 0;
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
