@@ -15,7 +15,7 @@ A new \fBTickitTerm\fP instance is created using the \fBtickit_term_new\fP(3) or
 .PP
 A terminal instance will need either an output function or an output filehandle set before it can send output. This can be performed by either \fBtickit_term_set_output_func\fP(3) or \fBtickit_term_set_output_fd\fP(3). An output buffer can be defined by \fBtickit_term_set_output_buffer\fP(3). If output is via a filehandle, then the size of that will be queried if it is a
 .SM TTY.
-If output is via an output function only then the size must be set using \fBtickit_term_set_size\fP(3). An input filehandle can be set using \fBtickit_term_set_input_fd\fP(3), or input can be sent from a byte buffer using \fBtickit_term_input_push_bytes\fP(3). Once input and output methods are set the terminal startup actions are performed, and the \fBtickit_term_await_started\fP(3) function can be used to wait until this is complete.
+If output is via an output function only then the size must be set using \fBtickit_term_set_size\fP(3). An input filehandle can be set using \fBtickit_term_set_input_fd\fP(3), or input can be sent from a byte buffer using \fBtickit_term_input_push_bytes\fP(3). Once input and output methods are set the terminal startup actions are performed, and the \fBtickit_term_await_started_msec\fP(3) function can be used to wait until this is complete.
 .PP
 It supports
 .SM UTF-8
@@ -27,7 +27,7 @@ The size of the terminal can be queried using \fBtickit_term_get_size\fP(3), or 
 .SH OUTPUT
 Once an output method is defined, a terminal instance can be used for outputting drawing and other commands. For drawing, the functions \fBtickit_term_print\fP(3), \fBtickit_term_goto\fP(3), \fBtickit_term_move\fP(3), \fBtickit_term_scrollrect\fP(3), \fBtickit_term_chpen\fP(3), \fBtickit_term_setpen\fP(3), \fBtickit_term_clear\fP(3) and \fBtickit_term_erasech\fP(3) can be used. Additionally for setting modes, the function \fBtickit_term_setctl_int\fP(3) can be used. If an output buffer is defined it will need to be flushed when drawing is complete by calling \fBtickit_term_flush\fP(3).
 .SH INPUT
-Input via a filehandle can be received either synchronously by calling \fBtickit_term_input_wait\fP(3), or asynchronously by calling \fBtickit_term_input_readable\fP(3) and \fBtickit_term_input_check_timeout\fP(3). Any of these functions may cause one or more events to be raised by invoking event handler functions.
+Input via a filehandle can be received either synchronously by calling \fBtickit_term_input_wait_msec\fP(3), or asynchronously by calling \fBtickit_term_input_readable\fP(3) and \fBtickit_term_input_check_timeout_msec\fP(3). Any of these functions may cause one or more events to be raised by invoking event handler functions.
 .SH EVENTS
 A terminal instance stores a set of event handlers. Each event handler consists of a bitmask of one or more event types it is interested in, a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_term_bind_event\fP(3) and removed using \fBtickit_term_unbind_event_id\fP(3).
 .PP

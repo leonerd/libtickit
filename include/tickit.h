@@ -188,8 +188,10 @@ int  tickit_term_get_output_fd(const TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
 void tickit_term_set_output_buffer(TickitTerm *tt, size_t len);
 
-void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout);
+// deprecate the unitless version
+#define tickit_term_await_started(tt, timeout) tickit_term_await_started_tv(tt, timeout)
 void tickit_term_await_started_msec(TickitTerm *tt, long msec);
+void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout);
 void tickit_term_flush(TickitTerm *tt);
 
 /* fd is allowed to be unset (-1); works abstractly */
@@ -201,11 +203,12 @@ void tickit_term_set_utf8(TickitTerm *tt, bool utf8);
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);
 void tickit_term_input_readable(TickitTerm *tt);
-// deprecate the unitless version
+// deprecate the unitless versions
 #define tickit_term_input_check_timeout(tt) tickit_term_input_check_timeout_msec(tt)
+#define tickit_term_input_wait(tt, timeout) tickit_term_input_wait_tv(tt, timeout)
 int  tickit_term_input_check_timeout_msec(TickitTerm *tt);
-void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout);
 void tickit_term_input_wait_msec(TickitTerm *tt, long msec);
+void tickit_term_input_wait_tv(TickitTerm *tt, const struct timeval *timeout);
 
 void tickit_term_get_size(const TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);

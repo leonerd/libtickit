@@ -334,7 +334,26 @@ void tickit_term_set_utf8(TickitTerm *tt, bool utf8)
   }
 }
 
+// provide link-time legacy wrappers
+#undef tickit_term_await_started
+
 void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout)
+{
+  tickit_term_await_started_tv(tt, timeout);
+}
+
+void tickit_term_await_started_msec(TickitTerm *tt, long msec)
+{
+  if(msec > -1)
+    tickit_term_await_started_tv(tt, &(struct timeval){
+        .tv_sec  = msec / 1000,
+        .tv_usec = (msec % 1000) * 1000,
+    });
+  else
+    tickit_term_await_started_tv(tt, NULL);
+}
+
+void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout)
 {
   if(tt->state == STARTED)
     return;
@@ -373,21 +392,10 @@ void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout)
     if(timeout.tv_sec < 0)
       break;
 
-    tickit_term_input_wait(tt, &timeout);
+    tickit_term_input_wait_tv(tt, &timeout);
   }
 
   tt->state = STARTED;
-}
-
-void tickit_term_await_started_msec(TickitTerm *tt, long msec)
-{
-  if(msec > -1)
-    tickit_term_await_started(tt, &(struct timeval){
-        .tv_sec  = msec / 1000,
-        .tv_usec = (msec % 1000) * 1000,
-    });
-  else
-    tickit_term_await_started(tt, NULL);
 }
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
@@ -485,8 +493,10 @@ void tickit_term_input_readable(TickitTerm *tt)
   get_keys(tt, tk);
 }
 
-// provide link-time legacy wrapper
+// provide link-time legacy wrappers
 #undef tickit_term_input_check_timeout
+#undef tickit_term_input_wait
+
 int tickit_term_input_check_timeout(TickitTerm *tt)
 {
   return tickit_term_input_check_timeout_msec(tt);
@@ -527,10 +537,7 @@ int tickit_term_input_check_timeout_msec(TickitTerm *tt)
 
 void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout)
 {
-  if(timeout)
-    tickit_term_input_wait_msec(tt, (long)(timeout->tv_sec) + (timeout->tv_usec / 1000));
-  else
-    tickit_term_input_wait_msec(tt, -1);
+  tickit_term_input_wait_tv(tt, timeout);
 }
 
 void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
@@ -555,6 +562,14 @@ void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
   while(termkey_getkey(tk, &key) == TERMKEY_RES_KEY) {
     got_key(tt, tk, &key);
   }
+}
+
+void tickit_term_input_wait_tv(TickitTerm *tt, const struct timeval *timeout)
+{
+  if(timeout)
+    tickit_term_input_wait_msec(tt, (long)(timeout->tv_sec) + (timeout->tv_usec / 1000));
+  else
+    tickit_term_input_wait_msec(tt, -1);
 }
 
 void tickit_term_flush(TickitTerm *tt)

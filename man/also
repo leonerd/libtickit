@@ -13,7 +13,8 @@ tickit_term_setpen.3 = tickit_term_chpen.3
 tickit_term_get_utf8.3 = tickit_term_set_utf8.3
 tickit_term_getctl_int.3 = tickit_term_setctl_int.3
 tickit_term_setctl_str.3 = tickit_term_setctl_int.3
-tickit_term_input_wait_msec.3 = tickit_term_input_wait.3
+tickit_term_input_wait_tv.3 = tickit_term_input_wait_msec.3
+tickit_term_await_started_tv.3 = tickit_term_await_started_msec.3
 
 tickit_pen_new_attrs.3 = tickit_pen_new.3
 tickit_pen_destroy.3 = tickit_pen_new.3

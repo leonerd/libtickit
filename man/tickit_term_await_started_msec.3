@@ -1,0 +1,26 @@
+.TH TICKIT_TERM_AWAIT_STARTED 3
+.SH NAME
+tickit_term_await_started_* \- wait until the terminal is initialised
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_await_started_msec(TickitTerm *" tt ", long" msec );
+.BI "void tickit_term_await_started_tv(TickitTerm *" tt ", const struct timeval *" timeout );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+The \fBtickit_term_await_started_*\fP() family of functions wait until the terminal driver announces it has completed setting up the terminal, and it is ready to be used. The timeout specifies the maximum time to wait; the function will return after this time even if the terminal is not ready yet. One of these functions should be called after the relevant input and output methods have been set on the terminal instance.
+.PP
+The functions differ in how the timeout is specified. \fBtickit_term_await_started_msec\fP() takes a time as an integer in miliseconds, or -1 to wait indefinitely. \fBtickit_term_await_started_tv\fP() takes a time as a \fIstruct timeval\fP, or \fBNULL\fP to wait indefinitely.
+.PP
+Under most terminal drivers it is not strictly required that it be completely prepared before it is used, as preparation consists mainly of detecting optionally-supported features the terminal may have. If the application starts outputting before this is finished, it simply may not make use of some features, or not detect or report that some features are present.
+.SH "RETURN VALUE"
+\fBtickit_term_await_started_msec\fP() and \fBtickit_term_await_started_tv\fP() return no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_output_func (3),
+.BR tickit_term_set_output_fd (3),
+.BR tickit_term (7),
+.BR tickit (7)
