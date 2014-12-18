@@ -36,8 +36,7 @@ int main(int argc, char *argv[])
   int counter = 0;
 
   while(still_running) {
-    struct timeval to = { .tv_sec = 1, .tv_usec = 0 };
-    tickit_term_input_wait(tt, &to);
+    tickit_term_input_wait_msec(tt, 1000);
 
     tickit_term_goto(tt, 5, 5);
     tickit_term_printf(tt, "Counter %d", counter++);

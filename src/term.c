@@ -379,6 +379,17 @@ void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout)
   tt->state = STARTED;
 }
 
+void tickit_term_await_started_msec(TickitTerm *tt, long msec)
+{
+  if(msec > -1)
+    tickit_term_await_started(tt, &(struct timeval){
+        .tv_sec  = msec / 1000,
+        .tv_usec = (msec % 1000) * 1000,
+    });
+  else
+    tickit_term_await_started(tt, NULL);
+}
+
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 {
   TickitEvent args;
@@ -509,17 +520,27 @@ int tickit_term_input_check_timeout(TickitTerm *tt)
 
 void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout)
 {
+  if(timeout)
+    tickit_term_input_wait_msec(tt, (long)(timeout->tv_sec) + (timeout->tv_usec / 1000));
+  else
+    tickit_term_input_wait_msec(tt, -1);
+}
+
+void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
+{
   TermKey *tk = get_termkey(tt);
   TermKeyKey key;
 
-  struct timeval to_copy;
-  if(timeout)
-    to_copy = *timeout;
+  struct timeval timeout;
+  if(msec > -1) {
+    timeout.tv_sec = msec / 1000;
+    timeout.tv_usec = (msec % 1000) * 1000;
+  }
 
   fd_set readfds;
   int fd = termkey_get_fd(tk);
   FD_SET(fd, &readfds);
-  if(select(fd + 1, &readfds, NULL, NULL, timeout ? &to_copy : NULL) == 1) {
+  if(select(fd + 1, &readfds, NULL, NULL, msec > -1 ? &timeout : NULL) == 1) {
     termkey_advisereadable(tk);
   }
 
