@@ -485,7 +485,14 @@ void tickit_term_input_readable(TickitTerm *tt)
   get_keys(tt, tk);
 }
 
+// provide link-time legacy wrapper
+#undef tickit_term_input_check_timeout
 int tickit_term_input_check_timeout(TickitTerm *tt)
+{
+  return tickit_term_input_check_timeout_msec(tt);
+}
+
+int tickit_term_input_check_timeout_msec(TickitTerm *tt)
 {
   if(tt->input_timeout_at.tv_sec == -1)
     return -1;

@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after write A");
   is_str(keystr,  "A",               "keystr after write A");
 
-  is_int(tickit_term_input_check_timeout(tt), -1, "term has no timeout after A");
+  is_int(tickit_term_input_check_timeout_msec(tt), -1, "term has no timeout after A");
 
   keytype = -1; keystr[0] = 0;
   write(fd[1], "\e", 1);
@@ -46,18 +46,18 @@ int main(int argc, char *argv[])
 
   is_int(keytype, -1, "keytype not set after write Escape");
 
-  int timeout_msec = tickit_term_input_check_timeout(tt);
-  ok(timeout_msec > 0, "term has timeout after Escape");
+  int msec = tickit_term_input_check_timeout_msec(tt);
+  ok(msec > 0, "term has timeout after Escape");
 
   /* Add an extra milisecond timing grace */
-  usleep((timeout_msec+1) * 1000);
+  usleep((msec+1) * 1000);
 
-  tickit_term_input_check_timeout(tt);
+  tickit_term_input_check_timeout_msec(tt);
 
   is_int(keytype, TICKIT_KEYEV_KEY, "keytype after write completed Escape");
   is_str(keystr,  "Escape",         "keystr after write completed Escape");
 
-  is_int(tickit_term_input_check_timeout(tt), -1, "term has no timeout after completed Escape");
+  is_int(tickit_term_input_check_timeout_msec(tt), -1, "term has no timeout after completed Escape");
 
   tickit_term_destroy(tt);
 
