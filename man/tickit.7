@@ -5,6 +5,11 @@ tickit \- Terminal Interface Construction KIT
 \fBtickit\fP is a library for building full-screen interactive programs that use a terminal interface. Typically a program using \fBtickit\fP would consist of an instance of \fBTickitTerm\fP to represent the user's terminal, on which drawing operations are sent and input events are received.
 .PP
 The application would likely also maintain a \fBTickitRenderBuffer\fP instance into which to draw updates to the screen, before flushing them to the terminal in reaction to user input or other events.
+.SH "COMMON EVENTS"
+Every object instance that supports events supports the following type of event, in addition to the specific ones listed for that kind of object:
+.TP
+.B TICKIT_EV_UNBIND
+Invoked when the event handler is about to be removed, either because it was unbound individually, or because the object instance itself is being destroyed. This will be the last time the application can use the stored \fIdata\fP argument; it may perform any resource reclaiming operations that are required at this time.
 .SH "SEE ALSO"
 .BR tickit_term (7),
 .BR tickit_pen (7),

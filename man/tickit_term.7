@@ -43,6 +43,9 @@ string of the Unicode character. \fImod\fP will contain a bitmask of \fBTICKIT_M
 .TP
 .B TICKIT_EV_MOUSE
 A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled. The \fIargs\fP structure gives details, with \fItype\fP taking one of the values \fBTICKIT_MOUSEEV_PRESS\fP, \fBTICKIT_MOUSEEV_DRAG\fP, \fBTICKIT_MOUSEEV_RELEASE\fP or \fBTICKIT_MOUSEEV_WHEEL\fP. \fIbutton\fP gives the button index for button events, or one of \fBTICKIT_MOUSEWHEEL_UP\fP or \fBTICKIT_MOUSEWHEEL_DOWN\fP for wheel events. \fIline\fP and \fIcol\fP give the position of the mouse cursor for this event. \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
+.TP
+.B TICKIT_EV_UNBIND
+Invoked when the event handler is about to be removed, either because it was unbound individually, or because the \fBTickitTerm\fP instance itself is being destroyed.
 .SH "SEE ALSO"
 .BR tickit (7),
 .BR tickit_renderbuffer (7)
