@@ -768,7 +768,7 @@ void tickit_term_clear(TickitTerm *tt)
   (*tt->driver->vtable->clear)(tt->driver);
 }
 
-void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
+void tickit_term_erasech(TickitTerm *tt, int count, TickitMaybeBool moveend)
 {
   (*tt->driver->vtable->erasech)(tt->driver, count, moveend);
 }

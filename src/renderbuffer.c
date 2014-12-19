@@ -840,7 +840,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
                           rb->cells[line][col + cell->len].state != SKIP;
 
             tickit_term_setpen(tt, cell->pen);
-            tickit_term_erasech(tt, cell->len, moveend ? 1 : -1);
+            tickit_term_erasech(tt, cell->len, moveend ? TICKIT_YES : TICKIT_MAYBE);
 
             if(moveend)
               phycol += cell->len;

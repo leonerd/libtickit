@@ -152,7 +152,7 @@ static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwa
   return false;
 }
 
-static void erasech(TickitTermDriver *ttd, int count, int moveend)
+static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
 {
   if(count < 1)
     return;
@@ -166,7 +166,7 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
     else
       tickit_termdrv_write_strf(ttd, "\e[%dX", count);
 
-    if(moveend == 1)
+    if(moveend == TICKIT_YES)
       move_rel(ttd, 0, count);
   }
   else {
@@ -180,7 +180,7 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
     }
     tickit_termdrv_write_str(ttd, spaces, count);
 
-    if(moveend == 0)
+    if(moveend == TICKIT_NO)
       move_rel(ttd, 0, -count);
   }
 }

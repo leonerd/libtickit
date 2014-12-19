@@ -239,7 +239,7 @@ void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen);
 void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen);
 
 void tickit_term_clear(TickitTerm *tt);
-void tickit_term_erasech(TickitTerm *tt, int count, int moveend);
+void tickit_term_erasech(TickitTerm *tt, int count, TickitMaybeBool moveend);
 
 typedef enum {
   /* This is part of the API so additions must go at the end only */

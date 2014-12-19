@@ -254,7 +254,7 @@ static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwa
   return false;
 }
 
-static void erasech(TickitTermDriver *ttd, int count, int moveend)
+static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
@@ -267,7 +267,7 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
   if(td->cap.bce && !tickit_pen_get_bool_attr(tickit_termdrv_current_pen(ttd), TICKIT_PEN_REVERSE)) {
     run_ti(ttd, td->str.ech, 1, count);
 
-    if(moveend == 1)
+    if(moveend == TICKIT_MOVE_YES)
       move_rel(ttd, 0, count);
   }
   else {
@@ -281,7 +281,7 @@ static void erasech(TickitTermDriver *ttd, int count, int moveend)
     }
     tickit_termdrv_write_str(ttd, spaces, count);
 
-    if(moveend == 0)
+    if(moveend == TICKIT_MOVE_NO)
       move_rel(ttd, 0, -count);
   }
 }

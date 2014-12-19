@@ -26,7 +26,7 @@ typedef struct {
   bool (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   void (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);
   bool (*scrollrect)(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward);
-  void (*erasech)(TickitTermDriver *ttd, int count, int moveend);
+  void (*erasech)(TickitTermDriver *ttd, int count, TickitMaybeBool moveend);
   void (*clear)(TickitTermDriver *ttd);
   void (*chpen)(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final);
   bool (*getctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int *value);

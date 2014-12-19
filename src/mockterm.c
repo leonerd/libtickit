@@ -329,7 +329,7 @@ static bool mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int do
   return false;
 }
 
-static void mtd_erasech(TickitTermDriver *ttd, int count, int moveend)
+static void mtd_erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -343,7 +343,7 @@ static void mtd_erasech(TickitTermDriver *ttd, int count, int moveend)
 
   mtd_clear_cells(mtd, mtd->line, mtd->col, right);
 
-  if(moveend)
+  if(moveend != TICKIT_NO)
     mtd->col = right;
 }
 
