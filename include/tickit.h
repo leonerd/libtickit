@@ -12,6 +12,14 @@ extern "C" {
 
 #include <sys/time.h>
 
+/* a tri-state yes/no/don't-know type */
+
+typedef enum {
+  TICKIT_NO    =  0,
+  TICKIT_YES   =  1,
+  TICKIT_MAYBE = -1,
+} TickitMaybeBool;
+
 /*
  * Tickit events
  */

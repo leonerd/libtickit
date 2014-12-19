@@ -5,6 +5,16 @@ tickit \- Terminal Interface Construction KIT
 \fBtickit\fP is a library for building full-screen interactive programs that use a terminal interface. Typically a program using \fBtickit\fP would consist of an instance of \fBTickitTerm\fP to represent the user's terminal, on which drawing operations are sent and input events are received.
 .PP
 The application would likely also maintain a \fBTickitRenderBuffer\fP instance into which to draw updates to the screen, before flushing them to the terminal in reaction to user input or other events.
+.SH "COMMON TYPES"
+Some API functions take or return the following enum type, to represent a tri-state extended boolean concept of true, false, or some third condition typically indicating a "don't care" or "unknown" state; the exact semantics will vary between specific uses and should be documented specifically.
+.sp
+.nf
+.B  typedef enum {
+.BR "  TICKIT_YES" " = 1,"
+.BR "  TICKIT_NO" " = 0,"
+.BR "  TICKIT_MAYBE" " = -1",
+.BI "} " TickitMaybeBool ;
+.fi
 .SH "COMMON EVENTS"
 Every object instance that supports events supports the following type of event, in addition to the specific ones listed for that kind of object:
 .TP
