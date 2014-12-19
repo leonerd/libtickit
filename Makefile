@@ -125,7 +125,7 @@ install-man:
 	  gzip <$$F >$(DESTDIR)$(MAN7DIR)/$${F#man/}.gz; \
 	done
 	while read FROM EQ TO; do \
-	  echo ln -sf $$TO.gz $(DESTDIR)$(MAN3DIR)/$$FROM.gz; \
+	  ln -sf $$TO.gz $(DESTDIR)$(MAN3DIR)/$$FROM.gz; \
 	done < man/also
 
 HTMLDIR=html
