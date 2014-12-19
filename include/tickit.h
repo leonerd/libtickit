@@ -206,7 +206,7 @@ void tickit_term_flush(TickitTerm *tt);
 void tickit_term_set_input_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_input_fd(const TickitTerm *tt);
 
-int  tickit_term_get_utf8(const TickitTerm *tt);
+TickitMaybeBool tickit_term_get_utf8(const TickitTerm *tt);
 void tickit_term_set_utf8(TickitTerm *tt, bool utf8);
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len);

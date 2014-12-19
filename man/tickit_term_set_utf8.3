@@ -8,7 +8,7 @@ mode
 .B #include <tickit.h>
 .sp
 .BI "void tickit_term_set_utf8(TickitTerm *" tt ", bool " utf8 );
-.BI "int tickit_term_get_utf8(TickitTerm *" tt );
+.BI "TickitMaybeBool tickit_term_get_utf8(TickitTerm *" tt );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
@@ -19,9 +19,9 @@ rules, or legacy 8-bit single byte rules. If this function is not called explici
 .PP
 \fBtickit_term_get_utf8\fP() returns the current value for
 .SM UTF-8
-support.
+support as \fBTICKIT_YES\fP or \fBTICKIT_NO\fP, or \fBTICKIT_MAYBE\fP if the value is not yet known and has not been explicitly set.
 .SH "RETURN VALUE"
-\fBtickit_term_set_utf8\fP() returns no value. \fBtickit_term_get_utf8\fP() returns a boolean integer value.
+\fBtickit_term_set_utf8\fP() returns no value. \fBtickit_term_get_utf8\fP() returns a \fITickitMaybeBool\fP tri-state boolean value.
 .SH "SEE ALSO"
 .BR tickit_term_new (3),
 .BR tickit_term (7),

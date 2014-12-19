@@ -44,7 +44,7 @@ struct TickitTerm {
   struct timeval        input_timeout_at; /* absolute time */
 
   const char *termtype;
-  signed char is_utf8;  /* -1 == unknown */
+  TickitMaybeBool is_utf8;
 
   char *outbuffer;
   size_t outbuffer_len; /* size of outbuffer */
@@ -72,9 +72,9 @@ static TermKey *get_termkey(TickitTerm *tt)
 {
   if(!tt->termkey) {
     int flags = 0;
-    if(tt->is_utf8 > 0)
+    if(tt->is_utf8 == TICKIT_YES)
       flags |= TERMKEY_FLAG_UTF8;
-    else if(tt->is_utf8 == 0)
+    else if(tt->is_utf8 == TICKIT_NO)
       flags |= TERMKEY_FLAG_RAW;
 
     tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR | flags);
@@ -138,7 +138,7 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   tt->tmpbuffer = NULL;
   tt->tmpbuffer_len = 0;
 
-  tt->is_utf8 = -1;
+  tt->is_utf8 = TICKIT_MAYBE;
 
   /* Initially; the driver may provide a more accurate value */
   tt->lines = 25;
@@ -311,7 +311,7 @@ int tickit_term_get_input_fd(const TickitTerm *tt)
   return tt->infd;
 }
 
-int tickit_term_get_utf8(const TickitTerm *tt)
+TickitMaybeBool tickit_term_get_utf8(const TickitTerm *tt)
 {
   return tt->is_utf8;
 }
