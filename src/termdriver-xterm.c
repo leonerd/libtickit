@@ -287,41 +287,41 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   tickit_termdrv_write_str(ttd, buffer, len);
 }
 
-static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
+static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       *value = xd->mode.altscreen;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORVIS:
       *value = xd->mode.cursorvis;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORBLINK:
       *value = xd->mode.cursorblink;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_MOUSE:
       *value = xd->mode.mouse;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORSHAPE:
       *value = xd->mode.cursorshape;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_KEYPAD_APP:
       *value = xd->mode.keypad;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_COLORS:
       *value = 256;
-      return 1;
+      return true;
 
     default:
-      return 0;
+      return false;
   }
 }
 

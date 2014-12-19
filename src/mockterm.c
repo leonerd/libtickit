@@ -370,20 +370,23 @@ static void mtd_chpen(TickitTermDriver *ttd, const TickitPen *delta, const Ticki
   tickit_pen_copy(mtd->pen, final, 1);
 }
 
-static int mtd_getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
+static bool mtd_getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
   switch(ctl) {
     case TICKIT_TERMCTL_CURSORVIS:
-      *value = mtd->cursorvis; return 1;
+      *value = mtd->cursorvis;
+      return true;
     case TICKIT_TERMCTL_CURSORSHAPE:
-      *value = mtd->cursorshape; return 1;
+      *value = mtd->cursorshape;
+      return true;
     case TICKIT_TERMCTL_COLORS:
       *value = 256;
-      return 1;
+      return true;
+
     default:
-      return 0;
+      return false;
   }
 }
 

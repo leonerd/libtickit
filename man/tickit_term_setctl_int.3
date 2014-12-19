@@ -5,14 +5,14 @@ tickit_term_setctl_int, tickit_term_setctl_str \- set an integer or string termi
 .nf
 .B #include <tickit.h>
 .sp
-.BI "int tickit_term_getctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int *" value );
+.BI "bool tickit_term_getctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int *" value );
 .BI "bool tickit_term_setctl_int(TickitTerm *" tt ", TickitTermCtl " ctl ", int " value );
 .BI "bool tickit_term_setctl_str(TickitTerm *" tt ", TickitTermCtl " ctl ", const char *" value );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. \fBtickit_term_setctl_str\fP() sets the value of a string terminal control option. \fBtickit_term_getctl_int\fP() returns the value of a terminal control setting.
+\fBtickit_term_setctl_int\fP() performs a terminal control operation, setting the value of a numeric terminal control option. \fBtickit_term_setctl_str\fP() sets the value of a string terminal control option. \fBtickit_term_getctl_int\fP() obtains the value of a terminal control setting.
 .PP
 The options are given in an enumeration called \fBTickitTermCtl\fP. The following control values are recognised:
 .in

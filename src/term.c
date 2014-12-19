@@ -773,7 +773,7 @@ void tickit_term_erasech(TickitTerm *tt, int count, int moveend)
   (*tt->driver->vtable->erasech)(tt->driver, count, moveend);
 }
 
-int tickit_term_getctl_int(TickitTerm *tt, TickitTermCtl ctl, int *value)
+bool tickit_term_getctl_int(TickitTerm *tt, TickitTermCtl ctl, int *value)
 {
   return (*tt->driver->vtable->getctl_int)(tt->driver, ctl, value);
 }

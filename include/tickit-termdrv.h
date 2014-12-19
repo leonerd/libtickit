@@ -29,7 +29,7 @@ typedef struct {
   void (*erasech)(TickitTermDriver *ttd, int count, int moveend);
   void (*clear)(TickitTermDriver *ttd);
   void (*chpen)(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final);
-  int  (*getctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int *value);
+  bool (*getctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int *value);
   bool (*setctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int value);
   bool (*setctl_str)(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value);
   int  (*gotkey)(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key); /* optional */
