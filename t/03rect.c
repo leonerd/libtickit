@@ -12,7 +12,7 @@ TickitRect *rect_init_strp(TickitRect *rect, const char *str)
   return rect;
 }
 
-int is_rect(TickitRect *got, const char *expect, char *name)
+void is_rect(TickitRect *got, const char *expect, char *name)
 {
   TickitRect exp;
   rect_init_strp(&exp, expect);

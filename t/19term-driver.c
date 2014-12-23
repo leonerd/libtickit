@@ -9,14 +9,14 @@ static void print(TickitTermDriver *ttd, const char *str, size_t len)
   tickit_termdrv_write_strf(ttd, "PRINT(%.*s)", len, str);
 }
 
-static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
+static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
   switch(ctl) {
     case TICKIT_TERMCTL_COLORS:
-      *value = 8; return 1;
+      *value = 8; return true;
   }
 
-  return 0;
+  return false;
 }
 
 static bool setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)

@@ -36,7 +36,7 @@ int rects_init_strp(TickitRect *rects, int n, const char *str)
   return i;
 }
 
-int is_rect(TickitRect *got, const char *expect, char *name)
+void is_rect(TickitRect *got, const char *expect, char *name)
 {
   TickitRect exp;
   rect_init_strp(&exp, expect);
