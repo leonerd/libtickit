@@ -364,7 +364,9 @@ void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int 
 void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols);
 void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col);
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text, TickitPen *pen);
+int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len, TickitPen *pen);
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text, TickitPen *pen);
+int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len, TickitPen *pen);
 void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols, TickitPen *pen);
 void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols, TickitPen *pen);
 void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen);

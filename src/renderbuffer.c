@@ -592,9 +592,14 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
 
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text, TickitPen *pen)
 {
+  return tickit_renderbuffer_textn_at(rb, line, col, text, -1, pen);
+}
+
+int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len, TickitPen *pen)
+{
 
   TickitStringPos endpos;
-  tickit_string_count(text, &endpos, NULL);
+  len = tickit_string_ncount(text, len, &endpos, NULL);
 
   int cols = endpos.columns;
   int ret = cols;
@@ -608,7 +613,9 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
     rb->texts = realloc(rb->texts, rb->size_texts * sizeof(char *));
   }
 
-  rb->texts[rb->n_texts] = strdup(text);
+  rb->texts[rb->n_texts] = malloc(len + 1);
+  memcpy(rb->texts[rb->n_texts], text, len);
+  rb->texts[rb->n_texts][len] = '\0';
 
   RBCell *linecells = rb->cells[line];
 
@@ -650,6 +657,17 @@ int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text, TickitPen *pen)
     return -1;
 
   int cols = tickit_renderbuffer_text_at(rb, rb->vc_line, rb->vc_col, text, pen);
+  rb->vc_col += cols;
+
+  return cols;
+}
+
+int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len, TickitPen *pen)
+{
+  if(!rb->vc_pos_set)
+    return -1;
+
+  int cols = tickit_renderbuffer_textn_at(rb, rb->vc_line, rb->vc_col, text, len, pen);
   rb->vc_col += cols;
 
   return cols;

@@ -198,6 +198,28 @@ int main(int argc, char *argv[])
         NULL);
   }
 
+  // Truncates correctly
+  {
+    cols = tickit_renderbuffer_textn_at(rb, 4, 0, "ABCDEFGHI", 3, NULL);
+    is_int(cols, 3, "cols from textn_at truncated correctly");
+    cols = tickit_renderbuffer_textn_at(rb, 5, 1, "ABCDEF", 6, NULL);
+    is_int(cols, 6, "cols from textn_at allows the full string");
+    cols = tickit_renderbuffer_textn_at(rb, 6, 2, "LMNOP", -1, NULL);
+    is_int(cols, 5, "cols from textn_at handles -1");
+
+    tickit_renderbuffer_goto(rb, 7, 3);
+    cols = tickit_renderbuffer_textn(rb, "QRSTUV", 4, NULL);
+    is_int(cols, 4, "cols from textn truncated correctly");
+
+    tickit_renderbuffer_flush_to_term(rb, tt);
+    is_termlog("RenderBuffer textn rendering",
+        GOTO(4,0), SETPEN(), PRINT("ABC"),
+        GOTO(5,1), SETPEN(), PRINT("ABCDEF"),
+        GOTO(6,2), SETPEN(), PRINT("LMNOP"),
+        GOTO(7,3), SETPEN(), PRINT("QRST"),
+        NULL);
+  }
+
   // Eraserect
   {
     tickit_renderbuffer_eraserect(rb, &(TickitRect){.top = 2, .left = 3, .lines = 5, .cols = 8}, NULL);
