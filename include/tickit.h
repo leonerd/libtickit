@@ -360,13 +360,13 @@ void tickit_renderbuffer_save(TickitRenderBuffer *rb);
 void tickit_renderbuffer_savepen(TickitRenderBuffer *rb);
 void tickit_renderbuffer_restore(TickitRenderBuffer *rb);
 
-void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int len);
-void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int len);
+void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int cols);
+void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols);
 void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col);
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text, TickitPen *pen);
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text, TickitPen *pen);
-void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int len, TickitPen *pen);
-void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int len, TickitPen *pen);
+void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols, TickitPen *pen);
+void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols, TickitPen *pen);
 void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen);
 void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect, TickitPen *pen);
 void tickit_renderbuffer_clear(TickitRenderBuffer *rb, TickitPen *pen);

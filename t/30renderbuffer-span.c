@@ -7,7 +7,6 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitRenderBuffer *rb;
   int lines, cols;
-  int len;
   char buffer[256];
 
   rb = tickit_renderbuffer_new(10, 20);
@@ -28,8 +27,8 @@ int main(int argc, char *argv[])
   {
     // Direct pen
     TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 1, -1);
-    len = tickit_renderbuffer_text_at(rb, 0, 1, "text span", fg_pen);
-    is_int(len, 9, "len from text_at");
+    cols = tickit_renderbuffer_text_at(rb, 0, 1, "text span", fg_pen);
+    is_int(cols, 9, "cols from text_at");
     tickit_renderbuffer_erase_at(rb, 1, 1, 5, fg_pen);
 
     // Stored pen
@@ -72,8 +71,8 @@ int main(int argc, char *argv[])
 
   // UTF-8 handling
   {
-    len = tickit_renderbuffer_text_at(rb, 6, 0, "somé text ĉi tie", NULL);
-    is_int(len, 16, "len from text_at UTF-8");
+    cols = tickit_renderbuffer_text_at(rb, 6, 0, "somé text ĉi tie", NULL);
+    is_int(cols, 16, "cols from text_at UTF-8");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer renders UTF-8 text",
@@ -142,8 +141,8 @@ int main(int argc, char *argv[])
     // Direct pen
     TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 3, -1);
     tickit_renderbuffer_goto(rb, 0, 2);
-    len = tickit_renderbuffer_text(rb, "text span", fg_pen);
-    is_int(len, 9, "len from text");
+    cols = tickit_renderbuffer_text(rb, "text span", fg_pen);
+    is_int(cols, 9, "cols from text");
 
     tickit_renderbuffer_goto(rb, 1, 2);
     tickit_renderbuffer_erase(rb, 5, fg_pen);
@@ -176,8 +175,8 @@ int main(int argc, char *argv[])
   {
     tickit_renderbuffer_translate(rb, 3, 5);
 
-    len = tickit_renderbuffer_text_at(rb, 0, 0, "at 0,0", NULL);
-    is_int(len, 6, "len from text_at translated");
+    cols = tickit_renderbuffer_text_at(rb, 0, 0, "at 0,0", NULL);
+    is_int(cols, 6, "cols from text_at translated");
 
     is_int(tickit_renderbuffer_get_cell_text(rb, 0, 0, buffer, sizeof buffer), 1,
         "get_cell_text TEXT at 0,0 translated");

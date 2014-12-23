@@ -28,7 +28,7 @@ enum {
 // Internal cell structure definition
 typedef struct {
   enum TickitRenderBufferCellState state;
-  int len; // or "startcol" for state == CONT
+  int cols; // or "startcol" for state == CONT
   int maskdepth; // -1 if not masked
   TickitPen *pen; // state -> {TEXT, ERASE, LINE, CHAR}
   union {
@@ -98,7 +98,7 @@ static void free_texts(TickitRenderBuffer *rb)
   rb->n_texts = 0;
 }
 
-static int xlate_and_clip(TickitRenderBuffer *rb, int *line, int *col, int *len, int *startcol)
+static int xlate_and_clip(TickitRenderBuffer *rb, int *line, int *col, int *cols, int *startcol)
 {
   *line += rb->xlate_line;
   *col  += rb->xlate_col;
@@ -117,16 +117,16 @@ static int xlate_and_clip(TickitRenderBuffer *rb, int *line, int *col, int *len,
     *startcol = 0;
 
   if(*col < clip->left) {
-    *len      -= clip->left - *col;
+    *cols      -= clip->left - *col;
     if(startcol)
       *startcol += clip->left - *col;
     *col = clip->left;
   }
-  if(*len <= 0)
+  if(*cols <= 0)
     return 0;
 
-  if(*len > tickit_rect_right(clip) - *col)
-    *len = tickit_rect_right(clip) - *col;
+  if(*cols > tickit_rect_right(clip) - *col)
+    *cols = tickit_rect_right(clip) - *col;
 
   return 1;
 }
@@ -148,38 +148,38 @@ static void cont_cell(RBCell *cell, int startcol)
 
   cell->state     = CONT;
   cell->maskdepth = -1;
-  cell->len       = startcol;
+  cell->cols      = startcol;
   cell->pen       = NULL;
 }
 
-static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int len)
+static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
 {
-  int end = col + len;
+  int end = col + cols;
   RBCell **cells = rb->cells;
 
   // If the following cell is a CONT, it needs to become a new start
   if(end < rb->cols && cells[line][end].state == CONT) {
-    int spanstart = cells[line][end].len;
+    int spanstart = cells[line][end].cols;
     RBCell *spancell = &cells[line][spanstart];
-    int spanend = spanstart + spancell->len;
+    int spanend = spanstart + spancell->cols;
     int afterlen = spanend - end;
     RBCell *endcell = &cells[line][end];
 
     switch(spancell->state) {
       case SKIP:
         endcell->state = SKIP;
-        endcell->len   = afterlen;
+        endcell->cols  = afterlen;
         break;
       case TEXT:
         endcell->state       = TEXT;
-        endcell->len         = afterlen;
+        endcell->cols        = afterlen;
         endcell->pen         = tickit_pen_clone(spancell->pen);
         endcell->v.text.idx  = spancell->v.text.idx;
         endcell->v.text.offs = spancell->v.text.offs + end - spanstart;
         break;
       case ERASE:
         endcell->state = ERASE;
-        endcell->len   = afterlen;
+        endcell->cols  = afterlen;
         endcell->pen   = tickit_pen_clone(spancell->pen);
         break;
       case LINE:
@@ -190,12 +190,12 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int len)
 
     // We know these are already CONT cells
     for(int c = end + 1; c < spanend; c++)
-      cells[line][c].len = end;
+      cells[line][c].cols = end;
   }
 
   // If the initial cell is a CONT, shorten its start
   if(cells[line][col].state == CONT) {
-    int beforestart = cells[line][col].len;
+    int beforestart = cells[line][col].cols;
     RBCell *spancell = &cells[line][beforestart];
     int beforelen = col - beforestart;
 
@@ -203,7 +203,7 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int len)
       case SKIP:
       case TEXT:
       case ERASE:
-        spancell->len = beforelen;
+        spancell->cols = beforelen;
         break;
       case LINE:
       case CHAR:
@@ -216,7 +216,7 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int len)
   for(int c = col; c < end; c++)
     cont_cell(&cells[line][c], col);
 
-  cells[line][col].len = len;
+  cells[line][col].cols = cols;
 
   return &cells[line][col];
 }
@@ -264,13 +264,13 @@ TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols)
 
     rb->cells[line][0].state     = SKIP;
     rb->cells[line][0].maskdepth = -1;
-    rb->cells[line][0].len       = rb->cols;
+    rb->cells[line][0].cols      = rb->cols;
     rb->cells[line][0].pen       = NULL;
 
     for(int col = 1; col < rb->cols; col++) {
       rb->cells[line][col].state     = CONT;
       rb->cells[line][col].maskdepth = -1;
-      rb->cells[line][col].len       = 0;
+      rb->cells[line][col].cols      = 0;
     }
   }
 
@@ -446,7 +446,7 @@ void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
 
     rb->cells[line][0].state     = SKIP;
     rb->cells[line][0].maskdepth = -1;
-    rb->cells[line][0].len       = rb->cols;
+    rb->cells[line][0].cols      = rb->cols;
   }
 
   rb->vc_pos_set = 0;
@@ -540,25 +540,25 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb)
   free(stack);
 }
 
-void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int len)
+void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int cols)
 {
-  if(!xlate_and_clip(rb, &line, &col, &len, NULL))
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
     return;
 
   RBCell *linecells = rb->cells[line];
 
-  while(len) {
-    while(len && linecells[col].maskdepth > -1) {
+  while(cols) {
+    while(cols && linecells[col].maskdepth > -1) {
       col++;
-      len--;
+      cols--;
     }
-    if(!len)
+    if(!cols)
       break;
 
     int spanlen = 0;
-    while(len && linecells[col + spanlen].maskdepth == -1) {
+    while(cols && linecells[col + spanlen].maskdepth == -1) {
       spanlen++;
-      len--;
+      cols--;
     }
     if(!spanlen)
       break;
@@ -570,13 +570,13 @@ void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int 
   }
 }
 
-void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int len)
+void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols)
 {
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_skip_at(rb, rb->vc_line, rb->vc_col, len);
-  rb->vc_col += len;
+  tickit_renderbuffer_skip_at(rb, rb->vc_line, rb->vc_col, cols);
+  rb->vc_col += cols;
 }
 
 void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
@@ -596,11 +596,11 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
   TickitStringPos endpos;
   tickit_string_count(text, &endpos, NULL);
 
-  int len = endpos.columns;
-  int ret = len;
+  int cols = endpos.columns;
+  int ret = cols;
 
   int startcol;
-  if(!xlate_and_clip(rb, &line, &col, &len, &startcol))
+  if(!xlate_and_clip(rb, &line, &col, &cols, &startcol))
     return ret;
 
   if(rb->n_texts == rb->size_texts) {
@@ -612,19 +612,19 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
 
   RBCell *linecells = rb->cells[line];
 
-  while(len) {
-    while(len && linecells[col].maskdepth > -1) {
+  while(cols) {
+    while(cols && linecells[col].maskdepth > -1) {
       col++;
-      len--;
+      cols--;
       startcol++;
     }
-    if(!len)
+    if(!cols)
       break;
 
     int spanlen = 0;
-    while(len && linecells[col + spanlen].maskdepth == -1) {
+    while(cols && linecells[col + spanlen].maskdepth == -1) {
       spanlen++;
-      len--;
+      cols--;
     }
     if(!spanlen)
       break;
@@ -649,31 +649,31 @@ int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text, TickitPen *pen)
   if(!rb->vc_pos_set)
     return -1;
 
-  int len = tickit_renderbuffer_text_at(rb, rb->vc_line, rb->vc_col, text, pen);
-  rb->vc_col += len;
+  int cols = tickit_renderbuffer_text_at(rb, rb->vc_line, rb->vc_col, text, pen);
+  rb->vc_col += cols;
 
-  return len;
+  return cols;
 }
 
-void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int len, TickitPen *pen)
+void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols, TickitPen *pen)
 {
-  if(!xlate_and_clip(rb, &line, &col, &len, NULL))
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
     return;
 
   RBCell *linecells = rb->cells[line];
 
-  while(len) {
-    while(len && linecells[col].maskdepth > -1) {
+  while(cols) {
+    while(cols && linecells[col].maskdepth > -1) {
       col++;
-      len--;
+      cols--;
     }
-    if(!len)
+    if(!cols)
       break;
 
     int spanlen = 0;
-    while(len && linecells[col + spanlen].maskdepth == -1) {
+    while(cols && linecells[col + spanlen].maskdepth == -1) {
       spanlen++;
-      len--;
+      cols--;
     }
     if(!spanlen)
       break;
@@ -686,13 +686,13 @@ void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int
   }
 }
 
-void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int len, TickitPen *pen)
+void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols, TickitPen *pen)
 {
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, len, pen);
-  rb->vc_col += len;
+  tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, cols, pen);
+  rb->vc_col += cols;
 }
 
 void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen)
@@ -714,15 +714,15 @@ void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect, Tic
 
 void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint, TickitPen *pen)
 {
-  int len = 1;
+  int cols = 1;
 
-  if(!xlate_and_clip(rb, &line, &col, &len, NULL))
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
     return;
 
   if(rb->cells[line][col].maskdepth > -1)
     return;
 
-  RBCell *cell = make_span(rb, line, col, len);
+  RBCell *cell = make_span(rb, line, col, cols);
   cell->state           = CHAR;
   cell->pen             = merge_pen(rb, pen);
   cell->v.chr.codepoint = codepoint;
@@ -740,9 +740,9 @@ void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint, TickitPen 
 
 static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, TickitPen *pen)
 {
-  int len = 1;
+  int cols = 1;
 
-  if(!xlate_and_clip(rb, &line, &col, &len, NULL))
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
     return;
 
   if(rb->cells[line][col].maskdepth > -1)
@@ -752,9 +752,9 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, Tickit
 
   RBCell *cell = &rb->cells[line][col];
   if(cell->state != LINE) {
-    make_span(rb, line, col, len);
+    make_span(rb, line, col, cols);
     cell->state       = LINE;
-    cell->len         = 1;
+    cell->cols        = 1;
     cell->pen         = cellpen;
     cell->v.line.mask = 0;
   }
@@ -805,7 +805,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
       RBCell *cell = &rb->cells[line][col];
 
       if(cell->state == SKIP) {
-        col += cell->len;
+        col += cell->cols;
         continue;
       }
 
@@ -822,28 +822,28 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
             tickit_stringpos_limit_columns(&limit, cell->v.text.offs);
             tickit_string_count(text, &start, &limit);
 
-            limit.columns += cell->len;
+            limit.columns += cell->cols;
             end = start;
             tickit_string_countmore(text, &end, &limit);
 
             tickit_term_setpen(tt, cell->pen);
             tickit_term_printn(tt, text + start.bytes, end.bytes - start.bytes);
 
-            phycol += cell->len;
+            phycol += cell->cols;
           }
           break;
         case ERASE:
           {
             /* No need to set moveend=true to erasech unless we actually
              * have more content */
-            int moveend = col + cell->len < rb->cols &&
-                          rb->cells[line][col + cell->len].state != SKIP;
+            int moveend = col + cell->cols < rb->cols &&
+                          rb->cells[line][col + cell->cols].state != SKIP;
 
             tickit_term_setpen(tt, cell->pen);
-            tickit_term_erasech(tt, cell->len, moveend ? TICKIT_YES : TICKIT_MAYBE);
+            tickit_term_erasech(tt, cell->cols, moveend ? TICKIT_YES : TICKIT_MAYBE);
 
             if(moveend)
-              phycol += cell->len;
+              phycol += cell->cols;
             else
               phycol = -1;
           }
@@ -856,7 +856,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
               tmp_cat_utf8(rb, linemask_to_char[cell->v.line.mask]);
 
               col++;
-              phycol += cell->len;
+              phycol += cell->cols;
             } while(col < rb->cols &&
                     (cell = &rb->cells[line][col]) &&
                     cell->state == LINE &&
@@ -875,7 +875,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
             tickit_term_printn(tt, rb->tmp, rb->tmplen);
             rb->tmplen = 0;
 
-            phycol += cell->len;
+            phycol += cell->cols;
           }
           break;
         case SKIP:
@@ -884,7 +884,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
           abort();
       }
 
-      col += cell->len;
+      col += cell->cols;
     }
   }
 
@@ -893,15 +893,15 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
 
 static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
 {
-  int len = 1;
-  if(!xlate_and_clip(rb, &line, &col, &len, NULL))
+  int cols = 1;
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
     return NULL;
 
   *offset = 0;
   RBCell *cell = &rb->cells[line][col];
   if(cell->state == CONT) {
-    *offset = col - cell->len; // startcol
-    cell = &rb->cells[line][cell->len];
+    *offset = col - cell->cols; // startcol
+    cell = &rb->cells[line][cell->cols];
   }
 
   return cell;
@@ -931,7 +931,7 @@ static size_t get_span_text(TickitRenderBuffer *rb, RBCell *span, int offset, in
         if(one_grapheme)
           tickit_stringpos_limit_graphemes(&limit, start.graphemes + 1);
         else
-          tickit_stringpos_limit_columns(&limit, span->len);
+          tickit_stringpos_limit_columns(&limit, span->cols);
         end = start;
         tickit_string_countmore(text, &end, &limit);
 
@@ -1012,7 +1012,7 @@ size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startc
     return -1;
 
   if(info)
-    info->n_columns = span->len - offset;
+    info->n_columns = span->cols - offset;
 
   if(span->state == SKIP) {
     if(info)
