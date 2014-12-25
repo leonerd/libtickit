@@ -121,6 +121,10 @@ int main(int argc, char *argv[])
   tickit_string_ncount("a\xcc", 1, &pos, &limit);
   is_int(pos.bytes, 1, "tickit_string_ncount ignores partial UTF-8 past len");
 
+  /* ncount still stops on NUL bytes */
+  is_int(tickit_string_ncount("ABCDEF", 7, &pos, &limit), 6, "tickit_string_ncount stops at NUL");
+  is_int(pos.bytes, 6, "tickit_string_ncount indicates end at NUL");
+
   /* C0 and C1 controls and ASCII DEL are errors */
   tickit_stringpos_limit_none(&limit);
 

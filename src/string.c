@@ -110,7 +110,7 @@ size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *po
   if(len != (size_t)-1)
     len -= pos->bytes;
 
-  while((len == (size_t)-1) ? *str : (len > 0)) {
+  while(*str && len != 0) {
     uint32_t cp;
     int bytes = next_utf8(str, len, &cp);
     if(bytes == -1)

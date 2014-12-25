@@ -51,9 +51,14 @@ The \fIcolumns\fP member counts the number of screen columns consumed by the gra
 sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold. It will begin at the offset given by \fIpos.bytes\fP.
 .PP
 The \fBtickit_string_ncount\fP() and \fBtickit_string_ncountmore\fP() variants are similar except that they read no more than \fIlen\fP bytes from the string and do not require it to be
-.SM
-NUL
-terminated.
+.SM NUL
+terminated. They will still stop at a
+.SM NUL
+byte if one is found before \fIlen\fP bytes have been read.
+.PP
+These functions will all immediately abort if any C0 or C1 control byte other than
+.SM NUL
+is encountered, returning the value -1. In this circumstance, the \fIpos\fP structure will still be updated with the progress so far.
 .SH USAGE
 Typically, these functions would be used either of two ways.
 .PP
@@ -61,7 +66,8 @@ When given a value in \fIlimit.bytes\fP (or no limit and simply using string ter
 .PP
 When given a value in \fIlimit.columns\fP, \fBtickit_string_count\fP() will yield the number of bytes of that string that will consume the given space on the terminal.
 .SH "RETURN VALUE"
-\fBtickit_string_count\fP() and \fBtickit_string_countmore\fP() return the number of bytes they have skipped over this call.
+\fBtickit_string_count\fP() and \fBtickit_string_countmore\fP() return the number of bytes they have skipped over this call, or -1 if they encounter a C0 or C1 byte other than
+.SM NUL .
 .SH "SEE ALSO"
 .BR tickit_stringpos_zero (3),
 .BR tickit_stringpos_limit_bytes (3),
