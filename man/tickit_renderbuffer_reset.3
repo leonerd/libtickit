@@ -11,6 +11,8 @@ tickit_renderbuffer_reset \- revert a render buffer back to initial state
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_renderbuffer_reset\fP() resets the render buffer back to its initial state. The pending content is erased, and all the cells are set back to the skipped state. The virtual cursor position is unset, the translation offset set back to zero, the clipping region set to the entire buffer and the pen removed if set. Also the saved state stack is cleared.
+.PP
+Any memory allocated for the storage of strings by the \fBtickit_renderbuffer_text\fP family of functions is also released by this function.
 .SH "RETURN VALUE"
 This function returns no value.
 .SH "SEE ALSO"

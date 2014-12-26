@@ -20,6 +20,8 @@ Link with \fI\-ltickit\fP.
 \fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the given pen. \fBtickit_renderbuffer_textn\fP() creates a text region of at most \fIlen\fP bytes. It returns the number of columns that the text string occupies. This function will update the virtual cursor position.
 .PP
 \fBtickit_renderbuffer_text_at\fP() creates a text region at the given position. \fBtickit_renderbuffer_textn_at\fP() creates a text region of at most \fIlen\fP bytes. This function does not use or update the virtual cursor position.
+.PP
+Calls to any of these functions allocate storage owned by the \fITickitRenderBuffer\fP instance itself to store the strings. This storage is only released again by \fBtickit_renderbuffer_reset\fP(3) or by the implicit reset that happens at the end of \fBtickit_renderbuffer_flush_to_term\fP(3).
 .SH "RETURN VALUE"
 These functions return an integer giving the number of columns the new region occupies.
 .SH "SEE ALSO"
