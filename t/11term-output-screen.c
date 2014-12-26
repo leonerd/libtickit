@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define RECT(t,l,li,co)  (TickitRect){ .top = t, .left = l, .lines = li, .cols = co }
+
 void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
 {
   char *buffer = user;
@@ -69,40 +71,40 @@ int main(int argc, char *argv[])
   is_str_escape(buffer, "\e[2D", "buffer after tickit_term_move left 2");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 3, 0, 7, 80, 1, 0);
-  is_str_escape(buffer, "\e[4;10r\e[4;1H\e[M\e[1;24r", "buffer after tickit_term_scroll lines 3-9 1 down");
+  tickit_term_scrollrect(tt, RECT(3,0,7,80), 1, 0);
+  is_str_escape(buffer, "\e[4;10r\e[4;1H\e[M\e[1;24r", "buffer after tickit_term_scrollrect lines 3-9 1 down");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 3, 0, 15, 80, 8, 0);
-  is_str_escape(buffer, "\e[4;18r\e[4;1H\e[8M\e[1;24r", "buffer after tickit_term_scroll lines 3-17 8 down");
+  tickit_term_scrollrect(tt, RECT(3,0,15,80), 8, 0);
+  is_str_escape(buffer, "\e[4;18r\e[4;1H\e[8M\e[1;24r", "buffer after tickit_term_scrollrect lines 3-17 8 down");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 3, 0, 7, 80, -1, 0);
-  is_str_escape(buffer, "\e[4;10r\e[4;1H\e[L\e[1;24r", "buffer after tickit_term_scroll lines 3-9 1 up");
+  tickit_term_scrollrect(tt, RECT(3,0,7,80), -1, 0);
+  is_str_escape(buffer, "\e[4;10r\e[4;1H\e[L\e[1;24r", "buffer after tickit_term_scrollrect lines 3-9 1 up");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 3, 0, 15, 80, -8, 0);
-  is_str_escape(buffer, "\e[4;18r\e[4;1H\e[8L\e[1;24r", "buffer after tickit_term_scroll lines 3-17 8 up");
+  tickit_term_scrollrect(tt, RECT(3,0,15,80), -8, 0);
+  is_str_escape(buffer, "\e[4;18r\e[4;1H\e[8L\e[1;24r", "buffer after tickit_term_scrollrect lines 3-17 8 up");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, 3);
+  tickit_term_scrollrect(tt, RECT(5,0,1,80), 0, 3);
   is_str_escape(buffer, "\e[6;1H\e[3P", "buffer after tickit_term_scrollrect line 5 3 right");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, 5);
+  tickit_term_scrollrect(tt, RECT(6,10,2,70), 0, 5);
   is_str_escape(buffer, "\e[7;11H\e[5P\e[8;11H\e[5P", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 right");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 5, 0, 1, 80, 0, -3);
+  tickit_term_scrollrect(tt, RECT(5,0,1,80), 0, -3);
   is_str_escape(buffer, "\e[6;1H\e[3@", "buffer after tickit_term_scrollrect line 5 3 left");
 
   buffer[0] = 0;
-  tickit_term_scrollrect(tt, 6, 10, 2, 70, 0, -5);
+  tickit_term_scrollrect(tt, RECT(6,10,2,70), 0, -5);
   is_str_escape(buffer, "\e[7;11H\e[5@\e[8;11H\e[5@", "buffer after tickit_term_scrollrect lines 6-7 cols 10-80 5 left");
 
-  is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 1, 0), 0, "tickit_term cannot scroll partial lines vertically");
+  is_int(tickit_term_scrollrect(tt, RECT(3,10,5,60), 1, 0), 0, "tickit_term cannot scroll partial lines vertically");
 
-  is_int(tickit_term_scrollrect(tt, 3, 10, 5, 60, 0, 1), 0, "tickit_term cannot scroll partial lines horizontally");
+  is_int(tickit_term_scrollrect(tt, RECT(3,10,5,60), 0, 1), 0, "tickit_term cannot scroll partial lines horizontally");
 
   buffer[0] = 0;
   tickit_term_clear(tt);

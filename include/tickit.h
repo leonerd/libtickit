@@ -233,7 +233,7 @@ void tickit_term_printf(TickitTerm *tt, const char *fmt, ...);
 void tickit_term_vprintf(TickitTerm *tt, const char *fmt, va_list args);
 bool tickit_term_goto(TickitTerm *tt, int line, int col);
 void tickit_term_move(TickitTerm *tt, int downward, int rightward);
-bool tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward);
+bool tickit_term_scrollrect(TickitTerm *tt, TickitRect rect, int downward, int rightward);
 
 void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen);
 void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen);

@@ -683,14 +683,8 @@ void tickit_term_move(TickitTerm *tt, int downward, int rightward)
   (*tt->driver->vtable->move_rel)(tt->driver, downward, rightward);
 }
 
-bool tickit_term_scrollrect(TickitTerm *tt, int top, int left, int lines, int cols, int downward, int rightward)
+bool tickit_term_scrollrect(TickitTerm *tt, TickitRect rect, int downward, int rightward)
 {
-  TickitRect rect = {
-    .top   = top,
-    .left  = left,
-    .lines = lines,
-    .cols  = cols,
-  };
   return (*tt->driver->vtable->scrollrect)(tt->driver, &rect, downward, rightward);
 }
 

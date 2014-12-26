@@ -7,6 +7,8 @@
 
 #define streq(a,b) (strcmp(a,b)==0)
 
+#define RECT(t,l,li,co)  (TickitRect){ .top = t, .left = l, .lines = li, .cols = co }
+
 static TickitTerm *tt;
 
 static void is_display_text(char *name, ...)
@@ -143,7 +145,7 @@ int main(int argc, char *argv[])
       "1111111111",
       "2222222222");
 
-  ok(tickit_term_scrollrect(tt, 0,0,3,10, +1,0), "Scrollrect down OK");
+  ok(tickit_term_scrollrect(tt, RECT(0,0,3,10), +1,0), "Scrollrect down OK");
   is_termlog("Termlog after scroll 1 down",
       SCROLLRECT(0,0,3,10, +1,0),
       NULL);
@@ -152,7 +154,7 @@ int main(int argc, char *argv[])
       "2222222222",
       "          ");
 
-  ok(tickit_term_scrollrect(tt, 0,0,3,10, -1,0), "Scrollrect up OK");
+  ok(tickit_term_scrollrect(tt, RECT(0,0,3,10), -1,0), "Scrollrect up OK");
   is_termlog("Termlog after scroll 1 up",
       SCROLLRECT(0,0,3,10, -1,0),
       NULL);
@@ -164,7 +166,7 @@ int main(int argc, char *argv[])
   fillterm(tt);
   tickit_mockterm_clearlog((TickitMockTerm *)tt);
 
-  tickit_term_scrollrect(tt, 0,0,2,10, +1,0);
+  tickit_term_scrollrect(tt, RECT(0,0,2,10), +1,0);
   is_termlog("Termlog after scroll partial 1 down",
       SCROLLRECT(0,0,2,10, +1,0),
       NULL);
@@ -173,7 +175,7 @@ int main(int argc, char *argv[])
       "          ",
       "2222222222");
 
-  tickit_term_scrollrect(tt, 0,0,2,10, -1,0);
+  tickit_term_scrollrect(tt, RECT(0,0,2,10), -1,0);
   is_termlog("Termlog after scroll partial 1 up",
       SCROLLRECT(0,0,2,10, -1,0),
       NULL);
@@ -186,7 +188,7 @@ int main(int argc, char *argv[])
     tickit_term_goto(tt, line, 0), tickit_term_print(tt, "ABCDEFGHIJ");
   tickit_mockterm_clearlog((TickitMockTerm *)tt);
 
-  tickit_term_scrollrect(tt, 0,5,1,5, 0,2);
+  tickit_term_scrollrect(tt, RECT(0,5,1,5), 0,2);
   is_termlog("Termlog after scroll right",
       SCROLLRECT(0,5,1,5, 0,+2),
       NULL);
@@ -195,7 +197,7 @@ int main(int argc, char *argv[])
       "ABCDEFGHIJ",
       "ABCDEFGHIJ");
 
-  tickit_term_scrollrect(tt, 1,5,1,5, 0,-3);
+  tickit_term_scrollrect(tt, RECT(1,5,1,5), 0,-3);
   is_termlog("Termlog after scroll left",
       SCROLLRECT(1,5,1,5, 0,-3),
       NULL);

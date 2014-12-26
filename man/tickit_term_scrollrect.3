@@ -5,7 +5,7 @@ tickit_term_scrollrect \- scroll a region of the terminal
 .nf
 .B #include <tickit.h>
 .sp
-.BI "bool tickit_term_scrollrect(TickitTerm *" tt ", int " top ", int " left ", int " lines ", int " cols ",
+.BI "bool tickit_term_scrollrect(TickitTerm *" tt ", TickitRect " rect ",
 .BI "    int " downward ", int " rightward );
 .fi
 .sp
