@@ -909,6 +909,49 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
   tickit_renderbuffer_reset(rb);
 }
 
+void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
+{
+  for(int line = 0; line < src->lines; line++) {
+    for(int col = 0; col < src->cols; /**/) {
+      RBCell *cell = &src->cells[line][col];
+
+      switch(cell->state) {
+        case SKIP:
+          break;
+        case TEXT:
+          {
+            TickitStringPos start, end, limit;
+            char *text = src->texts[cell->v.text.idx];
+
+            tickit_stringpos_limit_columns(&limit, cell->v.text.offs);
+            tickit_string_count(text, &start, &limit);
+
+            limit.columns += cell->cols;
+            end = start;
+            tickit_string_countmore(text, &end, &limit);
+
+            tickit_renderbuffer_textn_at(dst, line, col, text + start.bytes, end.bytes - start.bytes, cell->pen);
+          }
+          break;
+        case ERASE:
+          tickit_renderbuffer_erase_at(dst, line, col, cell->cols, cell->pen);
+          break;
+        case LINE:
+          linecell(dst, line, col, cell->v.line.mask, cell->pen);
+          break;
+        case CHAR:
+          tickit_renderbuffer_char_at(dst, line, col, cell->v.chr.codepoint, cell->pen);
+          break;
+        case CONT:
+          /* unreachable */
+          abort();
+      }
+
+      col += cell->cols;
+    }
+  }
+}
+
 static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
 {
   int cols = 1;

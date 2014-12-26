@@ -47,6 +47,8 @@ The virtual cursor position can be set using \fBtickit_renderbuffer_goto\fP(3) a
 .PP
 The auxilliary state can be saved to the state stack using \fBtickit_renderbuffer_save\fP(3) and later restored using \fBtickit_renderbuffer_restore\fP(3). A stack state consisting of just the pen with no other state can be saved using \fBtickit_renderbuffer_savepen\fP(3).
 .PP
+The stored content of a buffer can be copied to another buffer using \fBtickit_renderbuffer_blit\fP(3). This is useful for allowing a window to maintain a backing buffer that can be drawn to at any time and then copied to a destination buffer for display.
+.PP
 The stored content can be flushed to a \fBTickitTerm\fP instance using \fBtickit_renderbuffer_flush_to_term\fP(3).
 .SH "DRAWING OPERATIONS"
 The following functions all affect the stored content within the buffer, taking into account the clipping, translation, masking, stored pen, and optionally the virtual cursor position.

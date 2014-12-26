@@ -394,6 +394,8 @@ void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int end
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt);
 
+void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src);
+
 // This API is still somewhat experimental
 
 typedef struct {
