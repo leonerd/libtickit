@@ -179,6 +179,8 @@ void tickit_term_free(TickitTerm *tt)
     (*tt->driver->vtable->destroy)(tt->driver);
   }
 
+  tickit_term_flush(tt);
+
   if(tt->termkey)
     termkey_destroy(tt->termkey);
 
