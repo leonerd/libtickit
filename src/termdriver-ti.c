@@ -267,7 +267,7 @@ static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
   if(td->cap.bce && !tickit_pen_get_bool_attr(tickit_termdrv_current_pen(ttd), TICKIT_PEN_REVERSE)) {
     run_ti(ttd, td->str.ech, 1, count);
 
-    if(moveend == TICKIT_MOVE_YES)
+    if(moveend == TICKIT_YES)
       move_rel(ttd, 0, count);
   }
   else {
@@ -281,7 +281,7 @@ static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
     }
     tickit_termdrv_write_str(ttd, spaces, count);
 
-    if(moveend == TICKIT_MOVE_NO)
+    if(moveend == TICKIT_NO)
       move_rel(ttd, 0, -count);
   }
 }
@@ -323,75 +323,75 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
     run_ti(ttd, td->str.sgr_bg, 1, c);
 }
 
-static int getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
+static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       *value = td->mode.altscreen;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORVIS:
       *value = td->mode.cursorvis;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_MOUSE:
       *value = td->mode.mouse;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_COLORS:
       *value = td->cap.colours;
-      return 1;
+      return true;
 
     default:
-      return 0;
+      return false;
   }
 }
 
-static int setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
+static bool setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       if(!td->extra->enter_altscreen_mode)
-        return 0;
+        return false;
 
       if(!td->mode.altscreen == !value)
-        return 1;
+        return true;
 
       tickit_termdrv_write_str(ttd, value ? td->extra->enter_altscreen_mode : td->extra->exit_altscreen_mode, 0);
       td->mode.altscreen = !!value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_CURSORVIS:
       if(!td->mode.cursorvis == !value)
-        return 1;
+        return true;
 
       run_ti(ttd, value ? td->str.sm_csr : td->str.rm_csr, 0);
       td->mode.cursorvis = !!value;
-      return 1;
+      return true;
 
     case TICKIT_TERMCTL_MOUSE:
       if(!td->extra->enter_mouse_mode)
-        return 0;
+        return false;
 
       if(!td->mode.mouse == !value)
-        return 1;
+        return true;
 
       tickit_termdrv_write_str(ttd, value ? td->extra->enter_mouse_mode : td->extra->exit_mouse_mode, 0);
       td->mode.mouse = !!value;
-      return 1;
+      return true;
 
     default:
-      return 0;
+      return false;
   }
 }
 
-static int setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value)
+static bool setctl_str(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value)
 {
-  return 0;
+  return false;
 }
 
 static void attach(TickitTermDriver *ttd, TickitTerm *tt)
