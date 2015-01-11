@@ -11,26 +11,26 @@ endif
 override CFLAGS +=-Wall -Iinclude -Isrc -std=c99
 
 ifeq ($(DEBUG),1)
-  CFLAGS +=-ggdb -DDEBUG
+  override CFLAGS +=-ggdb -DDEBUG
 endif
 
 ifeq ($(PROFILE),1)
-  CFLAGS +=-pg
-  LDFLAGS+=-pg
+  override CFLAGS +=-pg
+  override LDFLAGS+=-pg
 endif
 
 ifeq ($(shell pkg-config --atleast-version=1.1.0 unibilium && echo 1),1)
-  CFLAGS +=$(shell pkg-config --cflags unibilium) -DHAVE_UNIBILIUM
-  LDFLAGS+=$(shell pkg-config --libs   unibilium)
+  override CFLAGS +=$(shell pkg-config --cflags unibilium) -DHAVE_UNIBILIUM
+  override LDFLAGS+=$(shell pkg-config --libs   unibilium)
 else ifeq ($(shell pkg-config ncursesw && echo 1),1)
-  CFLAGS +=$(shell pkg-config --cflags ncursesw)
-  LDFLAGS+=$(shell pkg-config --libs   ncursesw)
+  override CFLAGS +=$(shell pkg-config --cflags ncursesw)
+  override LDFLAGS+=$(shell pkg-config --libs   ncursesw)
 else
-  LDFLAGS+=-lncurses
+  override LDFLAGS+=-lncurses
 endif
 
-CFLAGS +=$(shell pkg-config --cflags termkey)
-LDFLAGS+=$(shell pkg-config --libs   termkey)
+override CFLAGS +=$(shell pkg-config --cflags termkey)
+override LDFLAGS+=$(shell pkg-config --libs   termkey)
 
 CFILES=$(wildcard src/*.c)
 HFILES=$(wildcard include/*.h)
