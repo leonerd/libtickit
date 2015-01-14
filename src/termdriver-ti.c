@@ -110,6 +110,7 @@ struct TIDriver {
 
     // Formatting
     const char *sgr;    // Select Graphic Rendition
+    const char *sgr_i0, *sgr_i1; // SGR italic off/on
     const char *sgr_fg; // SGR foreground colour
     const char *sgr_bg; // SGR background colour
 
@@ -313,6 +314,13 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       0, // protect
       0); // alt charset
 
+  if(tickit_pen_has_attr(delta, TICKIT_PEN_ITALIC)) {
+    if(td->str.sgr_i1 && tickit_pen_get_bool_attr(delta, TICKIT_PEN_ITALIC))
+      run_ti(ttd, td->str.sgr_i1, 0);
+    else if(td->str.sgr_i0)
+      run_ti(ttd, td->str.sgr_i0, 0);
+  }
+
   int c;
   if((c = tickit_pen_get_colour_attr(final, TICKIT_PEN_FG)) > -1 &&
       c < td->cap.colours)
@@ -486,6 +494,8 @@ static TickitTermDriver *new(const char *termtype)
   td->str.ed2    = require_ti_string(ut, termtype, unibi_clear_screen, "ed2");
   td->str.stbm   = require_ti_string(ut, termtype, unibi_change_scroll_region, "stbm");
   td->str.sgr    = require_ti_string(ut, termtype, unibi_set_attributes, "sgr");
+  td->str.sgr_i0 = lookup_ti_string(ut, termtype, unibi_exit_italics_mode);
+  td->str.sgr_i1 = lookup_ti_string(ut, termtype, unibi_enter_italics_mode);
   td->str.sgr_fg = require_ti_string(ut, termtype, unibi_set_a_foreground, "sgr_fg");
   td->str.sgr_bg = require_ti_string(ut, termtype, unibi_set_a_background, "sgr_bg");
 
