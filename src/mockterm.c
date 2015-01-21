@@ -135,7 +135,7 @@ static void mtd_destroy(TickitTermDriver *ttd)
   free(mtd);
 }
 
-static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
+static bool mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -197,6 +197,8 @@ static void mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
   }
 
   mtd->col = pos.columns;
+
+  return true;
 }
 
 static bool mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
@@ -217,11 +219,13 @@ static bool mtd_goto_abs(TickitTermDriver *ttd, int line, int col)
   return true;
 }
 
-static void mtd_move_rel(TickitTermDriver *ttd, int downward, int rightward)
+static bool mtd_move_rel(TickitTermDriver *ttd, int downward, int rightward)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
   mtd_goto_abs(ttd, mtd->line + downward, mtd->col + rightward);
+
+  return true;
 }
 
 static bool mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
@@ -329,7 +333,7 @@ static bool mtd_scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int do
   return false;
 }
 
-static void mtd_erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
+static bool mtd_erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -345,9 +349,11 @@ static void mtd_erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveen
 
   if(moveend != TICKIT_NO)
     mtd->col = right;
+
+  return true;
 }
 
-static void mtd_clear(TickitTermDriver *ttd)
+static bool mtd_clear(TickitTermDriver *ttd)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -356,9 +362,11 @@ static void mtd_clear(TickitTermDriver *ttd)
 
   for(int line = 0; line < mtd->lines; line++)
     mtd_clear_cells(mtd, line, 0, mtd->cols);
+
+  return true;
 }
 
-static void mtd_chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
+static bool mtd_chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
 {
   MockTermDriver *mtd = (MockTermDriver *)ttd;
 
@@ -368,6 +376,8 @@ static void mtd_chpen(TickitTermDriver *ttd, const TickitPen *delta, const Ticki
 
   tickit_pen_clear(mtd->pen);
   tickit_pen_copy(mtd->pen, final, 1);
+
+  return true;
 }
 
 static bool mtd_getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)

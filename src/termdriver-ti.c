@@ -121,9 +121,10 @@ struct TIDriver {
   const struct TermInfoExtraStrings *extra;
 };
 
-static void print(TickitTermDriver *ttd, const char *str, size_t len)
+static bool print(TickitTermDriver *ttd, const char *str, size_t len)
 {
   tickit_termdrv_write_str(ttd, str, len);
+  return true;
 }
 
 static void run_ti(TickitTermDriver *ttd, const char *str, int n_params, ...)
@@ -184,7 +185,7 @@ static bool goto_abs(TickitTermDriver *ttd, int line, int col)
   return true;
 }
 
-static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
+static bool move_rel(TickitTermDriver *ttd, int downward, int rightward)
 {
   struct TIDriver *td = (struct TIDriver*)ttd;
 
@@ -205,6 +206,8 @@ static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
     run_ti(ttd, td->str.cuf, 1, rightward);
   else if(rightward < 0)
     run_ti(ttd, td->str.cub, 1, -rightward);
+
+  return true;
 }
 
 static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
@@ -255,12 +258,12 @@ static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwa
   return false;
 }
 
-static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
+static bool erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
   if(count < 1)
-    return;
+    return true;
 
   /* Even if the terminal can do bce, only use ECH if we're not in
    * reverse-video mode. Most terminals don't do rv+ECH properly
@@ -285,16 +288,20 @@ static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
     if(moveend == TICKIT_NO)
       move_rel(ttd, 0, -count);
   }
+
+  return true;
 }
 
-static void clear(TickitTermDriver *ttd)
+static bool clear(TickitTermDriver *ttd)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
   run_ti(ttd, td->str.ed2, 0);
+
+  return true;
 }
 
-static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
+static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
@@ -329,6 +336,8 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   if((c = tickit_pen_get_colour_attr(final, TICKIT_PEN_BG)) > -1 &&
       c < td->cap.colours)
     run_ti(ttd, td->str.sgr_bg, 1, c);
+
+  return true;
 }
 
 static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)

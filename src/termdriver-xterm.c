@@ -34,9 +34,10 @@ struct XTermDriver {
   } initialised;
 };
 
-static void print(TickitTermDriver *ttd, const char *str, size_t len)
+static bool print(TickitTermDriver *ttd, const char *str, size_t len)
 {
   tickit_termdrv_write_str(ttd, str, len);
+  return true;
 }
 
 static bool goto_abs(TickitTermDriver *ttd, int line, int col)
@@ -55,7 +56,7 @@ static bool goto_abs(TickitTermDriver *ttd, int line, int col)
   return true;
 }
 
-static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
+static bool move_rel(TickitTermDriver *ttd, int downward, int rightward)
 {
   if(downward > 1)
     tickit_termdrv_write_strf(ttd, "\e[%dB", downward);
@@ -74,6 +75,8 @@ static void move_rel(TickitTermDriver *ttd, int downward, int rightward)
     tickit_termdrv_write_str(ttd, "\e[D", 3);
   else if(rightward < -1)
     tickit_termdrv_write_strf(ttd, "\e[%dD", -rightward);
+
+  return true;
 }
 
 static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downward, int rightward)
@@ -152,10 +155,10 @@ static bool scrollrect(TickitTermDriver *ttd, const TickitRect *rect, int downwa
   return false;
 }
 
-static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
+static bool erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
 {
   if(count < 1)
-    return;
+    return true;
 
   /* Only use ECH if we're not in reverse-video mode. xterm doesn't do rv+ECH
    * properly
@@ -183,11 +186,14 @@ static void erasech(TickitTermDriver *ttd, int count, TickitMaybeBool moveend)
     if(moveend == TICKIT_NO)
       move_rel(ttd, 0, -count);
   }
+
+  return true;
 }
 
-static void clear(TickitTermDriver *ttd)
+static bool clear(TickitTermDriver *ttd)
 {
   tickit_termdrv_write_strf(ttd, "\e[2J", 4);
+  return true;
 }
 
 static struct SgrOnOff { int on, off; } sgr_onoff[] = {
@@ -202,7 +208,7 @@ static struct SgrOnOff { int on, off; } sgr_onoff[] = {
   {  5, 25 }, /* blink */
 };
 
-static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
+static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
 {
   /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
    * 6 single attributes
@@ -259,7 +265,7 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   }
 
   if(pindex == 0)
-    return;
+    return true;
 
   /* If we're going to clear all the attributes then empty SGR is neater */
   if(!tickit_pen_is_nondefault(final))
@@ -285,6 +291,8 @@ static void chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   sprintf(s, "m");
 
   tickit_termdrv_write_str(ttd, buffer, len);
+
+  return true;
 }
 
 static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
