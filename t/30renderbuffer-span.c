@@ -80,6 +80,12 @@ int main(int argc, char *argv[])
         NULL);
   }
 
+  // Error conditions
+  {
+    is_int(tickit_renderbuffer_text_at(rb, 0, 0, "foo\nbar", NULL), -1,
+        "text_at() returns -1");
+  }
+
   // Span splitting
   {
     TickitPen *b_pen = tickit_pen_new_attrs(TICKIT_PEN_BOLD, 1, -1);

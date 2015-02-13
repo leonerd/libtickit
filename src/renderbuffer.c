@@ -600,6 +600,8 @@ int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char
 
   TickitStringPos endpos;
   len = tickit_string_ncount(text, len, &endpos, NULL);
+  if(1 + len == 0)
+    return -1;
 
   int cols = endpos.columns;
   int ret = cols;
