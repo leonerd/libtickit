@@ -110,6 +110,7 @@ struct TIDriver {
 
     // Formatting
     const char *sgr;    // Select Graphic Rendition
+    const char *sgr0;   // Exit Attribute Mode
     const char *sgr_i0, *sgr_i1; // SGR italic off/on
     const char *sgr_fg; // SGR foreground colour
     const char *sgr_bg; // SGR background colour
@@ -434,6 +435,8 @@ static void stop(TickitTermDriver *ttd)
     setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
   if(td->mode.altscreen)
     setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
+
+  run_ti(ttd, td->str.sgr0, 0);
 }
 
 static void destroy(TickitTermDriver *ttd)
@@ -503,6 +506,7 @@ static TickitTermDriver *new(const char *termtype)
   td->str.ed2    = require_ti_string(ut, termtype, unibi_clear_screen, "ed2");
   td->str.stbm   = require_ti_string(ut, termtype, unibi_change_scroll_region, "stbm");
   td->str.sgr    = require_ti_string(ut, termtype, unibi_set_attributes, "sgr");
+  td->str.sgr0   = require_ti_string(ut, termtype, unibi_exit_attribute_mode, "sgr0");
   td->str.sgr_i0 = lookup_ti_string(ut, termtype, unibi_exit_italics_mode);
   td->str.sgr_i1 = lookup_ti_string(ut, termtype, unibi_enter_italics_mode);
   td->str.sgr_fg = require_ti_string(ut, termtype, unibi_set_a_foreground, "sgr_fg");

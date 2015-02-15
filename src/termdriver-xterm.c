@@ -555,6 +555,9 @@ static void stop(TickitTermDriver *ttd)
     setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
   if(xd->mode.keypad)
     setctl_int(ttd, TICKIT_TERMCTL_KEYPAD_APP, 0);
+
+  // Reset pen
+  tickit_termdrv_write_str(ttd, "\e[m", 3);
 }
 
 static void destroy(TickitTermDriver *ttd)

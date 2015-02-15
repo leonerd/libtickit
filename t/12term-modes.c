@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
   ok(1, "tickit_term_destroy");
 
-  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l", "buffer after termkey_term_destroy resets modes");
+  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after termkey_term_destroy resets modes");
 
   return exit_status();
 }
