@@ -240,7 +240,7 @@ void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
     tt->lines = lines;
     tt->cols  = cols;
 
-    TickitEvent args = { .lines = lines, .cols = cols };
+    TickitEventInfo args = { .lines = lines, .cols = cols };
     run_events(tt, TICKIT_EV_RESIZE, &args);
   }
 }
@@ -402,7 +402,7 @@ void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout)
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 {
-  TickitEvent args;
+  TickitEventInfo args;
 
   if(tt->driver->vtable->gotkey &&
      (*tt->driver->vtable->gotkey)(tt->driver, tk, key))

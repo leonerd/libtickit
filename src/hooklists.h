@@ -2,9 +2,9 @@
 
 struct TickitEventHook;
 
-typedef void TickitEventFn(void *owner, TickitEventType ev, TickitEvent *args, void *data);
+typedef void TickitEventFn(void *owner, TickitEventType ev, TickitEventInfo *args, void *data);
 
-void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, TickitEvent *args);
+void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, TickitEventInfo *args);
 
 int  tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, TickitEventType ev, TickitEventFn *fn, void *data);
 void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *owner, int id);
@@ -25,7 +25,7 @@ void tickit_hooklist_unbind_and_destroy(struct TickitEventHook *hooks, void *own
   }                                                                    \
                                                                        \
   static void run_events(OWNER *owner, TickitEventType ev,             \
-      TickitEvent *args)                                               \
+      TickitEventInfo *args)                                           \
   {                                                                    \
     tickit_hooklist_run_event(owner->hooks, owner, ev, args);          \
   }

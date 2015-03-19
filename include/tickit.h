@@ -13,7 +13,7 @@ extern "C" {
 #include <sys/time.h>
 
 typedef enum TickitEventType TickitEventType;
-typedef struct TickitEvent TickitEvent;
+typedef struct TickitEventInfo TickitEventInfo;
 
 /* a tri-state yes/no/don't-know type */
 
@@ -78,7 +78,7 @@ bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b);
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr);
 void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite);
 
-typedef void TickitPenEventFn(TickitPen *tt, TickitEventType ev, TickitEvent *args, void *data);
+typedef void TickitPenEventFn(TickitPen *tt, TickitEventType ev, TickitEventInfo *args, void *data);
 
 int  tickit_pen_bind_event(TickitPen *tt, TickitEventType ev, TickitPenEventFn *fn, void *data);
 void tickit_pen_unbind_event_id(TickitPen *tt, int id);
@@ -181,7 +181,7 @@ void tickit_term_get_size(const TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
 void tickit_term_refresh_size(TickitTerm *tt);
 
-typedef void TickitTermEventFn(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data);
+typedef void TickitTermEventFn(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data);
 
 int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *data);
 void tickit_term_unbind_event_id(TickitTerm *tt, int id);
@@ -419,13 +419,19 @@ enum {
   TICKIT_MOD_CTRL  = 0x04,
 };
 
-struct TickitEvent {
-  int         lines, cols; // RESIZE
+struct TickitEventInfo {
   int         type;        // KEY, MOUSE
   const char *str;         // KEY
   int         button;      // MOUSE
-  int         line, col;   // MOUSE
   int         mod;         // KEY, MOUSE
+  union {
+    struct {
+      int lines, cols;     // RESIZE
+    };
+    struct {
+      int line, col;       // MOUSE
+    };
+  };
 };
 
 #endif

@@ -10,7 +10,7 @@ struct TickitEventHook {
   int                     id;
 };
 
-void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, TickitEvent *args)
+void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, TickitEventInfo *args)
 {
   for(struct TickitEventHook *hook = hooks; hook; hook = hook->next)
     if(hook->ev & ev)

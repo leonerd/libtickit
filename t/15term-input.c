@@ -10,7 +10,7 @@ TickitKeyEventType keytype;
 char               keystr[16];
 int                keymod;
 
-void on_key(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
+void on_key(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   keytype = args->type;
   strncpy(keystr, args->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
@@ -21,7 +21,7 @@ TickitMouseEventType mousetype;
 int mousebutton, mouseline, mousecol;
 int mousemod;
 
-void on_mouse(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
+void on_mouse(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   mousetype   = args->type;
   mousebutton = args->button;

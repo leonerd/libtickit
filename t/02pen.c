@@ -3,7 +3,7 @@
 
 static int changed = 0;
 
-void on_changed(TickitPen *pen, TickitEventType ev, TickitEvent *args, void *data)
+void on_changed(TickitPen *pen, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   changed++;
 }
