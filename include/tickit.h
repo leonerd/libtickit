@@ -12,6 +12,9 @@ extern "C" {
 
 #include <sys/time.h>
 
+typedef enum TickitEventType TickitEventType;
+typedef struct TickitEvent TickitEvent;
+
 /* a tri-state yes/no/don't-know type */
 
 typedef enum {
@@ -19,52 +22,6 @@ typedef enum {
   TICKIT_YES   =  1,
   TICKIT_MAYBE = -1,
 } TickitMaybeBool;
-
-/*
- * Tickit events
- */
-
-/* bitmasks */
-typedef enum {
-  TICKIT_EV_RESIZE = 0x01, // Term = lines, cols
-  TICKIT_EV_KEY    = 0x02, // Term = type(TickitKeyEventType), str
-  TICKIT_EV_MOUSE  = 0x04, // Term = type(TickitMouseEventType), button, line, col
-  TICKIT_EV_CHANGE = 0x08, // Pen = {none}
-
-  TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
-} TickitEventType;
-
-typedef enum {
-  TICKIT_KEYEV_KEY = 1,
-  TICKIT_KEYEV_TEXT,
-} TickitKeyEventType;
-
-typedef enum {
-  TICKIT_MOUSEEV_PRESS = 1,
-  TICKIT_MOUSEEV_DRAG,
-  TICKIT_MOUSEEV_RELEASE,
-  TICKIT_MOUSEEV_WHEEL,
-} TickitMouseEventType;
-
-enum {
-  TICKIT_MOUSEWHEEL_UP = 1,
-  TICKIT_MOUSEWHEEL_DOWN,
-};
-
-enum {
-  TICKIT_MOD_SHIFT = 0x01,
-  TICKIT_MOD_ALT   = 0x02,
-  TICKIT_MOD_CTRL  = 0x04,
-};
-
-typedef struct {
-  int         lines, cols; // RESIZE
-  int         type;        // KEY, MOUSE
-  const char *str;         // KEY
-  int         button;      // MOUSE
-  int         line, col;   // MOUSE
-  int         mod;         // KEY, MOUSE
-} TickitEvent;
 
 /*
  * TickitPen
@@ -149,6 +106,8 @@ static inline int tickit_rect_bottom(const TickitRect *rect)
 
 static inline int tickit_rect_right (const TickitRect *rect)
 { return rect->left + rect->cols; }
+
+void tickit_rect_translate(TickitRect *rect, int downward, int rightward);
 
 bool tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b);
 
@@ -422,6 +381,52 @@ struct TickitRenderBufferSpanInfo {
 
 // returns the text length or -1 on error
 size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *buffer, size_t len);
+
+/*
+ * Tickit events
+ */
+
+/* bitmasks */
+enum TickitEventType {
+  TICKIT_EV_RESIZE     = 0x01, // Term = lines, cols
+  TICKIT_EV_KEY        = 0x02, // Term = type(TickitKeyEventType), str
+  TICKIT_EV_MOUSE      = 0x04, // Term = type(TickitMouseEventType), button, line, col
+  TICKIT_EV_CHANGE     = 0x08, // Pen = {none}
+
+  TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
+};
+
+typedef enum {
+  TICKIT_KEYEV_KEY = 1,
+  TICKIT_KEYEV_TEXT,
+} TickitKeyEventType;
+
+typedef enum {
+  TICKIT_MOUSEEV_PRESS = 1,
+  TICKIT_MOUSEEV_DRAG,
+  TICKIT_MOUSEEV_RELEASE,
+  TICKIT_MOUSEEV_WHEEL,
+} TickitMouseEventType;
+
+enum {
+  TICKIT_MOUSEWHEEL_UP = 1,
+  TICKIT_MOUSEWHEEL_DOWN,
+};
+
+enum {
+  TICKIT_MOD_SHIFT = 0x01,
+  TICKIT_MOD_ALT   = 0x02,
+  TICKIT_MOD_CTRL  = 0x04,
+};
+
+struct TickitEvent {
+  int         lines, cols; // RESIZE
+  int         type;        // KEY, MOUSE
+  const char *str;         // KEY
+  int         button;      // MOUSE
+  int         line, col;   // MOUSE
+  int         mod;         // KEY, MOUSE
+};
 
 #endif
 
