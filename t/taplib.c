@@ -56,6 +56,16 @@ void is_int(int got, int expect, char *name)
   }
 }
 
+void is_ptr(void *got, void *expect, char *name)
+{
+  if(got == expect)
+    ok(1, name);
+  else {
+    ok(0, name);
+    diag("got %p expected %p", got, expect);
+  }
+}
+
 void is_str(const char *got, const char *expect, char *name)
 {
   if(strcmp(got, expect) == 0)
