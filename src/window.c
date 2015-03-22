@@ -197,6 +197,8 @@ TickitWindow *tickit_window_root(const TickitWindow *win)
 
 void tickit_window_destroy(TickitWindow *win)
 {
+  tickit_hooklist_unbind_and_destroy(win->hooks, win);
+
   win->pen = NULL;
 
   for(TickitWindow *child = win->first_child; child; child = child->next)
