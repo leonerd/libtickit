@@ -383,6 +383,12 @@ struct TickitRenderBufferSpanInfo {
 size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startcol, struct TickitRenderBufferSpanInfo *info, char *buffer, size_t len);
 
 /*
+ * Window
+ */
+
+typedef struct TickitWindow TickitWindow;
+
+/*
  * Tickit events
  */
 
@@ -392,6 +398,9 @@ enum TickitEventType {
   TICKIT_EV_KEY        = 0x02, // Term = type(TickitKeyEventType), str
   TICKIT_EV_MOUSE      = 0x04, // Term = type(TickitMouseEventType), button, line, col
   TICKIT_EV_CHANGE     = 0x08, // Pen = {none}
+  TICKIT_EV_GEOMCHANGE = 0x10, // Win = rect
+  TICKIT_EV_EXPOSE     = 0x20, // Win = rect, rb
+  TICKIT_EV_FOCUS      = 0x40, // Win = type(TickitFocusEventType)
 
   TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
 };
@@ -420,17 +429,22 @@ enum {
 };
 
 struct TickitEventInfo {
-  int         type;        // KEY, MOUSE
-  const char *str;         // KEY
-  int         button;      // MOUSE
-  int         mod;         // KEY, MOUSE
+  int         type;         // KEY, MOUSE
+  int         button;       // MOUSE
+  int         mod;          // KEY, MOUSE
   union {
     struct {
-      int lines, cols;     // RESIZE
+      int lines, cols;      // RESIZE
     };
     struct {
-      int line, col;       // MOUSE
+      int line, col;        // MOUSE
     };
+    TickitRect rect;        // GEOMCHANGE, EXPOSE
+  };
+  union {
+    const char *str;        // KEY
+    TickitRenderBuffer *rb; // EXPOSE
+    TickitWindow *win;      // FOCUS
   };
 };
 
