@@ -91,6 +91,13 @@ int main(int argc, char *argv[])
   is_int(tickit_rect_bottom(&rect1),  9, "tickit_rect_bottom(rect1) from init_bounded");
   is_int(tickit_rect_right(&rect1),  22, "tickit_rect_right(rect1) from init_bounded");
 
+  tickit_rect_translate(&rect1, 2, 4);
+
+  is_int(rect1.top,    5, "rect1.top after translate");
+  is_int(rect1.left,  12, "rect1.left after translate");
+  is_int(rect1.lines,  6, "rect1.lines after translate");
+  is_int(rect1.cols,  14, "rect1.cols after translate");
+
   // Rectangle addition
   TickitRect rects[4];
   int n_rects;

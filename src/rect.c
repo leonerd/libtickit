@@ -19,6 +19,12 @@ void tickit_rect_init_bounded(TickitRect *rect, int top, int left, int bottom, i
   rect->cols  = right - left;
 }
 
+void tickit_rect_translate(TickitRect *rect, int downward, int rightward)
+{
+  rect->top += downward;
+  rect->left += rightward;
+}
+
 bool tickit_rect_intersect(TickitRect *dst, const TickitRect *a, const TickitRect *b)
 {
   int top    = maxint(a->top, b->top);
