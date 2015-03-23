@@ -9,10 +9,12 @@
 TickitKeyEventType keytype;
 char               keystr[16];
 
-void on_key(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_key(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   keytype = args->type;
   strncpy(keystr, args->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
+
+  return 1;
 }
 
 int main(int argc, char *argv[])

@@ -30,7 +30,7 @@ void tickit_window_tick(TickitWindow *win);
 
 /* Event hooks */
 
-typedef void TickitWindowEventFn(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data);
+typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data);
 
 int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitWindowEventFn *fn, void *data);
 void tickit_window_unbind_event_id(TickitWindow *win, int id);

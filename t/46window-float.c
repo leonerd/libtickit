@@ -3,7 +3,7 @@
 #include "taplib.h"
 #include "taplib-mockterm.h"
 
-void on_expose_fillchr(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_fillchr(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   for(int line = args->rect.top; line < args->rect.top + args->rect.lines; line++) {
     char buffer[80];
@@ -12,11 +12,14 @@ void on_expose_fillchr(TickitWindow *win, TickitEventType ev, TickitEventInfo *a
     buffer[args->rect.cols] = 0;
     tickit_renderbuffer_text_at(args->rb, line, args->rect.left, buffer, NULL);
   }
+
+  return 1;
 }
 
-void on_expose_textat(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_textat(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   tickit_renderbuffer_text_at(args->rb, 0, 0, data, NULL);
+  return 1;
 }
 
 int main(int argc, char *argv[])

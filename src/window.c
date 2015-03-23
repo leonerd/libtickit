@@ -72,10 +72,11 @@ static void _request_hierarchy_change(HierarchyChangeType, TickitWindow *);
 static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *parent, TickitWindow *win);
 static void _purge_hierarchy_changes(TickitWindow *win);
 
-static void on_term_resize(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, void *data)
+static int on_term_resize(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   TickitRootWindow *root = data;
   tickit_window_resize(ROOT_AS_WINDOW(root), args->lines, args->cols);
+  return 1;
 }
 
 static void init_window(TickitWindow *win, TickitWindow *parent, int top, int left, int lines, int cols)

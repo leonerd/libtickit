@@ -31,23 +31,25 @@ void is_rect(TickitRect a, TickitRect b, char *name)
   pass(name);
 }
 
-void on_expose_incr(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_incr(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   (*(int *)data)++;
+  return 1;
 }
 
 static int next_rect = 0;
 static TickitRect exposed_rects[16];
 
-void on_expose_pushrect(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_pushrect(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   if(next_rect >= sizeof(exposed_rects)/sizeof(exposed_rects[0]))
-    return;
+    return 0;
 
   exposed_rects[next_rect++] = args->rect;
+  return 1;
 }
 
-void on_expose_render_text(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_render_text(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   TickitRenderBuffer *rb = args->rb;
 
@@ -55,7 +57,7 @@ void on_expose_render_text(TickitWindow *win, TickitEventType ev, TickitEventInf
     case 1:
       tickit_renderbuffer_text_at(rb, 1, 1, "The text", NULL);
       tickit_renderbuffer_erase_at(rb, 2, 2, 4, NULL);
-      return;
+      break;
 
     case 2:
       for(int line = args->rect.top; line < args->rect.top + args->rect.lines; line++) {
@@ -63,20 +65,22 @@ void on_expose_render_text(TickitWindow *win, TickitEventType ev, TickitEventInf
         sprintf(buffer, "Line %d", line);
         tickit_renderbuffer_text_at(rb, line, 0, buffer, NULL);
       }
-      return;
+      break;
 
     case 3: // parent
       tickit_renderbuffer_text_at(rb, 0,  0, "Parent", NULL);
       tickit_renderbuffer_text_at(rb, 0, 14, "Parent", NULL);
-      return;
+      break;
 
     case 4: // child
       tickit_renderbuffer_text_at(rb, 0, 0, "Child", NULL);
-      return;
+      break;
   }
+
+  return 1;
 }
 
-void on_expose_fillX(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_fillX(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   for(int line = args->rect.top; line < args->rect.top + args->rect.lines; line++) {
     char buffer[80];
@@ -85,11 +89,14 @@ void on_expose_fillX(TickitWindow *win, TickitEventType ev, TickitEventInfo *arg
     buffer[args->rect.cols] = 0;
     tickit_renderbuffer_text_at(args->rb, line, args->rect.left, buffer, NULL);
   }
+
+  return 1;
 }
 
-void on_expose_textat(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_textat(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   tickit_renderbuffer_text_at(args->rb, 0, 0, data, NULL);
+  return 1;
 }
 
 int main(int argc, char *argv[])

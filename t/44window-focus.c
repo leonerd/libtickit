@@ -3,9 +3,10 @@
 #include "taplib.h"
 #include "taplib-mockterm.h"
 
-static void on_focus(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_focus(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   *(int *)data = args->type == TICKIT_FOCUSEV_IN ? 1 : -1;
+  return 1;
 }
 
 int next_event = 0;
@@ -15,15 +16,17 @@ static struct {
   TickitWindow *focuswin;
 } focus_events[16];
 
-static void on_focus_push(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_focus_push(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   if(next_event > sizeof(focus_events)/sizeof(focus_events[0]))
-    return;
+    return 0;
 
   focus_events[next_event].type = args->type;
   focus_events[next_event].win = win;
   focus_events[next_event].focuswin = args->win;
   next_event++;
+
+  return 1;
 }
 
 int main(int argc, char *argv[])

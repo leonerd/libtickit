@@ -4,27 +4,30 @@
 int new_lines, new_cols;
 int unbound = 0;
 
-void on_resize(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_resize(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   if(ev == TICKIT_EV_UNBIND) {
     unbound = 1;
-    return;
+    return 1;
   }
 
   is_int(ev, TICKIT_EV_RESIZE, "ev type to on_resize()");
 
   new_lines = args->lines;
   new_cols  = args->cols;
+  return 1;
 }
 
 int new_lines2, new_cols2;
 
-void on_resize2(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_resize2(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   is_int(ev, TICKIT_EV_RESIZE, "ev type to on_resize2()");
 
   new_lines2 = args->lines;
   new_cols2  = args->cols;
+
+  return 1;
 }
 
 int main(int argc, char *argv[])
