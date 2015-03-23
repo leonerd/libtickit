@@ -428,7 +428,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 
     args.mod = key->modifiers;
 
-    run_events(tt, TICKIT_EV_MOUSE, &args);
+    run_events_whilefalse(tt, TICKIT_EV_MOUSE, &args);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
@@ -436,7 +436,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     args.str  = key->utf8;
     args.mod  = key->modifiers;
 
-    run_events(tt, TICKIT_EV_KEY, &args);
+    run_events_whilefalse(tt, TICKIT_EV_KEY, &args);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE ||
           key->type == TERMKEY_TYPE_FUNCTION ||
@@ -448,7 +448,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     args.str  = buffer;
     args.mod  = key->modifiers;
 
-    run_events(tt, TICKIT_EV_KEY, &args);
+    run_events_whilefalse(tt, TICKIT_EV_KEY, &args);
   }
 }
 

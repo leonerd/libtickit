@@ -10,12 +10,20 @@ TickitKeyEventType keytype;
 char               keystr[16];
 int                keymod;
 
+int on_key_return = 1;
+
 int on_key(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   keytype = args->type;
   strncpy(keystr, args->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
   keymod = args->mod;
 
+  return on_key_return;
+}
+
+int on_key_incr(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+{
+  (*(int *)data)++;
   return 1;
 }
 
@@ -124,6 +132,27 @@ int main(int argc, char *argv[])
   is_str(keystr,  "Escape",         "keystr after push_bytes completed Escape");
 
   is_int(tickit_term_input_check_timeout_msec(tt), -1, "term has no timeout after completed Escape");
+
+  {
+    int count = 0;
+    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, &on_key_incr, &count);
+
+    keytype = -1;
+    on_key_return = 1;
+    tickit_term_input_push_bytes(tt, "A", 1);
+
+    is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after push bytes with two events bound");
+    is_int(count, 0, "count of second event binding after first event with return 1");
+
+    keytype = -1;
+    on_key_return = 0;
+    tickit_term_input_push_bytes(tt, "A", 1);
+
+    is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after push bytes with two events bound the second time");
+    is_int(count, 1, "count of second event binding after first event with return 0");
+
+    tickit_term_unbind_event_id(tt, bind_id);
+  }
 
   tickit_term_destroy(tt);
 
