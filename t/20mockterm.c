@@ -51,6 +51,12 @@ static void fillterm(TickitTerm *tt)
   tickit_term_print(tt, "2222222222");
 }
 
+int on_event_get_type(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+{
+  *((int *)data) = args->type;
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   tt = make_term(3, 10);
@@ -217,6 +223,21 @@ int main(int argc, char *argv[])
       "ABCDEHIJ  ",
       "ABCDE   FG",
       "ABC     IJ");
+
+  {
+    int type = 0;
+    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_event_get_type, &type);
+
+    press_key(TICKIT_KEYEV_TEXT, "A", 0);
+    is_int(type, TICKIT_KEYEV_TEXT, "type is TICKIT_KEYEV_TEXT after press_key()");
+
+    type = 0;
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 2, 3, 0);
+    is_int(type, TICKIT_MOUSEEV_PRESS, "type is TICKIT_MOUSEEV_PRESS after press_mouse()");
+
+    tickit_term_unbind_event_id(tt, bind_id);
+  }
 
   return exit_status();
 }

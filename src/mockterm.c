@@ -597,3 +597,27 @@ void tickit_mockterm_get_position(TickitMockTerm *mt, int *line, int *col)
   if(col)
     *col = mtd->col;
 }
+
+void tickit_mockterm_press_key(TickitMockTerm *mt, int type, const char *str, int mod)
+{
+  TickitEventInfo info = {
+    .type = type,
+    .mod = mod,
+    .str = str,
+  };
+
+  tickit_termdrv_send_key(tickit_term_get_driver((TickitTerm *)mt), &info);
+}
+
+void tickit_mockterm_press_mouse(TickitMockTerm *mt, int type, int button, int line, int col, int mod)
+{
+  TickitEventInfo info = {
+    .type = type,
+    .button = button,
+    .line = line,
+    .col = col,
+    .mod = mod,
+  };
+
+  tickit_termdrv_send_mouse(tickit_term_get_driver((TickitTerm *)mt), &info);
+}

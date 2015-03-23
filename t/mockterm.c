@@ -120,3 +120,13 @@ void is_termlog(char *name, ...)
 failed:
   tickit_mockterm_clearlog(mt);
 }
+
+void press_key(int type, char *str, int mod)
+{
+  tickit_mockterm_press_key(mt, type, str, mod);
+}
+
+void press_mouse(int type, int button, int line, int col, int mod)
+{
+  tickit_mockterm_press_mouse(mt, type, button, line, col, mod);
+}
