@@ -452,6 +452,17 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
   }
 }
 
+/* Driver API */
+void tickit_termdrv_send_key(TickitTermDriver *ttd, TickitEventInfo *args)
+{
+  run_events_whilefalse(ttd->tt, TICKIT_EV_KEY, args);
+}
+
+void tickit_termdrv_send_mouse(TickitTermDriver *ttd, TickitEventInfo *args)
+{
+  run_events_whilefalse(ttd->tt, TICKIT_EV_MOUSE, args);
+}
+
 static void get_keys(TickitTerm *tt, TermKey *tk)
 {
   TermKeyResult res;

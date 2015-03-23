@@ -52,6 +52,11 @@ void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
   strncat(buffer, bytes, len);
 }
 
+int on_key(TickitTerm *tt, TickitEventType type, TickitEventInfo *args, void *data)
+{
+  *((int *)data) = args->type;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
@@ -73,6 +78,21 @@ int main(int argc, char *argv[])
   tickit_term_flush(tt);
 
   is_str(buffer, "PRINT(Hello)", "buffer after print");
+
+  {
+    int keytype = -1;
+    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, &on_key, &keytype);
+
+    TickitEventInfo info = {
+      .type = TICKIT_KEYEV_TEXT,
+      .mod = 0,
+      .str = "A",
+    };
+
+    tickit_termdrv_send_key(ttd, &info);
+
+    is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after got_key");
+  }
 
   return exit_status();
 }
