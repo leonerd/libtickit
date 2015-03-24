@@ -395,7 +395,7 @@ typedef struct TickitWindow TickitWindow;
 /* bitmasks */
 enum TickitEventType {
   TICKIT_EV_RESIZE     = 0x01, // Term = lines, cols
-  TICKIT_EV_KEY        = 0x02, // Term = type(TickitKeyEventType), str
+  TICKIT_EV_KEY        = 0x02, // Term,Win = type(TickitKeyEventType), str
   TICKIT_EV_MOUSE      = 0x04, // Term = type(TickitMouseEventType), button, line, col
   TICKIT_EV_CHANGE     = 0x08, // Pen = {none}
   TICKIT_EV_GEOMCHANGE = 0x10, // Win = rect

@@ -63,7 +63,7 @@ struct TickitRootWindow {
   bool needs_restore;
   bool needs_later_processing;
 
-  int resize_event_id;
+  int event_id;
 };
 
 static void _request_restore(TickitRootWindow *root);
@@ -71,11 +71,18 @@ static void _request_later_processing(TickitRootWindow *root);
 static void _request_hierarchy_change(HierarchyChangeType, TickitWindow *);
 static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *parent, TickitWindow *win);
 static void _purge_hierarchy_changes(TickitWindow *win);
+static int _handle_key(TickitWindow *win, TickitEventInfo *args);
 
-static int on_term_resize(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, void *data)
+static int on_term(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   TickitRootWindow *root = data;
-  tickit_window_resize(ROOT_AS_WINDOW(root), args->lines, args->cols);
+
+  if(ev & TICKIT_EV_RESIZE)
+    tickit_window_resize(ROOT_AS_WINDOW(root), args->lines, args->cols);
+
+  if(ev & TICKIT_EV_KEY)
+    _handle_key(ROOT_AS_WINDOW(root), args);
+
   return 1;
 }
 
@@ -136,7 +143,8 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
     return NULL;
   }
 
-  root->resize_event_id = tickit_term_bind_event(term, TICKIT_EV_RESIZE, &on_term_resize, root);
+  root->event_id = tickit_term_bind_event(term, TICKIT_EV_RESIZE|TICKIT_EV_KEY|TICKIT_EV_MOUSE,
+      &on_term, root);
 
   return ROOT_AS_WINDOW(root);
 }
@@ -217,7 +225,7 @@ void tickit_window_destroy(TickitWindow *win)
       tickit_rectset_destroy(root->damage);
     }
 
-    tickit_term_unbind_event_id(root->term, root->resize_event_id);
+    tickit_term_unbind_event_id(root->term, root->event_id);
   }
 
   free(win);
@@ -746,4 +754,32 @@ bool tickit_window_is_focused(TickitWindow *win)
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify)
 {
   win->focus_child_notify = notify;
+}
+
+static int _handle_key(TickitWindow *win, TickitEventInfo *args)
+{
+  if(!win->is_visible)
+    return 0;
+
+  if(win->first_child && win->first_child->steal_input)
+    if(_handle_key(win->first_child, args))
+      return 1;
+
+  if(win->focused_child)
+    if(_handle_key(win->focused_child, args))
+      return 1;
+
+  if(run_events_whilefalse(win, TICKIT_EV_KEY, args))
+    return 1;
+
+  // Last-ditch attempt to spread it around other children
+  for(TickitWindow *child = win->first_child; child; child = child->next) {
+    if(child == win->focused_child)
+      continue;
+
+    if(_handle_key(child, args))
+      return 1;
+  }
+
+  return 0;
 }
