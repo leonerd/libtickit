@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   tickit_window_tick(root);
 
   struct LastEvent win_last = { .ret = 1 };
-  int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY, &on_input_capture, &win_last);
+  int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_input_capture, &win_last);
 
   // Key events
   {
@@ -67,7 +67,20 @@ int main(int argc, char *argv[])
     is_int(win_last.mod,  TICKIT_MOD_CTRL,  "win_last.mod for C-a");
   }
 
-  // TODO: mouse events
+  // Mouse events
+  {
+    win_last.type = 0;
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 5, 15, 0);
+
+    is_int(win_last.type, TICKIT_MOUSEEV_PRESS, "win_last.type for press 1@15,5");
+    is_int(win_last.line, 2,                    "win_last.line for press 1@15,5");
+    is_int(win_last.col,  5,                    "win_last.col for press 1@15,5");
+
+    win_last.type = 0;
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 1, 2, 0);
+
+    is_int(win_last.type, 0, "win_last.type still 0 after press @1,2");
+  }
 
   TickitWindow *subwin = tickit_window_new_subwindow(win, 2, 2, 1, 10);
 
@@ -77,7 +90,7 @@ int main(int argc, char *argv[])
     tickit_window_tick(root);
 
     struct LastEvent subwin_last = { .ret = 1 };
-    int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY, &on_input_capture, &subwin_last);
+    int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_input_capture, &subwin_last);
 
     win_last.type = 0;
 
@@ -88,7 +101,13 @@ int main(int argc, char *argv[])
 
     is_int(win_last.type, 0, "win_last.type for B");
 
-    // TODO: mouse
+    subwin_last.type = 0;
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 5, 15, 0);
+
+    is_int(subwin_last.type, TICKIT_MOUSEEV_PRESS, "subwin_last.type for press 1@15,5");
+    is_int(subwin_last.line, 0,                    "subwin_last.line for press 1@15,5");
+    is_int(subwin_last.col,  3,                    "subwin_last.col for press 1@15,5");
 
     subwin_last.ret = 0;
 

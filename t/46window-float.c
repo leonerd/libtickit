@@ -72,7 +72,14 @@ int main(int argc, char *argv[])
 
     is_int(keyinfo.type, TICKIT_KEYEV_TEXT, "key type after press_key on popupwin");
 
-    // TODO: mouse events on popupwin
+    TickitEventInfo mouseinfo;
+    tickit_window_bind_event(popupwin, TICKIT_EV_MOUSE, &on_input_capture, &mouseinfo);
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 5, 12, 0);
+
+    is_int(mouseinfo.type, TICKIT_MOUSEEV_PRESS, "mouse type after press_mouse on popupwin");
+    is_int(mouseinfo.line,  -7, "mouse line after press_mouse on popupwin");
+    is_int(mouseinfo.col,  -10, "mouse column after press_mouse on popupwin");
 
     tickit_window_destroy(popupwin);
     tickit_window_destroy(win);

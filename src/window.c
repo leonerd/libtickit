@@ -72,6 +72,7 @@ static void _request_hierarchy_change(HierarchyChangeType, TickitWindow *);
 static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *parent, TickitWindow *win);
 static void _purge_hierarchy_changes(TickitWindow *win);
 static int _handle_key(TickitWindow *win, TickitEventInfo *args);
+static int _handle_mouse(TickitWindow *win, TickitEventInfo *args);
 
 static int on_term(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, void *data)
 {
@@ -82,6 +83,9 @@ static int on_term(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, 
 
   if(ev & TICKIT_EV_KEY)
     _handle_key(ROOT_AS_WINDOW(root), args);
+
+  if(ev & TICKIT_EV_MOUSE)
+    _handle_mouse(ROOT_AS_WINDOW(root), args);
 
   return 1;
 }
@@ -780,6 +784,36 @@ static int _handle_key(TickitWindow *win, TickitEventInfo *args)
     if(_handle_key(child, args))
       return 1;
   }
+
+  return 0;
+}
+
+static int _handle_mouse(TickitWindow *win, TickitEventInfo *args)
+{
+  if(!win->is_visible)
+    return 0;
+
+  for(TickitWindow *child = win->first_child; child; child = child->next) {
+    int child_line = args->line - child->rect.top;
+    int child_col  = args->col  - child->rect.left;
+
+    if(!child->steal_input) {
+      if(child_line < 0 || child_line >= child->rect.lines)
+        continue;
+      if(child_col < 0 || child_col >= child->rect.cols)
+        continue;
+    }
+
+    TickitEventInfo childargs = *args;
+    childargs.line = child_line;
+    childargs.col  = child_col;
+
+    if(_handle_mouse(child, &childargs))
+      return 1;
+  }
+
+  if(run_events_whilefalse(win, TICKIT_EV_MOUSE, args))
+    return 1;
 
   return 0;
 }
