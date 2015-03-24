@@ -22,6 +22,12 @@ int on_expose_textat(TickitWindow *win, TickitEventType ev, TickitEventInfo *arg
   return 1;
 }
 
+int on_input_capture(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+{
+  *((TickitEventInfo *)data) = *args;
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
@@ -59,7 +65,14 @@ int main(int argc, char *argv[])
     is_int(tickit_window_abs_top(popupwin),  12, "popupwin abs_top");
     is_int(tickit_window_abs_left(popupwin), 22, "popupwin abs_left");
 
-    // TODO: key events on popupwin
+    TickitEventInfo keyinfo;
+    tickit_window_bind_event(popupwin, TICKIT_EV_KEY, &on_input_capture, &keyinfo);
+
+    press_key(TICKIT_KEYEV_TEXT, "G", 0);
+
+    is_int(keyinfo.type, TICKIT_KEYEV_TEXT, "key type after press_key on popupwin");
+
+    // TODO: mouse events on popupwin
 
     tickit_window_destroy(popupwin);
     tickit_window_destroy(win);
