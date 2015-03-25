@@ -7,8 +7,6 @@ extern "C" {
 
 #include "tickit.h"
 
-typedef struct TickitWindow TickitWindow;
-
 /* Root window */
 
 TickitWindow *tickit_window_new_root(TickitTerm *term);
