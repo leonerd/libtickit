@@ -51,9 +51,12 @@ static void fillterm(TickitTerm *tt)
   tickit_term_print(tt, "2222222222");
 }
 
-int on_event_get_type(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_event_get_type(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
-  *((int *)data) = args->type;
+  if(ev & TICKIT_EV_KEY)
+    *((int *)data) = ((TickitKeyEventInfo *)_info)->type;
+  if(ev & TICKIT_EV_MOUSE)
+    *((int *)data) = ((TickitMouseEventInfo *)_info)->type;
   return 0;
 }
 

@@ -3,9 +3,9 @@
 #include "taplib.h"
 #include "taplib-mockterm.h"
 
-int on_focus(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_focus(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  *(int *)data = args->type == TICKIT_FOCUSEV_IN ? 1 : -1;
+  *(int *)data = ((TickitFocusEventInfo *)_info)->type == TICKIT_FOCUSEV_IN ? 1 : -1;
   return 1;
 }
 
@@ -16,14 +16,16 @@ static struct {
   TickitWindow *focuswin;
 } focus_events[16];
 
-int on_focus_push(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_focus_push(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
+  TickitFocusEventInfo *info = _info;
+
   if(next_event > sizeof(focus_events)/sizeof(focus_events[0]))
     return 0;
 
-  focus_events[next_event].type = args->type;
+  focus_events[next_event].type = info->type;
   focus_events[next_event].win = win;
-  focus_events[next_event].focuswin = args->win;
+  focus_events[next_event].focuswin = info->win;
   next_event++;
 
   return 1;

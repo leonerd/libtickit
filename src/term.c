@@ -240,8 +240,8 @@ void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
     tt->lines = lines;
     tt->cols  = cols;
 
-    TickitEventInfo args = { .lines = lines, .cols = cols };
-    run_events(tt, TICKIT_EV_RESIZE, &args);
+    TickitResizeEventInfo info = { .lines = lines, .cols = cols };
+    run_events(tt, TICKIT_EV_RESIZE, &info);
   }
 }
 
@@ -402,41 +402,42 @@ void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout)
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 {
-  TickitEventInfo args;
-
   if(tt->driver->vtable->gotkey &&
      (*tt->driver->vtable->gotkey)(tt->driver, tk, key))
     return;
 
   if(key->type == TERMKEY_TYPE_MOUSE) {
     TermKeyMouseEvent ev;
-    termkey_interpret_mouse(tk, key, &ev, &args.button, &args.line, &args.col);
+    TickitMouseEventInfo info;
+    termkey_interpret_mouse(tk, key, &ev, &info.button, &info.line, &info.col);
     /* TermKey is 1-based, Tickit is 0-based for position */
-    args.line--; args.col--;
+    info.line--; info.col--;
     switch(ev) {
-    case TERMKEY_MOUSE_PRESS:   args.type = TICKIT_MOUSEEV_PRESS;   break;
-    case TERMKEY_MOUSE_DRAG:    args.type = TICKIT_MOUSEEV_DRAG;    break;
-    case TERMKEY_MOUSE_RELEASE: args.type = TICKIT_MOUSEEV_RELEASE; break;
-    default:                    args.type = -1; break;
+    case TERMKEY_MOUSE_PRESS:   info.type = TICKIT_MOUSEEV_PRESS;   break;
+    case TERMKEY_MOUSE_DRAG:    info.type = TICKIT_MOUSEEV_DRAG;    break;
+    case TERMKEY_MOUSE_RELEASE: info.type = TICKIT_MOUSEEV_RELEASE; break;
+    default:                    info.type = -1; break;
     }
 
     /* Translate PRESS of buttons >= 4 into wheel events */
-    if(ev == TERMKEY_MOUSE_PRESS && args.button >= 4) {
-      args.type = TICKIT_MOUSEEV_WHEEL;
-      args.button -= (4 - TICKIT_MOUSEWHEEL_UP);
+    if(ev == TERMKEY_MOUSE_PRESS && info.button >= 4) {
+      info.type = TICKIT_MOUSEEV_WHEEL;
+      info.button -= (4 - TICKIT_MOUSEWHEEL_UP);
     }
 
-    args.mod = key->modifiers;
+    info.mod = key->modifiers;
 
-    run_events_whilefalse(tt, TICKIT_EV_MOUSE, &args);
+    run_events_whilefalse(tt, TICKIT_EV_MOUSE, &info);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
-    args.type = TICKIT_KEYEV_TEXT;
-    args.str  = key->utf8;
-    args.mod  = key->modifiers;
+    TickitKeyEventInfo info = {
+      .type = TICKIT_KEYEV_TEXT,
+      .str  = key->utf8,
+      .mod  = key->modifiers,
+    };
 
-    run_events_whilefalse(tt, TICKIT_EV_KEY, &args);
+    run_events_whilefalse(tt, TICKIT_EV_KEY, &info);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE ||
           key->type == TERMKEY_TYPE_FUNCTION ||
@@ -444,23 +445,25 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     char buffer[64]; // TODO: should be long enough
     termkey_strfkey(tk, buffer, sizeof buffer, key, TERMKEY_FORMAT_ALTISMETA);
 
-    args.type = TICKIT_KEYEV_KEY;
-    args.str  = buffer;
-    args.mod  = key->modifiers;
+    TickitKeyEventInfo info = {
+      .type = TICKIT_KEYEV_KEY,
+      .str  = buffer,
+      .mod  = key->modifiers,
+    };
 
-    run_events_whilefalse(tt, TICKIT_EV_KEY, &args);
+    run_events_whilefalse(tt, TICKIT_EV_KEY, &info);
   }
 }
 
 /* Driver API */
-void tickit_termdrv_send_key(TickitTermDriver *ttd, TickitEventInfo *args)
+void tickit_termdrv_send_key(TickitTermDriver *ttd, TickitKeyEventInfo *info)
 {
-  run_events_whilefalse(ttd->tt, TICKIT_EV_KEY, args);
+  run_events_whilefalse(ttd->tt, TICKIT_EV_KEY, info);
 }
 
-void tickit_termdrv_send_mouse(TickitTermDriver *ttd, TickitEventInfo *args)
+void tickit_termdrv_send_mouse(TickitTermDriver *ttd, TickitMouseEventInfo *info)
 {
-  run_events_whilefalse(ttd->tt, TICKIT_EV_MOUSE, args);
+  run_events_whilefalse(ttd->tt, TICKIT_EV_MOUSE, info);
 }
 
 static void get_keys(TickitTerm *tt, TermKey *tk)

@@ -3,7 +3,7 @@
 #include "taplib.h"
 #include "taplib-mockterm.h"
 
-int on_geom_changed(TickitWindow *window, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_geom_changed(TickitWindow *window, TickitEventType ev, void *_info, void *data)
 {
   (*(int*)data)++;
   return 1;

@@ -45,8 +45,8 @@ void tickit_termdrv_write_str(TickitTermDriver *ttd, const char *str, size_t len
 void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...);
 TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd);
 
-void tickit_termdrv_send_key(TickitTermDriver *ttd, TickitEventInfo *args);
-void tickit_termdrv_send_mouse(TickitTermDriver *ttd, TickitEventInfo *args);
+void tickit_termdrv_send_key(TickitTermDriver *ttd, TickitKeyEventInfo *args);
+void tickit_termdrv_send_mouse(TickitTermDriver *ttd, TickitMouseEventInfo *args);
 
 /*
  * Function to construct a new TickitTerm directly from a TickitTermDriver

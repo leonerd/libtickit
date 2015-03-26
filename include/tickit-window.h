@@ -28,7 +28,7 @@ void tickit_window_tick(TickitWindow *win);
 
 /* Event hooks */
 
-typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data);
+typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *info, void *data);
 
 int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitWindowEventFn *fn, void *data);
 void tickit_window_unbind_event_id(TickitWindow *win, int id);
@@ -78,10 +78,24 @@ void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(TickitWindow *win);
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
+typedef struct {
+  TickitRect rect;
+} TickitGeomchangeEventInfo;
+
+typedef struct {
+  TickitRect rect;
+  TickitRenderBuffer *rb;
+} TickitExposeEventInfo;
+
 typedef enum {
   TICKIT_FOCUSEV_IN = 1,
   TICKIT_FOCUSEV_OUT,
 } TickitFocusEventType;
+
+typedef struct {
+  TickitFocusEventType type;
+  TickitWindow *win;
+} TickitFocusEventInfo;
 
 #endif
 

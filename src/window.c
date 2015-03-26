@@ -71,21 +71,23 @@ static void _request_later_processing(TickitRootWindow *root);
 static void _request_hierarchy_change(HierarchyChangeType, TickitWindow *);
 static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *parent, TickitWindow *win);
 static void _purge_hierarchy_changes(TickitWindow *win);
-static int _handle_key(TickitWindow *win, TickitEventInfo *args);
-static int _handle_mouse(TickitWindow *win, TickitEventInfo *args);
+static int _handle_key(TickitWindow *win, TickitKeyEventInfo *args);
+static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
 
-static int on_term(TickitTerm *term, TickitEventType ev, TickitEventInfo *args, void *data)
+static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *data)
 {
   TickitRootWindow *root = data;
 
-  if(ev & TICKIT_EV_RESIZE)
-    tickit_window_resize(ROOT_AS_WINDOW(root), args->lines, args->cols);
+  if(ev & TICKIT_EV_RESIZE) {
+    TickitResizeEventInfo *info = _info;
+    tickit_window_resize(ROOT_AS_WINDOW(root), info->lines, info->cols);
+  }
 
   if(ev & TICKIT_EV_KEY)
-    _handle_key(ROOT_AS_WINDOW(root), args);
+    _handle_key(ROOT_AS_WINDOW(root), (TickitKeyEventInfo *)_info);
 
   if(ev & TICKIT_EV_MOUSE)
-    _handle_mouse(ROOT_AS_WINDOW(root), args);
+    _handle_mouse(ROOT_AS_WINDOW(root), (TickitMouseEventInfo *)_info);
 
   return 1;
 }
@@ -362,8 +364,10 @@ void tickit_window_set_geometry(TickitWindow *win, int top, int left, int lines,
     win->rect.lines = lines;
     win->rect.cols = cols;
 
-    TickitEventInfo args = { .rect = { .top = top, .left = left, .lines = lines, .cols = cols } };
-    run_events(win, TICKIT_EV_GEOMCHANGE, &args);
+    TickitGeomchangeEventInfo info = {
+      .rect = { .top = top, .left = left, .lines = lines, .cols = cols },
+    };
+    run_events(win, TICKIT_EV_GEOMCHANGE, &info);
   }
 }
 
@@ -429,8 +433,11 @@ static void _do_expose(TickitWindow *win, const TickitRect *rect, TickitRenderBu
     tickit_renderbuffer_mask(rb, &child->rect);
   }
 
-  TickitEventInfo args = { .rect = *rect, .rb = rb };
-  run_events(win, TICKIT_EV_EXPOSE, &args);
+  TickitExposeEventInfo info = {
+    .rect = *rect,
+    .rb = rb,
+  };
+  run_events(win, TICKIT_EV_EXPOSE, &info);
 }
 
 static void _request_restore(TickitRootWindow *root)
@@ -721,12 +728,12 @@ static void _focus_gained(TickitWindow *win, TickitWindow *child)
   if(!child) {
     win->is_focused = true;
 
-    TickitEventInfo args = { .type = TICKIT_FOCUSEV_IN, .win = win };
-    run_events(win, TICKIT_EV_FOCUS, &args);
+    TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_IN, .win = win };
+    run_events(win, TICKIT_EV_FOCUS, &info);
   }
   else if(win->focus_child_notify) {
-    TickitEventInfo args = { .type = TICKIT_FOCUSEV_IN, .win = child };
-    run_events(win, TICKIT_EV_FOCUS, &args);
+    TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_IN, .win = child };
+    run_events(win, TICKIT_EV_FOCUS, &info);
   }
 
   win->focused_child = child;
@@ -738,15 +745,15 @@ static void _focus_lost(TickitWindow *win)
     _focus_lost(win->focused_child);
 
     if(win->focus_child_notify) {
-      TickitEventInfo args = { .type = TICKIT_FOCUSEV_OUT, .win = win->focused_child };
-      run_events(win, TICKIT_EV_FOCUS, &args);
+      TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_OUT, .win = win->focused_child };
+      run_events(win, TICKIT_EV_FOCUS, &info);
     }
   }
 
   if(win->is_focused) {
     win->is_focused = false;
-    TickitEventInfo args = { .type = TICKIT_FOCUSEV_OUT, .win = win };
-    run_events(win, TICKIT_EV_FOCUS, &args);
+    TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_OUT, .win = win };
+    run_events(win, TICKIT_EV_FOCUS, &info);
   }
 }
 
@@ -760,20 +767,20 @@ void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify)
   win->focus_child_notify = notify;
 }
 
-static int _handle_key(TickitWindow *win, TickitEventInfo *args)
+static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
 {
   if(!win->is_visible)
     return 0;
 
   if(win->first_child && win->first_child->steal_input)
-    if(_handle_key(win->first_child, args))
+    if(_handle_key(win->first_child, info))
       return 1;
 
   if(win->focused_child)
-    if(_handle_key(win->focused_child, args))
+    if(_handle_key(win->focused_child, info))
       return 1;
 
-  if(run_events_whilefalse(win, TICKIT_EV_KEY, args))
+  if(run_events_whilefalse(win, TICKIT_EV_KEY, info))
     return 1;
 
   // Last-ditch attempt to spread it around other children
@@ -781,21 +788,21 @@ static int _handle_key(TickitWindow *win, TickitEventInfo *args)
     if(child == win->focused_child)
       continue;
 
-    if(_handle_key(child, args))
+    if(_handle_key(child, info))
       return 1;
   }
 
   return 0;
 }
 
-static int _handle_mouse(TickitWindow *win, TickitEventInfo *args)
+static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
 {
   if(!win->is_visible)
     return 0;
 
   for(TickitWindow *child = win->first_child; child; child = child->next) {
-    int child_line = args->line - child->rect.top;
-    int child_col  = args->col  - child->rect.left;
+    int child_line = info->line - child->rect.top;
+    int child_col  = info->col  - child->rect.left;
 
     if(!child->steal_input) {
       if(child_line < 0 || child_line >= child->rect.lines)
@@ -804,15 +811,15 @@ static int _handle_mouse(TickitWindow *win, TickitEventInfo *args)
         continue;
     }
 
-    TickitEventInfo childargs = *args;
-    childargs.line = child_line;
-    childargs.col  = child_col;
+    TickitMouseEventInfo childinfo = *info;
+    childinfo.line = child_line;
+    childinfo.col  = child_col;
 
-    if(_handle_mouse(child, &childargs))
+    if(_handle_mouse(child, &childinfo))
       return 1;
   }
 
-  if(run_events_whilefalse(win, TICKIT_EV_MOUSE, args))
+  if(run_events_whilefalse(win, TICKIT_EV_MOUSE, info))
     return 1;
 
   return 0;

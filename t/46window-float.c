@@ -3,28 +3,35 @@
 #include "taplib.h"
 #include "taplib-mockterm.h"
 
-int on_expose_fillchr(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_fillchr(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  for(int line = args->rect.top; line < args->rect.top + args->rect.lines; line++) {
+  TickitExposeEventInfo *info = _info;
+
+  for(int line = info->rect.top; line < info->rect.top + info->rect.lines; line++) {
     char buffer[90];
-    for(int i = 0; i < args->rect.cols; i++)
+    for(int i = 0; i < info->rect.cols; i++)
       buffer[i] = *(char *)data;
-    buffer[args->rect.cols] = 0;
-    tickit_renderbuffer_text_at(args->rb, line, args->rect.left, buffer, NULL);
+    buffer[info->rect.cols] = 0;
+    tickit_renderbuffer_text_at(info->rb, line, info->rect.left, buffer, NULL);
   }
 
   return 1;
 }
 
-int on_expose_textat(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_expose_textat(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  tickit_renderbuffer_text_at(args->rb, 0, 0, data, NULL);
+  TickitExposeEventInfo *info = _info;
+
+  tickit_renderbuffer_text_at(info->rb, 0, 0, data, NULL);
   return 1;
 }
 
-int on_input_capture(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_input_capture(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  *((TickitEventInfo *)data) = *args;
+  if(ev & TICKIT_EV_KEY)
+    *((TickitKeyEventInfo *)data) = *(TickitKeyEventInfo *)_info;
+  if(ev & TICKIT_EV_MOUSE)
+    *((TickitMouseEventInfo *)data) = *(TickitMouseEventInfo *)_info;
   return 1;
 }
 
@@ -65,14 +72,14 @@ int main(int argc, char *argv[])
     is_int(tickit_window_abs_top(popupwin),  12, "popupwin abs_top");
     is_int(tickit_window_abs_left(popupwin), 22, "popupwin abs_left");
 
-    TickitEventInfo keyinfo;
+    TickitKeyEventInfo keyinfo;
     tickit_window_bind_event(popupwin, TICKIT_EV_KEY, &on_input_capture, &keyinfo);
 
     press_key(TICKIT_KEYEV_TEXT, "G", 0);
 
     is_int(keyinfo.type, TICKIT_KEYEV_TEXT, "key type after press_key on popupwin");
 
-    TickitEventInfo mouseinfo;
+    TickitMouseEventInfo mouseinfo;
     tickit_window_bind_event(popupwin, TICKIT_EV_MOUSE, &on_input_capture, &mouseinfo);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 5, 12, 0);

@@ -2,10 +2,10 @@
 
 struct TickitEventHook;
 
-typedef int TickitEventFn(void *owner, TickitEventType ev, TickitEventInfo *args, void *data);
+typedef int TickitEventFn(void *owner, TickitEventType ev, void *info, void *data);
 
-void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, TickitEventInfo *args);
-int  tickit_hooklist_run_event_whilefalse(struct TickitEventHook *hooks, void *owner, TickitEventType ev, TickitEventInfo *args);
+void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, void *info);
+int  tickit_hooklist_run_event_whilefalse(struct TickitEventHook *hooks, void *owner, TickitEventType ev, void *info);
 
 int  tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, TickitEventType ev, TickitEventFn *fn, void *data);
 void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *owner, int id);
@@ -26,13 +26,13 @@ void tickit_hooklist_unbind_and_destroy(struct TickitEventHook *hooks, void *own
   }                                                                             \
                                                                                 \
   static inline void run_events(OWNER *owner, TickitEventType ev,               \
-      TickitEventInfo *args)                                                    \
+      void *info)                                                               \
   {                                                                             \
-    tickit_hooklist_run_event(owner->hooks, owner, ev, args);                   \
+    tickit_hooklist_run_event(owner->hooks, owner, ev, info);                   \
   }                                                                             \
                                                                                 \
   static inline int run_events_whilefalse(OWNER *owner, TickitEventType ev,     \
-      TickitEventInfo *args)                                                    \
+      void *info)                                                               \
   {                                                                             \
-    return tickit_hooklist_run_event_whilefalse(owner->hooks, owner, ev, args); \
+    return tickit_hooklist_run_event_whilefalse(owner->hooks, owner, ev, info); \
   }

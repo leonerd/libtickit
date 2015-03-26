@@ -12,16 +12,18 @@ int                keymod;
 
 int on_key_return = 1;
 
-int on_key(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_key(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
-  keytype = args->type;
-  strncpy(keystr, args->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
-  keymod = args->mod;
+  TickitKeyEventInfo *info = _info;
+
+  keytype = info->type;
+  strncpy(keystr, info->str, sizeof(keystr)-1); keystr[sizeof(keystr)-1] = 0;
+  keymod = info->mod;
 
   return on_key_return;
 }
 
-int on_key_incr(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_key_incr(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
   (*(int *)data)++;
   return 1;
@@ -31,13 +33,15 @@ TickitMouseEventType mousetype;
 int mousebutton, mouseline, mousecol;
 int mousemod;
 
-int on_mouse(TickitTerm *tt, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_mouse(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
-  mousetype   = args->type;
-  mousebutton = args->button;
-  mouseline   = args->line;
-  mousecol    = args->col;
-  mousemod    = args->mod;
+  TickitMouseEventInfo *info = _info;
+
+  mousetype   = info->type;
+  mousebutton = info->button;
+  mouseline   = info->line;
+  mousecol    = info->col;
+  mousemod    = info->mod;
 
   return 1;
 }

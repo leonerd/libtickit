@@ -14,18 +14,25 @@ struct LastEvent {
   int ret;
 };
 
-int on_input_capture(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_input_capture(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
   struct LastEvent *last_event = data;
 
-  last_event->type = args->type;
-  last_event->mod = args->mod;
-  if(ev & TICKIT_EV_KEY)
-    strcpy(last_event->str, args->str);
+  if(ev & TICKIT_EV_KEY) {
+    TickitKeyEventInfo *info = _info;
+
+    last_event->type = info->type;
+    last_event->mod = info->mod;
+    strcpy(last_event->str, info->str);
+  }
   else if(ev & TICKIT_EV_MOUSE) {
-    last_event->line = args->line;
-    last_event->col = args->col;
-    last_event->button = args->button;
+    TickitMouseEventInfo *info = _info;
+
+    last_event->type = info->type;
+    last_event->mod = info->mod;
+    last_event->line = info->line;
+    last_event->col = info->col;
+    last_event->button = info->button;
   }
 
   return last_event->ret;
@@ -34,7 +41,7 @@ int on_input_capture(TickitWindow *win, TickitEventType ev, TickitEventInfo *arg
 int next_idx = 0;
 char *ids[3];
 
-int on_input_push(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
+int on_input_push(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
   ids[next_idx++] = data;
   return 0;
