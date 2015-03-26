@@ -6,7 +6,7 @@
 int on_expose_fillchr(TickitWindow *win, TickitEventType ev, TickitEventInfo *args, void *data)
 {
   for(int line = args->rect.top; line < args->rect.top + args->rect.lines; line++) {
-    char buffer[80];
+    char buffer[90];
     for(int i = 0; i < args->rect.cols; i++)
       buffer[i] = *(char *)data;
     buffer[args->rect.cols] = 0;
