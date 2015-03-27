@@ -63,6 +63,7 @@ void tickit_window_set_geometry(TickitWindow *win, int top, int left, int lines,
 
 /* Drawing */
 
+TickitPen *tickit_window_get_pen(TickitWindow *win);
 void tickit_window_set_pen(TickitWindow *win, TickitPen *pen);
 void tickit_window_expose(TickitWindow *win, const TickitRect *exposed);
 

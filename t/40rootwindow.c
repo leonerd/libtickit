@@ -32,7 +32,15 @@ int main(int argc, char *argv[])
     ok(tickit_window_root(root) == root, "root tickit_window_root");
   }
 
-  // TODO: window pen?
+  // Window pen
+  {
+    TickitPen *pen = tickit_window_get_pen(root);
+
+    ok(pen, "window pen");
+    ok(!tickit_pen_is_nonempty(pen), "pen has no attrs set");
+
+    // TODO: effective pen?
+  }
 
   // TODO: Scrolling
 

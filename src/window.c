@@ -98,7 +98,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, int top, int le
   win->first_child = NULL;
   win->next = NULL;
   win->focused_child = NULL;
-  win->pen = NULL;
+  win->pen = tickit_pen_new();
   win->rect.top = top;
   win->rect.left = left;
   win->rect.lines = lines;
@@ -214,7 +214,8 @@ void tickit_window_destroy(TickitWindow *win)
 {
   tickit_hooklist_unbind_and_destroy(win->hooks, win);
 
-  win->pen = NULL;
+  if(win->pen)
+    tickit_pen_destroy(win->pen);
 
   for(TickitWindow *child = win->first_child; child; child = child->next)
     tickit_window_destroy(child);
@@ -369,6 +370,11 @@ void tickit_window_set_geometry(TickitWindow *win, int top, int left, int lines,
     };
     run_events(win, TICKIT_EV_GEOMCHANGE, &info);
   }
+}
+
+TickitPen *tickit_window_get_pen(TickitWindow *win)
+{
+  return win->pen;
 }
 
 void tickit_window_set_pen(TickitWindow *win, TickitPen *pen)
