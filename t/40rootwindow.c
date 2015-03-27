@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   {
     TickitPen *pen = tickit_window_get_pen(root);
 
-    ok(pen, "window pen");
+    ok(!!pen, "window pen");
     ok(!tickit_pen_is_nonempty(pen), "pen has no attrs set");
 
     // TODO: effective pen?
