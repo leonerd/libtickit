@@ -242,7 +242,19 @@ int main(int argc, char *argv[])
         GOTO(5,10), SETPEN(), PRINT("Line 2"),
         NULL);
 
+    tickit_pen_set_colour_attr(tickit_window_get_pen(win), TICKIT_PEN_FG, 5);
+    tickit_window_expose(win, NULL);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after Window expose with pen attrs",
+        GOTO(3,10), SETPEN(.fg=5), PRINT("Line 0"),
+        GOTO(4,10), SETPEN(.fg=5), PRINT("Line 1"),
+        GOTO(5,10), SETPEN(.fg=5), PRINT("Line 2"),
+        GOTO(6,10), SETPEN(.fg=5), PRINT("Line 3"),
+        NULL);
+
     tickit_window_unbind_event_id(win, bind_id);
+    tickit_pen_clear_attr(tickit_window_get_pen(win), TICKIT_PEN_FG);
   }
 
   // Rendering parent and child simultaneously
