@@ -4,9 +4,10 @@
 
 #include <string.h>
 
-static void print(TickitTermDriver *ttd, const char *str, size_t len)
+static bool print(TickitTermDriver *ttd, const char *str, size_t len)
 {
   tickit_termdrv_write_strf(ttd, "PRINT(%.*s)", len, str);
+  return true;
 }
 
 static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
