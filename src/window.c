@@ -8,8 +8,8 @@
  *   Input events (mouse, keyboard)
  */
 
-#define ROOT_AS_WINDOW(root) (TickitWindow*)root
-#define WINDOW_AS_ROOT(win) (TickitRootWindow*)win
+#define ROOT_AS_WINDOW(root) ((TickitWindow*)root)
+#define WINDOW_AS_ROOT(win)  ((TickitRootWindow*)win)
 
 typedef enum {
   TICKIT_HIERARCHY_INSERT_FIRST,
