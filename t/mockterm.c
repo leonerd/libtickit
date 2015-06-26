@@ -26,6 +26,11 @@ TickitTerm *make_term(int lines, int cols)
   return (TickitTerm *)mt;
 }
 
+void drain_termlog(void)
+{
+  tickit_mockterm_clearlog(mt);
+}
+
 void is_termlog(char *name, ...)
 {
   va_list args;

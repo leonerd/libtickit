@@ -33,6 +33,7 @@ struct TermLogExpectation {
 
 TickitTerm *make_term(int lines, int cols);
 
+void drain_termlog(void);
 void is_termlog(char *name, ...);
 
 void press_key(int type, char *str, int mod);
