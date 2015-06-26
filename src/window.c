@@ -686,9 +686,123 @@ static void _purge_hierarchy_changes(TickitWindow *win)
   }
 }
 
-bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward, TickitPen *pen)
+static bool _scroll(TickitWindow *win, TickitRectSet *visible, int downward, int rightward, TickitPen *pen)
 {
-  return false;
+  TickitWindow *origwin = win;
+
+  while(win) {
+    if(!win->is_visible)
+      return false;
+
+    tickit_pen_copy(pen, win->pen, false);
+
+    TickitWindow *parent = win->parent;
+    if(!parent)
+      break;
+
+    tickit_rectset_translate(visible, win->rect.top, win->rect.left);
+
+    // TODO: mask siblings
+
+    win = parent;
+  }
+
+  TickitTerm *term = WINDOW_AS_ROOT(win)->term;
+
+  // TODO: This is cheaper to calculate as part of the while loop
+  int abs_top  = tickit_window_abs_top(origwin),
+      abs_left = tickit_window_abs_left(origwin);
+
+  int n = tickit_rectset_rects(visible);
+  TickitRect rects[n];
+  tickit_rectset_get_rects(visible, rects, n);
+
+  bool ret = true;
+  bool done_pen = false;
+
+  for(int i = 0; i < n; i++) {
+    TickitRect rect = rects[i];
+
+    TickitRect origrect = rect;
+    tickit_rect_translate(&origrect, -abs_top, -abs_left);
+
+    if(abs(downward) >= rect.lines || abs(rightward) >= rect.cols) {
+      tickit_window_expose(origwin, &origrect);
+      continue;
+    }
+
+    // TODO: move damage
+
+    if(!done_pen) {
+      // TODO: only bg matters
+      tickit_term_setpen(term, pen);
+      done_pen = true;
+    }
+
+    if(tickit_term_scrollrect(term, rect, downward, rightward)) {
+      if(downward > 0) {
+        // "scroll down" means lines moved upward, so the bottom needs redrawing
+        tickit_window_expose(origwin, &(TickitRect){
+            .top  = origrect.top + origrect.lines - downward, .lines = downward,
+            .left = origrect.left,                            .cols  = rect.cols
+        });
+      }
+      else if(downward < 0) {
+        // "scroll up" means lines moved downward, so top needs redrawing
+        tickit_window_expose(origwin, &(TickitRect){
+            .top  = origrect.top,  .lines = -downward,
+            .left = origrect.left, .cols  = rect.cols,
+        });
+      }
+
+      if(rightward > 0) {
+        // "scroll right" means columns moved leftward, so the right edge needs redrawing
+        tickit_window_expose(origwin, &(TickitRect){
+            .top  = origrect.top,                              .lines = rect.lines,
+            .left = origrect.left + origrect.cols - rightward, .cols  = rightward,
+        });
+      }
+      else if(rightward < 0) {
+        tickit_window_expose(origwin, &(TickitRect){
+            .top  = origrect.top,  .lines = rect.lines,
+            .left = origrect.left, .cols  = -rightward,
+        });
+      }
+    }
+    else {
+      tickit_window_expose(origwin, &origrect);
+      ret = false;
+    }
+  }
+
+  return ret;
+}
+
+bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect_, int downward, int rightward, TickitPen *pen)
+{
+  TickitRect rect;
+  TickitRect selfrect = { .top = 0, .left = 0, .lines = win->rect.lines, .cols = win->rect.cols };
+
+  if(!tickit_rect_intersect(&rect, &selfrect, rect_))
+    return false;
+
+  if(pen)
+    pen = tickit_pen_clone(pen);
+  else
+    pen = tickit_pen_new();
+
+  TickitRectSet *visible = tickit_rectset_new();
+
+  tickit_rectset_add(visible, &rect);
+
+  // TODO: mask off children
+
+  bool ret = _scroll(win, visible, downward, rightward, pen);
+
+  tickit_rectset_destroy(visible);
+  tickit_pen_destroy(pen);
+
+  return ret;
 }
 
 bool tickit_window_scroll(TickitWindow *win, int downward, int rightward)
