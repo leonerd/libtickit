@@ -686,7 +686,7 @@ static void _purge_hierarchy_changes(TickitWindow *win)
   }
 }
 
-bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward)
+bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward, TickitPen *pen)
 {
   return false;
 }
@@ -695,7 +695,7 @@ bool tickit_window_scroll(TickitWindow *win, int downward, int rightward)
 {
   return tickit_window_scrollrect(win,
     &((TickitRect){ .top = 0, .left = 0, .lines = win->rect.lines, .cols = win->rect.cols }),
-    downward, rightward);
+    downward, rightward, NULL);
 }
 
 void tickit_window_cursor_at(TickitWindow *win, int line, int col)

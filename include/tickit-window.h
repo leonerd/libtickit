@@ -67,7 +67,7 @@ TickitPen *tickit_window_get_pen(TickitWindow *win);
 void tickit_window_set_pen(TickitWindow *win, TickitPen *pen);
 void tickit_window_expose(TickitWindow *win, const TickitRect *exposed);
 
-bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward);
+bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward, TickitPen *pen);
 bool tickit_window_scroll(TickitWindow *win, int downward, int rightward);
 
 /* Cursor */
