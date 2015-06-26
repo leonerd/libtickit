@@ -180,6 +180,14 @@ void tickit_rectset_subtract(TickitRectSet *trs, const TickitRect *rect)
   }
 }
 
+void tickit_rectset_translate(TickitRectSet *trs, int downward, int rightward)
+{
+  for(int i = 0; i < trs->count; i++) {
+    trs->rects[i].top  += downward;
+    trs->rects[i].left += rightward;
+  }
+}
+
 bool tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect)
 {
   for(int i = 0; i < trs->count; i++)

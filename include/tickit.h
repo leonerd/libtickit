@@ -133,6 +133,8 @@ size_t tickit_rectset_get_rects(const TickitRectSet *trs, TickitRect rects[], si
 void tickit_rectset_add(TickitRectSet *trs, const TickitRect *rect);
 void tickit_rectset_subtract(TickitRectSet *trs, const TickitRect *rect);
 
+void tickit_rectset_translate(TickitRectSet *trs, int downward, int rightward);
+
 bool tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect);
 bool tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rect);
 

@@ -191,6 +191,13 @@ int main(int argc, char *argv[])
     is_rect(rects + 0, "10,10+20,5", "rects[0] after second tickit_rectset_add");
     is_rect(rects + 1, "10,20+20,2", "rects[1] after second tickit_rectset_add");
 
+    // Translation
+    tickit_rectset_translate(trs, 2, 3);
+
+    is_int(tickit_rectset_get_rects(trs, rects, 4), 2, "tickit_rectset_get_rects after second tickit_rectset_translate");
+    is_rect(rects + 0, "13,12+20,5", "rects[0] after second tickit_rectset_translate");
+    is_rect(rects + 1, "13,22+20,2", "rects[1] after second tickit_rectset_translate");
+
     tickit_rectset_clear(trs);
 
     is_int(tickit_rectset_rects(trs), 0, "tickit_rectset_rects after clear");

@@ -1,0 +1,20 @@
+.TH TICKIT_RECTSET_TRANSLATE 3
+.SH NAME
+tickit_rectset_translate \- move all the rectangles in a rectangle set
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_rectset_translate(TickitRectSet *" trs ", int " downward ", int " rightward );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_rectset_translate\fP() moves every rectangle in the rectangle set by the given offset. The number of rectangles in the set is not affected by this operation, and since the set has no concept of boundaries, no clipping will take place.
+.SH "RETURN VALUE"
+\fBtickit_rectset_translate\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_rectset_new (3),
+.BR tickit_rectset (7),
+.BR tickit_rect (7),
+.BR tickit (7)
