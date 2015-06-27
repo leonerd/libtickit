@@ -1,6 +1,7 @@
 #include "tickit.h"
 #include "tickit-window.h"
 #include "taplib.h"
+#include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
 static int next_rect = 0;
@@ -15,32 +16,6 @@ int on_expose_pushrect(TickitWindow *win, TickitEventType ev, void *_info, void 
 
   exposed_rects[next_rect++] = info->rect;
   return 1;
-}
-
-void is_rect(TickitRect a, TickitRect b, char *name)
-{
-  if(a.top != b.top) {
-    fail(name);
-    diag("Got a.top = %d, expected b.top = %d", a.top, b.top);
-    return;
-  }
-  if(a.left != b.left) {
-    fail(name);
-    diag("Got a.left = %d, expected b.left = %d", a.left, b.left);
-    return;
-  }
-  if(a.lines != b.lines) {
-    fail(name);
-    diag("Got a.lines = %d, expected b.lines = %d", a.lines, b.lines);
-    return;
-  }
-  if(a.cols != b.cols) {
-    fail(name);
-    diag("Got a.cols = %d, expected b.cols = %d", a.cols, b.cols);
-    return;
-  }
-
-  pass(name);
 }
 
 int main(int argc, char *argv[])
@@ -77,7 +52,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 9, .left = 0, .lines = 1, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,9+80,1", "exposed_rects[0]");
   }
 
   // scroll up
@@ -92,7 +67,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+80,1", "exposed_rects[0]");
   }
 
   // scroll right
@@ -107,7 +82,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 79, .lines = 10, .cols = 1 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "79,0+1,10", "exposed_rects[0]");
   }
 
   // scroll left
@@ -122,7 +97,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 10, .cols = 1 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+1,10", "exposed_rects[0]");
   }
 
   // scrollrect up
@@ -139,7 +114,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 2, .left = 0, .lines = 1, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,2+80,1", "exposed_rects[0]");
   }
 
   // scrollrect down
@@ -155,7 +130,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 4, .left = 0, .lines = 1, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,4+80,1", "exposed_rects[0]");
   }
 
   // scrollrect further than area just exposes
@@ -169,7 +144,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,2+80,3", "exposed_rects[0]");
   }
 
   // Child to obscure part of it
@@ -188,7 +163,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 76, .lines = 10, .cols = 4 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "76,0+4,10", "exposed_rects[0]");
 
     tickit_window_hide(child);
     tickit_window_tick(root);
@@ -203,7 +178,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 76, .lines = 10, .cols = 4 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "76,0+4,10", "exposed_rects[0]");
 
     tickit_window_destroy(child);
     tickit_window_tick(root);
@@ -224,7 +199,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+80,2", "exposed_rects[0]");
 
     tickit_window_destroy(child);
     tickit_window_tick(root);
@@ -248,8 +223,8 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 2, "pushed 2 exposed rects");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 20, .lines = 5, .cols = 60 }, "exposed_rects[0]");
-    is_rect(exposed_rects[1], (TickitRect){ .top = 5, .left =  0, .lines = 2, .cols = 80 }, "exposed_rects[1]");
+    is_rect(exposed_rects+0, "20,0+60,5", "exposed_rects[0]");
+    is_rect(exposed_rects+1, "0,5+80,2", "exposed_rects[1]");
 
     tickit_window_hide(sibling);
     tickit_window_tick(root);
@@ -264,7 +239,7 @@ int main(int argc, char *argv[])
         NULL);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 80 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+80,2", "exposed_rects[0]");
 
     tickit_window_destroy(sibling);
     tickit_window_tick(root);

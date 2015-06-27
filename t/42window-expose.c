@@ -1,35 +1,10 @@
 #include "tickit.h"
 #include "tickit-window.h"
 #include "taplib.h"
+#include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
 #include <stdio.h>  // sprintf
-
-void is_rect(TickitRect a, TickitRect b, char *name)
-{
-  if(a.top != b.top) {
-    fail(name);
-    diag("Got a.top = %d, expected b.top = %d", a.top, b.top);
-    return;
-  }
-  if(a.left != b.left) {
-    fail(name);
-    diag("Got a.left = %d, expected b.left = %d", a.left, b.left);
-    return;
-  }
-  if(a.lines != b.lines) {
-    fail(name);
-    diag("Got a.lines = %d, expected b.lines = %d", a.lines, b.lines);
-    return;
-  }
-  if(a.cols != b.cols) {
-    fail(name);
-    diag("Got a.cols = %d, expected b.cols = %d", a.cols, b.cols);
-    return;
-  }
-
-  pass(name);
-}
 
 int on_expose_incr(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
@@ -134,7 +109,7 @@ int main(int argc, char *argv[])
     is_int(win_exposed,  1, "win expose count after tick");
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 4, .cols = 20 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+20,4", "exposed_rects[0]");
 
     next_rect = 0;
 
@@ -146,7 +121,7 @@ int main(int argc, char *argv[])
     is_int(win_exposed,  2, "win expose count after expose on win");
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 4, .cols = 20 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+20,4", "exposed_rects[0]");
 
     next_rect = 0;
 
@@ -190,8 +165,8 @@ int main(int argc, char *argv[])
     is_int(win_exposed, 7, "win expose count after expose two regions");
 
     is_int(next_rect, 2, "exposed 2 regions");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 20 }, "exposed_rects[0]");
-    is_rect(exposed_rects[1], (TickitRect){ .top = 2, .left = 0, .lines = 1, .cols = 20 }, "exposed_rects[1]");
+    is_rect(exposed_rects+0, "0,0+20,1", "exposed_rects[0]");
+    is_rect(exposed_rects+1, "0,2+20,1", "exposed_rects[1]");
 
     next_rect = 0;
 
@@ -203,7 +178,7 @@ int main(int argc, char *argv[])
     is_int(win_exposed, 8, "win expose count after expose separate root+win");
 
     is_int(next_rect, 1, "exposed 1 region");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 5, .lines = 1, .cols = 10 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "5,0+10,1", "exposed_rects[0]");
 
     next_rect = 0;
 
@@ -212,7 +187,7 @@ int main(int argc, char *argv[])
     tickit_window_tick(root);
 
     is_int(next_rect, 1, "exposed 1 region");
-    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 4, .cols = 20 }, "exposed_rects[0]");
+    is_rect(exposed_rects+0, "0,0+20,4", "exposed_rects[0]");
 
     tickit_window_unbind_event_id(win, bind_id);
     tickit_window_unbind_event_id(win, bind_id2);

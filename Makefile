@@ -72,7 +72,7 @@ src/renderbuffer.lo: src/linechars.inc
 src/linechars.inc: src/linechars.inc.PL
 	perl $^ > $@
 
-t/%.t: t/%.c $(LIBRARY) t/taplib.lo t/mockterm.lo
+t/%.t: t/%.c $(LIBRARY) t/taplib.lo t/mockterm.lo t/taplib-tickit.lo
 	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude -std=c99 -ggdb $^
 
 t/%.lo: t/%.c
