@@ -690,6 +690,8 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
 {
   TickitWindow *origwin = win;
 
+  int abs_top = 0, abs_left = 0;
+
   while(win) {
     if(!win->is_visible)
       return false;
@@ -700,6 +702,8 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
     if(!parent)
       break;
 
+    abs_top  += win->rect.top;
+    abs_left += win->rect.left;
     tickit_rectset_translate(visible, win->rect.top, win->rect.left);
 
     for(TickitWindow *sib = parent->first_child; sib; sib = sib->next) {
@@ -715,10 +719,6 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
   }
 
   TickitTerm *term = WINDOW_AS_ROOT(win)->term;
-
-  // TODO: This is cheaper to calculate as part of the while loop
-  int abs_top  = tickit_window_abs_top(origwin),
-      abs_left = tickit_window_abs_left(origwin);
 
   int n = tickit_rectset_rects(visible);
   TickitRect rects[n];
