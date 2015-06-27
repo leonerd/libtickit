@@ -42,7 +42,43 @@ int main(int argc, char *argv[])
     // TODO: effective pen?
   }
 
-  // TODO: Scrolling
+  // Scrolling
+  {
+    ok(tickit_window_scroll(root, 1, 0), "window can scroll");
+    tickit_window_tick(root);
+
+    is_termlog("Termlog scrolled",
+        SETPEN(),
+        SCROLLRECT(0,0,25,80, 1,0),
+        NULL);
+
+    tickit_window_scrollrect(root, &(TickitRect){ .top = 5, .left = 0, .lines = 10, .cols = 80 },
+        3, 0, NULL);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scrollrect",
+        SETPEN(),
+        SCROLLRECT(5,0,10,80, 3,0),
+        NULL);
+
+    tickit_window_scrollrect(root, &(TickitRect){ .top = 20, .left = 0, .lines = 1, .cols = 80 },
+        0, 1, NULL);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scrollrect rightward",
+        SETPEN(),
+        SCROLLRECT(20,0,1,80, 0,1),
+        NULL);
+
+    tickit_window_scrollrect(root, &(TickitRect){ .top = 21, .left = 10, .lines = 1, .cols = 70 },
+        0, -1, NULL);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scrollrect leftward not fullwidth",
+        SETPEN(),
+        SCROLLRECT(21,10,1,70, 0,-1),
+        NULL);
+  }
 
   // Geometry change event
   {

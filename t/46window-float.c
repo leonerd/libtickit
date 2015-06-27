@@ -1,6 +1,7 @@
 #include "tickit.h"
 #include "tickit-window.h"
 #include "taplib.h"
+#include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
 int on_expose_fillchr(TickitWindow *win, TickitEventType ev, void *_info, void *data)
@@ -23,6 +24,20 @@ int on_expose_textat(TickitWindow *win, TickitEventType ev, void *_info, void *d
   TickitExposeEventInfo *info = _info;
 
   tickit_renderbuffer_text_at(info->rb, 0, 0, data, NULL);
+  return 1;
+}
+
+static int next_rect = 0;
+static TickitRect exposed_rects[16];
+
+int on_expose_pushrect(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitExposeEventInfo *info = _info;
+
+  if(next_rect >= sizeof(exposed_rects)/sizeof(exposed_rects[0]))
+    return 0;
+
+  exposed_rects[next_rect++] = info->rect;
   return 1;
 }
 
@@ -118,7 +133,29 @@ int main(int argc, char *argv[])
     tickit_window_unbind_event_id(rootfloat, bind_id);
   }
 
-  // TODO: scrolling
+  // Scrolling with float obscurations
+  {
+    int bind_id = tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose_pushrect, NULL);
+    tickit_window_tick(root);
+    drain_termlog();
+
+    next_rect = 0;
+
+    tickit_window_scroll(root, 3, 0);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scroll with floats",
+        SETPEN(),
+        SCROLLRECT( 0,0,10,80, 3,0),
+        SCROLLRECT(15,0,10,80, 3,0),
+        NULL);
+
+    is_int(next_rect, 4, "");
+    is_rect(exposed_rects+0, "0,7+80,3", "exposed_rects[0]");
+    is_rect(exposed_rects+1, "0,10+10,5", "exposed_rects[1]");
+    is_rect(exposed_rects+2, "40,10+40,5", "exposed_rects[2]");
+    is_rect(exposed_rects+3, "0,22+80,3", "exposed_rects[3]");
+  }
 
   return exit_status();
 }
