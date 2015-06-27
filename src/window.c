@@ -702,7 +702,14 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
 
     tickit_rectset_translate(visible, win->rect.top, win->rect.left);
 
-    // TODO: mask siblings
+    for(TickitWindow *sib = parent->first_child; sib; sib = sib->next) {
+      if(sib == win)
+        break;
+      if(!sib->is_visible)
+        continue;
+
+      tickit_rectset_subtract(visible, &sib->rect);
+    }
 
     win = parent;
   }
