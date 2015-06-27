@@ -172,8 +172,46 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects[0], (TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 }, "exposed_rects[0]");
   }
 
+  // Child to obscure part of it
+  {
+    TickitWindow *child = tickit_window_new_subwindow(win, 0, 0, 3, 10);
+    tickit_window_tick(root);
+
+    next_rect = 0;
+    tickit_window_scroll(win, 0, 4);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scroll with obscuring child",
+        SETPEN(),
+        SCROLLRECT(5,10,3,70, 0,4),
+        SCROLLRECT(8, 0,7,80, 0,4),
+        NULL);
+
+    is_int(next_rect, 1, "pushed 1 exposed rect");
+    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 76, .lines = 10, .cols = 4 }, "exposed_rects[0]");
+
+    tickit_window_hide(child);
+    tickit_window_tick(root);
+
+    next_rect = 0;
+    tickit_window_scroll(win, 0, 4);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scroll with hidden obscuring child",
+        SETPEN(),
+        SCROLLRECT(5,0,10,80, 0,4),
+        NULL);
+
+    is_int(next_rect, 1, "pushed 1 exposed rect");
+    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 76, .lines = 10, .cols = 4 }, "exposed_rects[0]");
+
+    tickit_window_destroy(child);
+    tickit_window_tick(root);
+  }
+
   // Hidden windows should be ignored
   {
+    next_rect = 0;
     tickit_window_hide(win);
     tickit_window_tick(root);
 

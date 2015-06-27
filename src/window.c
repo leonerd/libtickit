@@ -795,7 +795,11 @@ bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect_, int do
 
   tickit_rectset_add(visible, &rect);
 
-  // TODO: mask off children
+  for(TickitWindow *child = win->first_child; child; child = child->next) {
+    if(!child->is_visible)
+      continue;
+    tickit_rectset_subtract(visible, &child->rect);
+  }
 
   bool ret = _scroll(win, visible, downward, rightward, pen);
 
