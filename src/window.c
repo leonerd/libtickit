@@ -686,7 +686,7 @@ static void _purge_hierarchy_changes(TickitWindow *win)
   }
 }
 
-static bool _scroll(TickitWindow *win, TickitRectSet *visible, int downward, int rightward, TickitPen *pen)
+static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downward, int rightward, TickitPen *pen)
 {
   TickitWindow *origwin = win;
 
@@ -801,7 +801,7 @@ bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect_, int do
     tickit_rectset_subtract(visible, &child->rect);
   }
 
-  bool ret = _scroll(win, visible, downward, rightward, pen);
+  bool ret = _scrollrectset(win, visible, downward, rightward, pen);
 
   tickit_rectset_destroy(visible);
   tickit_pen_destroy(pen);
