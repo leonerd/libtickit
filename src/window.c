@@ -778,12 +778,12 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
   return ret;
 }
 
-bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect_, int downward, int rightward, TickitPen *pen)
+static bool _scroll(TickitWindow *win, const TickitRect *origrect, int downward, int rightward, TickitPen *pen, bool mask_children)
 {
   TickitRect rect;
   TickitRect selfrect = { .top = 0, .left = 0, .lines = win->rect.lines, .cols = win->rect.cols };
 
-  if(!tickit_rect_intersect(&rect, &selfrect, rect_))
+  if(!tickit_rect_intersect(&rect, &selfrect, origrect))
     return false;
 
   if(pen)
@@ -795,11 +795,12 @@ bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect_, int do
 
   tickit_rectset_add(visible, &rect);
 
-  for(TickitWindow *child = win->first_child; child; child = child->next) {
-    if(!child->is_visible)
-      continue;
-    tickit_rectset_subtract(visible, &child->rect);
-  }
+  if(mask_children)
+    for(TickitWindow *child = win->first_child; child; child = child->next) {
+      if(!child->is_visible)
+        continue;
+      tickit_rectset_subtract(visible, &child->rect);
+    }
 
   bool ret = _scrollrectset(win, visible, downward, rightward, pen);
 
@@ -809,11 +810,23 @@ bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect_, int do
   return ret;
 }
 
+bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward, TickitPen *pen)
+{
+  return _scroll(win, rect, downward, rightward, pen, true);
+}
+
 bool tickit_window_scroll(TickitWindow *win, int downward, int rightward)
 {
-  return tickit_window_scrollrect(win,
+  return _scroll(win,
     &((TickitRect){ .top = 0, .left = 0, .lines = win->rect.lines, .cols = win->rect.cols }),
-    downward, rightward, NULL);
+    downward, rightward, NULL, true);
+}
+
+bool tickit_window_scroll_with_children(TickitWindow *win, int downward, int rightward)
+{
+  return _scroll(win,
+    &((TickitRect){ .top = 0, .left = 0, .lines = win->rect.lines, .cols = win->rect.cols }),
+    downward, rightward, NULL, false);
 }
 
 void tickit_window_cursor_at(TickitWindow *win, int line, int col)

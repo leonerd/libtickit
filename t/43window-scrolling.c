@@ -209,6 +209,27 @@ int main(int argc, char *argv[])
     tickit_window_tick(root);
   }
 
+  // scroll_with_children
+  {
+    TickitWindow *child = tickit_window_new_subwindow(win, 0, 70, 1, 10);
+    tickit_window_tick(root);
+
+    next_rect = 0;
+    tickit_window_scroll_with_children(win, -2, 0);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scroll_with_children",
+        SETPEN(),
+        SCROLLRECT(5,0,10,80, -2,0),
+        NULL);
+
+    is_int(next_rect, 1, "pushed 1 exposed rect");
+    is_rect(exposed_rects[0], (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 80 }, "exposed_rects[0]");
+
+    tickit_window_destroy(child);
+    tickit_window_tick(root);
+  }
+
   // Hidden windows should be ignored
   {
     next_rect = 0;
