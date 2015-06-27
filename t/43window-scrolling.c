@@ -158,5 +158,31 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects[0], (TickitRect){ .top = 4, .left = 0, .lines = 1, .cols = 80 }, "exposed_rects[0]");
   }
 
+  // scrollrect further than area just exposes
+  {
+    next_rect = 0;
+    tickit_window_scrollrect(win, &(TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 },
+        5, 0, NULL);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog empty after scrollrect further than area",
+        NULL);
+
+    is_int(next_rect, 1, "pushed 1 exposed rect");
+    is_rect(exposed_rects[0], (TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 }, "exposed_rects[0]");
+  }
+
+  // Hidden windows should be ignored
+  {
+    tickit_window_hide(win);
+    tickit_window_tick(root);
+
+    tickit_window_scroll(win, 2, 0);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog empty after scroll on hidden window",
+        NULL);
+  }
+
   return exit_status();
 }
