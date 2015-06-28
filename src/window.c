@@ -3,11 +3,6 @@
 
 #include <stdio.h>
 
-/* TODO:
- *   Scrolling
- *   Input events (mouse, keyboard)
- */
-
 #define ROOT_AS_WINDOW(root) ((TickitWindow*)root)
 #define WINDOW_AS_ROOT(win)  ((TickitRootWindow*)win)
 
