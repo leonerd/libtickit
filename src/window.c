@@ -738,7 +738,37 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
       continue;
     }
 
-    // TODO: move damage
+    // TODO: This may be more efficiently done with some rectset operations
+    //   instead of completely resetting and rebuilding the set
+    TickitRectSet *damageset = WINDOW_AS_ROOT(win)->damage;
+    int n_damage = tickit_rectset_rects(damageset);
+    TickitRect damage[n_damage];
+    tickit_rectset_get_rects(damageset, damage, n_damage);
+    tickit_rectset_clear(damageset);
+
+    for(int j = 0; j < n_damage; j++) {
+      TickitRect r = damage[j];
+
+      if(tickit_rect_bottom(&r) < rect.top || r.top > tickit_rect_bottom(&rect) ||
+         tickit_rect_right(&r) < rect.left || r.left > tickit_rect_right(&rect)) {
+        tickit_rectset_add(damageset, &r);
+        continue;
+      }
+
+      TickitRect outside[4];
+      int n_outside;
+      if((n_outside = tickit_rect_subtract(outside, &r, &rect))) {
+        for(int k = 0; k < n_outside; k++)
+          tickit_rectset_add(damageset, outside+k);
+      }
+
+      TickitRect inside;
+      if(tickit_rect_intersect(&inside, &r, &rect)) {
+        tickit_rect_translate(&inside, -downward, -rightward);
+        if(tickit_rect_intersect(&inside, &inside, &rect))
+          tickit_rectset_add(damageset, &inside);
+      }
+    }
 
     if(!done_pen) {
       // TODO: only bg matters

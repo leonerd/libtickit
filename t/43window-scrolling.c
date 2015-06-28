@@ -147,6 +147,38 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+0, "0,2+80,3", "exposed_rects[0]");
   }
 
+  // scrollrect with pending damage
+  {
+    // outside
+    tickit_window_expose(win, &(TickitRect){ .top = 1, .left =  4, .lines = 2, .cols = 10 });
+
+    // split
+    tickit_window_expose(win, &(TickitRect){ .top = 3, .left = 10, .lines = 3, .cols = 5 });
+
+    // inside
+    tickit_window_expose(win, &(TickitRect){ .top = 5, .left = 20, .lines = 2, .cols = 10 });
+
+    next_rect = 0;
+    tickit_window_scrollrect(win, &(TickitRect){ .top = 4, .left = 0, .lines = 6, .cols = 80 },
+        2, 0, NULL);
+    tickit_window_tick(root);
+
+    is_termlog("Termlog after scrollrect with impending damage",
+        SETPEN(),
+        SCROLLRECT(9,0,6,80, 2,0),
+        NULL);
+
+    is_int(next_rect, 4, "pushed 4 exposed rects");
+    // outside
+    is_rect(exposed_rects+0, "4,1+10,2", "exposed_rects[0]");
+    // split part outside
+    is_rect(exposed_rects+1, "10,3+5,1", "exposed_rects[1]");
+    // translated+truncated inside
+    is_rect(exposed_rects+2, "20,4+10,1", "exposed_rects[2]");
+    // exposed
+    is_rect(exposed_rects+3, "0,8+80,2", "exposed_rects[3]");
+  }
+
   // Child to obscure part of it
   {
     TickitWindow *child = tickit_window_new_subwindow(win, 0, 0, 3, 10);
