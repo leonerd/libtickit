@@ -452,6 +452,38 @@ static void _request_later_processing(TickitRootWindow *root)
   root->needs_later_processing = true;
 }
 
+static bool _cell_visible(TickitWindow *win, int line, int col)
+{
+  TickitWindow *prev;
+  while(win) {
+    if(line < 0 || line >= win->rect.lines ||
+       col  < 0 || col  >= win->rect.cols)
+      return false;
+
+    for(TickitWindow *child = win->first_child; child; child = child->next) {
+      if(prev && child == prev)
+        break;
+      if(!child->is_visible)
+        continue;
+
+      if(line < child->rect.top  || line >= child->rect.top + child->rect.lines)
+        continue;
+      if(col  < child->rect.left || col  >= child->rect.left + child->rect.cols)
+        continue;
+
+      return false;
+    }
+
+    line += win->rect.top;
+    col  += win->rect.left;
+
+    prev = win;
+    win = win->parent;
+  }
+
+  return true;
+}
+
 static void _do_restore(TickitRootWindow *root)
 {
   TickitWindow *win = ROOT_AS_WINDOW(root);
@@ -466,7 +498,8 @@ static void _do_restore(TickitRootWindow *root)
     win = win->focused_child;
   }
 
-  if(win && win->is_focused && win->cursor.visible) {
+  if(win && win->is_focused && win->cursor.visible &&
+     _cell_visible(win, win->cursor.line, win->cursor.col)) {
     /* TODO finish the visibility check here. */
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 1);
     int cursor_line = win->cursor.line + tickit_window_abs_top(win);
