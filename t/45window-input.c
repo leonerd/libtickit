@@ -161,7 +161,12 @@ int main(int argc, char *argv[])
     is_int(next_idx, 2, "press_key pushes 2 strings for E");
     is_str(ids[0], "win",      "ids[0] for E");
     is_str(ids[1], "otherwin", "ids[1] for E");
+
+    tickit_window_destroy(otherwin);
+    tickit_window_tick(root);
   }
+
+  tickit_window_destroy(subwin);
 
   return exit_status();
 }
