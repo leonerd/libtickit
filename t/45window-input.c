@@ -207,5 +207,37 @@ int main(int argc, char *argv[])
     tickit_window_tick(root);
   }
 
+  //   sibling windows
+  {
+    TickitWindow *siblingwin = NULL;
+    int siblingmouse = 0;
+
+    int win_on_mouse(TickitWindow *win, TickitEventType ev, void *_info, void *data) {
+      if(siblingwin)
+        return 0;
+
+      siblingwin = tickit_window_new_float(win, 0, 0, 2, 2);
+      tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, &on_input_incr_int, &siblingmouse);
+      return 0;
+    }
+
+    int id = tickit_window_bind_event(win, TICKIT_EV_MOUSE, &win_on_mouse, NULL);
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
+
+    ok(!!siblingwin, "sibling window created");
+    is_int(siblingmouse, 0, "sibling window has not yet received a mouse event");
+
+    tickit_window_tick(root);
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
+
+    is_int(siblingmouse, 1, "sibling window has now received an event after flush");
+
+    tickit_window_unbind_event_id(win, id);
+    tickit_window_destroy(siblingwin);
+    tickit_window_tick(root);
+  }
+
   return exit_status();
 }
