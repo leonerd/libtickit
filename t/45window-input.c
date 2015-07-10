@@ -47,6 +47,12 @@ int on_input_push(TickitWindow *win, TickitEventType ev, void *_info, void *data
   return 0;
 }
 
+int on_input_incr_int(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  ((int *)data)[0]++;
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
@@ -167,6 +173,39 @@ int main(int argc, char *argv[])
   }
 
   tickit_window_destroy(subwin);
+
+  // Windows created in input events handlers don't receive events
+  //   child windows
+  {
+    TickitWindow *childwin = NULL;
+    int childmouse = 0;
+
+    int win_on_mouse(TickitWindow *win, TickitEventType ev, void *_info, void *data) {
+      if(childwin)
+        return 0;
+
+      childwin = tickit_window_new_subwindow(win, 0, 0, 2, 2);
+      tickit_window_bind_event(childwin, TICKIT_EV_MOUSE, &on_input_incr_int, &childmouse);
+      return 0;
+    }
+
+    int id = tickit_window_bind_event(win, TICKIT_EV_MOUSE, &win_on_mouse, NULL);
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
+
+    ok(!!childwin, "child window created");
+    is_int(childmouse, 0, "child window has not yet received a mouse event");
+
+    tickit_window_tick(root);
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
+
+    is_int(childmouse, 1, "child window has now received an event after flush");
+
+    tickit_window_unbind_event_id(win, id);
+    tickit_window_destroy(childwin);
+    tickit_window_tick(root);
+  }
 
   return exit_status();
 }
