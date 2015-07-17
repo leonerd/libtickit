@@ -162,22 +162,22 @@ static TickitRootWindow *_get_root(const TickitWindow *win)
 TickitWindow *tickit_window_new_subwindow(TickitWindow *parent, int top, int left, int lines, int cols)
 {
   TickitWindow *win = new_window(parent, top, left, lines, cols);
-  _request_hierarchy_change(TICKIT_HIERARCHY_INSERT_LAST, win);
+  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_LAST, parent, win);
   return win;
 }
 
 TickitWindow *tickit_window_new_hidden_subwindow(TickitWindow *parent, int top, int left, int lines, int cols)
 {
   TickitWindow *win = new_window(parent, top, left, lines, cols);
-  _request_hierarchy_change(TICKIT_HIERARCHY_INSERT_LAST, win);
   win->is_visible = false;
+  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_LAST, parent, win);
   return win;
 }
 
 TickitWindow *tickit_window_new_float(TickitWindow *parent, int top, int left, int lines, int cols)
 {
   TickitWindow *win = new_window(parent, top, left, lines, cols);
-  _request_hierarchy_change(TICKIT_HIERARCHY_INSERT_FIRST, win);
+  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_FIRST, parent, win);
   return win;
 }
 
@@ -190,7 +190,7 @@ TickitWindow *tickit_window_new_popup(TickitWindow *parent, int top, int left, i
     root = root->parent;
   }
   TickitWindow *win = new_window(root, top, left, lines, cols);
-  _request_hierarchy_change(TICKIT_HIERARCHY_INSERT_FIRST, win);
+  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_FIRST, root, win);
   win->steal_input = true;
   return win;
 }
