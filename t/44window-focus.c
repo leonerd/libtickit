@@ -127,7 +127,6 @@ int main(int argc, char *argv[])
   // Obscuring by sibling
   {
     TickitWindow *sib = tickit_window_new_subwindow(root, 6, 0, 2, 40);
-    tickit_window_tick(root); // TODO
     tickit_window_raise(sib);
     tickit_window_tick(root);
 
