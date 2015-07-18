@@ -124,6 +124,25 @@ int main(int argc, char *argv[])
         NULL);
   }
 
+  // Obscuring by child
+  {
+    TickitWindow *child = tickit_window_new_subwindow(win, 1, 1, 4, 4);
+    tickit_window_tick(root);
+
+    tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
+    ok(!value, "Cursor is invisible after covering by child window");
+
+    tickit_window_hide(child);
+    tickit_window_tick(root);
+
+    tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
+    ok(value, "Cursor is visible again after lowering child window");
+
+    tickit_window_destroy(child);
+    tickit_window_tick(root);
+    drain_termlog();
+  }
+
   // Obscuring by sibling
   {
     TickitWindow *sib = tickit_window_new_subwindow(root, 6, 0, 2, 40);
