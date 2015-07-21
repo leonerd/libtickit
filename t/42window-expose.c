@@ -232,6 +232,34 @@ int main(int argc, char *argv[])
     tickit_pen_clear_attr(tickit_window_get_pen(win), TICKIT_PEN_FG);
   }
 
+  // New windows get exposed immediately
+  {
+    next_rect = 0;
+    int bind_id_in_win = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_pushrect, NULL);
+
+    TickitWindow *subwin = tickit_window_new_subwindow(win, 1, 4, 3, 6);
+
+    int exposed = 0;
+    int bind_id_in_sub = tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, &on_expose_incr, &exposed);
+
+    tickit_window_tick(root);
+
+    is_int(exposed, 1, "New child window is immediately exposed");
+
+    is_int(next_rect, 1, "pushed 1 exposed rect");
+    is_rect(exposed_rects+0, "4,1+6,3", "exposed_rects[0]");
+
+    next_rect = 0;
+
+    tickit_window_destroy(subwin);
+    tickit_window_tick(root);
+
+    is_int(next_rect, 1, "pushed 1 exposed rect");
+    is_rect(exposed_rects+0, "4,1+6,3", "exposed_rects[0]");
+
+    tickit_window_unbind_event_id(win, bind_id_in_win);
+  }
+
   // Rendering parent and child simultaneously
   {
     int idx_in_win = 3;
