@@ -1,4 +1,4 @@
-#include "tickit-window.h"
+#include "tickit.h"
 #include "hooklists.h"
 
 #include <stdio.h>

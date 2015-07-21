@@ -388,6 +388,63 @@ size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startc
  */
 
 typedef struct TickitWindow TickitWindow;
+typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *info, void *data);
+
+TickitWindow *tickit_window_new_root(TickitTerm *term);
+
+TickitWindow *tickit_window_new_subwindow(TickitWindow *parent, int top, int left, int lines, int cols);
+TickitWindow *tickit_window_new_hidden_subwindow(TickitWindow *parent, int top, int left, int lines, int cols);
+TickitWindow *tickit_window_new_float(TickitWindow *parent, int top, int left, int lines, int cols);
+TickitWindow *tickit_window_new_popup(TickitWindow *parent, int top, int left, int lines, int cols);
+
+TickitWindow *tickit_window_parent(const TickitWindow *win);
+TickitWindow *tickit_window_root(const TickitWindow *win);
+
+void tickit_window_destroy(TickitWindow *win);
+
+// internal API for event management
+void tickit_window_tick(TickitWindow *win);
+
+int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitWindowEventFn *fn, void *data);
+void tickit_window_unbind_event_id(TickitWindow *win, int id);
+
+void tickit_window_raise(TickitWindow *win);
+void tickit_window_raise_to_front(TickitWindow *win);
+void tickit_window_lower(TickitWindow *win);
+void tickit_window_lower_to_back(TickitWindow *win);
+
+void tickit_window_show(TickitWindow *win);
+void tickit_window_hide(TickitWindow *win);
+bool tickit_window_is_visible(TickitWindow *win);
+
+int tickit_window_top(const TickitWindow *win);
+int tickit_window_abs_top(const TickitWindow *win);
+int tickit_window_left(const TickitWindow *win);
+int tickit_window_abs_left(const TickitWindow *win);
+int tickit_window_lines(const TickitWindow *win);
+int tickit_window_cols(const TickitWindow *win);
+int tickit_window_bottom(const TickitWindow *win);
+int tickit_window_right(const TickitWindow *win);
+
+void tickit_window_resize(TickitWindow *win, int lines, int cols);
+void tickit_window_reposition(TickitWindow *win, int top, int left);
+void tickit_window_set_geometry(TickitWindow *win, int top, int left, int lines, int cols);
+
+TickitPen *tickit_window_get_pen(TickitWindow *win);
+void tickit_window_set_pen(TickitWindow *win, TickitPen *pen);
+void tickit_window_expose(TickitWindow *win, const TickitRect *exposed);
+
+bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward, TickitPen *pen);
+bool tickit_window_scroll(TickitWindow *win, int downward, int rightward);
+bool tickit_window_scroll_with_children(TickitWindow *win, int downward, int rightward);
+
+void tickit_window_cursor_at(TickitWindow *win, int line, int col);
+void tickit_window_cursor_visible(TickitWindow *win, bool visible);
+void tickit_window_cursor_shape(TickitWindow *win, TickitTermCursorShape shape);
+
+void tickit_window_take_focus(TickitWindow *win);
+bool tickit_window_is_focused(TickitWindow *win);
+void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
 /*
  * Tickit events
@@ -395,17 +452,18 @@ typedef struct TickitWindow TickitWindow;
 
 /* bitmasks */
 enum TickitEventType {
-  TICKIT_EV_RESIZE     = 0x01, // Term = lines, cols
-  TICKIT_EV_KEY        = 0x02, // Term,Win = type(TickitKeyEventType), str
-  TICKIT_EV_MOUSE      = 0x04, // Term = type(TickitMouseEventType), button, line, col
-  TICKIT_EV_CHANGE     = 0x08, // Pen = {none}
-  TICKIT_EV_GEOMCHANGE = 0x10, // Win = rect
-  TICKIT_EV_EXPOSE     = 0x20, // Win = rect, rb
-  TICKIT_EV_FOCUS      = 0x40, // Win = type(TickitFocusEventType)
+  TICKIT_EV_RESIZE     = 0x01,
+  TICKIT_EV_KEY        = 0x02,
+  TICKIT_EV_MOUSE      = 0x04,
+  TICKIT_EV_CHANGE     = 0x08,
+  TICKIT_EV_GEOMCHANGE = 0x10,
+  TICKIT_EV_EXPOSE     = 0x20,
+  TICKIT_EV_FOCUS      = 0x40,
 
   TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
 };
 
+// TICKIT_EV_RESIZE
 typedef struct {
   int lines, cols;
 } TickitResizeEventInfo;
@@ -415,6 +473,7 @@ typedef enum {
   TICKIT_KEYEV_TEXT,
 } TickitKeyEventType;
 
+// TICKIT_EV_KEY
 typedef struct {
   TickitKeyEventType type;
   int mod;
@@ -433,6 +492,7 @@ enum {
   TICKIT_MOUSEWHEEL_DOWN,
 };
 
+// TICKIT_EV_MOUSE
 typedef struct {
   TickitMouseEventType type;
   int button;
@@ -445,6 +505,28 @@ enum {
   TICKIT_MOD_ALT   = 0x02,
   TICKIT_MOD_CTRL  = 0x04,
 };
+
+// TICKIT_EV_GEOMCHANGE
+typedef struct {
+  TickitRect rect;
+} TickitGeomchangeEventInfo;
+
+// TICKIT_EV_EXPOSE
+typedef struct {
+  TickitRect rect;
+  TickitRenderBuffer *rb;
+} TickitExposeEventInfo;
+
+typedef enum {
+  TICKIT_FOCUSEV_IN = 1,
+  TICKIT_FOCUSEV_OUT,
+} TickitFocusEventType;
+
+// TICKIT_EV_FOCUS
+typedef struct {
+  TickitFocusEventType type;
+  TickitWindow *win;
+} TickitFocusEventInfo;
 
 #endif
 

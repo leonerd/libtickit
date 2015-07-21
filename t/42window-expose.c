@@ -1,5 +1,4 @@
 #include "tickit.h"
-#include "tickit-window.h"
 #include "taplib.h"
 #include "taplib-tickit.h"
 #include "taplib-mockterm.h"
