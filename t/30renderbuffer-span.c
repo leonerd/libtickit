@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
     cols = tickit_renderbuffer_text_at(rb, 0, 1, "text span");
     is_int(cols, 9, "cols from text_at");
     tickit_renderbuffer_erase_at(rb, 1, 1, 5);
+    tickit_renderbuffer_textf_at(rb, 2, 1, "message %d", 123);
 
     is_int(tickit_renderbuffer_get_cell_text(rb, 0, 1, buffer, sizeof buffer), 1, "get_cell_text TEXT at 0,1");
     is_str(buffer, "t", "buffer text at TEXT 0,1");
@@ -45,6 +46,7 @@ int main(int argc, char *argv[])
     is_termlog("RenderBuffer renders text to terminal",
         GOTO(0,1), SETPEN(.fg=1), PRINT("text span"),
         GOTO(1,1), SETPEN(.fg=1), ERASECH(5,-1),
+        GOTO(2,1), SETPEN(.fg=1), PRINT("message 123"),
         NULL);
 
     tickit_renderbuffer_flush_to_term(rb, tt);
@@ -142,10 +144,14 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_goto(rb, 1, 2);
     tickit_renderbuffer_erase(rb, 5);
 
+    tickit_renderbuffer_goto(rb, 2, 2);
+    tickit_renderbuffer_textf(rb, "another %08s", "string");
+
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer renders text at VC",
         GOTO(0,2), SETPEN(.fg=3), PRINT("text span"),
         GOTO(1,2), SETPEN(.fg=3), ERASECH(5,-1),
+        GOTO(2,2), SETPEN(.fg=3), PRINT("another   string"),
         NULL);
 
     tickit_pen_destroy(fg_pen);

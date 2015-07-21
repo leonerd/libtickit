@@ -3,6 +3,7 @@
 
 #include "tickit.h"
 
+#include <stdio.h>  // vsnprintf
 #include <stdlib.h>
 #include <string.h>
 
@@ -233,6 +234,17 @@ static void tmp_cat_utf8(TickitRenderBuffer *rb, long codepoint)
   rb->tmplen += seqlen;
 
   /* rb->tmp remains NOT nul-terminated */
+}
+
+static void tmp_alloc(TickitRenderBuffer *rb, size_t len)
+{
+  if(rb->tmpsize < len) {
+    free(rb->tmp);
+
+    while(rb->tmpsize < len)
+      rb->tmpsize *= 2;
+    rb->tmp = malloc(rb->tmpsize);
+  }
 }
 
 TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols)
@@ -654,6 +666,55 @@ int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len)
     return -1;
 
   int cols = tickit_renderbuffer_textn_at(rb, rb->vc_line, rb->vc_col, text, len);
+  rb->vc_col += cols;
+
+  return cols;
+}
+
+int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+
+  int ret = tickit_renderbuffer_vtextf_at(rb, line, col, fmt, args);
+
+  va_end(args);
+
+  return ret;
+}
+
+int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, char *fmt, va_list args)
+{
+  /* It's likely the string will fit in, say, 64 bytes */
+  char buffer[64];
+  size_t len = vsnprintf(buffer, sizeof buffer, fmt, args);
+
+  if(len < sizeof buffer)
+    return tickit_renderbuffer_textn_at(rb, line, col, buffer, len);
+
+  tmp_alloc(rb, len + 1);
+  vsnprintf(rb->tmp, rb->tmpsize, fmt, args);
+  return tickit_renderbuffer_textn_at(rb, line, col, rb->tmp, len);
+}
+
+int tickit_renderbuffer_textf(TickitRenderBuffer *rb, char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+
+  int ret = tickit_renderbuffer_vtextf(rb, fmt, args);
+
+  va_end(args);
+
+  return ret;
+}
+
+int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, char *fmt, va_list args)
+{
+  if(!rb->vc_pos_set)
+    return -1;
+
+  int cols = tickit_renderbuffer_vtextf_at(rb, rb->vc_line, rb->vc_col, fmt, args);
   rb->vc_col += cols;
 
   return cols;

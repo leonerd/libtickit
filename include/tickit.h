@@ -327,6 +327,10 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char 
 int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len);
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text);
 int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len);
+int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, char *fmt, ...);
+int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, char *fmt, va_list args);
+int tickit_renderbuffer_textf(TickitRenderBuffer *rb, char *fmt, ...);
+int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, char *fmt, va_list args);
 void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols);
 void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols);
 void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col);

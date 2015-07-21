@@ -9,17 +9,26 @@ tickit_renderbuffer_text, tickit_renderbuffer_text_at \- create text regions
 .BI "        char *" text );
 .BI "int tickit_renderbuffer_textn(TickitRenderBuffer *" rb ,
 .BI "        char *" text ", size_t " len );
+.BI "int tickit_renderbuffer_textf(TickitRenderBuffer *" rb ,
+.BI "        char *" fmt ", ...);"
+.BI "int tickit_renderbuffer_vtextf(TickitRenderBuffer *" rb ,
+.BI "        char *" fmt ", va_list " args );
+.sp
 .BI "int tickit_renderbuffer_text_at(TickitRenderBuffer *" rb ,
 .BI "        int " line ", int " col ", char *" text );
 .BI "int tickit_renderbuffer_textn_at(TickitRenderBuffer *" rb ,
 .BI "        int " line ", int " col ", char *" text ", size_t " len );
+.BI "int tickit_renderbuffer_textf_at(TickitRenderBuffer *" rb ,
+.BI "        int " line ", int " col ", char *" fmt ", ...);"
+.BI "int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *" rb ,
+.BI "        int " line ", int " col ", char *" fmt ", va_list " args );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the current pen. \fBtickit_renderbuffer_textn\fP() creates a text region of at most \fIlen\fP bytes. It returns the number of columns that the text string occupies. This function will update the virtual cursor position.
+\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the current pen. \fBtickit_renderbuffer_textn\fP() creates a text region of at most \fIlen\fP bytes. It returns the number of columns that the text string occupies.  \fBtickit_renderbuffer_textf\fP() and \fBtickit_renderbuffer_vtextf\fP() take a format string in the style of \fBsprintf\fP(3) to create formatted text from either a list of arguments or a \fIva_list\fP. These functions will update the virtual cursor position.
 .PP
-\fBtickit_renderbuffer_text_at\fP() creates a text region at the given position. \fBtickit_renderbuffer_textn_at\fP() creates a text region of at most \fIlen\fP bytes. This function does not use or update the virtual cursor position.
+\fBtickit_renderbuffer_text_at\fP(), \fBtickit_renderbuffer_textn_at\fP(), \fBtickit_renderbuffer_textf_at\fP() and \fBtickit_renderbuffer_vtextf_at\fP() create a text region at the given position, and otherwise operate analogously to their non-\fB_at\fP counterpart. These functions do not use or update the virtual cursor position.
 .PP
 Calls to any of these functions allocate storage owned by the \fITickitRenderBuffer\fP instance itself to store the strings. This storage is only released again by \fBtickit_renderbuffer_reset\fP(3) or by the implicit reset that happens at the end of \fBtickit_renderbuffer_flush_to_term\fP(3).
 .SH "RETURN VALUE"
