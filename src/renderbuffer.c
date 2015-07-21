@@ -221,22 +221,6 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
   return &cells[line][col];
 }
 
-static TickitPen *merge_pen(TickitRenderBuffer *rb, TickitPen *direct_pen)
-{
-  TickitPen *pen = tickit_pen_new();
-
-  // TODO: When libtickit itself can refcount pens, we can make this more
-  //   efficient in non-merge cases
-
-  if(rb->pen)
-    tickit_pen_copy(pen, rb->pen, 1);
-
-  if(direct_pen)
-    tickit_pen_copy(pen, direct_pen, 1);
-
-  return pen;
-}
-
 static void tmp_cat_utf8(TickitRenderBuffer *rb, long codepoint)
 {
   int seqlen = tickit_string_seqlen(codepoint);
@@ -470,10 +454,10 @@ void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
   free_texts(rb);
 }
 
-void tickit_renderbuffer_clear(TickitRenderBuffer *rb, TickitPen *pen)
+void tickit_renderbuffer_clear(TickitRenderBuffer *rb)
 {
   for(int line = 0; line < rb->lines; line++)
-    tickit_renderbuffer_erase_at(rb, line, 0, rb->cols, pen);
+    tickit_renderbuffer_erase_at(rb, line, 0, rb->cols);
 }
 
 void tickit_renderbuffer_save(TickitRenderBuffer *rb)
@@ -590,12 +574,12 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
   rb->vc_col = col;
 }
 
-int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text, TickitPen *pen)
+int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text)
 {
-  return tickit_renderbuffer_textn_at(rb, line, col, text, -1, pen);
+  return tickit_renderbuffer_textn_at(rb, line, col, text, -1);
 }
 
-int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len, TickitPen *pen)
+int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len)
 {
 
   TickitStringPos endpos;
@@ -640,7 +624,7 @@ int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char
 
     RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state       = TEXT;
-    cell->pen         = merge_pen(rb, pen);
+    cell->pen         = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
     cell->v.text.idx  = rb->n_texts;
     cell->v.text.offs = startcol;
 
@@ -653,29 +637,29 @@ int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char
   return ret;
 }
 
-int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text, TickitPen *pen)
+int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text)
 {
   if(!rb->vc_pos_set)
     return -1;
 
-  int cols = tickit_renderbuffer_text_at(rb, rb->vc_line, rb->vc_col, text, pen);
+  int cols = tickit_renderbuffer_text_at(rb, rb->vc_line, rb->vc_col, text);
   rb->vc_col += cols;
 
   return cols;
 }
 
-int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len, TickitPen *pen)
+int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len)
 {
   if(!rb->vc_pos_set)
     return -1;
 
-  int cols = tickit_renderbuffer_textn_at(rb, rb->vc_line, rb->vc_col, text, len, pen);
+  int cols = tickit_renderbuffer_textn_at(rb, rb->vc_line, rb->vc_col, text, len);
   rb->vc_col += cols;
 
   return cols;
 }
 
-void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols, TickitPen *pen)
+void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols)
 {
   if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
     return;
@@ -700,39 +684,39 @@ void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int
 
     RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state = ERASE;
-    cell->pen   = merge_pen(rb, pen);
+    cell->pen   = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
 
     col += spanlen;
   }
 }
 
-void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols, TickitPen *pen)
+void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols)
 {
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, cols, pen);
+  tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, cols);
   rb->vc_col += cols;
 }
 
-void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen)
+void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col)
 {
   if(!rb->vc_pos_set)
     return;
 
   if(rb->vc_col < col)
-    tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, col - rb->vc_col, pen);
+    tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
 
   rb->vc_col = col;
 }
 
-void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect, TickitPen *pen)
+void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect)
 {
   for(int line = rect->top; line < tickit_rect_bottom(rect); line++)
-    tickit_renderbuffer_erase_at(rb, line, rect->left, rect->cols, pen);
+    tickit_renderbuffer_erase_at(rb, line, rect->left, rect->cols);
 }
 
-void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint, TickitPen *pen)
+void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint)
 {
   int cols = 1;
 
@@ -744,21 +728,21 @@ void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long
 
   RBCell *cell = make_span(rb, line, col, cols);
   cell->state           = CHAR;
-  cell->pen             = merge_pen(rb, pen);
+  cell->pen             = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
   cell->v.chr.codepoint = codepoint;
 }
 
-void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint, TickitPen *pen)
+void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint)
 {
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_char_at(rb, rb->vc_line, rb->vc_col, codepoint, pen);
+  tickit_renderbuffer_char_at(rb, rb->vc_line, rb->vc_col, codepoint);
   // TODO: might not be 1; would have to look it up
   rb->vc_col += 1;
 }
 
-static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, TickitPen *pen)
+static void linecell(TickitRenderBuffer *rb, int line, int col, int bits)
 {
   int cols = 1;
 
@@ -768,7 +752,7 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, Tickit
   if(rb->cells[line][col].maskdepth > -1)
     return;
 
-  TickitPen *cellpen = merge_pen(rb, pen);
+  TickitPen *cellpen = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
 
   RBCell *cell = &rb->cells[line][col];
   if(cell->state != LINE) {
@@ -789,31 +773,27 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits, Tickit
 }
 
 void tickit_renderbuffer_hline_at(TickitRenderBuffer *rb, int line, int startcol, int endcol,
-    TickitLineStyle style, TickitPen *pen, TickitLineCaps caps)
+    TickitLineStyle style, TickitLineCaps caps)
 {
   int east = style << EAST_SHIFT;
   int west = style << WEST_SHIFT;
 
-  pen = merge_pen(rb, pen);
-
-  linecell(rb, line, startcol, east | (caps & TICKIT_LINECAP_START ? west : 0), pen);
+  linecell(rb, line, startcol, east | (caps & TICKIT_LINECAP_START ? west : 0));
   for(int col = startcol + 1; col <= endcol - 1; col++)
-    linecell(rb, line, col, east | west, pen);
-  linecell(rb, line, endcol, (caps & TICKIT_LINECAP_END ? east : 0) | west, pen);
+    linecell(rb, line, col, east | west);
+  linecell(rb, line, endcol, (caps & TICKIT_LINECAP_END ? east : 0) | west);
 }
 
 void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int endline, int col,
-    TickitLineStyle style, TickitPen *pen, TickitLineCaps caps)
+    TickitLineStyle style, TickitLineCaps caps)
 {
   int north = style << NORTH_SHIFT;
   int south = style << SOUTH_SHIFT;
 
-  pen = merge_pen(rb, pen);
-
-  linecell(rb, startline, col, south | (caps & TICKIT_LINECAP_START ? north : 0), pen);
+  linecell(rb, startline, col, south | (caps & TICKIT_LINECAP_START ? north : 0));
   for(int line = startline + 1; line <= endline - 1; line++)
-    linecell(rb, line, col, south | north, pen);
-  linecell(rb, endline, col, (caps & TICKIT_LINECAP_END ? south : 0) | north, pen);
+    linecell(rb, line, col, south | north);
+  linecell(rb, endline, col, (caps & TICKIT_LINECAP_END ? south : 0) | north);
 }
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
@@ -917,6 +897,11 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
     for(int col = 0; col < src->cols; /**/) {
       RBCell *cell = &src->cells[line][col];
 
+      if(cell->state != SKIP) {
+        tickit_renderbuffer_savepen(dst);
+        tickit_renderbuffer_setpen(dst, cell->pen);
+      }
+
       switch(cell->state) {
         case SKIP:
           break;
@@ -932,22 +917,25 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
             end = start;
             tickit_string_countmore(text, &end, &limit);
 
-            tickit_renderbuffer_textn_at(dst, line, col, text + start.bytes, end.bytes - start.bytes, cell->pen);
+            tickit_renderbuffer_textn_at(dst, line, col, text + start.bytes, end.bytes - start.bytes);
           }
           break;
         case ERASE:
-          tickit_renderbuffer_erase_at(dst, line, col, cell->cols, cell->pen);
+          tickit_renderbuffer_erase_at(dst, line, col, cell->cols);
           break;
         case LINE:
-          linecell(dst, line, col, cell->v.line.mask, cell->pen);
+          linecell(dst, line, col, cell->v.line.mask);
           break;
         case CHAR:
-          tickit_renderbuffer_char_at(dst, line, col, cell->v.chr.codepoint, cell->pen);
+          tickit_renderbuffer_char_at(dst, line, col, cell->v.chr.codepoint);
           break;
         case CONT:
           /* unreachable */
           abort();
       }
+
+      if(cell->state != SKIP)
+        tickit_renderbuffer_restore(dst);
 
       col += cell->cols;
     }

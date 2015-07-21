@@ -323,17 +323,17 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb);
 void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int cols);
 void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols);
 void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col);
-int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text, TickitPen *pen);
-int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len, TickitPen *pen);
-int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text, TickitPen *pen);
-int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len, TickitPen *pen);
-void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols, TickitPen *pen);
-void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols, TickitPen *pen);
-void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col, TickitPen *pen);
-void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect, TickitPen *pen);
-void tickit_renderbuffer_clear(TickitRenderBuffer *rb, TickitPen *pen);
-void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint, TickitPen *pen);
-void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint, TickitPen *pen);
+int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text);
+int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len);
+int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text);
+int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len);
+void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols);
+void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols);
+void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col);
+void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect);
+void tickit_renderbuffer_clear(TickitRenderBuffer *rb);
+void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint);
+void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint);
 
 typedef enum {
   TICKIT_LINE_SINGLE = 1,
@@ -348,9 +348,9 @@ typedef enum {
 } TickitLineCaps;
 
 void tickit_renderbuffer_hline_at(TickitRenderBuffer *rb, int line, int startcol, int endcol,
-    TickitLineStyle style, TickitPen *pen, TickitLineCaps caps);
+    TickitLineStyle style, TickitLineCaps caps);
 void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int endline, int col,
-    TickitLineStyle style, TickitPen *pen, TickitLineCaps caps);
+    TickitLineStyle style, TickitLineCaps caps);
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt);
 

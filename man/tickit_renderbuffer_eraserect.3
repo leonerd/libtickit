@@ -6,16 +6,15 @@ tickit_renderbuffer_eraserect, tickit_renderbuffer_clear \- erase large areas
 .B #include <tickit.h>
 .sp
 .BI "void tickit_renderbuffer_eraserect(TickitRenderBuffer *" rb ,
-.BI "         TickitRect *" rect ", TickitPen *" pen );
-.BI "void tickit_renderbuffer_clear(TickitRenderBuffer *" rb ",
-.BI "         TickitPen *" pen );
+.BI "         TickitRect *" rect );
+.BI "void tickit_renderbuffer_clear(TickitRenderBuffer *" rb );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_eraserect\fP() creates erase regions for every line in \fIrect\fP within the buffer, set to the given pen.
+\fBtickit_renderbuffer_eraserect\fP() creates erase regions for every line in \fIrect\fP within the buffer, set to the current pen.
 .PP
-\fBtickit_renderbuffer_clear\fP() erases the entire buffer area within the current clipping region and masks, setting it all to be erase regions with the given pen.
+\fBtickit_renderbuffer_clear\fP() erases the entire buffer area within the current clipping region and masks, setting it all to be erase regions with the curent pen.
 .PP
 Neither of these functions use or update the virtual cursor.
 .SH "RETURN VALUE"
@@ -25,5 +24,4 @@ These functions return nothing
 .BR tickit_renderbuffer_blit (3),
 .BR tickit_renderbuffer_flush_to_term (3),
 .BR tickit_renderbuffer (7),
-.BR tickit_pen (7),
 .BR tickit (7)

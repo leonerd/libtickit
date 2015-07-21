@@ -33,25 +33,25 @@ int on_expose_render_text(TickitWindow *win, TickitEventType ev, void *_info, vo
 
   switch(*(int *)data) {
     case 1:
-      tickit_renderbuffer_text_at(rb, 1, 1, "The text", NULL);
-      tickit_renderbuffer_erase_at(rb, 2, 2, 4, NULL);
+      tickit_renderbuffer_text_at(rb, 1, 1, "The text");
+      tickit_renderbuffer_erase_at(rb, 2, 2, 4);
       break;
 
     case 2:
       for(int line = info->rect.top; line < info->rect.top + info->rect.lines; line++) {
         char buffer[16];
         sprintf(buffer, "Line %d", line);
-        tickit_renderbuffer_text_at(rb, line, 0, buffer, NULL);
+        tickit_renderbuffer_text_at(rb, line, 0, buffer);
       }
       break;
 
     case 3: // parent
-      tickit_renderbuffer_text_at(rb, 0,  0, "Parent", NULL);
-      tickit_renderbuffer_text_at(rb, 0, 14, "Parent", NULL);
+      tickit_renderbuffer_text_at(rb, 0,  0, "Parent");
+      tickit_renderbuffer_text_at(rb, 0, 14, "Parent");
       break;
 
     case 4: // child
-      tickit_renderbuffer_text_at(rb, 0, 0, "Child", NULL);
+      tickit_renderbuffer_text_at(rb, 0, 0, "Child");
       break;
   }
 
@@ -67,7 +67,7 @@ int on_expose_fillX(TickitWindow *win, TickitEventType ev, void *_info, void *da
     for(int i = 0; i < info->rect.cols; i++)
       buffer[i] = 'X';
     buffer[info->rect.cols] = 0;
-    tickit_renderbuffer_text_at(info->rb, line, info->rect.left, buffer, NULL);
+    tickit_renderbuffer_text_at(info->rb, line, info->rect.left, buffer);
   }
 
   return 1;
@@ -77,7 +77,7 @@ int on_expose_textat(TickitWindow *win, TickitEventType ev, void *_info, void *d
 {
   TickitExposeEventInfo *info = _info;
 
-  tickit_renderbuffer_text_at(info->rb, 0, 0, data, NULL);
+  tickit_renderbuffer_text_at(info->rb, 0, 0, data);
   return 1;
 }
 

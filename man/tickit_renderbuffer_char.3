@@ -6,9 +6,9 @@ tickit_renderbuffer_char, tickit_renderbuffer_char_at \- create character region
 .B #include <tickit.h>
 .sp
 .BI "int tickit_renderbuffer_char(TickitRenderBuffer *" rb ,
-.BI "        long " codepoint ", TickitPen *" pen );
+.BI "        long " codepoint );
 .BI "int tickit_renderbuffer_char_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", long " codepoint ", TickitPen *" pen );
+.BI "        int " line ", int " col ", long " codepoint );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
@@ -23,5 +23,4 @@ This function returns no value.
 .BR tickit_renderbuffer_blit (3),
 .BR tickit_renderbuffer_flush_to_term (3),
 .BR tickit_renderbuffer (7),
-.BR tickit_pen (7),
 .BR tickit (7)

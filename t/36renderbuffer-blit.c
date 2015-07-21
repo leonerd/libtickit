@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 
   // Basic blit
   {
-    tickit_renderbuffer_text_at(window, 0, 0, "Hello", NULL);
-    tickit_renderbuffer_char_at(window, 1, 1, 'A', NULL);
+    tickit_renderbuffer_text_at(window, 0, 0, "Hello");
+    tickit_renderbuffer_char_at(window, 1, 1, 'A');
     tickit_renderbuffer_skip_at(window, 2, 2, 2);
 
     tickit_renderbuffer_blit(screen, window);
@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
   // Blitting an erase wipes underlying content
   {
     tickit_renderbuffer_reset(window);
-    tickit_renderbuffer_text_at(screen, 0, 0, "Hello", NULL);
-    tickit_renderbuffer_erase_at(window, 0, 0, 4, NULL);
+    tickit_renderbuffer_text_at(screen, 0, 0, "Hello");
+    tickit_renderbuffer_erase_at(window, 0, 0, 4);
 
     tickit_renderbuffer_blit(screen, window);
 
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_reset(window);
     TickitRect mask = { .top = 0, .left = 2, .lines = 1, .cols = 1 };
     tickit_renderbuffer_mask(window, &mask);
-    tickit_renderbuffer_text_at(window, 0, 0, "Hello", NULL);
+    tickit_renderbuffer_text_at(window, 0, 0, "Hello");
 
     tickit_renderbuffer_blit(screen, window);
 
@@ -68,9 +68,9 @@ int main(int argc, char *argv[])
   // Blitting merges line segments
   {
     tickit_renderbuffer_reset(window);
-    tickit_renderbuffer_hline_at(window, 1, 0, 20, TICKIT_LINE_SINGLE, NULL, 0);
+    tickit_renderbuffer_hline_at(window, 1, 0, 20, TICKIT_LINE_SINGLE, 0);
 
-    tickit_renderbuffer_vline_at(screen, 0, 2, 5, TICKIT_LINE_SINGLE, NULL, 0);
+    tickit_renderbuffer_vline_at(screen, 0, 2, 5, TICKIT_LINE_SINGLE, 0);
 
     tickit_renderbuffer_blit(screen, window);
 
@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_translate(window, 3, 3);
     tickit_renderbuffer_translate(screen, 2, 4);
 
-    tickit_renderbuffer_text_at(window, 0, 1, "Hello", NULL);
-    tickit_renderbuffer_char_at(window, 2, 4, 'B', NULL);
+    tickit_renderbuffer_text_at(window, 0, 1, "Hello");
+    tickit_renderbuffer_char_at(window, 2, 4, 'B');
 
     tickit_renderbuffer_blit(screen, window);
 
@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
     TickitRect clip = { .top=2, .left=2, .lines=6, .cols=16 };
     tickit_renderbuffer_clip(screen, &clip);
 
-    tickit_renderbuffer_text_at(window, 1, 0, "Hello", NULL);
-    tickit_renderbuffer_text_at(window, 2, 0, "World", NULL);
-    tickit_renderbuffer_char_at(window, 2, 19, 'C', NULL);
+    tickit_renderbuffer_text_at(window, 1, 0, "Hello");
+    tickit_renderbuffer_text_at(window, 2, 0, "World");
+    tickit_renderbuffer_char_at(window, 2, 19, 'C');
 
     tickit_renderbuffer_blit(screen, window);
 
@@ -140,13 +140,25 @@ int main(int argc, char *argv[])
         TICKIT_PEN_BG, 6,
         -1);
 
-    tickit_renderbuffer_text_at(window, 0, 0, "Hello", NULL);
-    tickit_renderbuffer_char_at(window, 1, 1, 'A', bg_pen);
-    tickit_renderbuffer_setpen(window, NULL);
-    tickit_renderbuffer_text_at(window, 2, 2, "World", bg_pen);
-    tickit_renderbuffer_text_at(window, 3, 3, "Again", NULL);
+    tickit_renderbuffer_text_at(window, 0, 0, "Hello");
+    {
+      tickit_renderbuffer_savepen(window);
+      tickit_renderbuffer_setpen(window, bg_pen);
+      tickit_renderbuffer_char_at(window, 1, 1, 'A');
+      tickit_renderbuffer_restore(window);
+    }
 
-    tickit_renderbuffer_text_at(screen, 4, 4, "Preserved Pen", NULL);
+    tickit_renderbuffer_setpen(window, NULL);
+
+    {
+      tickit_renderbuffer_savepen(window);
+      tickit_renderbuffer_setpen(window, bg_pen);
+      tickit_renderbuffer_text_at(window, 2, 2, "World");
+      tickit_renderbuffer_restore(window);
+    }
+
+    tickit_renderbuffer_text_at(window, 3, 3, "Again");
+    tickit_renderbuffer_text_at(screen, 4, 4, "Preserved Pen");
 
     tickit_renderbuffer_blit(screen, window);
 

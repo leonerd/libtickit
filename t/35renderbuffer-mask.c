@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
   {
     tickit_renderbuffer_mask(rb, &mask);
 
-    tickit_renderbuffer_text_at(rb, 3, 2, "ABCDEFG", NULL);      // before
-    tickit_renderbuffer_text_at(rb, 4, 6, "HI", NULL);           // inside
-    tickit_renderbuffer_text_at(rb, 5, 8, "JKLMN", NULL);        // after
-    tickit_renderbuffer_text_at(rb, 6, 2, "OPQRSTUVWXYZ", NULL); // spanning
+    tickit_renderbuffer_text_at(rb, 3, 2, "ABCDEFG");      // before
+    tickit_renderbuffer_text_at(rb, 4, 6, "HI");           // inside
+    tickit_renderbuffer_text_at(rb, 5, 8, "JKLMN");        // after
+    tickit_renderbuffer_text_at(rb, 6, 2, "OPQRSTUVWXYZ"); // spanning
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer masking around text",
@@ -33,10 +33,10 @@ int main(int argc, char *argv[])
   {
     tickit_renderbuffer_mask(rb, &mask);
 
-    tickit_renderbuffer_erase_at(rb, 3, 2,  6, NULL); // before
-    tickit_renderbuffer_erase_at(rb, 4, 6,  2, NULL); // inside
-    tickit_renderbuffer_erase_at(rb, 5, 8,  5, NULL); // after
-    tickit_renderbuffer_erase_at(rb, 6, 2, 12, NULL); // spanning
+    tickit_renderbuffer_erase_at(rb, 3, 2,  6); // before
+    tickit_renderbuffer_erase_at(rb, 4, 6,  2); // inside
+    tickit_renderbuffer_erase_at(rb, 5, 8,  5); // after
+    tickit_renderbuffer_erase_at(rb, 6, 2, 12); // spanning
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer masking around erasech",
@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
   {
     tickit_renderbuffer_mask(rb, &mask);
 
-    tickit_renderbuffer_hline_at(rb, 3, 2,  8, TICKIT_LINE_SINGLE, NULL, 0);
-    tickit_renderbuffer_hline_at(rb, 4, 6,  8, TICKIT_LINE_SINGLE, NULL, 0);
-    tickit_renderbuffer_hline_at(rb, 5, 8, 13, TICKIT_LINE_SINGLE, NULL, 0);
-    tickit_renderbuffer_hline_at(rb, 6, 2, 14, TICKIT_LINE_SINGLE, NULL, 0);
+    tickit_renderbuffer_hline_at(rb, 3, 2,  8, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_hline_at(rb, 4, 6,  8, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_hline_at(rb, 5, 8, 13, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_hline_at(rb, 6, 2, 14, TICKIT_LINE_SINGLE, 0);
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer masking around lines",
@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
     {
       tickit_renderbuffer_mask(rb, &mask);
 
-      tickit_renderbuffer_text_at(rb, 3, 0, "AAAAAAAAAAAAAAAAAAAA", NULL);
+      tickit_renderbuffer_text_at(rb, 3, 0, "AAAAAAAAAAAAAAAAAAAA");
     }
     tickit_renderbuffer_restore(rb);
 
-    tickit_renderbuffer_text_at(rb, 4, 0, "BBBBBBBBBBBBBBBBBBBB", NULL);
+    tickit_renderbuffer_text_at(rb, 4, 0, "BBBBBBBBBBBBBBBBBBBB");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer save/restore removes mask",
@@ -92,25 +92,25 @@ int main(int argc, char *argv[])
     {
       tickit_renderbuffer_save(rb);
       tickit_renderbuffer_translate(rb, 0, 0);
-      tickit_renderbuffer_text_at(rb, 0, 0, "A", NULL);
+      tickit_renderbuffer_text_at(rb, 0, 0, "A");
       tickit_renderbuffer_restore(rb);
     }
     {
       tickit_renderbuffer_save(rb);
       tickit_renderbuffer_translate(rb, 0, 2);
-      tickit_renderbuffer_text_at(rb, 0, 0, "B", NULL);
+      tickit_renderbuffer_text_at(rb, 0, 0, "B");
       tickit_renderbuffer_restore(rb);
     }
     {
       tickit_renderbuffer_save(rb);
       tickit_renderbuffer_translate(rb, 2, 0);
-      tickit_renderbuffer_text_at(rb, 0, 0, "C", NULL);
+      tickit_renderbuffer_text_at(rb, 0, 0, "C");
       tickit_renderbuffer_restore(rb);
     }
     {
       tickit_renderbuffer_save(rb);
       tickit_renderbuffer_translate(rb, 2, 2);
-      tickit_renderbuffer_text_at(rb, 0, 0, "D", NULL);
+      tickit_renderbuffer_text_at(rb, 0, 0, "D");
       tickit_renderbuffer_restore(rb);
     }
 

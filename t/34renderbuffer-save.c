@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     is_int(line, 2, "line after restore");
     is_int(col,  2, "col after restore");
 
-    tickit_renderbuffer_text(rb, "some text", NULL);
+    tickit_renderbuffer_text(rb, "some text");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("Stack saves/restores virtual cursor position",
@@ -40,18 +40,18 @@ int main(int argc, char *argv[])
 
   // Clipping
   {
-    tickit_renderbuffer_text_at(rb, 0, 0, "0000000000", NULL);
+    tickit_renderbuffer_text_at(rb, 0, 0, "0000000000");
 
     {
       tickit_renderbuffer_save(rb);
       tickit_renderbuffer_clip(rb, &(TickitRect){.top = 0, .left = 2, .lines = 10, .cols = 16});
 
-      tickit_renderbuffer_text_at(rb, 1, 0, "1111111111", NULL);
+      tickit_renderbuffer_text_at(rb, 1, 0, "1111111111");
 
       tickit_renderbuffer_restore(rb);
     }
 
-    tickit_renderbuffer_text_at(rb, 2, 0, "2222222222", NULL);
+    tickit_renderbuffer_text_at(rb, 2, 0, "2222222222");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("Stack saves/restores clipping region",
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 1, -1));
     tickit_pen_destroy(pen);
 
-    tickit_renderbuffer_text(rb, "123", NULL);
+    tickit_renderbuffer_text(rb, "123");
 
     {
       tickit_renderbuffer_savepen(rb);
@@ -78,17 +78,17 @@ int main(int argc, char *argv[])
       tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 4, -1));
       tickit_pen_destroy(pen);
 
-      tickit_renderbuffer_text(rb, "456", NULL);
+      tickit_renderbuffer_text(rb, "456");
 
       tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_BG, -1, -1));
       tickit_pen_destroy(pen);
 
-      tickit_renderbuffer_text(rb, "789", NULL);
+      tickit_renderbuffer_text(rb, "789");
 
       tickit_renderbuffer_restore(rb);
     }
 
-    tickit_renderbuffer_text(rb, "ABC", NULL);
+    tickit_renderbuffer_text(rb, "ABC");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("Stack saves/restores render pen",
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_REVERSE, 1, -1));
     tickit_pen_destroy(pen);
 
-    tickit_renderbuffer_text(rb, "123", NULL);
+    tickit_renderbuffer_text(rb, "123");
 
     {
       tickit_renderbuffer_savepen(rb);
@@ -111,12 +111,12 @@ int main(int argc, char *argv[])
       tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_REVERSE, 0, -1));
       tickit_pen_destroy(pen);
 
-      tickit_renderbuffer_text(rb, "456", NULL);
+      tickit_renderbuffer_text(rb, "456");
 
       tickit_renderbuffer_restore(rb);
     }
 
-    tickit_renderbuffer_text(rb, "789", NULL);
+    tickit_renderbuffer_text(rb, "789");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("Stack saves/restores allow zeroing pen attributes",
@@ -128,17 +128,17 @@ int main(int argc, char *argv[])
 
   // Translation
   {
-    tickit_renderbuffer_text_at(rb, 0, 0, "A", NULL);
+    tickit_renderbuffer_text_at(rb, 0, 0, "A");
 
     tickit_renderbuffer_save(rb);
     {
       tickit_renderbuffer_translate(rb, 2, 2);
 
-      tickit_renderbuffer_text_at(rb, 1, 1, "B", NULL);
+      tickit_renderbuffer_text_at(rb, 1, 1, "B");
     }
     tickit_renderbuffer_restore(rb);
 
-    tickit_renderbuffer_text_at(rb, 2, 2, "C", NULL);
+    tickit_renderbuffer_text_at(rb, 2, 2, "C");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("Stack saves/restores translation offset",

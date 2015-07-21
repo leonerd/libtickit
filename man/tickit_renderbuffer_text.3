@@ -6,18 +6,18 @@ tickit_renderbuffer_text, tickit_renderbuffer_text_at \- create text regions
 .B #include <tickit.h>
 .sp
 .BI "int tickit_renderbuffer_text(TickitRenderBuffer *" rb ,
-.BI "        char *" text ", TickitPen *" pen );
+.BI "        char *" text );
 .BI "int tickit_renderbuffer_textn(TickitRenderBuffer *" rb ,
-.BI "        char *" text ", size_t " len ", TickitPen *" pen );
+.BI "        char *" text ", size_t " len );
 .BI "int tickit_renderbuffer_text_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", char *" text ", TickitPen *" pen );
+.BI "        int " line ", int " col ", char *" text );
 .BI "int tickit_renderbuffer_textn_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", char *" text ", size_t " len ", TickitPen *" pen );
+.BI "        int " line ", int " col ", char *" text ", size_t " len );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the given pen. \fBtickit_renderbuffer_textn\fP() creates a text region of at most \fIlen\fP bytes. It returns the number of columns that the text string occupies. This function will update the virtual cursor position.
+\fBtickit_renderbuffer_text\fP() creates a text region that starts at the current virtual cursor position, containing the given text string and set to the current pen. \fBtickit_renderbuffer_textn\fP() creates a text region of at most \fIlen\fP bytes. It returns the number of columns that the text string occupies. This function will update the virtual cursor position.
 .PP
 \fBtickit_renderbuffer_text_at\fP() creates a text region at the given position. \fBtickit_renderbuffer_textn_at\fP() creates a text region of at most \fIlen\fP bytes. This function does not use or update the virtual cursor position.
 .PP
@@ -29,5 +29,4 @@ These functions return an integer giving the number of columns the new region oc
 .BR tickit_renderbuffer_blit (3),
 .BR tickit_renderbuffer_flush_to_term (3),
 .BR tickit_renderbuffer (7),
-.BR tickit_pen (7),
 .BR tickit (7)

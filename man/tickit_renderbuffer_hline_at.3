@@ -7,10 +7,10 @@ tickit_renderbuffer_hline_at, tickit_renderbuffer_vline_at \- create line region
 .sp
 .BI "void tickit_renderbuffer_hline_at(TickitRenderBuffer *" rb ,
 .BI "        int " line ", int " startcol ", int " endcol ,
-.BI "        TickitLineStyle " style ", TickitPen *" pen ", TickitLineCaps " caps );
+.BI "        TickitLineStyle " style ", TickitLineCaps " caps );
 .BI "void tickit_renderbuffer_vline_at(TickitRenderBuffer *" rb ,
 .BI "        int " startline ", int " endline ", int " col ,
-.BI "        TickitLineStyle " style ", TickitPen *" pen ", TickitLineCaps " caps );
+.BI "        TickitLineStyle " style ", TickitLineCaps " caps );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
@@ -57,5 +57,4 @@ This function returns no value.
 .BR tickit_renderbuffer_blit (3),
 .BR tickit_renderbuffer_flush_to_term (3),
 .BR tickit_renderbuffer (7),
-.BR tickit_pen (7),
 .BR tickit (7)

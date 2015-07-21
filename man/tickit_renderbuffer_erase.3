@@ -6,16 +6,16 @@ tickit_renderbuffer_erase, tickit_renderbuffer_erase_to, tickit_renderbuffer_era
 .B #include <tickit.h>
 .sp
 .BI "void tickit_renderbuffer_erase(TickitRenderBuffer *" rb ,
-.BI "         int " cols ", TickitPen *" pen );
+.BI "         int " cols );
 .BI "void tickit_renderbuffer_erase_to(TickitRenderBuffer *" rb ,
-.BI "         int " col ", TickitPen *" pen );
+.BI "         int " col );
 .BI "void tickit_renderbuffer_erase_at(TickitRenderBuffer *" rb ,
-.BI "         int " line ", int " col ", int " cols ", TickitPen *" pen );
+.BI "         int " line ", int " col ", int " cols );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_erase\fP() creates a erase region that starts at the current virtual cursor position, continuing on for \fIcols\fP cells set to the given pen. \fBtickit_renderbuffer_erase_to\fP() creates a erase region that continues until the given column if the cursor was before that, or has no effect if it was after. Both of these functions will update the virtual cursor position.
+\fBtickit_renderbuffer_erase\fP() creates a erase region that starts at the current virtual cursor position, continuing on for \fIcols\fP cells set to the current pen. \fBtickit_renderbuffer_erase_to\fP() creates a erase region that continues until the given column if the cursor was before that, or has no effect if it was after. Both of these functions will update the virtual cursor position.
 .PP
 \fBtickit_renderbuffer_erase_at\fP() creates a erase region at the given position and length. This function does not use or update the virtual cursor position.
 .SH "RETURN VALUE"
@@ -25,5 +25,4 @@ These functions return nothing
 .BR tickit_renderbuffer_blit (3),
 .BR tickit_renderbuffer_flush_to_term (3),
 .BR tickit_renderbuffer (7),
-.BR tickit_pen (7),
 .BR tickit (7)
