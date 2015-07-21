@@ -40,50 +40,53 @@ static void render_modes(TickitTerm *tt)
   tickit_term_goto(tt, 20, 20);
 }
 
-static void event(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
+static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
-  if(ev != TICKIT_EV_MOUSE)
-    return;
+  TickitMouseEventInfo *info = _info;
 
-  if(args->type != TICKIT_MOUSEEV_PRESS || args->button != 1)
-    return;
+  fprintf(stderr, "mouse event %d type=%d at %d,%d\n", ev, info->type, info->col, info->line);
 
-  if(args->line == 5) {
-    if(args->col >= 21 && args->col <= 26)
+  if(info->type != TICKIT_MOUSEEV_PRESS || info->button != 1)
+    return 0;
+
+  if(info->line == 5) {
+    if(info->col >= 21 && info->col <= 26)
       modes.vis = 1;
-    else if(args->col >= 28 && args->col <= 34)
+    else if(info->col >= 28 && info->col <= 34)
       modes.vis = 0;
     else
-      return;
+      return 0;
 
     tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, modes.vis);
   }
 
-  if(args->line == 7) {
-    if(args->col >= 21 && args->col <= 26)
+  if(info->line == 7) {
+    if(info->col >= 21 && info->col <= 26)
       modes.blink = 1;
-    else if(args->col >= 28 && args->col <= 34)
+    else if(info->col >= 28 && info->col <= 34)
       modes.blink = 0;
     else
-      return;
+      return 0;
 
     tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORBLINK, modes.blink);
   }
 
-  if(args->line == 9) {
-    if(args->col >= 21 && args->col <= 29)
+  if(info->line == 9) {
+    if(info->col >= 21 && info->col <= 29)
       modes.shape = TICKIT_TERM_CURSORSHAPE_BLOCK;
-    else if(args->col >= 31 && args->col <= 39)
+    else if(info->col >= 31 && info->col <= 39)
       modes.shape = TICKIT_TERM_CURSORSHAPE_UNDER;
-    else if(args->col >= 40 && args->col <= 47)
+    else if(info->col >= 40 && info->col <= 47)
       modes.shape = TICKIT_TERM_CURSORSHAPE_LEFT_BAR;
     else
-      return;
+      return 0;
 
     tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORSHAPE, modes.shape);
   }
 
   render_modes(tt);
+
+  return 1;
 }
 
 int main(int argc, char *argv[])

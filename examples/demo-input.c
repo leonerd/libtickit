@@ -73,27 +73,26 @@ static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, 
   tickit_term_erasech(tt, 20, -1);
 }
 
-static void event(TickitTerm *tt, TickitEventType ev, TickitEvent *args, void *data)
+static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
-  switch(ev) {
-  case TICKIT_EV_RESIZE:
-  case TICKIT_EV_CHANGE:
-  case TICKIT_EV_UNBIND:
-    break;
-
-  case TICKIT_EV_KEY:
-    if(args->type == TICKIT_KEYEV_KEY && strcmp(args->str, "C-c") == 0) {
+  if(ev & TICKIT_EV_KEY) {
+    TickitKeyEventInfo *info = _info;
+    if(info->type == TICKIT_KEYEV_KEY && strcmp(info->str, "C-c") == 0) {
       still_running = 0;
-      return;
+      return 0;
     }
 
-    render_key(tt, args->type, args->str, args->mod);
-    break;
-
-  case TICKIT_EV_MOUSE:
-    render_mouse(tt, args->type, args->button, args->line, args->col, args->mod);
-    break;
+    render_key(tt, info->type, info->str, info->mod);
+    return 1;
   }
+
+  if(ev & TICKIT_EV_MOUSE) {
+    TickitMouseEventInfo *info = _info;
+    render_mouse(tt, info->type, info->button, info->line, info->col, info->mod);
+    return 1;
+  }
+
+  return 0;
 }
 
 int main(int argc, char *argv[])
