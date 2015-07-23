@@ -182,6 +182,8 @@ void tickit_term_get_size(const TickitTerm *tt, int *lines, int *cols);
 void tickit_term_set_size(TickitTerm *tt, int lines, int cols);
 void tickit_term_refresh_size(TickitTerm *tt);
 
+void tickit_term_observe_sigwinch(TickitTerm *tt, bool observe);
+
 typedef int TickitTermEventFn(TickitTerm *tt, TickitEventType ev, void *info, void *data);
 
 int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *data);

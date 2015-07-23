@@ -1,0 +1,33 @@
+.TH TICKIT_TERM_OBSERVE_SIGWINCH 3
+.SH NAME
+tickit_term_observe_sigwinch \- react to the SIGWINCH signal
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_observe_sigwinch(TickitTerm *" tt ", bool " observe );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fPtickit_term_observe_sigwinch\fP() controls a setting on the \fITickitTerm\fP instance that allows it to be informed when the process receives a \fBSIGWINCH\fP signal, meaning that the controlling terminal may have changed size.
+.PP
+When this flag is enabled on at least one terminal instance, a handler for the \fBSIGWINCH\fP signal is automatically installed by \fIlibtickit\fP itself. On receipt of the signal the handler will mark a flag on any \fITickitTerm\fP instance that is observing it to indicate that the window may have changed size. The next time these instances invoke any of several input-related functions (listed below), this flag will cause the function to first perform the actions of \fBtickit_term_refresh_size\fP(3). This deferred handling ensures that the \fBTICKIT_EV_RESIZE\fP event is only invoked at a time when the application is expecting input events, and not asynchronously during the signal handler itself.
+.PP
+Note that use of this ability requires giving control of the process-wide \fBSIGWINCH\fP signal to the \fIlibtickit\fP library. If this is not suitable, the process should arrange to invoke \fBtickit_term_refresh_size\fP() at an appropriate time by some other mechanism.
+.SH "EVENT-DEFERRAL FUNCTIONS"
+.IP *
+\fBtickit_term_input_push_bytes\fP(3)
+.IP *
+\fBtickit_term_input_readable\fP(3)
+.IP *
+The \fBtickit_term_input_check_timeout_msec\fP(3) family
+.IP *
+The \fBtickit_term_input_wait_msec\fP(3) family
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_refresh_size (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

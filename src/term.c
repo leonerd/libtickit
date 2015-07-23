@@ -12,6 +12,7 @@
 #include "xterm-palette.inc"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,6 +58,11 @@ struct TickitTerm {
 
   int lines;
   int cols;
+
+  bool observe_winch;
+  TickitTerm *next_sigwinch_observer;
+
+  bool window_changed;
 
   enum { UNSTARTED, STARTING, STARTED } state;
 
@@ -144,6 +150,10 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   tt->lines = 25;
   tt->cols  = 80;
 
+  tt->observe_winch = false;
+  tt->next_sigwinch_observer = NULL;
+  tt->window_changed = false;
+
   tt->hooks = NULL;
 
   /* Initially empty because we don't necessarily know the initial state
@@ -171,6 +181,9 @@ void tickit_term_free(TickitTerm *tt)
 {
   tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
   tickit_pen_destroy(tt->pen);
+
+  if(tt->observe_winch)
+    tickit_term_observe_sigwinch(tt, false);
 
   if(tt->driver) {
     if(tt->driver->vtable->stop)
@@ -255,6 +268,60 @@ void tickit_term_refresh_size(TickitTerm *tt)
     return;
 
   tickit_term_set_size(tt, ws.ws_row, ws.ws_col);
+}
+
+static TickitTerm *first_sigwinch_observer;
+
+static void sigwinch(int signum)
+{
+  for(TickitTerm *tt = first_sigwinch_observer; tt; tt = tt->next_sigwinch_observer)
+    tt->window_changed = 1;
+}
+
+void tickit_term_observe_sigwinch(TickitTerm *tt, bool observe)
+{
+  sigset_t newset;
+  sigset_t oldset;
+
+  sigemptyset(&newset);
+  sigaddset(&newset, SIGWINCH);
+
+  sigprocmask(SIG_BLOCK, &newset, &oldset);
+
+  if(observe && !tt->observe_winch) {
+    tt->observe_winch = true;
+
+    if(!first_sigwinch_observer)
+      sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = sigwinch }, NULL);
+
+    TickitTerm **tailp = &first_sigwinch_observer;
+    while(*tailp)
+      tailp = &(*tailp)->next_sigwinch_observer;
+    *tailp = tt;
+  }
+  else if(!observe && tt->observe_winch) {
+    TickitTerm **tailp = &first_sigwinch_observer;
+    while(tailp && *tailp != tt)
+      tailp = &(*tailp)->next_sigwinch_observer;
+    if(tailp)
+      *tailp = (*tailp)->next_sigwinch_observer;
+
+    if(!first_sigwinch_observer)
+      sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
+
+    tt->observe_winch = false;
+  }
+
+  sigprocmask(SIG_SETMASK, &oldset, NULL);
+}
+
+static void check_resize(TickitTerm *tt)
+{
+  if(!tt->window_changed)
+    return;
+
+  tt->window_changed = 0;
+  tickit_term_refresh_size(tt);
 }
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd)
@@ -495,6 +562,8 @@ static void get_keys(TickitTerm *tt, TermKey *tk)
 
 void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len)
 {
+  check_resize(tt);
+
   TermKey *tk = get_termkey(tt);
   termkey_push_bytes(tk, bytes, len);
 
@@ -503,6 +572,8 @@ void tickit_term_input_push_bytes(TickitTerm *tt, const char *bytes, size_t len)
 
 void tickit_term_input_readable(TickitTerm *tt)
 {
+  check_resize(tt);
+
   TermKey *tk = get_termkey(tt);
   termkey_advisereadable(tk);
 
@@ -520,6 +591,7 @@ int tickit_term_input_check_timeout(TickitTerm *tt)
 
 int tickit_term_input_check_timeout_msec(TickitTerm *tt)
 {
+  check_resize(tt);
   if(tt->input_timeout_at.tv_sec == -1)
     return -1;
 
@@ -558,6 +630,8 @@ void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout)
 
 void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
 {
+  check_resize(tt);
+
   TermKey *tk = get_termkey(tt);
   TermKeyKey key;
 
@@ -573,6 +647,8 @@ void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
   if(select(fd + 1, &readfds, NULL, NULL, msec > -1 ? &timeout : NULL) == 1) {
     termkey_advisereadable(tk);
   }
+
+  check_resize(tt);
 
   /* Might as well get any more that are ready */
   while(termkey_getkey(tk, &key) == TERMKEY_RES_KEY) {

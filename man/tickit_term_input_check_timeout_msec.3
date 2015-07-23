@@ -12,6 +12,8 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_term_input_check_timeout_msec\fP() performs input-related timeout behaviour, used to handle multi-byte input events, the Escape key, and other things. It returns a value indicating the number of miliseconds of delay before it wishes to be called again. When called again, it may perform any timeout behaviours that are required, and either return another timeout delay, or -1 to indicate there is no longer a need for timeout. Calling it may result in \fBTICKIT_EV_KEY\fP events.
 .PP
+This function also invokes deferred \fBTICKIT_EV_RESIZE\fP events if enabled by \fPtickit_term_observe_sigwinch\fP(3).
+.PP
 This function is currently available as both a compile-time \fB#define\fP and a link-time alias as \fBtickit_term_input_check_timeout\fP for legacy reasons, but this will eventually be removed. Code should no longer be using this function under its old name.
 .SH "RETURN VALUE"
 \fBtickit_term_input_check_timeout_msec\fP() returns a number indicating a timeout delay in miliseconds.

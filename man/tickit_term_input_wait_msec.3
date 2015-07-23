@@ -13,6 +13,8 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 The \fBtickit_term_input_wait_*\fP() family of functions wait for at least one input event to be received, up until the maximum time given. Calling these functions may block if the underlying file descriptor is in blocking mode. They may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked.
 .PP
+This function also invokes deferred \fBTICKIT_EV_RESIZE\fP events if enabled by \fPtickit_term_observe_sigwinch\fP(3).
+.PP
 The functions differ in how the timeout is specified. \fBtickit_term_input_wait_msec\fP() takes a time as an integer in miliseconds, or -1 to wait indefinitely. \fBtickit_term_input_wait_tv\fP() takes a time as a \fIstruct timeval\fP, or \fBNULL\fP to wait indefinitely.
 .SH "RETURN VALUE"
 \fBtickit_term_input_wait_msec\fP() and \fBtickit_term_input_wait_tv\fP() return no value.
