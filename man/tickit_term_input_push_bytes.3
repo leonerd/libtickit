@@ -12,7 +12,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_term_push_input_bytes\fP() supplies more data to the terminal instance, as if it had been read from a terminal file descriptor. Calling this function may result in \fBTICKIT_EV_KEY\fP or \fBTICKIT_EV_MOUSE\fP events being invoked.
 .PP
-This function also invokes deferred \fBTICKIT_EV_RESIZE\fP events if enabled by \fPtickit_term_observe_sigwinch\fP(3).
+This function also invokes deferred \fBTICKIT_EV_RESIZE\fP events if enabled by \fBtickit_term_observe_sigwinch\fP(3).
 .SH "RETURN VALUE"
 \fBtickit_term_input_push_bytes\fP() returns no value.
 .SH "SEE ALSO"

@@ -10,7 +10,7 @@ tickit_term_observe_sigwinch \- react to the SIGWINCH signal
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fPtickit_term_observe_sigwinch\fP() controls a setting on the \fITickitTerm\fP instance that allows it to be informed when the process receives a \fBSIGWINCH\fP signal, meaning that the controlling terminal may have changed size.
+\fBtickit_term_observe_sigwinch\fP() controls a setting on the \fITickitTerm\fP instance that allows it to be informed when the process receives a \fBSIGWINCH\fP signal, meaning that the controlling terminal may have changed size.
 .PP
 When this flag is enabled on at least one terminal instance, a handler for the \fBSIGWINCH\fP signal is automatically installed by \fIlibtickit\fP itself. On receipt of the signal the handler will mark a flag on any \fITickitTerm\fP instance that is observing it to indicate that the window may have changed size. The next time these instances invoke any of several input-related functions (listed below), this flag will cause the function to first perform the actions of \fBtickit_term_refresh_size\fP(3). This deferred handling ensures that the \fBTICKIT_EV_RESIZE\fP event is only invoked at a time when the application is expecting input events, and not asynchronously during the signal handler itself.
 .PP
