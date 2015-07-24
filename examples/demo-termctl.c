@@ -93,14 +93,11 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  tt = tickit_term_new();
+  tt = tickit_term_open_stdio();
   if(!tt) {
     fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
     return 1;
   }
-
-  tickit_term_set_input_fd(tt, STDIN_FILENO);
-  tickit_term_set_output_fd(tt, STDOUT_FILENO);
   tickit_term_await_started_msec(tt, 50);
 
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
