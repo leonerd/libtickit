@@ -517,6 +517,7 @@ enum {
 // TICKIT_EV_GEOMCHANGE
 typedef struct {
   TickitRect rect;
+  TickitRect oldrect;
 } TickitGeomchangeEventInfo;
 
 // TICKIT_EV_EXPOSE

@@ -355,14 +355,16 @@ void tickit_window_set_geometry(TickitWindow *win, int top, int left, int lines,
      (win->rect.lines != lines) ||
      (win->rect.cols != cols))
   {
+    TickitGeomchangeEventInfo info = {
+      .rect = { .top = top, .left = left, .lines = lines, .cols = cols },
+      .oldrect = win->rect,
+    };
+
     win->rect.top = top;
     win->rect.left = left;
     win->rect.lines = lines;
     win->rect.cols = cols;
 
-    TickitGeomchangeEventInfo info = {
-      .rect = { .top = top, .left = left, .lines = lines, .cols = cols },
-    };
     run_events(win, TICKIT_EV_GEOMCHANGE, &info);
   }
 }
