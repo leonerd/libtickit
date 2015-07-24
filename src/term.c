@@ -177,6 +177,19 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   return tt;
 }
 
+TickitTerm *tickit_term_open_stdio(void)
+{
+  TickitTerm *tt = tickit_term_new();
+  if(!tt)
+    return NULL;
+
+  tickit_term_set_input_fd(tt, STDIN_FILENO);
+  tickit_term_set_output_fd(tt, STDOUT_FILENO);
+  tickit_term_observe_sigwinch(tt, true);
+
+  return tt;
+}
+
 void tickit_term_free(TickitTerm *tt)
 {
   tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
