@@ -725,9 +725,17 @@ static void write_vstrf(TickitTerm *tt, const char *fmt, va_list args)
 {
   /* It's likely the output will fit in, say, 64 bytes */
   char buffer[64];
-  size_t len = vsnprintf(buffer, sizeof buffer, fmt, args);
+  size_t len;
+  {
+    va_list args_for_size;
+    va_copy(args_for_size, args);
 
-  if(len < 64) {
+    len = vsnprintf(buffer, sizeof buffer, fmt, args_for_size);
+
+    va_end(args_for_size);
+  }
+
+  if(len < sizeof buffer) {
     write_str(tt, buffer, len);
     return;
   }

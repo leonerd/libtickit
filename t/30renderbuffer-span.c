@@ -56,6 +56,19 @@ int main(int argc, char *argv[])
     tickit_pen_destroy(fg_pen);
   }
 
+  // Formatting buffer edge case
+  {
+    TickitRenderBuffer *rb = tickit_renderbuffer_new(1, 80);
+    is_int(tickit_renderbuffer_textf_at(rb, 0, 0, "%-64s", "ABC"), 64, "textf_at() returns 64 for boundary case");
+
+    tickit_renderbuffer_flush_to_term(rb, tt);
+    is_termlog("Termlog after formatting via malloc'ed buffer",
+        GOTO(0,0), SETPEN(), PRINT("ABC                                                             "),
+        NULL);
+
+    tickit_renderbuffer_destroy(rb);
+  }
+
   // UTF-8 handling
   {
     cols = tickit_renderbuffer_text_at(rb, 6, 0, "somé text ĉi tie");

@@ -687,7 +687,15 @@ int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, cha
 {
   /* It's likely the string will fit in, say, 64 bytes */
   char buffer[64];
-  size_t len = vsnprintf(buffer, sizeof buffer, fmt, args);
+  size_t len;
+  {
+    va_list args_for_size;
+    va_copy(args_for_size, args);
+
+    len = vsnprintf(buffer, sizeof buffer, fmt, args_for_size);
+
+    va_end(args_for_size);
+  }
 
   if(len < sizeof buffer)
     return tickit_renderbuffer_textn_at(rb, line, col, buffer, len);
