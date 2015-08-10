@@ -97,7 +97,6 @@ int main(int argc, char *argv[])
   tickit_term_clear(tt);
 
   TickitWindow *root = tickit_window_new_root(tt);
-  tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &tickit_window_on_geomchange_expose, NULL);
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose, NULL);
 
   // Initial expose

@@ -72,17 +72,41 @@ static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
 static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *data)
 {
   TickitRootWindow *root = data;
+  TickitWindow *win = ROOT_AS_WINDOW(root);
 
   if(ev & TICKIT_EV_RESIZE) {
     TickitResizeEventInfo *info = _info;
-    tickit_window_resize(ROOT_AS_WINDOW(root), info->lines, info->cols);
+    int oldlines = win->rect.lines;
+    int oldcols  = win->rect.cols;
+
+    tickit_window_resize(win, info->lines, info->cols);
+
+    if(info->lines > oldlines) {
+      TickitRect damage = {
+        .top   = oldlines,
+        .left  = 0,
+        .lines = info->lines - oldlines,
+        .cols  = info->cols,
+      };
+      tickit_window_expose(win, &damage);
+    }
+
+    if(info->cols > oldcols) {
+      TickitRect damage = {
+        .top   = 0,
+        .left  = oldcols,
+        .lines = oldlines,
+        .cols  = info->cols - oldcols,
+      };
+      tickit_window_expose(win, &damage);
+    }
   }
 
   if(ev & TICKIT_EV_KEY)
-    _handle_key(ROOT_AS_WINDOW(root), (TickitKeyEventInfo *)_info);
+    _handle_key(win, (TickitKeyEventInfo *)_info);
 
   if(ev & TICKIT_EV_MOUSE)
-    _handle_mouse(ROOT_AS_WINDOW(root), (TickitMouseEventInfo *)_info);
+    _handle_mouse(win, (TickitMouseEventInfo *)_info);
 
   return 1;
 }
@@ -1039,38 +1063,4 @@ static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
     return 1;
 
   return 0;
-}
-
-/*
- * Utility for applications
- */
-
-int tickit_window_on_geomchange_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
-{
-  TickitGeomchangeEventInfo *info = _info;
-
-  if(!(ev & TICKIT_EV_GEOMCHANGE))
-    return 0;
-
-  if(info->rect.lines > info->oldrect.lines) {
-    TickitRect damage = {
-      .top   = info->oldrect.lines,
-      .left  = 0,
-      .lines = info->rect.lines - info->oldrect.lines,
-      .cols  = info->rect.cols,
-    };
-    tickit_window_expose(win, &damage);
-  }
-
-  if(info->rect.cols > info->oldrect.cols) {
-    TickitRect damage = {
-      .top   = 0,
-      .left  = info->oldrect.cols,
-      .lines = info->oldrect.lines,
-      .cols  = info->rect.cols - info->oldrect.cols,
-    };
-    tickit_window_expose(win, &damage);
-  }
-
-  return 1;
 }

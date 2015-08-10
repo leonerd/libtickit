@@ -1,5 +1,6 @@
 #include "tickit.h"
 #include "taplib.h"
+#include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
 int on_geom_changed(TickitWindow *window, TickitEventType ev, void *_info, void *data)
@@ -79,18 +80,33 @@ int main(int argc, char *argv[])
         NULL);
   }
 
-  // Geometry change event
+  // Resize events
   {
     int geom_changed = 0;
     tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &on_geom_changed, &geom_changed);
     is_int(geom_changed, 0, "geometry not yet changed");
 
+    int nextrect = 0;
+    TickitRect rects[4];
+    int push_on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+    {
+      TickitExposeEventInfo *info = _info;
+      rects[nextrect++] = info->rect;
+      return 1;
+    }
+    tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &push_on_expose, NULL);
+
     tickit_mockterm_resize(tt, 30, 100);
+    tickit_window_tick(root);
 
     is_int(tickit_window_lines(root), 30, "root tickit_window_lines after term resize");
     is_int(tickit_window_cols(root), 100, "root tickit_window_cols after term resize");
 
     is_int(geom_changed, 1, "geometry changed after term resize");
+
+    is_int(nextrect, 2, "two exposed rects after term resize");
+    is_rect(rects+0, "80,0..100,25", "exposed rects[0]");
+    is_rect(rects+1, "0,25..100,30", "exposed rects[1]");
   }
 
   return exit_status();
