@@ -80,33 +80,6 @@ static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *d
   return 1;
 }
 
-static int on_geomchange(TickitWindow *win, TickitEventType ev, void *_info, void *data)
-{
-  TickitGeomchangeEventInfo *info = _info;
-
-  if(info->rect.lines > info->oldrect.lines) {
-    TickitRect damage = {
-      .top   = info->oldrect.lines,
-      .left  = 0,
-      .lines = info->rect.lines - info->oldrect.lines,
-      .cols  = info->rect.cols,
-    };
-    tickit_window_expose(win, &damage);
-  }
-
-  if(info->rect.cols > info->oldrect.cols) {
-    TickitRect damage = {
-      .top   = 0,
-      .left  = info->oldrect.cols,
-      .lines = info->oldrect.lines,
-      .cols  = info->rect.cols - info->oldrect.cols,
-    };
-    tickit_window_expose(win, &damage);
-  }
-
-  return 1;
-}
-
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
@@ -124,7 +97,7 @@ int main(int argc, char *argv[])
   tickit_term_clear(tt);
 
   TickitWindow *root = tickit_window_new_root(tt);
-  tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &on_geomchange, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &tickit_window_on_geomchange_expose, NULL);
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose, NULL);
 
   // Initial expose

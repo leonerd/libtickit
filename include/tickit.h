@@ -454,6 +454,9 @@ void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(TickitWindow *win);
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
+/* Utility */
+int tickit_window_on_geomchange_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data);
+
 /*
  * Tickit events
  */

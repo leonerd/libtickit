@@ -1040,3 +1040,37 @@ static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
 
   return 0;
 }
+
+/*
+ * Utility for applications
+ */
+
+int tickit_window_on_geomchange_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitGeomchangeEventInfo *info = _info;
+
+  if(!(ev & TICKIT_EV_GEOMCHANGE))
+    return 0;
+
+  if(info->rect.lines > info->oldrect.lines) {
+    TickitRect damage = {
+      .top   = info->oldrect.lines,
+      .left  = 0,
+      .lines = info->rect.lines - info->oldrect.lines,
+      .cols  = info->rect.cols,
+    };
+    tickit_window_expose(win, &damage);
+  }
+
+  if(info->rect.cols > info->oldrect.cols) {
+    TickitRect damage = {
+      .top   = 0,
+      .left  = info->oldrect.cols,
+      .lines = info->oldrect.lines,
+      .cols  = info->rect.cols - info->oldrect.cols,
+    };
+    tickit_window_expose(win, &damage);
+  }
+
+  return 1;
+}
