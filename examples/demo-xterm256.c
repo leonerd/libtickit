@@ -14,10 +14,102 @@ static void sigint(int sig)
   still_running = 0;
 }
 
+static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
+
+  tickit_renderbuffer_eraserect(rb, &info->rect);
+
+  TickitPen *pen = tickit_pen_new();
+
+  tickit_renderbuffer_goto(rb, 0, 0);
+  tickit_renderbuffer_text(rb, "ANSI");
+
+  {
+    tickit_renderbuffer_save(rb);
+
+    tickit_renderbuffer_goto(rb, 2, 0);
+    for(int i = 0; i < 16; i++) {
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, i);
+      tickit_renderbuffer_setpen(rb, pen);
+      tickit_renderbuffer_textf(rb, "[%02d]", i);
+    }
+
+    tickit_renderbuffer_restore(rb);
+  }
+
+  tickit_renderbuffer_goto(rb, 4, 0);
+  tickit_renderbuffer_text(rb, "216 RGB cube");
+
+  {
+    tickit_renderbuffer_save(rb);
+
+    for(int y = 0; y < 6; y++) {
+      tickit_renderbuffer_goto(rb, 6+y, 0);
+      for(int x = 0; x < 36; x++) {
+        tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, y*36 + x + 16);
+        tickit_renderbuffer_setpen(rb, pen);
+        tickit_renderbuffer_text(rb, "  ");
+      }
+    }
+
+    tickit_renderbuffer_restore(rb);
+  }
+
+  tickit_renderbuffer_goto(rb, 13, 0);
+  tickit_renderbuffer_text(rb, "24 Greyscale ramp");
+
+  {
+    tickit_renderbuffer_save(rb);
+
+    tickit_renderbuffer_goto(rb, 15, 0);
+    for(int i = 0; i < 24; i++) {
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, 232 + i);
+      if(i > 12)
+        tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 0);
+      tickit_renderbuffer_setpen(rb, pen);
+      tickit_renderbuffer_textf(rb, "g%02d", i);
+    }
+
+    tickit_renderbuffer_restore(rb);
+  }
+
+  tickit_pen_destroy(pen);
+
+  return 1;
+}
+
+static int on_geomchange(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitGeomchangeEventInfo *info = _info;
+
+  if(info->rect.lines > info->oldrect.lines) {
+    TickitRect damage = {
+      .top   = info->oldrect.lines,
+      .left  = 0,
+      .lines = info->rect.lines - info->oldrect.lines,
+      .cols  = info->rect.cols,
+    };
+    tickit_window_expose(win, &damage);
+  }
+
+  if(info->rect.cols > info->oldrect.cols) {
+    TickitRect damage = {
+      .top   = 0,
+      .left  = info->oldrect.cols,
+      .lines = info->oldrect.lines,
+      .cols  = info->rect.cols - info->oldrect.cols,
+    };
+    tickit_window_expose(win, &damage);
+  }
+
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
-  TickitPen *default_pen, *pen;
 
   tt = tickit_term_open_stdio();
   if(!tt) {
@@ -31,51 +123,20 @@ int main(int argc, char *argv[])
   tickit_term_setctl_str(tt, TICKIT_TERMCTL_TITLE_TEXT, "XTerm256 colour demo");
   tickit_term_clear(tt);
 
-  default_pen = tickit_pen_new();
+  TickitWindow *root = tickit_window_new_root(tt);
+  tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &on_geomchange, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose, NULL);
 
-  pen = tickit_pen_new();
-
-  tickit_term_goto(tt, 0, 0);
-  tickit_term_setpen(tt, default_pen);
-  tickit_term_print(tt, "ANSI");
-
-  tickit_term_goto(tt, 2, 0);
-  for(int i = 0; i < 16; i++) {
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, i);
-    tickit_term_setpen(tt, pen);
-    tickit_term_printf(tt, "[%02d]", i);
-  }
-
-  tickit_term_goto(tt, 4, 0);
-  tickit_term_setpen(tt, default_pen);
-  tickit_term_print(tt, "216 RGB cube");
-
-  for(int y = 0; y < 6; y++) {
-    tickit_term_goto(tt, 6+y, 0);
-    for(int x = 0; x < 36; x++) {
-      tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, y*36 + x + 16);
-      tickit_term_setpen(tt, pen);
-      tickit_term_print(tt, "  ");
-    }
-  }
-
-  tickit_term_goto(tt, 13, 0);
-  tickit_term_setpen(tt, default_pen);
-  tickit_term_print(tt, "24 Greyscale ramp");
-
-  tickit_term_goto(tt, 15, 0);
-  for(int i = 0; i < 24; i++) {
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, 232 + i);
-    if(i > 12)
-      tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 0);
-    tickit_term_setpen(tt, pen);
-    tickit_term_printf(tt, "g%02d", i);
-  }
+  // Initial expose
+  tickit_window_expose(root, NULL);
+  tickit_window_tick(root);
 
   signal(SIGINT, sigint);
 
-  while(still_running)
+  while(still_running) {
     tickit_term_input_wait_msec(tt, -1);
+    tickit_window_tick(root);
+  }
 
   tickit_term_destroy(tt);
 
