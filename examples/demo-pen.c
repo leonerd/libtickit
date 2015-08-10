@@ -9,6 +9,8 @@
 struct {
   char *name;
   int  val;
+
+  TickitPen *pen_fg, *pen_fg_hi, *pen_bg, *pen_bg_hi;
 } colours[] = {
   { "red   ", 1 },
   { "blue  ", 4 },
@@ -19,13 +21,16 @@ struct {
 struct {
   char *name;
   TickitPenAttr attr;
+
+  TickitPen *pen;
 } attrs[] = {
-  { "bold",          TICKIT_PEN_BOLD },
-  { "underline",     TICKIT_PEN_UNDER },
-  { "italic",        TICKIT_PEN_ITALIC },
-  { "strikethrough", TICKIT_PEN_STRIKE },
-  { "reverse video", TICKIT_PEN_REVERSE },
-  { "blink",         TICKIT_PEN_BLINK },
+  { "bold",           TICKIT_PEN_BOLD },
+  { "underline",      TICKIT_PEN_UNDER },
+  { "italic",         TICKIT_PEN_ITALIC },
+  { "strikethrough",  TICKIT_PEN_STRIKE },
+  { "reverse video",  TICKIT_PEN_REVERSE },
+  { "blink",          TICKIT_PEN_BLINK },
+  { "alternate font", TICKIT_PEN_ALTFONT },
 };
 
 int still_running = 1;
@@ -35,10 +40,112 @@ static void sigint(int sig)
   still_running = 0;
 }
 
+static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
+
+  tickit_renderbuffer_eraserect(rb, &info->rect);
+
+  /* ANSI colours foreground */
+  tickit_renderbuffer_goto(rb, 0, 0);
+
+  for(int i = 0; i < 4; i++) {
+    tickit_renderbuffer_savepen(rb);
+
+    if(!colours[i].pen_fg)
+      colours[i].pen_fg = tickit_pen_new_attrs(
+          TICKIT_PEN_FG, colours[i].val,
+          -1);
+
+    tickit_renderbuffer_setpen(rb, colours[i].pen_fg);
+    tickit_renderbuffer_textf(rb, "fg %s", colours[i].name);
+
+    tickit_renderbuffer_restore(rb);
+
+    tickit_renderbuffer_text(rb, "     ");
+  }
+
+  /* ANSI high-brightness colours foreground */
+  tickit_renderbuffer_goto(rb, 2, 0);
+
+  for(int i = 0; i < 4; i++) {
+    tickit_renderbuffer_savepen(rb);
+
+    if(!colours[i].pen_fg_hi)
+      colours[i].pen_fg_hi = tickit_pen_new_attrs(
+          TICKIT_PEN_FG, colours[i].val+8,
+          -1);
+
+    tickit_renderbuffer_setpen(rb, colours[i].pen_fg_hi);
+    tickit_renderbuffer_textf(rb, "fg hi-%s", colours[i].name);
+
+    tickit_renderbuffer_restore(rb);
+
+    tickit_renderbuffer_text(rb, "  ");
+  }
+
+  /* ANSI colours background */
+  tickit_renderbuffer_goto(rb, 4, 0);
+
+  for(int i = 0; i < 4; i++) {
+    tickit_renderbuffer_savepen(rb);
+
+    if(!colours[i].pen_bg)
+      colours[i].pen_bg = tickit_pen_new_attrs(
+          TICKIT_PEN_BG, colours[i].val,
+          TICKIT_PEN_FG, 0,
+          -1);
+
+    tickit_renderbuffer_setpen(rb, colours[i].pen_bg);
+    tickit_renderbuffer_textf(rb, "bg %s", colours[i].name);
+
+    tickit_renderbuffer_restore(rb);
+
+    tickit_renderbuffer_text(rb, "     ");
+  }
+
+  tickit_renderbuffer_goto(rb, 6, 0);
+
+  /* ANSI high-brightness colours background */
+  for(int i = 0; i < 4; i++) {
+    tickit_renderbuffer_savepen(rb);
+
+    if(!colours[i].pen_bg_hi)
+      colours[i].pen_bg_hi = tickit_pen_new_attrs(
+          TICKIT_PEN_BG, colours[i].val+8,
+          TICKIT_PEN_FG, 0,
+          -1);
+
+    tickit_renderbuffer_setpen(rb, colours[i].pen_bg_hi);
+    tickit_renderbuffer_textf(rb, "bg hi-%s", colours[i].name);
+
+    tickit_renderbuffer_restore(rb);
+
+    tickit_renderbuffer_text(rb, "  ");
+  }
+
+  /* Some interesting rendering attributes */
+  for(int i = 0; i < 7; i++) {
+    tickit_renderbuffer_savepen(rb);
+
+    tickit_renderbuffer_goto(rb, 8 + 2*i, 0);
+
+    if(!attrs[i].pen)
+      attrs[i].pen = tickit_pen_new_attrs(attrs[i].attr, 1, -1);
+
+    tickit_renderbuffer_setpen(rb, attrs[i].pen);
+    tickit_renderbuffer_text(rb, attrs[i].name);
+
+    tickit_renderbuffer_restore(rb);
+  }
+
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
-  TickitPen *default_pen, *pen;
 
   tt = tickit_term_open_stdio();
   if(!tt) {
@@ -51,84 +158,20 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
   tickit_term_clear(tt);
 
-  default_pen = tickit_pen_new();
+  TickitWindow *root = tickit_window_new_root(tt);
+  tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &tickit_window_on_geomchange_expose, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose, NULL);
 
-  pen = tickit_pen_new();
-
-  /* ANSI colours foreground */
-  tickit_term_goto(tt, 0, 0);
-
-  for(int i = 0; i < 4; i++) {
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, colours[i].val);
-    tickit_term_setpen(tt, pen);
-    tickit_term_printf(tt, "fg %s", colours[i].name);
-
-    tickit_term_setpen(tt, default_pen);
-    tickit_term_print(tt, "     ");
-  }
-
-  tickit_term_goto(tt, 2, 0);
-
-  /* ANSI high-brightness colours foreground */
-  for(int i = 0; i < 4; i++) {
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, colours[i].val+8);
-    tickit_term_setpen(tt, pen);
-    tickit_term_printf(tt, "fg hi-%s", colours[i].name);
-
-    tickit_term_setpen(tt, default_pen);
-    tickit_term_print(tt, "  ");
-  }
-
-  /* ANSI colours background */
-  tickit_term_goto(tt, 4, 0);
-
-  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 0);
-
-  for(int i = 0; i < 4; i++) {
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, colours[i].val);
-    tickit_term_setpen(tt, pen);
-    tickit_term_printf(tt, "bg %s", colours[i].name);
-
-    tickit_term_setpen(tt, default_pen);
-    tickit_term_print(tt, "     ");
-  }
-
-  tickit_term_goto(tt, 6, 0);
-
-  /* ANSI high-brightness colours background */
-  for(int i = 0; i < 4; i++) {
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, colours[i].val+8);
-    tickit_term_setpen(tt, pen);
-    tickit_term_printf(tt, "bg hi-%s", colours[i].name);
-
-    tickit_term_setpen(tt, default_pen);
-    tickit_term_print(tt, "  ");
-  }
-
-  tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
-  tickit_pen_clear_attr(pen, TICKIT_PEN_BG);
-
-  /* Some interesting rendering attributes */
-  for(int i = 0; i < 6; i++) {
-    tickit_term_goto(tt, 8 + 2*i, 0);
-
-    tickit_pen_set_bool_attr(pen, attrs[i].attr, 1);
-    tickit_term_setpen(tt, pen);
-    tickit_term_print(tt, attrs[i].name);
-
-    tickit_pen_clear_attr(pen, attrs[i].attr);
-  }
-
-  tickit_term_goto(tt, 20, 0);
-
-  tickit_pen_set_int_attr(pen, TICKIT_PEN_ALTFONT, 1);
-  tickit_term_setpen(tt, pen);
-  tickit_term_print(tt, "alternate font");
+  // Initial expose
+  tickit_window_expose(root, NULL);
+  tickit_window_tick(root);
 
   signal(SIGINT, sigint);
 
-  while(still_running)
+  while(still_running) {
     tickit_term_input_wait_msec(tt, -1);
+    tickit_window_tick(root);
+  }
 
   tickit_term_destroy(tt);
 
