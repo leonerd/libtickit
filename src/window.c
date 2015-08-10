@@ -171,6 +171,8 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
   root->event_id = tickit_term_bind_event(term, TICKIT_EV_RESIZE|TICKIT_EV_KEY|TICKIT_EV_MOUSE,
       &on_term, root);
 
+  tickit_window_expose(ROOT_AS_WINDOW(root), NULL);
+
   return ROOT_AS_WINDOW(root);
 }
 

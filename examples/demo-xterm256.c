@@ -99,15 +99,11 @@ int main(int argc, char *argv[])
   TickitWindow *root = tickit_window_new_root(tt);
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose, NULL);
 
-  // Initial expose
-  tickit_window_expose(root, NULL);
-  tickit_window_tick(root);
-
   signal(SIGINT, sigint);
 
   while(still_running) {
-    tickit_term_input_wait_msec(tt, -1);
     tickit_window_tick(root);
+    tickit_term_input_wait_msec(tt, -1);
   }
 
   tickit_term_destroy(tt);
