@@ -69,9 +69,9 @@ static void _purge_hierarchy_changes(TickitWindow *win);
 static int _handle_key(TickitWindow *win, TickitKeyEventInfo *args);
 static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
 
-static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *data)
+static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user)
 {
-  TickitRootWindow *root = data;
+  TickitRootWindow *root = user;
   TickitWindow *win = ROOT_AS_WINDOW(root);
 
   if(ev & TICKIT_EV_RESIZE) {
