@@ -16,8 +16,14 @@ int main(int argc, char *argv[])
 
   // Basics
   {
+    TickitRect geom = tickit_window_get_geometry(root);
+    is_rect(&geom, "0,0+80,25", "root tickit_window_get_geometry");
+
     is_int(tickit_window_top(root), 0, "root tickit_window_top");
     is_int(tickit_window_left(root), 0, "root tickit_window_left");
+
+    geom = tickit_window_get_abs_geometry(root);
+    is_rect(&geom, "0,0+80,25", "root tickit_window_get_abs_geometry");
 
     is_int(tickit_window_abs_top(root), 0, "root tickit_window_abs_top");
     is_int(tickit_window_abs_left(root), 0, "root tickit_window_abs_left");

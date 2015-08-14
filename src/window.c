@@ -309,46 +309,19 @@ bool tickit_window_is_visible(TickitWindow *win)
   return win->is_visible;
 }
 
-int tickit_window_top(const TickitWindow *win)
+TickitRect tickit_window_get_geometry(const TickitWindow *win)
 {
-  return win->rect.top;
+  return win->rect;
 }
 
-int tickit_window_abs_top(const TickitWindow *win)
+TickitRect tickit_window_get_abs_geometry(const TickitWindow *win)
 {
-  int top = win->rect.top;
-  TickitWindow* parent = win->parent;
-  while(parent) {
-    top += parent->rect.top;
-    parent = parent->parent;
-  }
-  return top;
-}
+  TickitRect geom = win->rect;
 
-int tickit_window_left(const TickitWindow *win)
-{
-  return win->rect.left;
-}
+  for(win = win->parent; win; win = win->parent)
+    tickit_rect_translate(&geom, win->rect.top, win->rect.left);
 
-int tickit_window_abs_left(const TickitWindow *win)
-{
-  int left = win->rect.left;
-  TickitWindow* parent = win->parent;
-  while(parent) {
-    left += parent->rect.left;
-    parent = parent->parent;
-  }
-  return left;
-}
-
-int tickit_window_lines(const TickitWindow *win)
-{
-  return win->rect.lines;
-}
-
-int tickit_window_cols(const TickitWindow *win)
-{
-  return win->rect.cols;
+  return geom;
 }
 
 int tickit_window_bottom(const TickitWindow *win)

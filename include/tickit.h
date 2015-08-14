@@ -425,12 +425,17 @@ void tickit_window_show(TickitWindow *win);
 void tickit_window_hide(TickitWindow *win);
 bool tickit_window_is_visible(TickitWindow *win);
 
-int tickit_window_top(const TickitWindow *win);
-int tickit_window_abs_top(const TickitWindow *win);
-int tickit_window_left(const TickitWindow *win);
-int tickit_window_abs_left(const TickitWindow *win);
-int tickit_window_lines(const TickitWindow *win);
-int tickit_window_cols(const TickitWindow *win);
+TickitRect tickit_window_get_geometry(const TickitWindow *win);
+TickitRect tickit_window_get_abs_geometry(const TickitWindow *win);
+
+#define tickit_window_top(win)   (tickit_window_get_geometry(win)).top
+#define tickit_window_left(win)  (tickit_window_get_geometry(win)).left
+#define tickit_window_lines(win) (tickit_window_get_geometry(win)).lines
+#define tickit_window_cols(win)  (tickit_window_get_geometry(win)).cols
+
+#define tickit_window_abs_top(win)  (tickit_window_get_abs_geometry(win)).top
+#define tickit_window_abs_left(win) (tickit_window_get_abs_geometry(win)).left
+
 int tickit_window_bottom(const TickitWindow *win);
 int tickit_window_right(const TickitWindow *win);
 

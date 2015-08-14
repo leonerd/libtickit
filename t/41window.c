@@ -1,5 +1,6 @@
 #include "tickit.h"
 #include "taplib.h"
+#include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
 int on_geom_changed(TickitWindow *window, TickitEventType ev, void *_info, void *data)
@@ -18,8 +19,14 @@ int main(int argc, char *argv[])
 
   // Basics
   {
+    TickitRect geom = tickit_window_get_geometry(win);
+    is_rect(&geom, "10,3+20,4", "tickit_window_get_geometry");
+
     is_int(tickit_window_top(win), 3, "tickit_window_top");
     is_int(tickit_window_left(win), 10, "tickit_window_left");
+
+    geom = tickit_window_get_abs_geometry(win);
+    is_rect(&geom, "10,3+20,4", "tickit_window_get_abs_geometry");
 
     is_int(tickit_window_abs_top(win), 3, "tickit_window_abs_top");
     is_int(tickit_window_abs_left(win), 10, "tickit_window_abs_left");
@@ -42,6 +49,9 @@ int main(int argc, char *argv[])
 
     tickit_window_resize(win, 4, 15);
 
+    TickitRect geom = tickit_window_get_geometry(win);
+    is_rect(&geom, "10,3+15,4", "tickit_window_get_geometry after resize");
+
     is_int(tickit_window_lines(win), 4, "resize tickit_window_lines after resize");
     is_int(tickit_window_cols(win), 15, "resize tickit_window_cols after resize");
 
@@ -49,8 +59,14 @@ int main(int argc, char *argv[])
 
     tickit_window_reposition(win, 5, 15);
 
+    geom = tickit_window_get_geometry(win);
+    is_rect(&geom, "15,5+15,4", "tickit_window_get_geometry after reposition");
+
     is_int(tickit_window_top(win), 5, "tickit_window_top after reposition");
     is_int(tickit_window_left(win), 15, "tickit_window_left after reposition");
+
+    geom = tickit_window_get_abs_geometry(win);
+    is_rect(&geom, "15,5+15,4", "tickit_window_get_abs_geometry after reposition");
 
     is_int(tickit_window_abs_top(win), 5, "tickit_window_abs_top after reposition");
     is_int(tickit_window_abs_left(win), 15, "tickit_window_abs_left after reposition");
@@ -63,8 +79,14 @@ int main(int argc, char *argv[])
     TickitWindow *subwin = tickit_window_new_subwindow(win, 2, 2, 1, 10);
     tickit_window_tick(root);
 
+    TickitRect geom = tickit_window_get_geometry(subwin);
+    is_rect(&geom, "2,2+10,1", "nested tickit_window_get_geometry");
+
     is_int(tickit_window_top(subwin), 2, "nested tickit_window_top");
     is_int(tickit_window_left(subwin), 2, "nested tickit_window_left");
+
+    geom = tickit_window_get_abs_geometry(subwin);
+    is_rect(&geom, "17,7+10,1", "nested tickit_window_get_abs_geometry");
 
     is_int(tickit_window_abs_top(subwin), 7, "nested tickit_window_abs_top");
     is_int(tickit_window_abs_left(subwin), 17, "nested tickit_window_abs_left");
