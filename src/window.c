@@ -503,8 +503,9 @@ static void _do_restore(TickitRootWindow *root)
      _cell_visible(win, win->cursor.line, win->cursor.col)) {
     /* TODO finish the visibility check here. */
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 1);
-    int cursor_line = win->cursor.line + tickit_window_abs_top(win);
-    int cursor_col = win->cursor.col + tickit_window_abs_left(win);
+    TickitRect abs_geom = tickit_window_get_abs_geometry(win);
+    int cursor_line = win->cursor.line + abs_geom.top;
+    int cursor_col = win->cursor.col + abs_geom.left;
     tickit_term_goto(root->term, cursor_line, cursor_col);
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORSHAPE, win->cursor.shape);
   }
