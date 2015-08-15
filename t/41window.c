@@ -28,9 +28,6 @@ int main(int argc, char *argv[])
     geom = tickit_window_get_abs_geometry(win);
     is_rect(&geom, "10,3+20,4", "tickit_window_get_abs_geometry");
 
-    is_int(tickit_window_abs_top(win), 3, "tickit_window_abs_top");
-    is_int(tickit_window_abs_left(win), 10, "tickit_window_abs_left");
-
     is_int(tickit_window_lines(win), 4, "tickit_window_lines");
     is_int(tickit_window_cols(win), 20, "tickit_window_cols");
 
@@ -68,9 +65,6 @@ int main(int argc, char *argv[])
     geom = tickit_window_get_abs_geometry(win);
     is_rect(&geom, "15,5+15,4", "tickit_window_get_abs_geometry after reposition");
 
-    is_int(tickit_window_abs_top(win), 5, "tickit_window_abs_top after reposition");
-    is_int(tickit_window_abs_left(win), 15, "tickit_window_abs_left after reposition");
-
     is_int(geom_changed, 2, "geometry changed after reposition");
   }
 
@@ -87,9 +81,6 @@ int main(int argc, char *argv[])
 
     geom = tickit_window_get_abs_geometry(subwin);
     is_rect(&geom, "17,7+10,1", "nested tickit_window_get_abs_geometry");
-
-    is_int(tickit_window_abs_top(subwin), 7, "nested tickit_window_abs_top");
-    is_int(tickit_window_abs_left(subwin), 17, "nested tickit_window_abs_left");
 
     is_int(tickit_window_lines(subwin), 1, "nested tickit_window_lines");
     is_int(tickit_window_cols(subwin), 10, "nested tickit_window_cols");

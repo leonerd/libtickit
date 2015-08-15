@@ -433,9 +433,6 @@ TickitRect tickit_window_get_abs_geometry(const TickitWindow *win);
 #define tickit_window_lines(win) (tickit_window_get_geometry(win)).lines
 #define tickit_window_cols(win)  (tickit_window_get_geometry(win)).cols
 
-#define tickit_window_abs_top(win)  (tickit_window_get_abs_geometry(win)).top
-#define tickit_window_abs_left(win) (tickit_window_get_abs_geometry(win)).left
-
 int tickit_window_bottom(const TickitWindow *win);
 int tickit_window_right(const TickitWindow *win);
 

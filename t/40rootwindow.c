@@ -25,9 +25,6 @@ int main(int argc, char *argv[])
     geom = tickit_window_get_abs_geometry(root);
     is_rect(&geom, "0,0+80,25", "root tickit_window_get_abs_geometry");
 
-    is_int(tickit_window_abs_top(root), 0, "root tickit_window_abs_top");
-    is_int(tickit_window_abs_left(root), 0, "root tickit_window_abs_left");
-
     is_int(tickit_window_lines(root), 25, "root tickit_window_lines");
     is_int(tickit_window_cols(root), 80, "root tickit_window_cols");
 

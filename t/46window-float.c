@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
     TickitWindow *popupwin = tickit_window_new_popup(win, 2, 2, 10, 10);
     tickit_window_tick(root);
 
-    is_int(tickit_window_abs_top(popupwin),  12, "popupwin abs_top");
-    is_int(tickit_window_abs_left(popupwin), 22, "popupwin abs_left");
+    TickitRect geom = tickit_window_get_abs_geometry(popupwin);
+    is_rect(&geom, "22,12+10,10", "popupwin abs_geometry");
 
     TickitKeyEventInfo keyinfo;
     tickit_window_bind_event(popupwin, TICKIT_EV_KEY, &on_input_capture, &keyinfo);
