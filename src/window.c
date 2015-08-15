@@ -336,33 +336,40 @@ int tickit_window_right(const TickitWindow *win)
 
 void tickit_window_resize(TickitWindow *win, int lines, int cols)
 {
-  tickit_window_set_geometry(win, win->rect.top, win->rect.left, lines, cols);
+  tickit_window_set_geometry(win, (TickitRect){
+      .top   = win->rect.top,
+      .left  = win->rect.left,
+      .lines = lines,
+      .cols  = cols}
+  );
 }
 
 void tickit_window_reposition(TickitWindow *win, int top, int left)
 {
-  tickit_window_set_geometry(win, top, left, win->rect.lines, win->rect.cols);
+  tickit_window_set_geometry(win, (TickitRect){
+      .top   = top,
+      .left  = left,
+      .lines = win->rect.lines,
+      .cols  = win->rect.cols}
+  );
 
   if(win->is_focused)
     _request_restore(_get_root(win));
 }
 
-void tickit_window_set_geometry(TickitWindow *win, int top, int left, int lines, int cols)
+void tickit_window_set_geometry(TickitWindow *win, TickitRect geom)
 {
-  if((win->rect.top != top) ||
-     (win->rect.left != left) ||
-     (win->rect.lines != lines) ||
-     (win->rect.cols != cols))
+  if((win->rect.top != geom.top) ||
+     (win->rect.left != geom.left) ||
+     (win->rect.lines != geom.lines) ||
+     (win->rect.cols != geom.cols))
   {
     TickitGeomchangeEventInfo info = {
-      .rect = { .top = top, .left = left, .lines = lines, .cols = cols },
+      .rect = geom,
       .oldrect = win->rect,
     };
 
-    win->rect.top = top;
-    win->rect.left = left;
-    win->rect.lines = lines;
-    win->rect.cols = cols;
+    win->rect = geom;
 
     run_events(win, TICKIT_EV_GEOMCHANGE, &info);
   }
