@@ -277,7 +277,7 @@ TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols)
 
   tickit_rect_init_sized(&rb->clip, 0, 0, rb->lines, rb->cols);
 
-  rb->pen = NULL;
+  rb->pen = tickit_pen_new();
 
   rb->stack = NULL;
   rb->depth = 0;
@@ -316,8 +316,7 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
   free(rb->cells);
   rb->cells = NULL;
 
-  if(rb->pen)
-    tickit_pen_unref(rb->pen);
+  tickit_pen_unref(rb->pen);
 
   if(rb->stack)
     free_stack(rb->stack);
@@ -410,27 +409,18 @@ void tickit_renderbuffer_ungoto(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, TickitPen *pen)
 {
-  TickitPen *prevpen = NULL;
+  TickitPen *prevpen = rb->stack ? rb->stack->pen : NULL;
 
-  if(rb->stack && rb->stack->pen)
-    prevpen = rb->stack->pen;
+  /* never mutate the pen inplace; make a new one */
+  TickitPen *newpen = tickit_pen_new();
 
-  if(!pen && !prevpen) {
-    if(rb->pen)
-      tickit_pen_unref(rb->pen);
-    rb->pen = NULL;
-  }
-  else {
-    if(!rb->pen)
-      rb->pen = tickit_pen_new();
-    else
-      tickit_pen_clear(rb->pen);
+  if(pen)
+    tickit_pen_copy(newpen, pen, 1);
+  if(prevpen)
+    tickit_pen_copy(newpen, prevpen, 0);
 
-    if(pen)
-      tickit_pen_copy(rb->pen, pen, 1);
-    if(prevpen)
-      tickit_pen_copy(rb->pen, prevpen, 0);
-  }
+  tickit_pen_unref(rb->pen);
+  rb->pen = newpen;
 }
 
 void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
@@ -452,10 +442,8 @@ void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
 
   tickit_rect_init_sized(&rb->clip, 0, 0, rb->lines, rb->cols);
 
-  if(rb->pen) {
-    tickit_pen_unref(rb->pen);
-    rb->pen = NULL;
-  }
+  tickit_pen_unref(rb->pen);
+  rb->pen = tickit_pen_new();
 
   if(rb->stack) {
     free_stack(rb->stack);
@@ -481,7 +469,7 @@ void tickit_renderbuffer_save(TickitRenderBuffer *rb)
   stack->xlate_line = rb->xlate_line;
   stack->xlate_col  = rb->xlate_col;
   stack->clip       = rb->clip;
-  stack->pen        = rb->pen ? tickit_pen_clone(rb->pen) : NULL;
+  stack->pen        = tickit_pen_ref(rb->pen);
   stack->pen_only   = 0;
 
   stack->prev = rb->stack;
@@ -493,7 +481,7 @@ void tickit_renderbuffer_savepen(TickitRenderBuffer *rb)
 {
   RBStack *stack = malloc(sizeof(struct RBStack));
 
-  stack->pen      = rb->pen ? tickit_pen_clone(rb->pen) : NULL;
+  stack->pen      = tickit_pen_ref(rb->pen);
   stack->pen_only = 1;
 
   stack->prev = rb->stack;
@@ -519,8 +507,7 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb)
     rb->clip       = stack->clip;
   }
 
-  if(rb->pen)
-    tickit_pen_unref(rb->pen);
+  tickit_pen_unref(rb->pen);
   rb->pen = stack->pen;
   // We've now definitely taken ownership of the old stack frame's pen, so
   //   it doesn't need destroying now
@@ -636,7 +623,7 @@ int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char
 
     RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state       = TEXT;
-    cell->pen         = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
+    cell->pen         = tickit_pen_ref(rb->pen);
     cell->v.text.idx  = rb->n_texts;
     cell->v.text.offs = startcol;
 
@@ -753,7 +740,7 @@ void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int
 
     RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state = ERASE;
-    cell->pen   = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
+    cell->pen   = tickit_pen_ref(rb->pen);
 
     col += spanlen;
   }
@@ -797,7 +784,7 @@ void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long
 
   RBCell *cell = make_span(rb, line, col, cols);
   cell->state           = CHAR;
-  cell->pen             = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
+  cell->pen             = tickit_pen_ref(rb->pen);
   cell->v.chr.codepoint = codepoint;
 }
 
@@ -821,22 +808,18 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits)
   if(rb->cells[line][col].maskdepth > -1)
     return;
 
-  TickitPen *cellpen = rb->pen ? tickit_pen_clone(rb->pen) : tickit_pen_new();
-
   RBCell *cell = &rb->cells[line][col];
   if(cell->state != LINE) {
     make_span(rb, line, col, cols);
     cell->state       = LINE;
     cell->cols        = 1;
-    cell->pen         = cellpen;
+    cell->pen         = tickit_pen_ref(rb->pen);
     cell->v.line.mask = 0;
   }
-  else if(!tickit_pen_equiv(cell->pen, cellpen)) {
+  else if(!tickit_pen_equiv(cell->pen, rb->pen)) {
     tickit_pen_unref(cell->pen);
-    cell->pen   = cellpen;
+    cell->pen   = tickit_pen_ref(rb->pen);
   }
-  else
-    tickit_pen_unref(cellpen);
 
   cell->v.line.mask |= bits;
 }
