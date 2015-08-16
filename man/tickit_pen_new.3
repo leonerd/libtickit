@@ -19,10 +19,14 @@ Link with \fI\-ltickit\fP.
 .PP
 \fBtickit_pen_clone\fP() creates a new \fBTickitPen\fP instance. It initially has the same attributes values set as the one given by \fIorig\fP.
 .PP
+The reference count of a newly-constructed pen instance will be one. This can be incremented or decremented using \fBtickit_pen_ref\fP(3) and \fBtickit_pen_unref\fP(3).
+.PP
 \fBtickit_pen_destroy\fP() destroys the given instance and releases any resources controlled by it. It will unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate.
 .SH "RETURN VALUE"
 If successful, \fBtickit_pen_new\fP(), \fBtickit_pen_new_attrs\fP() and \fBtickit_pen_clone\fP() return a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure. \fBtickit_pen_destroy\fP() returns no value.
 .SH "SEE ALSO"
+.BR tickit_pen_ref (3),
+.BR tickit_pen_unref (3),
 .BR tickit_pen_bind_event (3),
 .BR tickit_pen (7),
 .BR tickit (7)

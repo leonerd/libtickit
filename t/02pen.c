@@ -1,12 +1,9 @@
 #include "tickit.h"
 #include "taplib.h"
 
-static int changed = 0;
-
-int on_changed(TickitPen *pen, TickitEventType ev, void *_info, void *data)
-{
-  changed++;
-  return 0;
+static int on_event_incr(TickitPen *pen, TickitEventType ev, void *_info, void *data) {
+  ((int *)data)[0]++;
+  return 1;
 }
 
 int main(int argc, char *argv[])
@@ -18,7 +15,8 @@ int main(int argc, char *argv[])
 
   ok(!!pen, "tickit_pen_new");
 
-  tickit_pen_bind_event(pen, TICKIT_EV_CHANGE, on_changed, NULL);
+  int changed = 0;
+  tickit_pen_bind_event(pen, TICKIT_EV_CHANGE, on_event_incr, &changed);
 
   is_int(tickit_pen_attrtype(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
 
@@ -117,7 +115,17 @@ int main(int argc, char *argv[])
 
   ok(tickit_pen_has_attr(pen2, TICKIT_PEN_UNDER), "pen copy still copies present but default-value attributes");
 
-  tickit_pen_destroy(pen);
+  is_ptr(tickit_pen_ref(pen), pen, "tickit_pen_ref() returns same pen");
+
+  int destroyed = 0;
+  tickit_pen_bind_event(pen, TICKIT_EV_UNBIND, on_event_incr, &destroyed);
+
+  tickit_pen_unref(pen);
+  ok(!destroyed, "pen not destroyed after first unref");
+
+  tickit_pen_unref(pen);
+  ok(destroyed, "pen destroyed after second unref");
+
   tickit_pen_destroy(pen2);
 
   pass("tickit_pen_destroy");

@@ -53,6 +53,9 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...);
 TickitPen *tickit_pen_clone(const TickitPen *orig);
 void       tickit_pen_destroy(TickitPen *pen);
 
+TickitPen *tickit_pen_ref(TickitPen *pen);
+void       tickit_pen_unref(TickitPen *pen);
+
 bool tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr);
 bool tickit_pen_is_nonempty(const TickitPen *pen);
 bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr);

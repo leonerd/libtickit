@@ -33,6 +33,7 @@ struct TickitPen {
                  blink   : 1;
   } valid;
 
+  int refcount;
   struct TickitEventHook *hooks;
 };
 
@@ -44,6 +45,7 @@ TickitPen *tickit_pen_new(void)
   if(!pen)
     return NULL;
 
+  pen->refcount = 1;
   pen->hooks = NULL;
 
   tickit_pen_clear(pen);
@@ -101,6 +103,19 @@ void tickit_pen_destroy(TickitPen *pen)
 {
   tickit_hooklist_unbind_and_destroy(pen->hooks, pen);
   free(pen);
+}
+
+TickitPen *tickit_pen_ref(TickitPen *pen)
+{
+  pen->refcount++;
+  return pen;
+}
+
+void tickit_pen_unref(TickitPen *pen)
+{
+  pen->refcount--;
+  if(!pen->refcount)
+    tickit_pen_destroy(pen);
 }
 
 bool tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)

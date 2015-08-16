@@ -11,7 +11,7 @@ TickitPen \- store a collection of terminal rendering attributes
 .SH DESCRIPTION
 A \fBTickitPen\fP instance stores a collection of terminal rendering attributes. For each known attribute, a pen instance may store a value for this attribute. A pen instance is used in the \fBtickit_term_chpen\fP(3) and \fBtickit_term_setpen\fP(3) functions.
 .SH FUNCTIONS
-A new \fBTickitPen\fP instance is created using the \fBtickit_pen_new\fP(3) function, and destroyed using \fBtickit_pen_destroy\fP(3).
+A new \fBTickitPen\fP instance is created using the \fBtickit_pen_new\fP(3) function, and destroyed using \fBtickit_pen_destroy\fP(3). A pen instance stores a reference count, to make it easier for applications to manage the lifetime of pens. A new pen starts with a count of one, and it can be adjusted using \fBtickit_pen_ref\fP(3) and \fBtickit_pen_unref\fP(3). When it reaches zero it is destroyed.
 .SH ATTRIBUTES
 The \fBTickitPenAttr\fP enumeration lists the attributes known by a pen. Each attribute has a type, as given by the \fBTickitPenAttrType\fP enumeration. The \fBtickit_pen_attrtype\fP(3) function gives the type of a given attribute. The \fBtickit_pen_attrname\fP(3) function gives the name of a given attribute, which is also given below in parentheses. The \fBtickit_pen_lookup_attr\fP(3) function looks up an attribute constant from a string containing the name.
 .TP
