@@ -174,14 +174,14 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
       case TEXT:
         endcell->state       = TEXT;
         endcell->cols        = afterlen;
-        endcell->pen         = tickit_pen_clone(spancell->pen);
+        endcell->pen         = tickit_pen_ref(spancell->pen);
         endcell->v.text.idx  = spancell->v.text.idx;
         endcell->v.text.offs = spancell->v.text.offs + end - spanstart;
         break;
       case ERASE:
         endcell->state = ERASE;
         endcell->cols  = afterlen;
-        endcell->pen   = tickit_pen_clone(spancell->pen);
+        endcell->pen   = tickit_pen_ref(spancell->pen);
         break;
       case LINE:
       case CHAR:
