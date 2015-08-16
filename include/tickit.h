@@ -440,7 +440,7 @@ void tickit_window_resize(TickitWindow *win, int lines, int cols);
 void tickit_window_reposition(TickitWindow *win, int top, int left);
 void tickit_window_set_geometry(TickitWindow *win, TickitRect rect);
 
-TickitPen *tickit_window_get_pen(TickitWindow *win);
+TickitPen *tickit_window_get_pen(const TickitWindow *win);
 void tickit_window_set_pen(TickitWindow *win, TickitPen *pen);
 void tickit_window_expose(TickitWindow *win, const TickitRect *exposed);
 

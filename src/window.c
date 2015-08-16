@@ -375,7 +375,7 @@ void tickit_window_set_geometry(TickitWindow *win, TickitRect geom)
   }
 }
 
-TickitPen *tickit_window_get_pen(TickitWindow *win)
+TickitPen *tickit_window_get_pen(const TickitWindow *win)
 {
   return win->pen;
 }
