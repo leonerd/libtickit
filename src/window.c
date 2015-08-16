@@ -26,7 +26,7 @@ struct TickitWindow {
   struct {
     int line;
     int col;
-    TickitTermCursorShape shape;
+    TickitCursorShape shape;
     bool visible;
   } cursor;
   bool is_visible;
@@ -124,7 +124,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, int top, int le
   win->rect.cols = cols;
   win->cursor.line = 0;
   win->cursor.col = 0;
-  win->cursor.shape = TICKIT_TERM_CURSORSHAPE_BLOCK;
+  win->cursor.shape = TICKIT_CURSORSHAPE_BLOCK;
   win->cursor.visible = true;
   win->is_visible = true;
   win->is_focused = false;
@@ -925,7 +925,7 @@ void tickit_window_set_cursor_visible(TickitWindow *win, bool visible)
     _request_restore(_get_root(win));
 }
 
-void tickit_window_set_cursor_shape(TickitWindow *win, TickitTermCursorShape shape)
+void tickit_window_set_cursor_shape(TickitWindow *win, TickitCursorShape shape)
 {
   win->cursor.shape = shape;
 

@@ -86,14 +86,14 @@ int main(int argc, char *argv[])
         GOTO(7,17),
         NULL);
 
-    tickit_window_set_cursor_shape(win, TICKIT_TERM_CURSORSHAPE_UNDER);
+    tickit_window_set_cursor_shape(win, TICKIT_CURSORSHAPE_UNDER);
     tickit_window_tick(root);
 
     is_termlog("Termlog after cursor_shape",
         GOTO(7,17),
         NULL);
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORSHAPE, &value);
-    is_int(value, TICKIT_TERM_CURSORSHAPE_UNDER, "Cursor shape after cursor_shape");
+    is_int(value, TICKIT_CURSORSHAPE_UNDER, "Cursor shape after cursor_shape");
 
     tickit_window_set_cursor_visible(win, false);
     tickit_window_tick(root);

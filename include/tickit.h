@@ -230,10 +230,10 @@ typedef enum {
 } TickitTermMouseMode;
 
 typedef enum {
-  TICKIT_TERM_CURSORSHAPE_BLOCK = 1,
-  TICKIT_TERM_CURSORSHAPE_UNDER,
-  TICKIT_TERM_CURSORSHAPE_LEFT_BAR,
-} TickitTermCursorShape;
+  TICKIT_CURSORSHAPE_BLOCK = 1,
+  TICKIT_CURSORSHAPE_UNDER,
+  TICKIT_CURSORSHAPE_LEFT_BAR,
+} TickitCursorShape;
 
 bool tickit_term_getctl_int(TickitTerm *tt, TickitTermCtl ctl, int *value);
 bool tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
@@ -453,7 +453,7 @@ bool tickit_window_scroll_with_children(TickitWindow *win, int downward, int rig
 
 void tickit_window_set_cursor_position(TickitWindow *win, int line, int col);
 void tickit_window_set_cursor_visible(TickitWindow *win, bool visible);
-void tickit_window_set_cursor_shape(TickitWindow *win, TickitTermCursorShape shape);
+void tickit_window_set_cursor_shape(TickitWindow *win, TickitCursorShape shape);
 
 void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(TickitWindow *win);
