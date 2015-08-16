@@ -319,7 +319,7 @@ void tickit_renderbuffer_get_cursorpos(const TickitRenderBuffer *rb, int *line, 
 void tickit_renderbuffer_goto(TickitRenderBuffer *rb, int line, int col);
 void tickit_renderbuffer_ungoto(TickitRenderBuffer *rb);
 
-void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, TickitPen *pen);
+void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, const TickitPen *pen);
 
 void tickit_renderbuffer_reset(TickitRenderBuffer *rb);
 

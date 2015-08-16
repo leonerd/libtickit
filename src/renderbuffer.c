@@ -407,7 +407,7 @@ void tickit_renderbuffer_ungoto(TickitRenderBuffer *rb)
   rb->vc_pos_set = 0;
 }
 
-void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, TickitPen *pen)
+void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, const TickitPen *pen)
 {
   TickitPen *prevpen = rb->stack ? rb->stack->pen : NULL;
 
