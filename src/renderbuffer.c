@@ -77,7 +77,7 @@ static void free_stack(RBStack *stack)
   while(stack) {
     RBStack *prev = stack->prev;
     if(stack->pen)
-      tickit_pen_destroy(stack->pen);
+      tickit_pen_unref(stack->pen);
     free(stack);
 
     stack = prev;
@@ -139,7 +139,7 @@ static void cont_cell(RBCell *cell, int startcol)
     case ERASE:
     case LINE:
     case CHAR:
-      tickit_pen_destroy(cell->pen);
+      tickit_pen_unref(cell->pen);
       break;
     case SKIP:
     case CONT:
@@ -303,7 +303,7 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
         case ERASE:
         case LINE:
         case CHAR:
-          tickit_pen_destroy(cell->pen);
+          tickit_pen_unref(cell->pen);
           break;
         case SKIP:
         case CONT:
@@ -317,7 +317,7 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
   rb->cells = NULL;
 
   if(rb->pen)
-    tickit_pen_destroy(rb->pen);
+    tickit_pen_unref(rb->pen);
 
   if(rb->stack)
     free_stack(rb->stack);
@@ -417,7 +417,7 @@ void tickit_renderbuffer_setpen(TickitRenderBuffer *rb, TickitPen *pen)
 
   if(!pen && !prevpen) {
     if(rb->pen)
-      tickit_pen_destroy(rb->pen);
+      tickit_pen_unref(rb->pen);
     rb->pen = NULL;
   }
   else {
@@ -453,7 +453,7 @@ void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
   tickit_rect_init_sized(&rb->clip, 0, 0, rb->lines, rb->cols);
 
   if(rb->pen) {
-    tickit_pen_destroy(rb->pen);
+    tickit_pen_unref(rb->pen);
     rb->pen = NULL;
   }
 
@@ -520,7 +520,7 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb)
   }
 
   if(rb->pen)
-    tickit_pen_destroy(rb->pen);
+    tickit_pen_unref(rb->pen);
   rb->pen = stack->pen;
   // We've now definitely taken ownership of the old stack frame's pen, so
   //   it doesn't need destroying now
@@ -832,11 +832,11 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits)
     cell->v.line.mask = 0;
   }
   else if(!tickit_pen_equiv(cell->pen, cellpen)) {
-    tickit_pen_destroy(cell->pen);
+    tickit_pen_unref(cell->pen);
     cell->pen   = cellpen;
   }
   else
-    tickit_pen_destroy(cellpen);
+    tickit_pen_unref(cellpen);
 
   cell->v.line.mask |= bits;
 }

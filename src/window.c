@@ -236,7 +236,7 @@ void tickit_window_destroy(TickitWindow *win)
   tickit_hooklist_unbind_and_destroy(win->hooks, win);
 
   if(win->pen)
-    tickit_pen_destroy(win->pen);
+    tickit_pen_unref(win->pen);
 
   for(TickitWindow *child = win->first_child; child; child = child->next)
     tickit_window_destroy(child);
@@ -879,7 +879,7 @@ static bool _scroll(TickitWindow *win, const TickitRect *origrect, int downward,
   bool ret = _scrollrectset(win, visible, downward, rightward, pen);
 
   tickit_rectset_destroy(visible);
-  tickit_pen_destroy(pen);
+  tickit_pen_unref(pen);
 
   return ret;
 }

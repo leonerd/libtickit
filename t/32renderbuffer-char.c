@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
                    SETPEN(.fg=4), PRINT("C"),
         NULL);
 
-    tickit_pen_destroy(fg_pen);
+    tickit_pen_unref(fg_pen);
   }
 
   // VC characters
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         GOTO(0,4), SETPEN(.fg=5), PRINT("G"),
         NULL);
 
-    tickit_pen_destroy(fg_pen);
+    tickit_pen_unref(fg_pen);
   }
 
   // Characters with translation

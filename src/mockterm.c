@@ -44,7 +44,7 @@ static void mtd_free_cell(MockTermDriver *mtd, int line, int col)
   if(cell->str)
     free(cell->str);
   if(cell->pen)
-    tickit_pen_destroy(cell->pen);
+    tickit_pen_unref(cell->pen);
 
   free(cell);
 }
@@ -86,7 +86,7 @@ static void mtd_clear_cells(MockTermDriver *mtd, int line, int startcol, int sto
     if(cell->str)
       free(cell->str);
     if(cell->pen)
-      tickit_pen_destroy(cell->pen);
+      tickit_pen_unref(cell->pen);
 
     cell->str = strdup(" ");
     cell->pen = tickit_pen_clone(mtd->pen);
@@ -114,7 +114,7 @@ static void mtd_free_logentry(TickitMockTermLogEntry *entry)
   entry->str = NULL;
 
   if(entry->pen)
-    tickit_pen_destroy(entry->pen);
+    tickit_pen_unref(entry->pen);
   entry->pen = NULL;
 }
 
@@ -130,7 +130,7 @@ static void mtd_destroy(TickitTermDriver *ttd)
     mtd_free_line(mtd, line);
   free(mtd->cells);
 
-  tickit_pen_destroy(mtd->pen);
+  tickit_pen_unref(mtd->pen);
 
   free(mtd);
 }
@@ -177,7 +177,7 @@ static bool mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
     if(cell->str)
       free(cell->str);
     if(cell->pen)
-      tickit_pen_destroy(cell->pen);
+      tickit_pen_unref(cell->pen);
 
     cell->str = strndup(str + start.bytes, pos.bytes - start.bytes);
     cell->pen = tickit_pen_clone(mtd->pen);
@@ -189,7 +189,7 @@ static bool mtd_print(TickitTermDriver *ttd, const char *str, size_t len)
       if(cell->str)
         free(cell->str);
       if(cell->pen)
-        tickit_pen_destroy(cell->pen);
+        tickit_pen_unref(cell->pen);
 
       cell->str = NULL; /* empty */
       cell->pen = tickit_pen_clone(mtd->pen);

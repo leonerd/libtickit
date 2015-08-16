@@ -193,7 +193,7 @@ TickitTerm *tickit_term_open_stdio(void)
 void tickit_term_free(TickitTerm *tt)
 {
   tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
-  tickit_pen_destroy(tt->pen);
+  tickit_pen_unref(tt->pen);
 
   if(tt->observe_winch)
     tickit_term_observe_sigwinch(tt, false);
@@ -835,7 +835,7 @@ void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
 
   (*tt->driver->vtable->chpen)(tt->driver, delta, tt->pen);
 
-  tickit_pen_destroy(delta);
+  tickit_pen_unref(delta);
 }
 
 void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
@@ -861,7 +861,7 @@ void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
 
   (*tt->driver->vtable->chpen)(tt->driver, delta, tt->pen);
 
-  tickit_pen_destroy(delta);
+  tickit_pen_unref(delta);
 }
 
 /* Driver API */

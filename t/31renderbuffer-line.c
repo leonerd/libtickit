@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
         GOTO(13,10), SETPEN(.fg=1), PRINT("╵╵││"),
         NULL);
 
-    tickit_pen_destroy(fg_pen);
+    tickit_pen_unref(fg_pen);
   }
 
   // Line merging

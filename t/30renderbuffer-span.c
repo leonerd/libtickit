@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     is_termlog("RenderBuffer now empty after render to terminal",
         NULL);
 
-    tickit_pen_destroy(fg_pen);
+    tickit_pen_unref(fg_pen);
   }
 
   // Formatting buffer edge case
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         GOTO(3,0), SETPEN(.b=1), PRINT("DDDDD"), SETPEN(), PRINT("ddd"),
         NULL);
 
-    tickit_pen_destroy(b_pen);
+    tickit_pen_unref(b_pen);
   }
 
   {
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
         GOTO(2,2), SETPEN(.fg=3), PRINT("another   string"),
         NULL);
 
-    tickit_pen_destroy(fg_pen);
+    tickit_pen_unref(fg_pen);
   }
 
   // Translation
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
         GOTO(9,0), SETPEN(.bg=3), ERASECH(20,-1),
         NULL);
 
-    tickit_pen_destroy(bg_pen);
+    tickit_pen_unref(bg_pen);
   }
 
   tickit_renderbuffer_destroy(rb);

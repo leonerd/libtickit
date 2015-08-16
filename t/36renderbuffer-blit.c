@@ -128,13 +128,13 @@ int main(int argc, char *argv[])
         TICKIT_PEN_FG, 4,
         -1);
     tickit_renderbuffer_setpen(screen, screen_pen);
-    tickit_pen_destroy(screen_pen);
+    tickit_pen_unref(screen_pen);
 
     TickitPen *window_pen = tickit_pen_new_attrs(
         TICKIT_PEN_FG, 5,
         -1);
     tickit_renderbuffer_setpen(window, window_pen);
-    tickit_pen_destroy(window_pen);
+    tickit_pen_unref(window_pen);
 
     TickitPen *bg_pen = tickit_pen_new_attrs(
         TICKIT_PEN_BG, 6,
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
         GOTO(4,4), SETPEN(.fg=4), PRINT("Preserved Pen"),
         NULL);
 
-    tickit_pen_destroy(bg_pen);
+    tickit_pen_unref(bg_pen);
   }
 
   tickit_renderbuffer_destroy(window);

@@ -75,7 +75,7 @@ static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *d
     tickit_renderbuffer_restore(rb);
   }
 
-  tickit_pen_destroy(pen);
+  tickit_pen_unref(pen);
 
   return 1;
 }

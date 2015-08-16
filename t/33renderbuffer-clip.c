@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
       tickit_renderbuffer_setpen(rb, pen);
       tickit_renderbuffer_erase_at(rb, 5, 15, 10);
 
-      tickit_pen_destroy(pen);
+      tickit_pen_unref(pen);
       tickit_renderbuffer_restore(rb);
     }
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
       tickit_renderbuffer_setpen(rb, pen);
       tickit_renderbuffer_erase_at(rb, 5, 15, 10);
 
-      tickit_pen_destroy(pen);
+      tickit_pen_unref(pen);
       tickit_renderbuffer_restore(rb);
     }
 
