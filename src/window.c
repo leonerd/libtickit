@@ -382,8 +382,13 @@ TickitPen *tickit_window_get_pen(const TickitWindow *win)
 
 void tickit_window_set_pen(TickitWindow *win, TickitPen *pen)
 {
-  /* TODO: Refcounting the pen would be nice. Until then, we assume we don't own it. */
-  win->pen = pen;
+  if(win->pen)
+    tickit_pen_unref(win->pen);
+
+  if(pen)
+    win->pen = tickit_pen_ref(pen);
+  else
+    win->pen = NULL;
 }
 
 void tickit_window_expose(TickitWindow *win, const TickitRect *exposed)
@@ -861,7 +866,7 @@ static bool _scroll(TickitWindow *win, const TickitRect *origrect, int downward,
     return false;
 
   if(pen)
-    pen = tickit_pen_clone(pen);
+    pen = tickit_pen_ref(pen);
   else
     pen = tickit_pen_new();
 
