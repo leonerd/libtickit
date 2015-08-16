@@ -1,0 +1,34 @@
+.TH TICKIT_WINDOW_GET_GEOMETRY 3
+.SH NAME
+tickit_window_get_geometry \- query the size and position of a window
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitRect tickit_window_get_geometry(const TickitWindow *" win );
+.sp
+.BI "int tickit_window_top(const TickitWindow *" win );
+.BI "int tickit_window_left(const TickitWindow *" win );
+.BI "int tickit_window_lines(const TickitWindow *" win );
+.BI "int tickit_window_cols(const TickitWindow *" win );
+.sp
+.BI "int tickit_window_bottom(const TickitWindow *" win );
+.BI "int tickit_window_right(const TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_get_geometry\fP() returns the size and position within its immediate parent of the given window. When invoked on a root window, its top left corner will be at zero, and its size will give the size of the underlying terminal.
+.PP
+The four convenience accessors return the four fields of the rectangle structure immediately. They may be implemented as macros.
+.PP
+\fBtickit_window_bottom\fP() gives the line number in the parent where the window stops (i.e. the first line after its content). \fBtickit_window_right\fP() gives the column number in the parent where the window stops.
+.SH "RETURN VALUE"
+\fBtickit_window_get_geometry\fP() returns a \fBTickitRect\fP structure. The other functions return integers.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_get_abs_geometry (3),
+.BR tickit_window_set_geometry (3),
+.BR tickit_window (7),
+.BR tickit_rect (7),
+.BR tickit (7)

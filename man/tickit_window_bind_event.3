@@ -1,0 +1,26 @@
+.TH TICKIT_WINDOW_BIND_EVENT 3
+.SH NAME
+tickit_window_bind_event, tickit_window_unbind_event_id \- add or remove event handlers
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "typedef void " TickitWindowEventFn "(TickitWindow *" win ", TickitEventType " ev ,
+.BI "    void *" info ", void *" user );
+.sp
+.BI "int tickit_window_bind_event(TickitWindow *" win ", TickitEventType " ev ,
+.BI "    TickitWindowEventFn *" fn ", void *" user );
+.BI "void tickit_window_unbind_event_id(TickitWindow *" win ", int " id );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_bind_event\fP() adds a new event handler to the set of handlers stored by the window, and returns an integer to identify this handler. This handler will be invoked for any of the events given by the \fIev\fP bitmask. When invoked, \fIfunc\fP will be passed the window instance, and event bitmask, a pointer to an event information structure whose type depends on the event, and the user data pointer it was installed with.
+.PP
+\fBtickit_window_unbind_event_id\fP() removes an event handler previously added, by the identifier returned when it was added.
+.SH "RETURN VALUE"
+\fBtickit_window_bind_event\fP() returns an identifier integer. \fBtickit_window_unbind_event_id\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window (7),
+.BR tickit (7)

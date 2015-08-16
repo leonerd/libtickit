@@ -1,0 +1,26 @@
+.TH TICKIT_WINDOW_GET_PEN 3
+.SH NAME
+tickit_window_get_pen, tickit_window_set_pen \- manipulate the window's rendering pen
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitPen *tickit_window_get_pen(const TickitWindow *" win );
+.BI "void tickit_window_set_pen(TickitWindow *" win ", TickitPen " pen );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_get_pen\fP() returns a pointer to the given window's pen instance. This pen instance is directly stored by the window. The application is permitted to modify this pen instance, though any modifications will not be observed until the window is next exposed for rendering.
+.PP
+\fBtickit_window_set_pen\fP() stores a new pointer for a pen instance into the given window. The window retains a reference to that pen and increments the reference count on it. Any previous pen is unreferenced first.
+.PP
+Because the window stores what may be one of many references to the pen instance, applications that do modify the pen should be careful that such modifications do not adversely affect other users of the same pen.
+.SH "RETURN VALUE"
+\fBtickit_window_get_pen\fP() returns a pointer to a pen instance. \fBtickit_window_set_pen\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_expose (3),
+.BR tickit_window (7),
+.BR tickit_pen (7),
+.BR tickit (7)

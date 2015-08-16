@@ -1,0 +1,21 @@
+.TH TICKIT_WINDOW_DESTROY 3
+.SH NAME
+tickit_window_destroy \- destroy a window instance
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_window_destroy(TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_destroy\fP() destroys the given window instance and releases any resources controlled by it, recursively destroying any child windows of the given one as well. It will unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate.
+.SH "RETURN VALUE"
+\fBtickit_window_destroy\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window_unbind_event_id (3),
+.BR tickit_window (7),
+.BR tickit (7)

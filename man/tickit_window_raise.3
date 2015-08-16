@@ -1,0 +1,27 @@
+.TH TICKIT_WINDOW_RAISE 3
+.SH NAME
+tickit_window_raise, tickit_window_lower \- change window stacking order
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_window_raise(TickitWindow *" win );
+.BI "void tickit_window_raise_to_front(TickitWindow *" win );
+.BI "void tickit_window_lower(TickitWindow *" win );
+.BI "void tickit_window_lower_to_back(TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_raise\fP() brings the given window one level higher up in the stacking order in its parent. \fBtickit_window_raise_to_front\fP() brings the given window to the front of the stacking order in its parent. These functions may cause new areas of the given window or children of it to become exposed, and may result in \fBTICKIT_EV_EXPOSE\fP events at the next tick.
+.PP
+\fBtickit_window_lower\fP() brings the given window one level lower down in the stacking order in its parent. \fBtickit_window_lower_to_back\fP() brings the given window to the back of the stacking order in its parent. These functions may cause new areas of other sibling windows or their children to become exposed, and may result in \fBTICKIT_EV_EXPOSE\fP events at the next tick.
+.SH "RETURN VALUE"
+These functions return no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_show (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window_tick (3),
+.BR tickit_window (7),
+.BR tickit (7)

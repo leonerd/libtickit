@@ -1,0 +1,27 @@
+.TH TICKIT_WINDOW_SHOW 3
+.SH NAME
+tickit_window_show, tickit_window_hide \- control a window's visibility
+.SH SYNOPSIS
+.nf
+.BI "void tickit_window_show(TickitWindow *" win );
+.BI "void tickit_window_hide(TickitWindow *" win );
+.sp
+.BI "bool tickit_window_is_visible(TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_show\fP() makes the given window visible, allowing it to receive events and obscure lower sibling windows. This may cause it to receive \fBTICKIT_EV_EXPOSE\fP events at the next tick.
+.PP
+\fBtickit_window_hide\fP() makes the given window non-visible, preventing it from receiving events and making it transparent to lower sibling windows, so their content is now visible. This may cause lower siblings to receive \fBTICKIT_EV_EXPOSE\fP events at the next tick.
+.PP
+\fBtickit_window_is_visible\fP() tests whether the given window is visible within its immediate parent. This does not imply that it is actually visible to the terminal, as it may still have a hidden parent.
+.SH "RETURN VALUE"
+\fBtickit_window_show\fP() and \fBtickit_window_hide\fP() return no value. \fBtickit_window_is_visible\fP() returns a boolean.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_raise (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window_tick (3),
+.BR tickit_window (7),
+.BR tickit (7)

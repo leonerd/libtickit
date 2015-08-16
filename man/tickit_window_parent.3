@@ -1,0 +1,22 @@
+.TH TICKIT_WINDOW_PARENT 3
+.SH NAME
+tickit_window_parent, tickit_window_root \- query the ancestry of a window
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitWindow *tickit_window_parent(const TickitWindow *" win );
+.BI "TickitWindow *tickit_window_root(const TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_parent\fP() returns a pointer to the given window's immediate parent instance (i.e. the one it was created from), or \fBNULL\fP if called on a root window instance.
+.PP
+\fBtickit_window_root\fP() returns a pointer to the given window's ultimate root window instance. This may be the window itself, if called on a root window instance.
+.SH "RETURN VALUE"
+\fBtickit_window_parent\fP() and \fBtickit_window_root\fP() return pointers to window instances.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window (7),
+.BR tickit (7)

@@ -1,0 +1,23 @@
+.TH TICKIT_WINDOW_EXPOSE 3
+.SH NAME
+tickit_window_expose \- mark an area of a window for re-rendering
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_window_expose(TickitWindow *" win ", const TickitRect *" exposed );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_expose\fP() marks the given area of the given window as needing to be re-rendered, causing it to receive a \fBTICKIT_EV_EXPOSE\fP event on the next tick. \fIexposed\fP may be \fBNULL\fP, indicating that the entire window should be exposed.
+.PP
+If the window, or any of its parents, are hidden, then this function has no effect. Otherwise, it enqueues the corresponding area on the root window as being damaged, causing an \fBTICKIT_EV_EXPOSE\fP event to propagate upwards from the root on the next tick. This will propagate up to any window occupying that area, meaning that this window or others may receive it.
+.SH "RETURN VALUE"
+\fBtickit_window_expose\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_set_geometry (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window (7),
+.BR tickit (7)

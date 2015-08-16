@@ -1,0 +1,20 @@
+.TH TICKIT_WINDOW_GET_ABS_GEOMETRY 3
+.SH NAME
+tickit_window_get_abs_geometry \- query the absolute position of a window
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitRect tickit_window_get_abs_geometry(const TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_get_abs_geometry\fP() returns a \fBTickitRect\fP structure containing the absolute position of the given window within the underlying terminal. For a root window or an immediate child of it, this will be the same as its position given by \fBtickit_window_get_geometry\fP(3). For further-nested children, this will take account of the position of its parents.
+.SH "RETURN VALUE"
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_get_geometry (3),
+.BR tickit_window_reposition (3),
+.BR tickit_window (7),
+.BR tickit (7)

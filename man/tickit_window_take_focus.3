@@ -1,0 +1,25 @@
+.TH TICKIT_WINDOW_TAKE_FOCUS 3
+.SH NAME
+tickit_window_take_focus, tickit_window_is_focused \- control the input focus
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_window_take_focus(TickitWindow *" win );
+.BI "bool tickit_window_is_focused(const TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_take_focus\fP() requests that the given window take the input focus, causing respectively the parent to take focus, recursively to the root. The terminal cursor will then take the properties defined by the given window. This results in a \fBTICKIT_EV_FOCUS\fP event being delivered to the previous owner of the focus, as well as to the given window.
+.PP
+\fBtickit_window_is_focused\fP() returns true if the given window currently has the input focus.
+.SH "RETURN VALUE"
+\fBtickit_window_take_focus\fP() returns no value. \fBtickit_window_is_focused\fP() returns a boolean.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_set_cursor_position (3),
+.BR tickit_window_set_focus_child_notify (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window (7),
+.BR tickit (7)

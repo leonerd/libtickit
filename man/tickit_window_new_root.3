@@ -1,0 +1,29 @@
+.TH TICKIT_WINDOW_NEW_ROOT 3
+.SH NAME
+tickit_window_new_root \- create a new toplevel root window
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitWindow *tickit_window_new_root(TickitTerm *" term );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_new_root\fP() creates a new toplevel \fBTickitWindow\fP instance to represent the drawing area on the given terminal instance. The terminal instance is stored by the window itself, and is used for flushing the \fBTickitRenderBuffer\fP to when expose events occur.
+.PP
+The root window behaves similar to other windows within the application, with the following differences:
+.TP *
+Its position remains fixed at zero, and should not be set by the application.
+.TP *
+Its size is managed automatically by observing resize events from the underlying terminal instance, and should not be set by the application.
+.TP *
+It is initially fully-damaged after construction, and will have a pending expose event waiting to occur.
+.SH "RETURN VALUE"
+If successful, \fBtickit_window_new_root\fP() returns a pointer to the new instance.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window_expose (3),
+.BR tickit_window (7),
+.BR tickit (7)
