@@ -451,9 +451,9 @@ bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int dow
 bool tickit_window_scroll(TickitWindow *win, int downward, int rightward);
 bool tickit_window_scroll_with_children(TickitWindow *win, int downward, int rightward);
 
-void tickit_window_cursor_at(TickitWindow *win, int line, int col);
-void tickit_window_cursor_visible(TickitWindow *win, bool visible);
-void tickit_window_cursor_shape(TickitWindow *win, TickitTermCursorShape shape);
+void tickit_window_set_cursor_position(TickitWindow *win, int line, int col);
+void tickit_window_set_cursor_visible(TickitWindow *win, bool visible);
+void tickit_window_set_cursor_shape(TickitWindow *win, TickitTermCursorShape shape);
 
 void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(TickitWindow *win);

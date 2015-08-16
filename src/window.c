@@ -908,7 +908,7 @@ bool tickit_window_scroll_with_children(TickitWindow *win, int downward, int rig
     downward, rightward, NULL, false);
 }
 
-void tickit_window_cursor_at(TickitWindow *win, int line, int col)
+void tickit_window_set_cursor_position(TickitWindow *win, int line, int col)
 {
   win->cursor.line = line;
   win->cursor.col = col;
@@ -917,7 +917,7 @@ void tickit_window_cursor_at(TickitWindow *win, int line, int col)
     _request_restore(_get_root(win));
 }
 
-void tickit_window_cursor_visible(TickitWindow *win, bool visible)
+void tickit_window_set_cursor_visible(TickitWindow *win, bool visible)
 {
   win->cursor.visible = visible;
 
@@ -925,7 +925,7 @@ void tickit_window_cursor_visible(TickitWindow *win, bool visible)
     _request_restore(_get_root(win));
 }
 
-void tickit_window_cursor_shape(TickitWindow *win, TickitTermCursorShape shape)
+void tickit_window_set_cursor_shape(TickitWindow *win, TickitTermCursorShape shape)
 {
   win->cursor.shape = shape;
 
