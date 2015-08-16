@@ -19,6 +19,7 @@ tickit_term_await_started_tv.3 = tickit_term_await_started_msec.3
 tickit_pen_new_attrs.3 = tickit_pen_new.3
 tickit_pen_destroy.3 = tickit_pen_new.3
 tickit_pen_clone.3 = tickit_pen_new.3
+tickit_pen_unref.3 = tickit_pen_ref.3
 tickit_pen_unbind_event_id.3 = tickit_pen_bind_event.3
 tickit_pen_nondefault_attr.3 = tickit_pen_has_attr.3
 tickit_pen_is_nondefault.3 = tickit_pen_is_nonempty.3
