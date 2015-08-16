@@ -985,7 +985,7 @@ static void _focus_lost(TickitWindow *win)
   }
 }
 
-bool tickit_window_is_focused(TickitWindow *win)
+bool tickit_window_is_focused(const TickitWindow *win)
 {
   return win->is_focused;
 }
