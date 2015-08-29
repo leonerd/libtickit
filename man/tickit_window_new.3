@@ -1,0 +1,40 @@
+.TH TICKIT_WINDOW_NEW 3
+.SH NAME
+tickit_window_new \- create a new sub-window
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "TickitWindow *tickit_window_new(TickitWindow *" parent ", TickitRect " rect ,
+.BI "         TickitWindowFlags " flags );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_new\fP() creates a new sub-window as a child of the given parent, using the given rectangle as its initial geometry relative to its parent. The \fIflags\fP argument is a bitmask of flags influencing the initial behaviour of the child window.
+.in
+.TP
+.B TICKIT_WINDOW_HIDDEN
+The new child window will be created in the hidden state initially. No pending expose event will occur because of it. It can later be shown by calling \fBtickit_window_show\fP(3).
+.TP
+.B TICKIT_WINDOW_LOWEST
+Normally the most recently-added child window is ordered at the top of the list in its parent, making it appear front-most in the display. This flag causes it to be added at the bottom of the list, appearing lowest-most instead.
+.TP
+.B TICKIT_WINDOW_ROOT_PARENT
+The new child window will have the root window of the window tree as its parent, instead of the given window. The position will be automatically adjusted so that the new window still appears at the given geometry position relative to the window passed as the \fIparent\fP argument.
+.TP
+.B TICKIT_WINDOW_STEAL_INPUT
+Causes the child window to have special behaviour on input events that are likely to be useful to implement popup windows. Specifically, the window receives all key events on its parent even before the sibling with the input focus receives them, provided it is the front-most child of its parent. Additionally, the window will receive all mouse events, even those outside of its geometry.
+.IP
+This flag is not useful when combined with \fBTICKIT_WINDOW_LOWEST\fP, as the input-stealing behaviour only applies while the window is front-most within its parent.
+.TP
+.B TICKIT_WINDOW_POPUP
+A convenient shortcut to specifying both \fBTICKIT_WINDOW_ROOT_PARENT\fP and \fBTICKIT_WINDOW_STEAL_INPUT\fP flags. This is useful for implementing popup dialog windows, menus, and other such UI behaviours.
+.SH "RETURN VALUE"
+If successful, \fBtickit_window_new\fP() returns a pointer to the new instance.
+.SH "SEE ALSO"
+.BR tickit_window_new_root (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window_expose (3),
+.BR tickit_window (7),
+.BR tickit (7)
