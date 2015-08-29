@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   TickitWindow *root = tickit_window_new_root(tt);
 
   {
-    TickitWindow *win = tickit_window_new_subwindow(root, 3, 10, 4, 30);
+    TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 30}, 0);
     tickit_window_tick(root);
 
     ok(!tickit_window_scroll(win, 1, 0), "window does not support scrolling");
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   }
 
   // Scrollable window probably needs to be fullwidth
-  TickitWindow *win = tickit_window_new_subwindow(root, 5, 0, 10, 80);
+  TickitWindow *win = tickit_window_new(root, (TickitRect){5, 0, 10, 80}, 0);
   tickit_window_tick(root);
 
   int bind_id = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_pushrect, NULL);
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
   // Child to obscure part of it
   {
-    TickitWindow *child = tickit_window_new_subwindow(win, 0, 0, 3, 10);
+    TickitWindow *child = tickit_window_new(win, (TickitRect){0, 0, 3, 10}, 0);
     tickit_window_tick(root);
 
     next_rect = 0;
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
 
   // scroll_with_children
   {
-    TickitWindow *child = tickit_window_new_subwindow(win, 0, 70, 1, 10);
+    TickitWindow *child = tickit_window_new(win, (TickitRect){0, 70, 1, 10}, 0);
     tickit_window_tick(root);
 
     next_rect = 0;
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 
   // sibling to obscure part of it
   {
-    TickitWindow *sibling = tickit_window_new_subwindow(root, 0, 0, 10, 20);
+    TickitWindow *sibling = tickit_window_new(root, (TickitRect){0, 0, 10, 20}, 0);
     tickit_window_tick(root);
 
     tickit_window_raise(sibling);

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitWindow *root = tickit_window_new_root(tt);
 
-  TickitWindow *rootfloat = tickit_window_new_float(root, 10, 10, 5, 30);
+  TickitWindow *rootfloat = tickit_window_new(root, (TickitRect){10, 10, 5, 30}, TICKIT_WINDOW_FLOAT);
   tickit_window_tick(root);
 
   // Basics
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         GOTO(10,40), SETPEN(), PRINT("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"),
         NULL);
 
-    TickitWindow *win = tickit_window_new_subwindow(root, 10, 20, 1, 50);
+    TickitWindow *win = tickit_window_new(root, (TickitRect){10, 20, 1, 50}, 0);
 
     tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_fillchr, "Y");
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         GOTO(10,40), SETPEN(), PRINT("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"),
         NULL);
 
-    TickitWindow *popupwin = tickit_window_new_popup(win, 2, 2, 10, 10);
+    TickitWindow *popupwin = tickit_window_new(win, (TickitRect){2, 2, 10, 10}, TICKIT_WINDOW_POPUP);
     tickit_window_tick(root);
 
     TickitRect geom = tickit_window_get_abs_geometry(popupwin);
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
         GOTO(10,10), SETPEN(), PRINT("|-- Yipee --|"),
         NULL);
 
-    TickitWindow *subwin = tickit_window_new_subwindow(rootfloat, 0, 4, 1, 6);
+    TickitWindow *subwin = tickit_window_new(rootfloat, (TickitRect){0, 4, 1, 6}, 0);
 
     tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, &on_expose_textat, "Byenow");
     tickit_window_expose(subwin, NULL);

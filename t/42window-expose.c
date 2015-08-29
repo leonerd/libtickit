@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitWindow *root = tickit_window_new_root(tt);
 
-  TickitWindow *win = tickit_window_new_subwindow(root, 3, 10, 4, 20);
+  TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
   tickit_window_tick(root);
 
   int root_exposed = 0;
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     next_rect = 0;
     int bind_id_in_win = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_pushrect, NULL);
 
-    TickitWindow *subwin = tickit_window_new_subwindow(win, 1, 4, 3, 6);
+    TickitWindow *subwin = tickit_window_new(win, (TickitRect){1, 4, 3, 6}, 0);
 
     int exposed = 0;
     int bind_id_in_sub = tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, &on_expose_incr, &exposed);
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 
     tickit_window_expose(win, &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 20 });
 
-    TickitWindow *sub = tickit_window_new_subwindow(win, 0, 7, 1, 7);
+    TickitWindow *sub = tickit_window_new(win, (TickitRect){0, 7, 1, 7}, 0);
 
     int idx_in_sub = 4;
     tickit_window_bind_event(sub, TICKIT_EV_EXPOSE, &on_expose_render_text, &idx_in_sub);
@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
   {
     int bind_id = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_fillX, NULL);
 
-    TickitWindow *sub = tickit_window_new_subwindow(win, 0, 5, 1, 10);
+    TickitWindow *sub = tickit_window_new(win, (TickitRect){0, 5, 1, 10}, 0);
     // no expose event
 
     tickit_window_expose(win, &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 80 });
@@ -324,9 +324,9 @@ int main(int argc, char *argv[])
 
   // Window ordering
   {
-    TickitWindow *winA = tickit_window_new_subwindow(root, 0, 0, 4, 80);
-    TickitWindow *winB = tickit_window_new_subwindow(root, 0, 0, 4, 80);
-    TickitWindow *winC = tickit_window_new_subwindow(root, 0, 0, 4, 80);
+    TickitWindow *winA = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
+    TickitWindow *winB = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
+    TickitWindow *winC = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
     tickit_window_tick(root);
 
     int bind_idA = tickit_window_bind_event(winA, TICKIT_EV_EXPOSE, &on_expose_textat, "Window A");

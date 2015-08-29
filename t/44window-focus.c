@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitWindow *root = tickit_window_new_root(tt);
 
-  TickitWindow *win = tickit_window_new_subwindow(root, 3, 10, 4, 20);
+  TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
 
   int focused;
   tickit_window_bind_event(win, TICKIT_EV_FOCUS, &on_focus, &focused);
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
   // Obscuring by child
   {
-    TickitWindow *child = tickit_window_new_subwindow(win, 1, 1, 4, 4);
+    TickitWindow *child = tickit_window_new(win, (TickitRect){1, 1, 4, 4}, 0);
     tickit_window_tick(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 
   // Obscuring by sibling
   {
-    TickitWindow *sib = tickit_window_new_subwindow(root, 6, 0, 2, 40);
+    TickitWindow *sib = tickit_window_new(root, (TickitRect){6, 0, 2, 40}, 0);
     tickit_window_raise(sib);
     tickit_window_tick(root);
 
@@ -163,8 +163,8 @@ int main(int argc, char *argv[])
   }
 
   {
-    TickitWindow *winA = tickit_window_new_subwindow(root, 5, 0, 1, 80);
-    TickitWindow *winB = tickit_window_new_subwindow(root, 6, 0, 1, 80);
+    TickitWindow *winA = tickit_window_new(root, (TickitRect){5, 0, 1, 80}, 0);
+    TickitWindow *winB = tickit_window_new(root, (TickitRect){6, 0, 1, 80}, 0);
     tickit_window_set_cursor_position(winA, 0, 0);
     tickit_window_set_cursor_position(winB, 0, 0);
 
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
 
   // Child notifications
   {
-    TickitWindow *subwin = tickit_window_new_subwindow(win, 1, 1, 2, 2);
+    TickitWindow *subwin = tickit_window_new(win, (TickitRect){1, 1, 2, 2}, 0);
 
     int bind_id = tickit_window_bind_event(win, TICKIT_EV_FOCUS, &on_focus_push, NULL);
     tickit_window_bind_event(subwin, TICKIT_EV_FOCUS, &on_focus_push, NULL);
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
     is_ptr(focus_events[1].win,      subwin,            "focus_events[1].win");
     is_ptr(focus_events[1].focuswin, subwin,            "focus_events[1].focuswin");
 
-    TickitWindow *otherwin = tickit_window_new_subwindow(root, 0, 0, 1, 1);
+    TickitWindow *otherwin = tickit_window_new(root, (TickitRect){0, 0, 1, 1}, 0);
     tickit_window_tick(root);
 
     next_event = 0;

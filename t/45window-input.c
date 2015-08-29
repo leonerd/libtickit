@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitWindow *root = tickit_window_new_root(tt);
 
-  TickitWindow *win = tickit_window_new_subwindow(root, 3, 10, 4, 20);
+  TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
 
   tickit_window_take_focus(win);
   tickit_window_tick(root);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     is_int(win_last.type, 0, "win_last.type still 0 after press @1,2");
   }
 
-  TickitWindow *subwin = tickit_window_new_subwindow(win, 2, 2, 1, 10);
+  TickitWindow *subwin = tickit_window_new(win, (TickitRect){2, 2, 1, 10}, 0);
 
   // Subwindow
   {
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
   // Event ordering
   {
-    TickitWindow *otherwin = tickit_window_new_subwindow(root, 10, 10, 4, 20);
+    TickitWindow *otherwin = tickit_window_new(root, (TickitRect){10, 10, 4, 20}, 0);
     tickit_window_tick(root);
 
     int bind_ids[] = {
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
       if(childwin)
         return 0;
 
-      childwin = tickit_window_new_subwindow(win, 0, 0, 2, 2);
+      childwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
       tickit_window_bind_event(childwin, TICKIT_EV_MOUSE, &on_input_incr_int, &childmouse);
       return 0;
     }
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
       if(siblingwin)
         return 0;
 
-      siblingwin = tickit_window_new_float(win, 0, 0, 2, 2);
+      siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, TICKIT_WINDOW_FLOAT);
       tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, &on_input_incr_int, &siblingmouse);
       return 0;
     }

@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitWindow *root = tickit_window_new_root(tt);
 
-  TickitWindow *win = tickit_window_new_subwindow(root, 3, 10, 4, 20);
+  TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
   tickit_window_tick(root);
 
   // Basics
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
   // sub-window nesting
   {
-    TickitWindow *subwin = tickit_window_new_subwindow(win, 2, 2, 1, 10);
+    TickitWindow *subwin = tickit_window_new(win, (TickitRect){2, 2, 1, 10}, 0);
     tickit_window_tick(root);
 
     TickitRect geom = tickit_window_get_geometry(subwin);
