@@ -414,11 +414,6 @@ typedef enum {
 TickitWindow *tickit_window_new_root(TickitTerm *term);
 TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWindowFlags flags);
 
-TickitWindow *tickit_window_new_subwindow(TickitWindow *parent, int top, int left, int lines, int cols);
-TickitWindow *tickit_window_new_hidden_subwindow(TickitWindow *parent, int top, int left, int lines, int cols);
-TickitWindow *tickit_window_new_float(TickitWindow *parent, int top, int left, int lines, int cols);
-TickitWindow *tickit_window_new_popup(TickitWindow *parent, int top, int left, int lines, int cols);
-
 TickitWindow *tickit_window_parent(const TickitWindow *win);
 TickitWindow *tickit_window_root(const TickitWindow *win);
 

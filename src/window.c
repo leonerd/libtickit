@@ -199,28 +199,6 @@ TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWin
   return win;
 }
 
-// TODO: make these static inline in .h
-
-TickitWindow *tickit_window_new_subwindow(TickitWindow *parent, int top, int left, int lines, int cols)
-{
-  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, 0);
-}
-
-TickitWindow *tickit_window_new_hidden_subwindow(TickitWindow *parent, int top, int left, int lines, int cols)
-{
-  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, TICKIT_WINDOW_HIDDEN);
-}
-
-TickitWindow *tickit_window_new_float(TickitWindow *parent, int top, int left, int lines, int cols)
-{
-  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, TICKIT_WINDOW_FLOAT);
-}
-
-TickitWindow *tickit_window_new_popup(TickitWindow *parent, int top, int left, int lines, int cols)
-{
-  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, TICKIT_WINDOW_POPUP);
-}
-
 TickitWindow *tickit_window_parent(const TickitWindow *win)
 {
   return win->parent;
