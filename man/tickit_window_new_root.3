@@ -13,11 +13,11 @@ Link with \fI\-ltickit\fP.
 \fBtickit_window_new_root\fP() creates a new toplevel \fBTickitWindow\fP instance to represent the drawing area on the given terminal instance. The terminal instance is stored by the window itself, and is used for flushing the \fBTickitRenderBuffer\fP to when expose events occur.
 .PP
 The root window behaves similar to other windows within the application, with the following differences:
-.TP *
+.IP *
 Its position remains fixed at zero, and should not be set by the application.
-.TP *
+.IP *
 Its size is managed automatically by observing resize events from the underlying terminal instance, and should not be set by the application.
-.TP *
+.IP *
 It is initially fully-damaged after construction, and will have a pending expose event waiting to occur.
 .SH "RETURN VALUE"
 If successful, \fBtickit_window_new_root\fP() returns a pointer to the new instance.
