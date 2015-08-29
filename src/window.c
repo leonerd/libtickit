@@ -111,17 +111,14 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
   return 1;
 }
 
-static void init_window(TickitWindow *win, TickitWindow *parent, int top, int left, int lines, int cols)
+static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect)
 {
   win->parent = parent;
   win->first_child = NULL;
   win->next = NULL;
   win->focused_child = NULL;
   win->pen = tickit_pen_new();
-  win->rect.top = top;
-  win->rect.left = left;
-  win->rect.lines = lines;
-  win->rect.cols = cols;
+  win->rect = rect;
   win->cursor.line = 0;
   win->cursor.col = 0;
   win->cursor.shape = TICKIT_CURSORSHAPE_BLOCK;
@@ -134,17 +131,6 @@ static void init_window(TickitWindow *win, TickitWindow *parent, int top, int le
   win->hooks = NULL;
 }
 
-static TickitWindow* new_window(TickitWindow *parent, int top, int left, int lines, int cols)
-{
-  TickitWindow *win = malloc(sizeof(TickitWindow));
-  if(!win)
-    return NULL;
-
-  init_window(win, parent, top, left, lines, cols);
-
-  return win;
-}
-
 TickitWindow* tickit_window_new_root(TickitTerm *term)
 {
   int lines, cols;
@@ -154,7 +140,7 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
   if(!root)
     return NULL;
 
-  init_window(ROOT_AS_WINDOW(root), NULL, 0, 0, lines, cols);
+  init_window(ROOT_AS_WINDOW(root), NULL, (TickitRect) { .top = 0, .left = 0, .lines = lines, .cols = cols });
 
   root->term = term;
   root->hierarchy_changes = NULL;
@@ -185,40 +171,54 @@ static TickitRootWindow *_get_root(const TickitWindow *win)
   return WINDOW_AS_ROOT(root);
 }
 
+TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWindowFlags flags)
+{
+  if(flags & TICKIT_WINDOW_ROOT_PARENT)
+    while(parent->parent) {
+      rect.top  += parent->rect.top;
+      rect.left += parent->rect.left;
+      parent = parent->parent;
+    }
+
+  TickitWindow *win = malloc(sizeof(TickitWindow));
+  if(!win)
+    return NULL;
+
+  init_window(win, parent, rect);
+
+  if(flags & TICKIT_WINDOW_HIDDEN)
+    win->is_visible = false;
+  if(flags & TICKIT_WINDOW_STEAL_INPUT)
+    win->steal_input = true;
+
+  _do_hierarchy_change(
+    (flags & TICKIT_WINDOW_FLOAT) ? TICKIT_HIERARCHY_INSERT_FIRST : TICKIT_HIERARCHY_INSERT_LAST,
+    parent, win
+  );
+
+  return win;
+}
+
+// TODO: make these static inline in .h
+
 TickitWindow *tickit_window_new_subwindow(TickitWindow *parent, int top, int left, int lines, int cols)
 {
-  TickitWindow *win = new_window(parent, top, left, lines, cols);
-  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_LAST, parent, win);
-  return win;
+  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, 0);
 }
 
 TickitWindow *tickit_window_new_hidden_subwindow(TickitWindow *parent, int top, int left, int lines, int cols)
 {
-  TickitWindow *win = new_window(parent, top, left, lines, cols);
-  win->is_visible = false;
-  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_LAST, parent, win);
-  return win;
+  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, TICKIT_WINDOW_HIDDEN);
 }
 
 TickitWindow *tickit_window_new_float(TickitWindow *parent, int top, int left, int lines, int cols)
 {
-  TickitWindow *win = new_window(parent, top, left, lines, cols);
-  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_FIRST, parent, win);
-  return win;
+  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, TICKIT_WINDOW_FLOAT);
 }
 
 TickitWindow *tickit_window_new_popup(TickitWindow *parent, int top, int left, int lines, int cols)
 {
-  TickitWindow *root = parent;
-  while(root->parent) {
-    top += root->rect.top;
-    left += root->rect.left;
-    root = root->parent;
-  }
-  TickitWindow *win = new_window(root, top, left, lines, cols);
-  _do_hierarchy_change(TICKIT_HIERARCHY_INSERT_FIRST, root, win);
-  win->steal_input = true;
-  return win;
+  return tickit_window_new(parent, (TickitRect){ .top = top, .left = left, .lines = lines, .cols = cols }, TICKIT_WINDOW_POPUP);
 }
 
 TickitWindow *tickit_window_parent(const TickitWindow *win)

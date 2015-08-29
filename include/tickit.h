@@ -401,7 +401,18 @@ size_t tickit_renderbuffer_get_span(TickitRenderBuffer *rb, int line, int startc
 typedef struct TickitWindow TickitWindow;
 typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *info, void *user);
 
+typedef enum {
+  TICKIT_WINDOW_HIDDEN      = 1<<0,
+  TICKIT_WINDOW_FLOAT       = 1<<1,
+  TICKIT_WINDOW_ROOT_PARENT = 1<<2,
+  TICKIT_WINDOW_STEAL_INPUT = 1<<3,
+
+  // Composite flag
+  TICKIT_WINDOW_POPUP = TICKIT_WINDOW_FLOAT|TICKIT_WINDOW_ROOT_PARENT|TICKIT_WINDOW_STEAL_INPUT,
+} TickitWindowFlags;
+
 TickitWindow *tickit_window_new_root(TickitTerm *term);
+TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWindowFlags flags);
 
 TickitWindow *tickit_window_new_subwindow(TickitWindow *parent, int top, int left, int lines, int cols);
 TickitWindow *tickit_window_new_hidden_subwindow(TickitWindow *parent, int top, int left, int lines, int cols);
