@@ -325,8 +325,8 @@ int main(int argc, char *argv[])
   // Window ordering
   {
     TickitWindow *winA = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
-    TickitWindow *winB = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
-    TickitWindow *winC = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
+    TickitWindow *winB = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, TICKIT_WINDOW_LOWEST);
+    TickitWindow *winC = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, TICKIT_WINDOW_LOWEST);
     tickit_window_tick(root);
 
     int bind_idA = tickit_window_bind_event(winA, TICKIT_EV_EXPOSE, &on_expose_textat, "Window A");

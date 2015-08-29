@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
       if(siblingwin)
         return 0;
 
-      siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, TICKIT_WINDOW_FLOAT);
+      siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
       tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, &on_input_incr_int, &siblingmouse);
       return 0;
     }

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   TickitTerm *tt = make_term(25, 80);
   TickitWindow *root = tickit_window_new_root(tt);
 
-  TickitWindow *rootfloat = tickit_window_new(root, (TickitRect){10, 10, 5, 30}, TICKIT_WINDOW_FLOAT);
+  TickitWindow *rootfloat = tickit_window_new(root, (TickitRect){10, 10, 5, 30}, 0);
   tickit_window_tick(root);
 
   // Basics
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         GOTO(10,40), SETPEN(), PRINT("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"),
         NULL);
 
-    TickitWindow *win = tickit_window_new(root, (TickitRect){10, 20, 1, 50}, 0);
+    TickitWindow *win = tickit_window_new(root, (TickitRect){10, 20, 1, 50}, TICKIT_WINDOW_LOWEST);
 
     tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_fillchr, "Y");
 

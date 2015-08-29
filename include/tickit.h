@@ -403,12 +403,12 @@ typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *inf
 
 typedef enum {
   TICKIT_WINDOW_HIDDEN      = 1<<0,
-  TICKIT_WINDOW_FLOAT       = 1<<1,
+  TICKIT_WINDOW_LOWEST      = 1<<1,
   TICKIT_WINDOW_ROOT_PARENT = 1<<2,
   TICKIT_WINDOW_STEAL_INPUT = 1<<3,
 
   // Composite flag
-  TICKIT_WINDOW_POPUP = TICKIT_WINDOW_FLOAT|TICKIT_WINDOW_ROOT_PARENT|TICKIT_WINDOW_STEAL_INPUT,
+  TICKIT_WINDOW_POPUP = TICKIT_WINDOW_ROOT_PARENT|TICKIT_WINDOW_STEAL_INPUT,
 } TickitWindowFlags;
 
 TickitWindow *tickit_window_new_root(TickitTerm *term);

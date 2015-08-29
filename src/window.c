@@ -192,7 +192,7 @@ TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWin
     win->steal_input = true;
 
   _do_hierarchy_change(
-    (flags & TICKIT_WINDOW_FLOAT) ? TICKIT_HIERARCHY_INSERT_FIRST : TICKIT_HIERARCHY_INSERT_LAST,
+    (flags & TICKIT_WINDOW_LOWEST) ? TICKIT_HIERARCHY_INSERT_LAST : TICKIT_HIERARCHY_INSERT_FIRST,
     parent, win
   );
 
