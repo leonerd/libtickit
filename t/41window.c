@@ -87,6 +87,23 @@ int main(int argc, char *argv[])
 
     ok(tickit_window_parent(subwin) == win, "nested tickit_window_parent");
     ok(tickit_window_root(subwin) == root, "nested tickit_window_root");
+
+    tickit_window_destroy(subwin);
+    tickit_window_tick(root);
+  }
+
+  // initially-hidden
+  {
+    TickitWindow *subwin = tickit_window_new(win, (TickitRect){4, 4, 2, 2}, TICKIT_WINDOW_HIDDEN);
+    tickit_window_tick(root);
+
+    ok(!tickit_window_is_visible(subwin), "initially-hidden window not yet visible");
+
+    tickit_window_show(subwin);
+    ok(tickit_window_is_visible(subwin), "initially-hidden window visible after show");
+
+    tickit_window_destroy(subwin);
+    tickit_window_tick(root);
   }
 
   return exit_status();
