@@ -491,7 +491,6 @@ static void _do_restore(TickitRootWindow *root)
 
   if(win && win->is_focused && win->cursor.visible &&
      _cell_visible(win, win->cursor.line, win->cursor.col)) {
-    /* TODO finish the visibility check here. */
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 1);
     TickitRect abs_geom = tickit_window_get_abs_geometry(win);
     int cursor_line = win->cursor.line + abs_geom.top;
