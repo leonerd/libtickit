@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
 
   tickit_window_take_focus(win);
-  tickit_window_tick(root);
+  tickit_window_flush(root);
 
   struct LastEvent win_last = { .ret = 1 };
   int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_input_capture, &win_last);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   // Subwindow
   {
     tickit_window_take_focus(subwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     struct LastEvent subwin_last = { .ret = 1 };
     int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_input_capture, &subwin_last);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
   // Event ordering
   {
     TickitWindow *otherwin = tickit_window_new(root, (TickitRect){10, 10, 4, 20}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     int bind_ids[] = {
       tickit_window_bind_event(win,      TICKIT_EV_KEY, &on_input_push, "win"),
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
     is_str(ids[1], "otherwin", "ids[1] for E");
 
     tickit_window_destroy(otherwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   tickit_window_destroy(subwin);
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
     ok(!!childwin, "child window created");
     is_int(childmouse, 0, "child window has not yet received a mouse event");
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
 
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 
     tickit_window_unbind_event_id(win, id);
     tickit_window_destroy(childwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   //   sibling windows
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
     ok(!!siblingwin, "sibling window created");
     is_int(siblingmouse, 0, "sibling window has not yet received a mouse event");
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
 
@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
 
     tickit_window_unbind_event_id(win, id);
     tickit_window_destroy(siblingwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   return exit_status();

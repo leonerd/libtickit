@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   TickitWindow *root = tickit_window_new_root(tt);
 
   TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
-  tickit_window_tick(root);
+  tickit_window_flush(root);
 
   int root_exposed = 0;
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose_incr, &root_exposed);
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     is_int(win_exposed, 0, "EV_EXPOSE not yet invoked");
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(root_exposed, 1, "root expose count after tick");
     is_int(win_exposed,  1, "win expose count after tick");
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 
     tickit_window_expose(win, NULL);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(root_exposed, 2, "root expose count after expose on win");
     is_int(win_exposed,  2, "win expose count after expose on win");
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     tickit_window_expose(root, NULL);
     tickit_window_expose(win, NULL);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(root_exposed, 3, "root expose count after expose on root-then-win");
     is_int(win_exposed,  3, "win expose count after expose on root-then-win");
@@ -135,21 +135,21 @@ int main(int argc, char *argv[])
     tickit_window_expose(win, NULL);
     tickit_window_expose(root, NULL);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(root_exposed, 4, "root expose count after expose on win-then-root");
     is_int(win_exposed,  4, "win expose count after expose on win-then-root");
 
     tickit_window_hide(win);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(root_exposed, 5, "root expose count after hide");
     is_int(win_exposed,  4, "win expose count after hide");
 
     tickit_window_show(win);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(root_exposed, 6, "root expose count after show");
     is_int(win_exposed,  5, "win expose count after show");
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
     tickit_window_expose(win, &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 20 });
     tickit_window_expose(win, &(TickitRect){ .top = 2, .left = 0, .lines = 1, .cols = 20 });
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(win_exposed, 7, "win expose count after expose two regions");
 
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     tickit_window_expose(root, &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 20 });
     tickit_window_expose(win, &(TickitRect){ .top = 0, .left = 5, .lines = 1, .cols = 10 });
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(win_exposed, 8, "win expose count after expose separate root+win");
 
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 
     tickit_window_expose(win, &(TickitRect){ .top = -2, .left = -2, .lines = 50, .cols = 200 });
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(next_rect, 1, "exposed 1 region");
     is_rect(exposed_rects+0, "0,0+20,4", "exposed_rects[0]");
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
     int bind_id = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_render_text, &idx);
 
     tickit_window_expose(win, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after Window expose with output",
         GOTO(4,11), SETPEN(), PRINT("The text"),
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 
     tickit_window_expose(win, &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 20 });
     tickit_window_expose(win, &(TickitRect){ .top = 2, .left = 0, .lines = 1, .cols = 20 });
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after Window expose twice",
         GOTO(3,10), SETPEN(), PRINT("Line 0"),
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
 
     tickit_pen_set_colour_attr(tickit_window_get_pen(win), TICKIT_PEN_FG, 5);
     tickit_window_expose(win, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after Window expose with pen attrs",
         GOTO(3,10), SETPEN(.fg=5), PRINT("Line 0"),
@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
     int exposed = 0;
     int bind_id_in_sub = tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, &on_expose_incr, &exposed);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(exposed, 1, "New child window is immediately exposed");
 
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
     next_rect = 0;
 
     tickit_window_destroy(subwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
     is_rect(exposed_rects+0, "4,1+6,3", "exposed_rects[0]");
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
     int idx_in_sub = 4;
     tickit_window_bind_event(sub, TICKIT_EV_EXPOSE, &on_expose_render_text, &idx_in_sub);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Display after simultaneous expose in parent + child",
         GOTO(3,10), SETPEN(), PRINT("Parent"),
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 
     tickit_window_destroy(sub);
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_window_unbind_event_id(win, bind_id_in_win);
   }
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 
     for(int i = 0; i < 100; i++) {
       tickit_window_expose(win, NULL);
-      tickit_window_tick(root);
+      tickit_window_flush(root);
     }
 
     is_int(exposed, 100, "exposed 100 times");
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
     // no expose event
 
     tickit_window_expose(win, &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 80 });
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after expose parent with visible child",
         GOTO(3,10), SETPEN(), PRINT("XXXXX"),
@@ -327,35 +327,35 @@ int main(int argc, char *argv[])
     TickitWindow *winA = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, 0);
     TickitWindow *winB = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, TICKIT_WINDOW_LOWEST);
     TickitWindow *winC = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, TICKIT_WINDOW_LOWEST);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     int bind_idA = tickit_window_bind_event(winA, TICKIT_EV_EXPOSE, &on_expose_textat, "Window A");
     int bind_idB = tickit_window_bind_event(winB, TICKIT_EV_EXPOSE, &on_expose_textat, "Window B");
     int bind_idC = tickit_window_bind_event(winC, TICKIT_EV_EXPOSE, &on_expose_textat, "Window C");
 
     tickit_window_expose(root, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for overlapping initially",
         GOTO(0,0), SETPEN(), PRINT("Window A"),
         NULL);
 
     tickit_window_raise(winB);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for overlapping after winB raise",
         GOTO(0,0), SETPEN(), PRINT("Window B"),
         NULL);
 
     tickit_window_lower(winB);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for overlapping after winB lower",
         GOTO(0,0), SETPEN(), PRINT("Window A"),
         NULL);
 
     tickit_window_raise_to_front(winC);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for overlapping after winC raise_to_front",
         GOTO(0,0), SETPEN(), PRINT("Window C"),

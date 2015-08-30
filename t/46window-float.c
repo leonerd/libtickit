@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
   TickitWindow *root = tickit_window_new_root(tt);
 
   TickitWindow *rootfloat = tickit_window_new(root, (TickitRect){10, 10, 5, 30}, 0);
-  tickit_window_tick(root);
+  tickit_window_flush(root);
 
   // Basics
   {
     int bind_id = tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose_fillchr, "X");
 
     tickit_window_expose(root, &(TickitRect){ .top = 10, .lines = 1, .left = 0, .cols = 80 });
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for print under floating window",
         GOTO(10,0), SETPEN(), PRINT("XXXXXXXXXX"),
@@ -74,14 +74,14 @@ int main(int argc, char *argv[])
     tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_fillchr, "Y");
 
     tickit_window_expose(win, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for print sibling under floating window",
         GOTO(10,40), SETPEN(), PRINT("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"),
         NULL);
 
     TickitWindow *popupwin = tickit_window_new(win, (TickitRect){2, 2, 10, 10}, TICKIT_WINDOW_POPUP);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     TickitRect geom = tickit_window_get_abs_geometry(popupwin);
     is_rect(&geom, "22,12+10,10", "popupwin abs_geometry");
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   {
     int bind_id = tickit_window_bind_event(rootfloat, TICKIT_EV_EXPOSE, &on_expose_textat, "|-- Yipee --|");
     tickit_window_expose(rootfloat, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for print to floating window",
         GOTO(10,10), SETPEN(), PRINT("|-- Yipee --|"),
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, &on_expose_textat, "Byenow");
     tickit_window_expose(subwin, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog for print to child of floating window",
         GOTO(10,14), SETPEN(), PRINT("Byenow"),
@@ -135,13 +135,13 @@ int main(int argc, char *argv[])
   // Scrolling with float obscurations
   {
     int bind_id = tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose_pushrect, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
     drain_termlog();
 
     next_rect = 0;
 
     tickit_window_scroll(root, 3, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scroll with floats",
         SETPEN(),

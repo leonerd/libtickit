@@ -11,9 +11,9 @@ tickit_window_show, tickit_window_hide \- control a window's visibility
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_window_show\fP() makes the given window visible, allowing it to receive events and obscure lower sibling windows. This may cause it to receive \fBTICKIT_EV_EXPOSE\fP events at the next tick.
+\fBtickit_window_show\fP() makes the given window visible, allowing it to receive events and obscure lower sibling windows. This may cause it to receive \fBTICKIT_EV_EXPOSE\fP events when \fBtickit_window_flush\fP(3) is next called.
 .PP
-\fBtickit_window_hide\fP() makes the given window non-visible, preventing it from receiving events and making it transparent to lower sibling windows, so their content is now visible. This may cause lower siblings to receive \fBTICKIT_EV_EXPOSE\fP events at the next tick.
+\fBtickit_window_hide\fP() makes the given window non-visible, preventing it from receiving events and making it transparent to lower sibling windows, so their content is now visible. This may cause lower siblings to receive \fBTICKIT_EV_EXPOSE\fP events when \fBtickit_window_flush\fP(3) is next called.
 .PP
 \fBtickit_window_is_visible\fP() tests whether the given window is visible within its immediate parent. This does not imply that it is actually visible to the terminal, as it may still have a hidden parent.
 .SH "RETURN VALUE"

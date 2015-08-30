@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   TickitWindow *root = tickit_window_new_root(tt);
 
   TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
-  tickit_window_tick(root);
+  tickit_window_flush(root);
 
   // Basics
   {
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
   // sub-window nesting
   {
     TickitWindow *subwin = tickit_window_new(win, (TickitRect){2, 2, 1, 10}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     TickitRect geom = tickit_window_get_geometry(subwin);
     is_rect(&geom, "2,2+10,1", "nested tickit_window_get_geometry");
@@ -89,13 +89,13 @@ int main(int argc, char *argv[])
     ok(tickit_window_root(subwin) == root, "nested tickit_window_root");
 
     tickit_window_destroy(subwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   // initially-hidden
   {
     TickitWindow *subwin = tickit_window_new(win, (TickitRect){4, 4, 2, 2}, TICKIT_WINDOW_HIDDEN);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     ok(!tickit_window_is_visible(subwin), "initially-hidden window not yet visible");
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     ok(tickit_window_is_visible(subwin), "initially-hidden window visible after show");
 
     tickit_window_destroy(subwin);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   return exit_status();

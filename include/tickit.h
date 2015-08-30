@@ -419,9 +419,6 @@ TickitWindow *tickit_window_root(const TickitWindow *win);
 
 void tickit_window_destroy(TickitWindow *win);
 
-// internal API for event management
-void tickit_window_tick(TickitWindow *win);
-
 int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitWindowEventFn *fn, void *user);
 void tickit_window_unbind_event_id(TickitWindow *win, int id);
 
@@ -452,6 +449,7 @@ void tickit_window_set_geometry(TickitWindow *win, TickitRect rect);
 TickitPen *tickit_window_get_pen(const TickitWindow *win);
 void tickit_window_set_pen(TickitWindow *win, TickitPen *pen);
 void tickit_window_expose(TickitWindow *win, const TickitRect *exposed);
+void tickit_window_flush(TickitWindow *win);
 
 bool tickit_window_scrollrect(TickitWindow *win, const TickitRect *rect, int downward, int rightward, TickitPen *pen);
 bool tickit_window_scroll(TickitWindow *win, int downward, int rightward);

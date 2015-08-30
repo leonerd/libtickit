@@ -47,12 +47,12 @@ int main(int argc, char *argv[])
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(!value, "cursor not yet visible initially");
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     ok(!tickit_window_is_focused(win), "window does not yet have focus");
 
     tickit_window_set_cursor_position(win, 0, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     ok(!tickit_window_is_focused(win), "window still unfocused after set cursor position");
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     is_int(focused, 1, "window receives FOCUS_IN event");
     focused = 0;
 
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after focus",
         GOTO(3,10),
@@ -73,21 +73,21 @@ int main(int argc, char *argv[])
     ok(value, "Terminal cursor visible after window focus");
 
     tickit_window_reposition(win, 5, 15);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after window reposition",
         GOTO(5,15),
         NULL);
 
     tickit_window_set_cursor_position(win, 2, 2);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after set cursor position",
         GOTO(7,17),
         NULL);
 
     tickit_window_set_cursor_shape(win, TICKIT_CURSORSHAPE_UNDER);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after cursor_shape",
         GOTO(7,17),
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     is_int(value, TICKIT_CURSORSHAPE_UNDER, "Cursor shape after cursor_shape");
 
     tickit_window_set_cursor_visible(win, false);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog empty after cursor_visible false",
         NULL);
@@ -107,13 +107,13 @@ int main(int argc, char *argv[])
     tickit_window_set_cursor_visible(win, true);
 
     tickit_window_hide(win);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(!value, "Cursor is invisible after focus window hide");
 
     tickit_window_show(win);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(value, "Cursor is visible after focus window show");
@@ -126,19 +126,19 @@ int main(int argc, char *argv[])
   // Obscuring by child
   {
     TickitWindow *child = tickit_window_new(win, (TickitRect){1, 1, 4, 4}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(!value, "Cursor is invisible after covering by child window");
 
     tickit_window_hide(child);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(value, "Cursor is visible again after lowering child window");
 
     tickit_window_destroy(child);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
     drain_termlog();
   }
 
@@ -146,19 +146,19 @@ int main(int argc, char *argv[])
   {
     TickitWindow *sib = tickit_window_new(root, (TickitRect){6, 0, 2, 40}, 0);
     tickit_window_raise(sib);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(!value, "Cursor is invisible after covering by sibling window");
 
     tickit_window_lower(sib);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(value, "Cursor is visible again after lowering sibling window");
 
     tickit_window_destroy(sib);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
     drain_termlog();
   }
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
     tickit_window_bind_event(winB, TICKIT_EV_FOCUS, &on_focus, &focusB);
 
     tickit_window_take_focus(winA);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(focusA, 1, "focusA after winA takes focus");
     is_int(focusB, 0, "focusB undef after winA takes focus");
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
         NULL);
 
     tickit_window_take_focus(winB);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(focusA, -1, "focusA lost after winB takes focus");
     is_int(focusB,  1, "focusB after winB takes focus");
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
     tickit_window_hide(winB);
     tickit_window_take_focus(winA);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after winB hidden",
         GOTO(5,0),
@@ -201,21 +201,21 @@ int main(int argc, char *argv[])
 
     tickit_window_hide(winA);
     tickit_window_show(winB);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after winA hidden / winB shown",
         GOTO(6,0),
         NULL);
 
     tickit_window_take_focus(winA);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog empty after winA take focus while hidden", NULL);
     ok(tickit_window_is_focused(winB), "winB still has focus after take focus while hidden");
 
     tickit_window_destroy(winA);
     tickit_window_destroy(winB);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   // Child notifications
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
     tickit_window_bind_event(subwin, TICKIT_EV_FOCUS, &on_focus_push, NULL);
 
     tickit_window_set_focus_child_notify(win, true);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_window_set_cursor_position(subwin, 0, 0);
     tickit_window_take_focus(subwin);
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
     is_ptr(focus_events[1].focuswin, subwin,            "focus_events[1].focuswin");
 
     TickitWindow *otherwin = tickit_window_new(root, (TickitRect){0, 0, 1, 1}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     next_event = 0;
 

@@ -24,18 +24,18 @@ int main(int argc, char *argv[])
 
   {
     TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 30}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     ok(!tickit_window_scroll(win, 1, 0), "window does not support scrolling");
     drain_termlog();
 
     tickit_window_destroy(win);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   // Scrollable window probably needs to be fullwidth
   TickitWindow *win = tickit_window_new(root, (TickitRect){5, 0, 10, 80}, 0);
-  tickit_window_tick(root);
+  tickit_window_flush(root);
 
   int bind_id = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, &on_expose_pushrect, NULL);
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   {
     next_rect = 0;
     ok(tickit_window_scroll(win, 1, 0), "fullwidth window supports vertical scrolling");
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after fullwidth scroll downward",
         SETPEN(),
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   {
     next_rect = 0;
     tickit_window_scroll(win, -1, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after fullwidth scroll upward",
         SETPEN(),
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
   {
     next_rect = 0;
     ok(tickit_window_scroll(win, 0, 1), "fullwidth window supports horizontal scrolling");
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after fullwidth scroll rightward",
         SETPEN(),
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   {
     next_rect = 0;
     tickit_window_scroll(win, 0, -1);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after fullwidth scroll leftward",
         SETPEN(),
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     ok(tickit_window_scrollrect(win, &(TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 },
           -1, 0, NULL),
         "Fullwidth window supports scrolling a region");
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after fullwidth scrollrect downward",
         SETPEN(),
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     next_rect = 0;
     tickit_window_scrollrect(win, &(TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 },
         1, 0, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after fullwidth scrollrect upward",
         SETPEN(),
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     next_rect = 0;
     tickit_window_scrollrect(win, &(TickitRect){ .top = 2, .left = 0, .lines = 3, .cols = 80 },
         5, 0, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog empty after scrollrect further than area",
         NULL);
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     next_rect = 0;
     tickit_window_scrollrect(win, &(TickitRect){ .top = 4, .left = 0, .lines = 6, .cols = 80 },
         2, 0, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scrollrect with impending damage",
         SETPEN(),
@@ -181,11 +181,11 @@ int main(int argc, char *argv[])
   // Child to obscure part of it
   {
     TickitWindow *child = tickit_window_new(win, (TickitRect){0, 0, 3, 10}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     next_rect = 0;
     tickit_window_scroll(win, 0, 4);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scroll with obscuring child",
         SETPEN(),
@@ -197,11 +197,11 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+0, "76,0+4,10", "exposed_rects[0]");
 
     tickit_window_hide(child);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     next_rect = 0;
     tickit_window_scroll(win, 0, 4);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scroll with hidden obscuring child",
         SETPEN(),
@@ -212,17 +212,17 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+0, "76,0+4,10", "exposed_rects[0]");
 
     tickit_window_destroy(child);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   // scroll_with_children
   {
     TickitWindow *child = tickit_window_new(win, (TickitRect){0, 70, 1, 10}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     next_rect = 0;
     tickit_window_scroll_with_children(win, -2, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scroll_with_children",
         SETPEN(),
@@ -233,20 +233,20 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+0, "0,0+80,2", "exposed_rects[0]");
 
     tickit_window_destroy(child);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   // sibling to obscure part of it
   {
     TickitWindow *sibling = tickit_window_new(root, (TickitRect){0, 0, 10, 20}, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_window_raise(sibling);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     next_rect = 0;
     tickit_window_scroll_with_children(win, -2, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scroll_with_children with sibling",
         SETPEN(),
@@ -258,11 +258,11 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+1, "0,5+80,2", "exposed_rects[1]");
 
     tickit_window_hide(sibling);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     next_rect = 0;
     tickit_window_scroll_with_children(win, -2, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scroll_with_children with hidden sibling",
         SETPEN(),
@@ -273,17 +273,17 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+0, "0,0+80,2", "exposed_rects[0]");
 
     tickit_window_destroy(sibling);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
   }
 
   // Hidden windows should be ignored
   {
     next_rect = 0;
     tickit_window_hide(win);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     tickit_window_scroll(win, 2, 0);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog empty after scroll on hidden window",
         NULL);

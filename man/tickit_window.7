@@ -27,7 +27,7 @@ The position of a window within its parent can be queried using \fBtickit_window
 .PP
 A window can be given the input focus using \fBtickit_window_take_focus\fP(3), and can be queried to see if it has the focus using \fBtickit_window_is_focused\fP(3). Windows normally only invoke focus events about themselves, but can be made to invoke events about children windows as well by using \fBtickit_window_set_focus_child_notify\fP(3). When a window has the input focus, the properties of the terminal cursor can be set using \fBtickit_window_set_cursor_position\fP(3), \fBtickit_window_set_cursor_visible\fP(3) and \fBtickit_window_set_cursor_shape\fP(3).
 .PP
-The \fBTickitPen\fP instance associated with each window for drawing purposes can be obtained using \fBtickit_window_get_pen\fP(3), and replaced using \fBtickit_window_set_pen\fP(3). This pen is used during expose events, which can be requested using \fBtickit_window_expose\fP(3).
+The \fBTickitPen\fP instance associated with each window for drawing purposes can be obtained using \fBtickit_window_get_pen\fP(3), and replaced using \fBtickit_window_set_pen\fP(3). This pen is used during expose events, which can be requested using \fBtickit_window_expose\fP(3). Pending expose events and other activity are performed by calling \fBtickit_window_flush\fP(3) on the root window instance.
 .PP
 While most drawing operations are performed in a deferred manner using expose events, scrolling of the terminal content can be directly requested using \fBtickit_window_scrollrect\fP(3), \fBtickit_window_scroll\fP(3) or \fBtickit_window_scroll_with_children\fP(3).
 .SH EVENTS

@@ -1,0 +1,33 @@
+.TH TICKIT_WINDOW_FLUSH 3
+.SH NAME
+tickit_window_flush \- invoke pending events on the window hierarchy
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_window_flush(TickitWindow *" win );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_flush\fP() causes any pending activity in the window hierarchy to be performed. First it makes any window ordering changes that have been queued by \fBtickit_window_raise\fP(3) and \fBtickit_window_lower\fP(3), then fires any \fBTICKIT_EV_EXPOSE\fP events to render newly-exposed areas, before finally resetting the terminal cursor to the state required by whichever window has input focus. This function must be invoked on the root window instance.
+.PP
+An application working at the window level would typically use this function in conjunction with input even waiting, to drive the main loop of the core logic. Such a loop may look like:
+.sp
+.nf
+.in
+  while(1) {
+    tickit_window_flush(rootwin);
+    tickit_term_input_wait_msec(term, -1);
+  }
+.fi
+.PP
+There is no adverse effect of calling this function when here are no pending events on the window instance. An application that makes use of multiple root windows across multiple terminal instances in a multi-head setup can safely invoke it on all the root windows at once.
+.SH "RETURN VALUE"
+\fBtickit_window_flush\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_expose (3),
+.BR tickit_window_bind_event (3),
+.BR tickit_window (7),
+.BR tickit (7)

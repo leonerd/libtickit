@@ -505,10 +505,10 @@ static void _do_restore(TickitRootWindow *root)
   tickit_term_flush(root->term);
 }
 
-void tickit_window_tick(TickitWindow *win)
+void tickit_window_flush(TickitWindow *win)
 {
   if(win->parent)
-    // Can't tick non-root.
+    // Can't flush non-root.
     return;
 
   TickitRootWindow *root = WINDOW_AS_ROOT(win);

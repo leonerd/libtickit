@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
   signal(SIGINT, sigint);
 
   while(still_running) {
-    tickit_window_tick(root);
+    tickit_window_flush(root);
     tickit_term_input_wait_msec(tt, -1);
   }
 

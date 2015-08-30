@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
   // Scrolling
   {
     ok(tickit_window_scroll(root, 1, 0), "window can scroll");
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog scrolled",
         SETPEN(),
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     tickit_window_scrollrect(root, &(TickitRect){ .top = 5, .left = 0, .lines = 10, .cols = 80 },
         3, 0, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scrollrect",
         SETPEN(),
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
     tickit_window_scrollrect(root, &(TickitRect){ .top = 20, .left = 0, .lines = 1, .cols = 80 },
         0, 1, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scrollrect rightward",
         SETPEN(),
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
     tickit_window_scrollrect(root, &(TickitRect){ .top = 21, .left = 10, .lines = 1, .cols = 70 },
         0, -1, NULL);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_termlog("Termlog after scrollrect leftward not fullwidth",
         SETPEN(),
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &push_on_expose, NULL);
 
     tickit_mockterm_resize(tt, 30, 100);
-    tickit_window_tick(root);
+    tickit_window_flush(root);
 
     is_int(tickit_window_lines(root), 30, "root tickit_window_lines after term resize");
     is_int(tickit_window_cols(root), 100, "root tickit_window_cols after term resize");
