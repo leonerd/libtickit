@@ -573,12 +573,12 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
   rb->vc_col = col;
 }
 
-int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, char *text)
+int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, const char *text)
 {
   return tickit_renderbuffer_textn_at(rb, line, col, text, -1);
 }
 
-int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char *text, size_t len)
+int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
 {
 
   TickitStringPos endpos;
@@ -636,7 +636,7 @@ int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, char
   return ret;
 }
 
-int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text)
+int tickit_renderbuffer_text(TickitRenderBuffer *rb, const char *text)
 {
   if(!rb->vc_pos_set)
     return -1;
@@ -647,7 +647,7 @@ int tickit_renderbuffer_text(TickitRenderBuffer *rb, char *text)
   return cols;
 }
 
-int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len)
+int tickit_renderbuffer_textn(TickitRenderBuffer *rb, const char *text, size_t len)
 {
   if(!rb->vc_pos_set)
     return -1;
@@ -658,7 +658,7 @@ int tickit_renderbuffer_textn(TickitRenderBuffer *rb, char *text, size_t len)
   return cols;
 }
 
-int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, char *fmt, ...)
+int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, const char *fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -670,7 +670,7 @@ int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, char
   return ret;
 }
 
-int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, char *fmt, va_list args)
+int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, const char *fmt, va_list args)
 {
   /* It's likely the string will fit in, say, 64 bytes */
   char buffer[64];
@@ -692,7 +692,7 @@ int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, cha
   return tickit_renderbuffer_textn_at(rb, line, col, rb->tmp, len);
 }
 
-int tickit_renderbuffer_textf(TickitRenderBuffer *rb, char *fmt, ...)
+int tickit_renderbuffer_textf(TickitRenderBuffer *rb, const char *fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -704,7 +704,7 @@ int tickit_renderbuffer_textf(TickitRenderBuffer *rb, char *fmt, ...)
   return ret;
 }
 
-int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, char *fmt, va_list args)
+int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, const char *fmt, va_list args)
 {
   if(!rb->vc_pos_set)
     return -1;

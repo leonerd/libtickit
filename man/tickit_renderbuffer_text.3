@@ -6,22 +6,22 @@ tickit_renderbuffer_text, tickit_renderbuffer_text_at \- create text regions
 .B #include <tickit.h>
 .sp
 .BI "int tickit_renderbuffer_text(TickitRenderBuffer *" rb ,
-.BI "        char *" text );
+.BI "        const char *" text );
 .BI "int tickit_renderbuffer_textn(TickitRenderBuffer *" rb ,
-.BI "        char *" text ", size_t " len );
+.BI "        const char *" text ", size_t " len );
 .BI "int tickit_renderbuffer_textf(TickitRenderBuffer *" rb ,
-.BI "        char *" fmt ", ...);"
+.BI "        const char *" fmt ", ...);"
 .BI "int tickit_renderbuffer_vtextf(TickitRenderBuffer *" rb ,
-.BI "        char *" fmt ", va_list " args );
+.BI "        const char *" fmt ", va_list " args );
 .sp
 .BI "int tickit_renderbuffer_text_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", char *" text );
+.BI "        int " line ", int " col ", const char *" text );
 .BI "int tickit_renderbuffer_textn_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", char *" text ", size_t " len );
+.BI "        int " line ", int " col ", const char *" text ", size_t " len );
 .BI "int tickit_renderbuffer_textf_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", char *" fmt ", ...);"
+.BI "        int " line ", int " col ", const char *" fmt ", ...);"
 .BI "int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *" rb ,
-.BI "        int " line ", int " col ", char *" fmt ", va_list " args );
+.BI "        int " line ", int " col ", const char *" fmt ", va_list " args );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
