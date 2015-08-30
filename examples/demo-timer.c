@@ -13,6 +13,19 @@ static void sigint(int sig)
   still_running = 0;
 }
 
+static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
+
+  tickit_renderbuffer_eraserect(rb, &info->rect);
+
+  tickit_renderbuffer_goto(rb, 5, 5);
+  tickit_renderbuffer_textf(rb, "Counter %d", *((int *)data));
+
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
@@ -28,15 +41,19 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
   tickit_term_clear(tt);
 
-  signal(SIGINT, sigint);
-
   int counter = 0;
 
+  TickitWindow *root = tickit_window_new_root(tt);
+  tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &on_expose, &counter);
+
+  signal(SIGINT, sigint);
+
   while(still_running) {
+    tickit_window_flush(root);
     tickit_term_input_wait_msec(tt, 1000);
 
-    tickit_term_goto(tt, 5, 5);
-    tickit_term_printf(tt, "Counter %d", counter++);
+    counter++;
+    tickit_window_expose(root, NULL);
   }
 
   tickit_term_destroy(tt);
