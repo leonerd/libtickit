@@ -48,7 +48,7 @@ At least one of the fields of the window geometry have been changed, meaning it 
 .B  typedef struct {
 .BI "    TickitRect " rect ;
 .BI "    TickitRect " oldrect ;
-.B  } TickitGeomchangeEventInfo;
+.BI "} " TickitGeomchangeEventInfo ;
 .fi
 .IP
 \fIrect\fP gives the new geometry of the window relative to its parent, and \fIoldrect\fP gives the previous geometry.
@@ -60,7 +60,7 @@ An area of the window needs to be re-rendered because it has now been freshly ex
 .B  typedef struct {
 .BI "    TickitRect " rect ;
 .BI "    TickitRenderBuffer *" rb ;
-.B  } TickitExposeEventInfo;
+.BI "} " TickitExposeEventInfo ;
 .fi
 .IP
 \fIrect\fP gives the region of the window that needs to be redrawn. This will always be inside the window's bounds. If multiple pending regions need to be exposed, they are output in non-overlapping segments. The handling function or functions should then use the \fBTickitRenderBuffer\fP instance given by the \fIrb\fP field to draw the required contents of the window to. This instance will already be set up with the appropriate drawing pen, clipping rectangle and hole regions to account for the window hierarchy.
@@ -72,7 +72,7 @@ This window has either gained or lost the input focus, or a child of it has an t
 .B  typedef struct {
 .BI "    TickitFocusEventType " type ;
 .BI "    TickitWindow *" win ;
-.B  } TickitFocusEventInfo;
+.BI "} " TickitFocusEventInfo ;
 .fi
 .IP
 \fItype\fP takes onw of the values \fBTICKIT_FOCUSEV_IN\fP or \fBTICKIT_FOCUSEV_OUT\fP. \fIwin\fP will normally be the window that is invoking the event, except for the case of notifications about child windows, where it will indicate which child has changed focus. When a focus change happens, the window losing focus receives its \fBTICKIT_FOCUSEV_OUT\fP event before the window gaining it receives its \fBTICKIT_FOCUSEV_IN\fP.
