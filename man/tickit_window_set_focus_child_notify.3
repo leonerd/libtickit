@@ -1,18 +1,18 @@
-.TH TICKIT_WINDOW_SET_CHILD_FOCUS_NOTIFY 3
+.TH TICKIT_WINDOW_SET_FOCUS_CHILD_NOTIFY 3
 .SH NAME
-tickit_window_set_child_focus_notify \- control whether windows are informed of child focus changes
+tickit_window_set_focus_child_notify \- control whether windows are informed of child focus changes
 .SH SYNOPSIS
 .nf
 .B #include <tickit.h>
 .sp
-.BI "void tickit_window_set_child_focus_notify(TickitWindow *" win ", bool " notify );
+.BI "void tickit_window_set_focus_child_notify(TickitWindow *" win ", bool " notify );
 .fi
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_window_set_child_focus_notify\fP() sets the value of a setting on the given window which controls whether the window will receive \fBTICKIT_EV_FOCUS\fP events when its child windows change focus state (when true), or whether the only focus events it receives are ones relating to itself directly (when false).
+\fBtickit_window_set_focus_child_notify\fP() sets the value of a setting on the given window which controls whether the window will receive \fBTICKIT_EV_FOCUS\fP events when its child windows change focus state (when true), or whether the only focus events it receives are ones relating to itself directly (when false).
 .SH "RETURN VALUE"
-\fBtickit_window_set_child_focus_notify\fP() returns no value.
+\fBtickit_window_set_focus_child_notify\fP() returns no value.
 .SH "SEE ALSO"
 .BR tickit_window_new (3),
 .BR tickit_window_take_focus (3),
