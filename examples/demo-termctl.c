@@ -31,8 +31,8 @@ static void render_modes(TickitTerm *tt)
 
   tickit_term_goto(tt, 9, 3);
   tickit_term_print(tt, "Cursor shape:    ");
-  tickit_term_print(tt, modes.shape == TICKIT_TERM_CURSORSHAPE_BLOCK ? "| >Block< |  Under  |  Bar  |" :
-                        modes.shape == TICKIT_TERM_CURSORSHAPE_UNDER ? "|  Block  | >Under< |  Bar  |" :
+  tickit_term_print(tt, modes.shape == TICKIT_CURSORSHAPE_BLOCK ? "| >Block< |  Under  |  Bar  |" :
+                        modes.shape == TICKIT_CURSORSHAPE_UNDER ? "|  Block  | >Under< |  Bar  |" :
                                                                        "|  Block  |  Under  | >Bar< |");
 
   tickit_term_goto(tt, 20, 10);
@@ -73,11 +73,11 @@ static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 
   if(info->line == 9) {
     if(info->col >= 21 && info->col <= 29)
-      modes.shape = TICKIT_TERM_CURSORSHAPE_BLOCK;
+      modes.shape = TICKIT_CURSORSHAPE_BLOCK;
     else if(info->col >= 31 && info->col <= 39)
-      modes.shape = TICKIT_TERM_CURSORSHAPE_UNDER;
+      modes.shape = TICKIT_CURSORSHAPE_UNDER;
     else if(info->col >= 40 && info->col <= 47)
-      modes.shape = TICKIT_TERM_CURSORSHAPE_LEFT_BAR;
+      modes.shape = TICKIT_CURSORSHAPE_LEFT_BAR;
     else
       return 0;
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 
   modes.vis = 1;
   modes.blink = 1;
-  modes.shape = TICKIT_TERM_CURSORSHAPE_BLOCK;
+  modes.shape = TICKIT_CURSORSHAPE_BLOCK;
 
   render_modes(tt);
 
