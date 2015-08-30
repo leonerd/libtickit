@@ -1,0 +1,83 @@
+.TH TICKIT_WINDOW 7
+.SH NAME
+TickitWindow \- a window for drawing operations and input
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "typedef struct " TickitWindow ;
+.fi
+.sp
+.SH DESCRIPTION
+A \fBTickitWindow\fP instance represents a rectangular region of the screen. Windows are constructed as sub-divisions of existing windows, ultimately coming from a special "root window" is that represents the entire area of the terminal. Each window allows drawing to its region of the screen by responding to an event that signifies damage to that area that needs to be repainted, and has other events that represent user input.
+.PP
+A window occupies a given size and position within its parent (apart from the root window, which occupies the entire terminal). Conceptually a window can be placed outside of the bounds of its parent, though any drawing output is clipped to the parent (and its parent, hierarchially, all the way to the root). A window may be hidden, at which point none of its output affects the screen, nor will it receive input events.
+.PP
+The child windows of a given parent form an ordered list, the order of which can be modified. Drawing operations on a window only take effect if there are no higher siblings that would obscure it. The stacking order also affects the way that windows receive mouse events, with higher-level window shielding lower ones from receiving an event at a given cell.
+.PP
+Each window tracks whether a single child window has the "input focus"; this is the child window that will be informed of keyboard input events. The innermost window following the focus chain gets the first chance to react to the event, followed by successively outer ones if it remains unhandled.
+.PP
+Newly-exposed areas of windows are tracked by the root window, ready to be rendered by expose events. The root window itself will expose new areas caused by terminal resizes, and the entire root window is entirely exposed initially, to allow the application to run its initial rendering on startup. Each window stores a \fBTickitPen\fP instance that can be used to apply a default style to any rendering operations that take place within it or its children.
+.SH FUNCTIONS
+A new top-level \fBTickitWindow\fP instance to represent the entire terminal is created using \fBtickit_window_new_root\fP(3), further sub-divided into regions using \fBtickit_window_new\fP(3), and eventually destroyed using \fBtickit_window_destroy\fP(3). The ancestry of a window can be queried using \fBtickit_window_parent\fP(3) and \fBtickit_window_root\fP(3).
+.PP
+The stacking order of a window among its siblings can be controlled using \fBtickit_window_raise\fP(3), \fBtickit_window_raise_to_front\fP(3), \fBtickit_window_lower\fP(3) and \fBtickit_window_lower_to_back\fP(3). Its visibility can be controlled using \fBtickit_window_show\fP(3) and \fBtickit_window_hide\fP(3), and queried using \fBtickit_window_is_visible\fP(3).
+.PP
+The position of a window within its parent can be queried using \fBtickit_window_get_geometry\fP(3) and within the terminal as a whole using \fBtickit_window_get_abs_geometry\fP(3). It can be resized using \fBtickit_window_resize\fP(3), moved using \fBtickit_window_reposition\fP(3), or both using \fBtickit_window_set_geometry\fP(3).
+.PP
+A window can be given the input focus using \fBtickit_window_take_focus\fP(3), and can be queried to see if it has the focus using \fBtickit_window_is_focused\fP(3). Windows normally only invoke focus events about themselves, but can be made to invoke events about children windows as well by using \fBtickit_window_set_focus_child_notify\fP(3). When a window has the input focus, the properties of the terminal cursor can be set using \fBtickit_window_set_cursor_position\fP(3), \fBtickit_window_set_cursor_visible\fP(3) and \fBtickit_window_set_cursor_shape\fP(3).
+.PP
+The \fBTickitPen\fP instance associated with each window for drawing purposes can be obtained using \fBtickit_window_get_pen\fP(3), and replaced using \fBtickit_window_set_pen\fP(3). This pen is used during expose events, which can be requested using \fBtickit_window_expose\fP(3).
+.PP
+While most drawing operations are performed in a deferred manner using expose events, scrolling of the terminal content can be directly requested using \fBtickit_window_scrollrect\fP(3), \fBtickit_window_scroll\fP(3) or \fBtickit_window_scroll_with_children\fP(3).
+.SH EVENTS
+A window instace stores a set of event handlers. Each event handler consists of a bitmask of one or more event types it is interested in, a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_window_bind_event\fP(3) and removed using \fBtickit_window_unbind_event_id\fP(3).
+.PP
+The event types recognised are:
+.TP
+.B TICKIT_EV_KEY
+A key has been pressed on the keyboard while this window has input focus (or is set to steal input). \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_KEY\fP event described in \fBtickit_term\fP(7).
+.TP
+.B TICKIT_EV_MOUSE
+A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled while the cursor is within the bounds of this window (or the window is set to steal input). \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_MOUSE\fP event described in \fBtickit_term\fP(7), except that the position given by the \fIline\fP and \fIcol\fP fields will be relative to the window, rather than the terminal as a whole.
+.TP
+.B TICKIT_EV_GEOMCHANGE
+At least one of the fields of the window geometry have been changed, meaning it now occupies a different area of the screen. \fIinfo\fP will point to a structure defined as:
+.sp
+.nf
+.B  typedef struct {
+.BI "    TickitRect " rect ;
+.BI "    TickitRect " oldrect ;
+.B  } TickitGeomchangeEventInfo;
+.fi
+.IP
+\fIrect\fP gives the new geometry of the window relative to its parent, and \fIoldrect\fP gives the previous geometry.
+.TP
+.B TICKIT_EV_EXPOSE
+An area of the window needs to be re-rendered because it has now been freshly exposed; either because of stacking or visibilty changes of this or sibling windows, a cascaded expose event on its parent, or due to a call to \fBtickit_window_expose\fP(). \fIinfo\fP will point to a structure defined as:
+.sp
+.nf
+.B  typedef struct {
+.BI "    TickitRect " rect ;
+.BI "    TickitRenderBuffer *" rb ;
+.B  } TickitExposeEventInfo;
+.fi
+.IP
+\fIrect\fP gives the region of the window that needs to be redrawn. This will always be inside the window's bounds. If multiple pending regions need to be exposed, they are output in non-overlapping segments. The handling function or functions should then use the \fBTickitRenderBuffer\fP instance given by the \fIrb\fP field to draw the required contents of the window to. This instance will already be set up with the appropriate drawing pen, clipping rectangle and hole regions to account for the window hierarchy.
+.TP
+.B TICKIT_EV_FOCUS
+This window has either gained or lost the input focus, or a child of it has an this window is set to also notify on that case by using \fBtickit_window_set_focus_child_notify\fP(). \fIinfo\fP will point to a structure defined as:
+.sp
+.nf
+.B  typedef struct {
+.BI "    TickitFocusEventType " type ;
+.BI "    TickitWindow *" win ;
+.B  } TickitFocusEventInfo;
+.fi
+.IP
+\fItype\fP takes onw of the values \fBTICKIT_FOCUSEV_IN\fP or \fBTICKIT_FOCUSEV_OUT\fP. \fIwin\fP will normally be the window that is invoking the event, except for the case of notifications about child windows, where it will indicate which child has changed focus. When a focus change happens, the window losing focus receives its \fBTICKIT_FOCUSEV_OUT\fP event before the window gaining it receives its \fBTICKIT_FOCUSEV_IN\fP.
+.SH "SEE ALSO"
+.BR tickit (7),
+.BR tickit_term (7),
+.BR tickit_renderbuffer (7),
+.BR tickit_rect (7)
