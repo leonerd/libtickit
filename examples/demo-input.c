@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 500  /* strdup */
+
 #include "tickit.h"
 
 #include <errno.h>
@@ -8,91 +10,120 @@
 
 int still_running = 1;
 
+TickitKeyEventInfo lastkey;
+TickitWindow *keywin;
+
+TickitMouseEventInfo lastmouse;
+TickitWindow *mousewin;
+
 static void sigint(int sig)
 {
   still_running = 0;
 }
 
-static void render_modifier(TickitTerm *tt, int mod)
+static void render_modifier(TickitRenderBuffer *rb, int mod)
 {
   if(!mod)
     return;
 
   int pipe = 0;
 
-  tickit_term_erasech(tt, 3, 1);
-  tickit_term_print(tt, "<");
+  tickit_renderbuffer_text(rb, "<");
 
   if(mod & TICKIT_MOD_SHIFT)
-    tickit_term_print(tt, pipe++ ? "|SHIFT" : "SHIFT");
+    tickit_renderbuffer_text(rb, pipe++ ? "|SHIFT" : "SHIFT");
   if(mod & TICKIT_MOD_ALT)
-    tickit_term_print(tt, pipe++ ? "|ALT" : "ALT");
+    tickit_renderbuffer_text(rb, pipe++ ? "|ALT" : "ALT");
   if(mod & TICKIT_MOD_CTRL)
-    tickit_term_print(tt, pipe++ ? "|CTRL" : "CTRL");
+    tickit_renderbuffer_text(rb, pipe++ ? "|CTRL" : "CTRL");
 
-  tickit_term_print(tt, ">");
+  tickit_renderbuffer_text(rb, ">");
 }
 
-static void render_key(TickitTerm *tt, TickitKeyEventType type, const char *str, int mod)
+static int render_key(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  tickit_term_goto(tt, 2, 2);
-  tickit_term_print(tt, "Key:");
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
 
-  tickit_term_goto(tt, 4, 4);
-  switch(type) {
-    case TICKIT_KEYEV_TEXT: tickit_term_print(tt, "text "); break;
-    case TICKIT_KEYEV_KEY:  tickit_term_print(tt, "key  "); break;
-    default: return;
+  tickit_renderbuffer_eraserect(rb, &info->rect);
+
+  tickit_renderbuffer_goto(rb, 0, 0);
+  tickit_renderbuffer_text(rb, "Key:");
+
+  tickit_renderbuffer_goto(rb, 2, 2);
+  switch(lastkey.type) {
+    case TICKIT_KEYEV_TEXT: tickit_renderbuffer_text(rb, "text "); break;
+    case TICKIT_KEYEV_KEY:  tickit_renderbuffer_text(rb, "key  "); break;
+    default: return 0;
   }
-  tickit_term_print(tt, str);
-  render_modifier(tt, mod);
-  tickit_term_erasech(tt, 30, -1);
+  tickit_renderbuffer_text(rb, lastkey.str);
+
+  render_modifier(rb, lastkey.mod);
+
+  return 1;
 }
 
-static void render_mouse(TickitTerm *tt, TickitMouseEventType type, int button, int line, int col, int mod)
+static int event_key(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  tickit_term_goto(tt, 8, 2);
-  tickit_term_print(tt, "Mouse:");
-
-  tickit_term_goto(tt, 10, 4);
-  switch(type) {
-    case TICKIT_MOUSEEV_PRESS:   tickit_term_print(tt, "press   "); break;
-    case TICKIT_MOUSEEV_DRAG:    tickit_term_print(tt, "drag    "); break;
-    case TICKIT_MOUSEEV_RELEASE: tickit_term_print(tt, "release "); break;
-    case TICKIT_MOUSEEV_WHEEL:   tickit_term_print(tt, "wheel ");   break;
-    default: return;
+  TickitKeyEventInfo *info = _info;
+  if(info->type == TICKIT_KEYEV_KEY && strcmp(info->str, "C-c") == 0) {
+    still_running = 0;
+    return 0;
   }
 
-  if(type == TICKIT_MOUSEEV_WHEEL) {
-    tickit_term_printf(tt, "%s at (%d,%d)", button == TICKIT_MOUSEWHEEL_DOWN ? "down" : "up", line, col);
+  if(lastkey.str)
+    free((void *)lastkey.str);
+
+  lastkey = *info;
+  lastkey.str = strdup(info->str);
+
+  tickit_window_expose(keywin, NULL);
+
+  return 1;
+}
+
+static int render_mouse(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
+
+  tickit_renderbuffer_eraserect(rb, &info->rect);
+
+  tickit_renderbuffer_goto(rb, 0, 0);
+  tickit_renderbuffer_text(rb, "Mouse:");
+
+  tickit_renderbuffer_goto(rb, 2, 2);
+  switch(lastmouse.type) {
+    case TICKIT_MOUSEEV_PRESS:   tickit_renderbuffer_text(rb, "press   "); break;
+    case TICKIT_MOUSEEV_DRAG:    tickit_renderbuffer_text(rb, "drag    "); break;
+    case TICKIT_MOUSEEV_RELEASE: tickit_renderbuffer_text(rb, "release "); break;
+    case TICKIT_MOUSEEV_WHEEL:   tickit_renderbuffer_text(rb, "wheel ");   break;
+    default: return 0;
+  }
+
+  if(lastmouse.type == TICKIT_MOUSEEV_WHEEL) {
+    tickit_renderbuffer_text(rb, lastmouse.button == TICKIT_MOUSEWHEEL_DOWN ? "down" : "up");
   }
   else {
-    tickit_term_printf(tt, "button %d at (%d,%d)", button, line, col);
+    tickit_renderbuffer_textf(rb, "button %d", lastmouse.button);
   }
-  render_modifier(tt, mod);
-  tickit_term_erasech(tt, 20, -1);
+
+  tickit_renderbuffer_textf(rb, " at (%d,%d)", lastmouse.line, lastmouse.col);
+
+  render_modifier(rb, lastmouse.mod);
+
+  return 1;
 }
 
-static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+static int event_mouse(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
-  if(ev & TICKIT_EV_KEY) {
-    TickitKeyEventInfo *info = _info;
-    if(info->type == TICKIT_KEYEV_KEY && strcmp(info->str, "C-c") == 0) {
-      still_running = 0;
-      return 0;
-    }
+  TickitMouseEventInfo *info = _info;
 
-    render_key(tt, info->type, info->str, info->mod);
-    return 1;
-  }
+  lastmouse = *info;
 
-  if(ev & TICKIT_EV_MOUSE) {
-    TickitMouseEventInfo *info = _info;
-    render_mouse(tt, info->type, info->button, info->line, info->col, info->mod);
-    return 1;
-  }
+  tickit_window_expose(mousewin, NULL);
 
-  return 0;
+  return 1;
 }
 
 int main(int argc, char *argv[])
@@ -112,15 +143,31 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
   tickit_term_clear(tt);
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, event, NULL);
+  TickitWindow *root = tickit_window_new_root(tt);
 
-  render_key(tt, -1, "", 0);
-  render_mouse(tt, -1, 0, 0, 0, 0);
+  keywin = tickit_window_new(root, (TickitRect){
+      .top = 2, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
+    }, 0);
+
+  tickit_window_bind_event(keywin, TICKIT_EV_EXPOSE, &render_key, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_KEY, &event_key, NULL);
+
+  mousewin = tickit_window_new(root, (TickitRect){
+      .top = 8, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
+    }, 0);
+
+  tickit_window_bind_event(mousewin, TICKIT_EV_EXPOSE, &render_mouse, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_MOUSE, &event_mouse, NULL);
+
+  tickit_window_take_focus(root);
+  tickit_window_set_cursor_visible(root, false);
 
   signal(SIGINT, sigint);
 
-  while(still_running)
+  while(still_running) {
+    tickit_window_flush(root);
     tickit_term_input_wait_msec(tt, -1);
+  }
 
   tickit_term_destroy(tt);
 
