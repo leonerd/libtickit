@@ -14,7 +14,10 @@ static void *debug_func_data;
 
 static FILE *debug_fh;
 
-bool tickit_debug_enabled;
+/* This needs to default true on startup so the first debugging call gets
+ * made, which then lets us inspect the env. vars. to set it correctly
+ */
+bool tickit_debug_enabled = true;
 
 struct Flag {
   struct Flag *next;
