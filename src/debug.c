@@ -64,9 +64,18 @@ void tickit_debug_init(void)
 
 static bool flag_enabled(const char *name)
 {
-  for(struct Flag *f = enabled_flags; f; f = f->next)
-    if(streq(name, f->name))
+  for(struct Flag *f = enabled_flags; f; f = f->next) {
+    if(f->name[0] == '*')
       return true;
+
+    if(name[0] != f->name[0])
+      continue;
+
+    if(!f->name[1])
+      return true;
+    if(streq(name+1, f->name+1))
+      return true;
+  }
 
   return false;
 }
