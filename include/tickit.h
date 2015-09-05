@@ -470,6 +470,8 @@ void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
 void tickit_debug_init(void);
 
+extern bool tickit_debug_enabled;
+
 void tickit_debug_logf(const char *flag, const char *fmt, ...);
 void tickit_debug_vlogf(const char *flag, const char *fmt, va_list args);
 

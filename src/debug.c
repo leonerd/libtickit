@@ -14,6 +14,8 @@ static void *debug_func_data;
 
 static FILE *debug_fh;
 
+bool tickit_debug_enabled;
+
 struct Flag {
   struct Flag *next;
   char *name;
@@ -59,6 +61,8 @@ void tickit_debug_init(void)
   }
   // TODO: else if(enabled_flags) open autogen filename
 
+  tickit_debug_enabled = !!enabled_flags && (debug_func || debug_fh);
+
   init_done = true;
 }
 
@@ -87,6 +91,8 @@ void tickit_debug_set_func(void (*func)(const char *str, void *data), void *data
 
   if(debug_fh)
     fclose(debug_fh);
+
+  tickit_debug_enabled = !!enabled_flags && (debug_func || debug_fh);
 }
 
 void tickit_debug_set_fh(FILE *fh)
@@ -98,6 +104,8 @@ void tickit_debug_set_fh(FILE *fh)
 
   if(debug_func)
     debug_func = NULL;
+
+  tickit_debug_enabled = !!enabled_flags && (debug_func || debug_fh);
 }
 
 bool tickit_debug_open(const char *path)
@@ -125,7 +133,7 @@ void tickit_debug_vlogf(const char *flag, const char *fmt, va_list args)
   if(!init_done)
     tickit_debug_init();
 
-  if(!debug_fh && !debug_func)
+  if(!tickit_debug_enabled)
     return;
   if(!flag_enabled(flag))
     return;
