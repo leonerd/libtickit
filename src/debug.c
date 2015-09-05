@@ -22,8 +22,11 @@ struct Flag {
 static struct Flag *enabled_flags;
 
 static bool init_done = false;
-static void init(void)
+void tickit_debug_init(void)
 {
+  if(init_done)
+    return;
+
   const char *flags_str = getenv("TICKIT_DEBUG_FLAGS");
 
   while(flags_str) {
@@ -111,7 +114,7 @@ void tickit_debug_logf(const char *flag, const char *fmt, ...)
 void tickit_debug_vlogf(const char *flag, const char *fmt, va_list args)
 {
   if(!init_done)
-    init();
+    tickit_debug_init();
 
   if(!debug_fh && !debug_func)
     return;
