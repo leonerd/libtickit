@@ -2,16 +2,60 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
+
+#define streq(a,b) (!strcmp(a,b))
 
 static void (*debug_func)(const char *str, void *data);
 static void *debug_func_data;
 
 static FILE *debug_fh;
 
-static bool flag_enabled(const char *flag)
+struct Flag {
+  struct Flag *next;
+  char *name;
+};
+
+static struct Flag *enabled_flags;
+
+static bool init_done = false;
+static void init(void)
 {
-  return true; // todo
+  const char *flags_str = getenv("TICKIT_DEBUG_FLAGS");
+
+  while(flags_str) {
+    const char *endp = strchr(flags_str, ',');
+    if(!endp)
+      endp = flags_str + strlen(flags_str);
+
+    struct Flag *newflag = malloc(sizeof *newflag);
+    newflag->name = malloc(endp - flags_str + 1);
+    strncpy(newflag->name, flags_str, endp - flags_str);
+
+    newflag->next = enabled_flags;
+    enabled_flags = newflag;
+
+    flags_str = endp;
+    if(flags_str[0] == ',')
+      flags_str++;
+    else
+      break;
+  }
+
+  init_done = true;
+}
+
+static bool flag_enabled(const char *name)
+{
+  if(!init_done)
+    init();
+
+  for(struct Flag *f = enabled_flags; f; f = f->next)
+    if(streq(name, f->name))
+      return true;
+
+  return false;
 }
 
 void tickit_debug_set_func(void (*func)(const char *str, void *data), void *data)
