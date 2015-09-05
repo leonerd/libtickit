@@ -8,6 +8,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdbool.h>
 
 #include <sys/time.h>
@@ -462,6 +463,17 @@ void tickit_window_set_cursor_shape(TickitWindow *win, TickitCursorShape shape);
 void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(const TickitWindow *win);
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
+
+/*
+ * Debug support
+ */
+
+void tickit_debug_logf(const char *flag, const char *fmt, ...);
+void tickit_debug_vlogf(const char *flag, const char *fmt, va_list args);
+
+void tickit_debug_set_func(void (*func)(const char *str, void *data), void *data);
+void tickit_debug_set_fh(FILE *fh);
+bool tickit_debug_open(const char *path);
 
 /*
  * Tickit events
