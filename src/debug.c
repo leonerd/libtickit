@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE  // fdopen
+
 #include <tickit.h>
 
 #include <stdarg.h>
@@ -43,14 +45,22 @@ static void init(void)
       break;
   }
 
+  const char *val;
+  if((val = getenv("TICKIT_DEBUG_FD")) && val[0]) {
+    int fd;
+    if(sscanf(val, "%d", &fd))
+      tickit_debug_set_fh(fdopen(fd, "a"));
+  }
+  else if((val = getenv("TICKIT_DEBUG_FILE")) && val[0]) {
+    tickit_debug_open(val);
+  }
+  // TODO: else if(enabled_flags) open autogen filename
+
   init_done = true;
 }
 
 static bool flag_enabled(const char *name)
 {
-  if(!init_done)
-    init();
-
   for(struct Flag *f = enabled_flags; f; f = f->next)
     if(streq(name, f->name))
       return true;
@@ -100,9 +110,11 @@ void tickit_debug_logf(const char *flag, const char *fmt, ...)
 
 void tickit_debug_vlogf(const char *flag, const char *fmt, va_list args)
 {
+  if(!init_done)
+    init();
+
   if(!debug_fh && !debug_func)
     return;
-
   if(!flag_enabled(flag))
     return;
 
