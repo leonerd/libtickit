@@ -639,13 +639,11 @@ static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *paren
     case TICKIT_HIERARCHY_INSERT_LAST:
       _do_hierarchy_insert_last(parent, win);
       break;
-    case TICKIT_HIERARCHY_REMOVE: {
-        _do_hierarchy_remove(parent, win);
-        if(parent->focused_child && parent->focused_child == win) {
-          parent->focused_child = NULL;
-        }
-        break;
-      }
+    case TICKIT_HIERARCHY_REMOVE:
+      _do_hierarchy_remove(parent, win);
+      if(parent->focused_child && parent->focused_child == win)
+        parent->focused_child = NULL;
+      break;
     case TICKIT_HIERARCHY_RAISE:
       _do_hierarchy_raise(parent, win);
       break;
