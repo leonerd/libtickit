@@ -320,6 +320,36 @@ static void put_char(TickitRenderBuffer *rb, int line, int col, long codepoint)
   cell->v.chr.codepoint = codepoint;
 }
 
+static void skip(TickitRenderBuffer *rb, int line, int col, int cols)
+{
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
+    return;
+
+  RBCell *linecells = rb->cells[line];
+
+  while(cols) {
+    while(cols && linecells[col].maskdepth > -1) {
+      col++;
+      cols--;
+    }
+    if(!cols)
+      break;
+
+    int spanlen = 0;
+    while(cols && linecells[col + spanlen].maskdepth == -1) {
+      spanlen++;
+      cols--;
+    }
+    if(!spanlen)
+      break;
+
+    RBCell *cell = make_span(rb, line, col, spanlen);
+    cell->state = SKIP;
+
+    col += spanlen;
+  }
+}
+
 static void erase(TickitRenderBuffer *rb, int line, int col, int cols)
 {
   if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
@@ -629,32 +659,7 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int cols)
 {
-  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
-    return;
-
-  RBCell *linecells = rb->cells[line];
-
-  while(cols) {
-    while(cols && linecells[col].maskdepth > -1) {
-      col++;
-      cols--;
-    }
-    if(!cols)
-      break;
-
-    int spanlen = 0;
-    while(cols && linecells[col + spanlen].maskdepth == -1) {
-      spanlen++;
-      cols--;
-    }
-    if(!spanlen)
-      break;
-
-    RBCell *cell = make_span(rb, line, col, spanlen);
-    cell->state = SKIP;
-
-    col += spanlen;
-  }
+  skip(rb, line, col, cols);
 }
 
 void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols)
@@ -662,7 +667,7 @@ void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols)
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_skip_at(rb, rb->vc_line, rb->vc_col, cols);
+  skip(rb, rb->vc_line, rb->vc_col, cols);
   rb->vc_col += cols;
 }
 
@@ -672,7 +677,7 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
     return;
 
   if(rb->vc_col < col)
-    tickit_renderbuffer_skip_at(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
+    skip(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
 
   rb->vc_col = col;
 }
