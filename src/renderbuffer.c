@@ -247,6 +247,79 @@ static void tmp_alloc(TickitRenderBuffer *rb, size_t len)
   }
 }
 
+static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
+{
+  TickitStringPos endpos;
+  len = tickit_string_ncount(text, len, &endpos, NULL);
+  if(1 + len == 0)
+    return -1;
+
+  int cols = endpos.columns;
+  int ret = cols;
+
+  int startcol;
+  if(!xlate_and_clip(rb, &line, &col, &cols, &startcol))
+    return ret;
+
+  if(rb->n_texts == rb->size_texts) {
+    rb->size_texts *= 2;
+    rb->texts = realloc(rb->texts, rb->size_texts * sizeof(char *));
+  }
+
+  rb->texts[rb->n_texts] = malloc(len + 1);
+  memcpy(rb->texts[rb->n_texts], text, len);
+  rb->texts[rb->n_texts][len] = '\0';
+
+  RBCell *linecells = rb->cells[line];
+
+  while(cols) {
+    while(cols && linecells[col].maskdepth > -1) {
+      col++;
+      cols--;
+      startcol++;
+    }
+    if(!cols)
+      break;
+
+    int spanlen = 0;
+    while(cols && linecells[col + spanlen].maskdepth == -1) {
+      spanlen++;
+      cols--;
+    }
+    if(!spanlen)
+      break;
+
+    RBCell *cell = make_span(rb, line, col, spanlen);
+    cell->state       = TEXT;
+    cell->pen         = tickit_pen_ref(rb->pen);
+    cell->v.text.idx  = rb->n_texts;
+    cell->v.text.offs = startcol;
+
+    col      += spanlen;
+    startcol += spanlen;
+  }
+
+  rb->n_texts++;
+
+  return ret;
+}
+
+static void put_char(TickitRenderBuffer *rb, int line, int col, long codepoint)
+{
+  int cols = 1;
+
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
+    return;
+
+  if(rb->cells[line][col].maskdepth > -1)
+    return;
+
+  RBCell *cell = make_span(rb, line, col, cols);
+  cell->state           = CHAR;
+  cell->pen             = tickit_pen_ref(rb->pen);
+  cell->v.chr.codepoint = codepoint;
+}
+
 static void erase(TickitRenderBuffer *rb, int line, int col, int cols)
 {
   if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
@@ -606,65 +679,12 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
 
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, const char *text)
 {
-  return tickit_renderbuffer_textn_at(rb, line, col, text, -1);
+  return put_text(rb, line, col, text, -1);
 }
 
 int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
 {
-
-  TickitStringPos endpos;
-  len = tickit_string_ncount(text, len, &endpos, NULL);
-  if(1 + len == 0)
-    return -1;
-
-  int cols = endpos.columns;
-  int ret = cols;
-
-  int startcol;
-  if(!xlate_and_clip(rb, &line, &col, &cols, &startcol))
-    return ret;
-
-  if(rb->n_texts == rb->size_texts) {
-    rb->size_texts *= 2;
-    rb->texts = realloc(rb->texts, rb->size_texts * sizeof(char *));
-  }
-
-  rb->texts[rb->n_texts] = malloc(len + 1);
-  memcpy(rb->texts[rb->n_texts], text, len);
-  rb->texts[rb->n_texts][len] = '\0';
-
-  RBCell *linecells = rb->cells[line];
-
-  while(cols) {
-    while(cols && linecells[col].maskdepth > -1) {
-      col++;
-      cols--;
-      startcol++;
-    }
-    if(!cols)
-      break;
-
-    int spanlen = 0;
-    while(cols && linecells[col + spanlen].maskdepth == -1) {
-      spanlen++;
-      cols--;
-    }
-    if(!spanlen)
-      break;
-
-    RBCell *cell = make_span(rb, line, col, spanlen);
-    cell->state       = TEXT;
-    cell->pen         = tickit_pen_ref(rb->pen);
-    cell->v.text.idx  = rb->n_texts;
-    cell->v.text.offs = startcol;
-
-    col      += spanlen;
-    startcol += spanlen;
-  }
-
-  rb->n_texts++;
-
-  return ret;
+  return put_text(rb, line, col, text, len);
 }
 
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, const char *text)
@@ -683,7 +703,7 @@ int tickit_renderbuffer_textn(TickitRenderBuffer *rb, const char *text, size_t l
   if(!rb->vc_pos_set)
     return -1;
 
-  int cols = tickit_renderbuffer_textn_at(rb, rb->vc_line, rb->vc_col, text, len);
+  int cols = put_text(rb, rb->vc_line, rb->vc_col, text, len);
   rb->vc_col += cols;
 
   return cols;
@@ -716,11 +736,11 @@ int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, con
   }
 
   if(len < sizeof buffer)
-    return tickit_renderbuffer_textn_at(rb, line, col, buffer, len);
+    return put_text(rb, line, col, buffer, len);
 
   tmp_alloc(rb, len + 1);
   vsnprintf(rb->tmp, rb->tmpsize, fmt, args);
-  return tickit_renderbuffer_textn_at(rb, line, col, rb->tmp, len);
+  return put_text(rb, line, col, rb->tmp, len);
 }
 
 int tickit_renderbuffer_textf(TickitRenderBuffer *rb, const char *fmt, ...)
@@ -779,18 +799,7 @@ void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect)
 
 void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint)
 {
-  int cols = 1;
-
-  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
-    return;
-
-  if(rb->cells[line][col].maskdepth > -1)
-    return;
-
-  RBCell *cell = make_span(rb, line, col, cols);
-  cell->state           = CHAR;
-  cell->pen             = tickit_pen_ref(rb->pen);
-  cell->v.chr.codepoint = codepoint;
+  put_char(rb, line, col, codepoint);
 }
 
 void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint)
@@ -798,7 +807,7 @@ void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint)
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_char_at(rb, rb->vc_line, rb->vc_col, codepoint);
+  put_char(rb, rb->vc_line, rb->vc_col, codepoint);
   // TODO: might not be 1; would have to look it up
   rb->vc_col += 1;
 }
@@ -974,7 +983,7 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
             end = start;
             tickit_string_countmore(text, &end, &limit);
 
-            tickit_renderbuffer_textn_at(dst, line, col, text + start.bytes, end.bytes - start.bytes);
+            put_text(dst, line, col, text + start.bytes, end.bytes - start.bytes);
           }
           break;
         case ERASE:
@@ -984,7 +993,7 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
           linecell(dst, line, col, cell->v.line.mask);
           break;
         case CHAR:
-          tickit_renderbuffer_char_at(dst, line, col, cell->v.chr.codepoint);
+          put_char(dst, line, col, cell->v.chr.codepoint);
           break;
         case CONT:
           /* unreachable */
