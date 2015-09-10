@@ -247,6 +247,37 @@ static void tmp_alloc(TickitRenderBuffer *rb, size_t len)
   }
 }
 
+static void erase(TickitRenderBuffer *rb, int line, int col, int cols)
+{
+  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
+    return;
+
+  RBCell *linecells = rb->cells[line];
+
+  while(cols) {
+    while(cols && linecells[col].maskdepth > -1) {
+      col++;
+      cols--;
+    }
+    if(!cols)
+      break;
+
+    int spanlen = 0;
+    while(cols && linecells[col + spanlen].maskdepth == -1) {
+      spanlen++;
+      cols--;
+    }
+    if(!spanlen)
+      break;
+
+    RBCell *cell = make_span(rb, line, col, spanlen);
+    cell->state = ERASE;
+    cell->pen   = tickit_pen_ref(rb->pen);
+
+    col += spanlen;
+  }
+}
+
 TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols)
 {
   TickitRenderBuffer *rb = malloc(sizeof(TickitRenderBuffer));
@@ -457,7 +488,7 @@ void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
 void tickit_renderbuffer_clear(TickitRenderBuffer *rb)
 {
   for(int line = 0; line < rb->lines; line++)
-    tickit_renderbuffer_erase_at(rb, line, 0, rb->cols);
+    erase(rb, line, 0, rb->cols);
 }
 
 void tickit_renderbuffer_save(TickitRenderBuffer *rb)
@@ -717,33 +748,7 @@ int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, const char *fmt, va_list 
 
 void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols)
 {
-  if(!xlate_and_clip(rb, &line, &col, &cols, NULL))
-    return;
-
-  RBCell *linecells = rb->cells[line];
-
-  while(cols) {
-    while(cols && linecells[col].maskdepth > -1) {
-      col++;
-      cols--;
-    }
-    if(!cols)
-      break;
-
-    int spanlen = 0;
-    while(cols && linecells[col + spanlen].maskdepth == -1) {
-      spanlen++;
-      cols--;
-    }
-    if(!spanlen)
-      break;
-
-    RBCell *cell = make_span(rb, line, col, spanlen);
-    cell->state = ERASE;
-    cell->pen   = tickit_pen_ref(rb->pen);
-
-    col += spanlen;
-  }
+  erase(rb, line, col, cols);
 }
 
 void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols)
@@ -751,7 +756,7 @@ void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols)
   if(!rb->vc_pos_set)
     return;
 
-  tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, cols);
+  erase(rb, rb->vc_line, rb->vc_col, cols);
   rb->vc_col += cols;
 }
 
@@ -761,7 +766,7 @@ void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col)
     return;
 
   if(rb->vc_col < col)
-    tickit_renderbuffer_erase_at(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
+    erase(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
 
   rb->vc_col = col;
 }
@@ -769,7 +774,7 @@ void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col)
 void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect)
 {
   for(int line = rect->top; line < tickit_rect_bottom(rect); line++)
-    tickit_renderbuffer_erase_at(rb, line, rect->left, rect->cols);
+    erase(rb, line, rect->left, rect->cols);
 }
 
 void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint)
@@ -973,7 +978,7 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
           }
           break;
         case ERASE:
-          tickit_renderbuffer_erase_at(dst, line, col, cell->cols);
+          erase(dst, line, col, cell->cols);
           break;
         case LINE:
           linecell(dst, line, col, cell->v.line.mask);
