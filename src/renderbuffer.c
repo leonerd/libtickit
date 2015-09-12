@@ -304,6 +304,28 @@ static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text,
   return ret;
 }
 
+static int put_vtextf(TickitRenderBuffer *rb, int line, int col, const char *fmt, va_list args)
+{
+  /* It's likely the string will fit in, say, 64 bytes */
+  char buffer[64];
+  size_t len;
+  {
+    va_list args_for_size;
+    va_copy(args_for_size, args);
+
+    len = vsnprintf(buffer, sizeof buffer, fmt, args_for_size);
+
+    va_end(args_for_size);
+  }
+
+  if(len < sizeof buffer)
+    return put_text(rb, line, col, buffer, len);
+
+  tmp_alloc(rb, len + 1);
+  vsnprintf(rb->tmp, rb->tmpsize, fmt, args);
+  return put_text(rb, line, col, rb->tmp, len);
+}
+
 static void put_char(TickitRenderBuffer *rb, int line, int col, long codepoint)
 {
   int cols = 1;
@@ -684,7 +706,7 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
 
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, const char *text)
 {
-  return put_text(rb, line, col, text, -1);
+  return tickit_renderbuffer_textn_at(rb, line, col, text, -1);
 }
 
 int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
@@ -694,13 +716,7 @@ int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, cons
 
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, const char *text)
 {
-  if(!rb->vc_pos_set)
-    return -1;
-
-  int cols = tickit_renderbuffer_text_at(rb, rb->vc_line, rb->vc_col, text);
-  rb->vc_col += cols;
-
-  return cols;
+  return tickit_renderbuffer_textn(rb, text, -1);
 }
 
 int tickit_renderbuffer_textn(TickitRenderBuffer *rb, const char *text, size_t len)
@@ -728,24 +744,7 @@ int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, cons
 
 int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, const char *fmt, va_list args)
 {
-  /* It's likely the string will fit in, say, 64 bytes */
-  char buffer[64];
-  size_t len;
-  {
-    va_list args_for_size;
-    va_copy(args_for_size, args);
-
-    len = vsnprintf(buffer, sizeof buffer, fmt, args_for_size);
-
-    va_end(args_for_size);
-  }
-
-  if(len < sizeof buffer)
-    return put_text(rb, line, col, buffer, len);
-
-  tmp_alloc(rb, len + 1);
-  vsnprintf(rb->tmp, rb->tmpsize, fmt, args);
-  return put_text(rb, line, col, rb->tmp, len);
+  return put_vtextf(rb, line, col, fmt, args);
 }
 
 int tickit_renderbuffer_textf(TickitRenderBuffer *rb, const char *fmt, ...)
@@ -765,7 +764,7 @@ int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, const char *fmt, va_list 
   if(!rb->vc_pos_set)
     return -1;
 
-  int cols = tickit_renderbuffer_vtextf_at(rb, rb->vc_line, rb->vc_col, fmt, args);
+  int cols = put_vtextf(rb, rb->vc_line, rb->vc_col, fmt, args);
   rb->vc_col += cols;
 
   return cols;
