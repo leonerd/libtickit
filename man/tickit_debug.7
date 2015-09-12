@@ -11,6 +11,20 @@ The \fIlibtickit\fP library contains a debug logging system that other parts of 
 Debug messages themselves each have a flag name, which is a short string identifying the library component or event that caused that message. A given set of these flags can be enabled during a debugging session, causing only those messages to be printed. Messages pertaining to flags that are not enabled will not be printed.
 .SH FLAGS
 Each flag name starts with an upper-case letter indicating the library component it relates to, then lower-case letters to indicate the particular kind of event or message within that component.
+.SS B
+These messages relate to \fBTickitRenderBuffer\fP (tickit_renderbuffer(7)).
+.TP
+\f(CwBd\fP
+Drawing operations such as \fBtickit_renderbuffer_text\fP(3).
+.TP
+\f(CwBf\fP
+Flushing
+.TP
+\f(CwBs\fP
+Stack state save and restore.
+.TP
+\f(CwBt\fP
+Transformations (translation, clipping and masking).
 .SH ENVIRONMENT
 The debugging support is controlled by the following environment variables, which should be set before the application starts, or early during its initialisation before it has invoked any \fIlibtickit\fP functions.
 .TP

@@ -9,6 +9,9 @@
 
 #include "linechars.inc"
 
+#define RECT_PRINTF_FMT     "[(%d,%d)..(%d,%d)]"
+#define RECT_PRINTF_ARGS(r) (r).left, (r).top, tickit_rect_right(&(r)), tickit_rect_bottom(&(r))
+
 /* must match .pm file */
 enum TickitRenderBufferCellState {
   SKIP  = 0,
@@ -152,6 +155,26 @@ static void cont_cell(RBCell *cell, int startcol)
   cell->cols      = startcol;
   cell->pen       = NULL;
 }
+
+static void debug_logf(TickitRenderBuffer *rb, const char *flag, const char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+
+  char fmt_with_indent[strlen(fmt) + 3 * rb->depth + 1];
+  {
+    char *s = fmt_with_indent;
+    for(int i = 0; i < rb->depth; i++)
+      s += sprintf(s, "|  ");
+    strcpy(s, fmt);
+  }
+
+  tickit_debug_vlogf(flag, fmt_with_indent, args);
+
+  va_end(args);
+}
+
+#define DEBUG_LOGF  if(tickit_debug_enabled) debug_logf
 
 static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
 {
@@ -496,12 +519,16 @@ void tickit_renderbuffer_get_size(const TickitRenderBuffer *rb, int *lines, int 
 
 void tickit_renderbuffer_translate(TickitRenderBuffer *rb, int downward, int rightward)
 {
+  DEBUG_LOGF(rb, "Bt", "Translate (%+d,%+d)", rightward, downward);
+
   rb->xlate_line += downward;
   rb->xlate_col  += rightward;
 }
 
 void tickit_renderbuffer_clip(TickitRenderBuffer *rb, TickitRect *rect)
 {
+  DEBUG_LOGF(rb, "Bt", "Clip " RECT_PRINTF_FMT, RECT_PRINTF_ARGS(*rect));
+
   TickitRect other;
 
   other = *rect;
@@ -514,6 +541,8 @@ void tickit_renderbuffer_clip(TickitRenderBuffer *rb, TickitRect *rect)
 
 void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask)
 {
+  DEBUG_LOGF(rb, "Bt", "Mask " RECT_PRINTF_FMT, RECT_PRINTF_ARGS(*mask));
+
   TickitRect hole;
 
   hole = *mask;
@@ -612,12 +641,16 @@ void tickit_renderbuffer_reset(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_clear(TickitRenderBuffer *rb)
 {
+  DEBUG_LOGF(rb, "Bd", "Clear");
+
   for(int line = 0; line < rb->lines; line++)
     erase(rb, line, 0, rb->cols);
 }
 
 void tickit_renderbuffer_save(TickitRenderBuffer *rb)
 {
+  DEBUG_LOGF(rb, "Bs", "+-Save");
+
   RBStack *stack = malloc(sizeof(struct RBStack));
 
   stack->vc_line    = rb->vc_line;
@@ -635,6 +668,8 @@ void tickit_renderbuffer_save(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_savepen(TickitRenderBuffer *rb)
 {
+  DEBUG_LOGF(rb, "Bs", "+-Savepen");
+
   RBStack *stack = malloc(sizeof(struct RBStack));
 
   stack->pen      = tickit_pen_ref(rb->pen);
@@ -677,10 +712,14 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb)
         rb->cells[line][col].maskdepth = -1;
 
   free(stack);
+
+  DEBUG_LOGF(rb, "Bs", "+-Restore");
 }
 
 void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int cols)
 {
+  DEBUG_LOGF(rb, "Bd", "Skip (%d..%d,%d)", col, col + cols, line);
+
   skip(rb, line, col, cols);
 }
 
@@ -688,6 +727,8 @@ void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols)
 {
   if(!rb->vc_pos_set)
     return;
+
+  DEBUG_LOGF(rb, "Bd", "Skip (%d..%d,%d) +%d", rb->vc_col, rb->vc_col + cols, rb->vc_line, cols);
 
   skip(rb, rb->vc_line, rb->vc_col, cols);
   rb->vc_col += cols;
@@ -697,6 +738,8 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
 {
   if(!rb->vc_pos_set)
     return;
+
+  DEBUG_LOGF(rb, "Bd", "Skip (%d..%d,%d) +%d", rb->vc_col, col, rb->vc_line, col - rb->vc_col);
 
   if(rb->vc_col < col)
     skip(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
@@ -711,7 +754,11 @@ int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, const
 
 int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
 {
-  return put_text(rb, line, col, text, len);
+  int cols = put_text(rb, line, col, text, len);
+
+  DEBUG_LOGF(rb, "Bd", "Text (%d..%d,%d)", col, col + cols, line);
+
+  return cols;
 }
 
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, const char *text)
@@ -725,8 +772,10 @@ int tickit_renderbuffer_textn(TickitRenderBuffer *rb, const char *text, size_t l
     return -1;
 
   int cols = put_text(rb, rb->vc_line, rb->vc_col, text, len);
-  rb->vc_col += cols;
 
+  DEBUG_LOGF(rb, "Bd", "Text (%d..%d,%d) +%d", rb->vc_col, rb->vc_col + cols, rb->vc_line, cols);
+
+  rb->vc_col += cols;
   return cols;
 }
 
@@ -744,7 +793,11 @@ int tickit_renderbuffer_textf_at(TickitRenderBuffer *rb, int line, int col, cons
 
 int tickit_renderbuffer_vtextf_at(TickitRenderBuffer *rb, int line, int col, const char *fmt, va_list args)
 {
-  return put_vtextf(rb, line, col, fmt, args);
+  int cols = put_vtextf(rb, line, col, fmt, args);
+
+  DEBUG_LOGF(rb, "Bd", "Text (%d..%d,%d)", col, col + cols, line);
+
+  return cols;
 }
 
 int tickit_renderbuffer_textf(TickitRenderBuffer *rb, const char *fmt, ...)
@@ -765,13 +818,17 @@ int tickit_renderbuffer_vtextf(TickitRenderBuffer *rb, const char *fmt, va_list 
     return -1;
 
   int cols = put_vtextf(rb, rb->vc_line, rb->vc_col, fmt, args);
-  rb->vc_col += cols;
 
+  DEBUG_LOGF(rb, "Bd", "Text (%d..%d,%d) +%d", rb->vc_col, rb->vc_col + cols, rb->vc_line, cols);
+
+  rb->vc_col += cols;
   return cols;
 }
 
 void tickit_renderbuffer_erase_at(TickitRenderBuffer *rb, int line, int col, int cols)
 {
+  DEBUG_LOGF(rb, "Bd", "Erase (%d..%d,%d)", col, col + cols, line);
+
   erase(rb, line, col, cols);
 }
 
@@ -779,6 +836,8 @@ void tickit_renderbuffer_erase(TickitRenderBuffer *rb, int cols)
 {
   if(!rb->vc_pos_set)
     return;
+
+  DEBUG_LOGF(rb, "Bd", "Erase (%d..%d,%d) +%d", rb->vc_col, rb->vc_col + cols, rb->vc_line, cols);
 
   erase(rb, rb->vc_line, rb->vc_col, cols);
   rb->vc_col += cols;
@@ -789,6 +848,8 @@ void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col)
   if(!rb->vc_pos_set)
     return;
 
+  DEBUG_LOGF(rb, "Bd", "Erase (%d..%d,%d) +%d", rb->vc_col, col, rb->vc_line, col - rb->vc_col);
+
   if(rb->vc_col < col)
     erase(rb, rb->vc_line, rb->vc_col, col - rb->vc_col);
 
@@ -797,12 +858,16 @@ void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col)
 
 void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect)
 {
+  DEBUG_LOGF(rb, "Bd", "Erase [(%d,%d)..(%d,%d)]", rect->left, rect->top, rect->left + rect->cols, rect->top + rect->lines);
+
   for(int line = rect->top; line < tickit_rect_bottom(rect); line++)
     erase(rb, line, rect->left, rect->cols);
 }
 
 void tickit_renderbuffer_char_at(TickitRenderBuffer *rb, int line, int col, long codepoint)
 {
+  DEBUG_LOGF(rb, "Bd", "Char (%d.,%d,%d)", col, col + 1, line);
+
   put_char(rb, line, col, codepoint);
 }
 
@@ -810,6 +875,8 @@ void tickit_renderbuffer_char(TickitRenderBuffer *rb, long codepoint)
 {
   if(!rb->vc_pos_set)
     return;
+
+  DEBUG_LOGF(rb, "Bd", "Char (%d..%d,%d) +%d", rb->vc_col, rb->vc_col + 1, rb->vc_line, 1);
 
   put_char(rb, rb->vc_line, rb->vc_col, codepoint);
   // TODO: might not be 1; would have to look it up
@@ -845,6 +912,8 @@ static void linecell(TickitRenderBuffer *rb, int line, int col, int bits)
 void tickit_renderbuffer_hline_at(TickitRenderBuffer *rb, int line, int startcol, int endcol,
     TickitLineStyle style, TickitLineCaps caps)
 {
+  DEBUG_LOGF(rb, "Bd", "HLine (%d..%d,%d)", startcol, endcol, line);
+
   int east = style << EAST_SHIFT;
   int west = style << WEST_SHIFT;
 
@@ -857,6 +926,8 @@ void tickit_renderbuffer_hline_at(TickitRenderBuffer *rb, int line, int startcol
 void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int endline, int col,
     TickitLineStyle style, TickitLineCaps caps)
 {
+  DEBUG_LOGF(rb, "Bd", "VLine (%d,%d..%d)", col, startline, endline);
+
   int north = style << NORTH_SHIFT;
   int south = style << SOUTH_SHIFT;
 
@@ -868,6 +939,8 @@ void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int end
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
 {
+  DEBUG_LOGF(rb, "Bf", "Flush to term");
+
   for(int line = 0; line < rb->lines; line++) {
     int phycol = -1; /* column where the terminal cursor physically is */
 
