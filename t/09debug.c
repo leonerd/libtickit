@@ -19,9 +19,8 @@ int main(int argc, char *argv[])
 {
   putenv("TICKIT_DEBUG_FLAGS=T,X,Ca");
 
-  tickit_debug_init();
-
   tickit_debug_set_func(savemsg, NULL);
+  tickit_debug_init();
 
   tickit_debug_logf("T", "Test message %s", "here");
 

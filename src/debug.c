@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>  // getpid
 
 #define streq(a,b) (!strcmp(a,b))
 
@@ -53,16 +54,22 @@ void tickit_debug_init(void)
       break;
   }
 
-  const char *val;
-  if((val = getenv("TICKIT_DEBUG_FD")) && val[0]) {
-    int fd;
-    if(sscanf(val, "%d", &fd))
-      tickit_debug_set_fh(fdopen(fd, "a"));
+  if(!debug_func) {
+    const char *val;
+    if((val = getenv("TICKIT_DEBUG_FD")) && val[0]) {
+      int fd;
+      if(sscanf(val, "%d", &fd))
+        tickit_debug_set_fh(fdopen(fd, "a"));
+    }
+    else if((val = getenv("TICKIT_DEBUG_FILE")) && val[0]) {
+      tickit_debug_open(val);
+    }
+    else if(enabled_flags) {
+      char name[17];
+      sprintf(name, "tickit-%d.log", getpid());
+      tickit_debug_open(name);
+    }
   }
-  else if((val = getenv("TICKIT_DEBUG_FILE")) && val[0]) {
-    tickit_debug_open(val);
-  }
-  // TODO: else if(enabled_flags) open autogen filename
 
   tickit_debug_enabled = !!enabled_flags && (debug_func || debug_fh);
 
