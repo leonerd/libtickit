@@ -44,6 +44,8 @@ $ TICKIT_DEBUG_FD=3 TICKIT_DEBUG_FLAGS=... $TERM my-tickit-app 3>&2
 .fi
 .sp
 This requests that \fIlibtickit\fP log to file descriptor 3, which has been created by dup(2)ing the original shell's standard output. Debug logging will therefore be printed to the existing terminal where this command was executed, while the application itself draws its output to the newly-created one.
+.SH FUNCTIONS
+The debug system is intialised by calling \fBtickit_debug_init\fP(3). Messages can be logged using \fBtickit_debug_logf\fP(3) and \fBtickit_debug_vlogf\fP(3).
 .SH "SEE ALSO"
 .BR tickit (7),
 .BR tickit_term (7),

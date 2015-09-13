@@ -1,0 +1,23 @@
+.TH TICKIT_DEBUG_INIT 3
+.SH NAME
+tickit_debug_init \- initialise the debugging system
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_debug_init(void);"
+.sp
+.BI "bool " tickit_debug_enabled ;
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_debug_init\fP() initialises the \fIlibtickit\fP debugging system. It reads the values of the environment variables and sets up the output filehandle, if enabled. It also has a side-effect on the value of the \fItickit_debug_enabled\fP global variable, setting it to the correct value. Applications that wish to read this variable to control their output of debugging messages may wish to call this function on startup, to ensure it takes the correct value.
+.PP
+\fBtickit_debug_init\fP() is guarded internally so that it is safe to call multiple times; there is no downside to opportunistically invoking it on startup anyway, even if some other part of the application may also have done so.
+.SH "RETURN VALUE"
+This function returns no value.
+.SH "SEE ALSO"
+.BR tickit_debug_logf (3),
+.BR tickit_debug (7),
+.BR tickit (7)

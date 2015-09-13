@@ -1,0 +1,23 @@
+.TH TICKIT_DEBUG_LOGF 3
+.SH NAME
+tickit_debug_logf, tickit_debug_vlogf \- emit debugging log messages
+.SH SYNOPSIS
+.nf
+.B #include <tickit.h>
+.sp
+.BI "void tickit_debug_logf(const char *" flag ,
+.BI "          const char *" fmt ", ...);"
+.BI "void tickit_debug_vlogf(const char *" flag ,
+.BI "          const char *" fmt ", va_list " args );
+.fi
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_debug_logf\fP() emits a debug logging message, by creating a string using the given format string and argument list in the style of \fBsprintf\fP(3). If the requested message flag is enabled, this will be appended to the log output along with a timestamp and the name of the flag itself.
+.PP
+\fBtickit_debug_vlogf\fP() works analogously, except that it takes a single \fIva_list\fP for the arguments to format.
+.SH "RETURN VALUE"
+These functions return no value.
+.SH "SEE ALSO"
+.BR tickit_debug (7),
+.BR tickit (7)

@@ -86,3 +86,5 @@ tickit_window_set_cursor_visible.3 = tickit_window_set_cursor_position.3
 tickit_window_set_cursor_shape.3 = tickit_window_set_cursor_position.3
 tickit_window_scrollrect.3 = tickit_window_scroll.3
 tickit_window_scroll_with_children.3 = tickit_window_scroll.3
+
+tickit_debug_vlogf.3 = tickit_debug_logf.3
