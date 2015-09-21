@@ -39,6 +39,12 @@ struct TickitWindow {
   struct TickitEventHook *hooks;
 };
 
+#define WINDOW_PRINTF_FMT     "[%dx%d abs@%d,%d]"
+#define WINDOW_PRINTF_ARGS(w) (w)->rect.cols, (w)->rect.lines, tickit_window_get_abs_geometry(w).left, tickit_window_get_abs_geometry(w).top
+
+#define RECT_PRINTF_FMT     "[(%d,%d)..(%d,%d)]"
+#define RECT_PRINTF_ARGS(r) (r).left, (r).top, tickit_rect_right(&(r)), tickit_rect_bottom(&(r))
+
 DEFINE_HOOKLIST_FUNCS(window,TickitWindow,TickitWindowEventFn)
 
 typedef struct HierarchyChange HierarchyChange;
@@ -408,6 +414,9 @@ void tickit_window_expose(TickitWindow *win, const TickitRect *exposed)
     return;
   }
 
+  DEBUG_LOGF("Wd", "Damage root " RECT_PRINTF_FMT,
+      RECT_PRINTF_ARGS(damaged));
+
   /* If we're here, then we're a root win. */
   TickitRootWindow *root = WINDOW_AS_ROOT(win);
   if(tickit_rectset_contains(root->damage, &damaged))
@@ -650,33 +659,46 @@ static void _do_hierarchy_lower(TickitWindow *parent, TickitWindow *win)
 
 static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *parent, TickitWindow *win)
 {
+  const char *fmt = NULL;
+
   switch(change) {
     case TICKIT_HIERARCHY_INSERT_FIRST:
+       fmt = "Window " WINDOW_PRINTF_FMT " adds " WINDOW_PRINTF_FMT;
       _do_hierarchy_insert_first(parent, win);
       break;
     case TICKIT_HIERARCHY_INSERT_LAST:
+      fmt = "Window " WINDOW_PRINTF_FMT " adds " WINDOW_PRINTF_FMT;
       _do_hierarchy_insert_last(parent, win);
       break;
     case TICKIT_HIERARCHY_REMOVE:
+      fmt = "Window " WINDOW_PRINTF_FMT " removes " WINDOW_PRINTF_FMT;
       _do_hierarchy_remove(parent, win);
       if(parent->focused_child && parent->focused_child == win)
         parent->focused_child = NULL;
       break;
     case TICKIT_HIERARCHY_RAISE:
+      fmt = "Window " WINDOW_PRINTF_FMT " raises " WINDOW_PRINTF_FMT;
       _do_hierarchy_raise(parent, win);
       break;
     case TICKIT_HIERARCHY_RAISE_FRONT:
+      fmt = "Window " WINDOW_PRINTF_FMT " raises " WINDOW_PRINTF_FMT " to front";
       _do_hierarchy_remove(parent, win);
       _do_hierarchy_insert_first(parent, win);
       break;
     case TICKIT_HIERARCHY_LOWER:
+      fmt = "Window " WINDOW_PRINTF_FMT " lowers " WINDOW_PRINTF_FMT;
       _do_hierarchy_lower(parent, win);
       break;
     case TICKIT_HIERARCHY_LOWER_BACK:
+      fmt = "Window " WINDOW_PRINTF_FMT " lowers " WINDOW_PRINTF_FMT " to back";
       _do_hierarchy_remove(parent, win);
       _do_hierarchy_insert_last(parent, win);
       break;
   }
+
+  if(fmt)
+    DEBUG_LOGF("Wh", fmt,
+        WINDOW_PRINTF_ARGS(parent), WINDOW_PRINTF_ARGS(win));
 
   tickit_window_expose(parent, &win->rect);
 }
@@ -805,6 +827,9 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
       }
     }
 
+    DEBUG_LOGF("Wsr", "Term scrollrect " RECT_PRINTF_FMT " by %+d,%+d",
+      RECT_PRINTF_ARGS(rect), rightward, downward);
+
     if(!done_pen) {
       // TODO: only bg matters
       tickit_term_setpen(term, pen);
@@ -857,6 +882,9 @@ static bool _scroll(TickitWindow *win, const TickitRect *origrect, int downward,
 
   if(!tickit_rect_intersect(&rect, &selfrect, origrect))
     return false;
+
+  DEBUG_LOGF("Ws", "Scroll " RECT_PRINTF_FMT " by %+d,%+d",
+    RECT_PRINTF_ARGS(rect), rightward, downward);
 
   if(pen)
     pen = tickit_pen_ref(pen);
