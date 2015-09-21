@@ -6,6 +6,8 @@
 #define ROOT_AS_WINDOW(root) ((TickitWindow*)root)
 #define WINDOW_AS_ROOT(win)  ((TickitRootWindow*)win)
 
+#define DEBUG_LOGF  if(tickit_debug_enabled) tickit_debug_logf
+
 typedef enum {
   TICKIT_HIERARCHY_INSERT_FIRST,
   TICKIT_HIERARCHY_INSERT_LAST,
@@ -80,6 +82,8 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
     int oldcols  = win->rect.cols;
 
     tickit_window_resize(win, info->lines, info->cols);
+    DEBUG_LOGF("Ir", "Resize to %dx%d",
+        info->cols, info->lines);
 
     if(info->lines > oldlines) {
       TickitRect damage = {
@@ -102,11 +106,25 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
     }
   }
 
-  if(ev & TICKIT_EV_KEY)
-    _handle_key(win, (TickitKeyEventInfo *)_info);
+  if(ev & TICKIT_EV_KEY) {
+    TickitKeyEventInfo *info = _info;
+    static const char * const evnames[] = { NULL, "KEY", "TEXT" };
 
-  if(ev & TICKIT_EV_MOUSE)
-    _handle_mouse(win, (TickitMouseEventInfo *)_info);
+    DEBUG_LOGF("Ik", "Key event %s %s (mod=%02x)",
+        evnames[info->type], info->str, info->mod);
+
+    _handle_key(win, info);
+  }
+
+  if(ev & TICKIT_EV_MOUSE) {
+    TickitMouseEventInfo *info = _info;
+    static const char * const evnames[] = { NULL, "PRESS", "DRAG", "RELEASE", "WHEEL" };
+
+    DEBUG_LOGF("Im", "Mouse event %s %d @%d,%d (mod=%02x)",
+        evnames[info->type], info->button, info->col, info->line, info->mod);
+
+    _handle_mouse(win, info);
+  }
 
   return 1;
 }
