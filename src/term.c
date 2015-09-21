@@ -4,6 +4,9 @@
 /* We need strdup and va_copy */
 #define _XOPEN_SOURCE 600
 
+/* We need SIGWINCH */
+#define _BSD_SOURCE
+
 #include "tickit.h"
 
 #include "hooklists.h"
