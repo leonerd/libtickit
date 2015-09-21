@@ -428,8 +428,34 @@ void tickit_window_expose(TickitWindow *win, const TickitRect *exposed)
   _request_later_processing(root);
 }
 
+static char *_gen_indent(TickitWindow *win)
+{
+  int depth = 0;
+  while(win->parent) {
+    depth++;
+    win = win->parent;
+  }
+
+  static size_t buflen = 0;
+  static char *buf = NULL;
+
+  if(depth * 2 >= buflen) {
+    free(buf);
+    buf = malloc(buflen = (depth * 2 + 1));
+    buf[0] = 0;
+  }
+
+  for(char *s = buf; depth; depth--, s += 2)
+    s[0] = '|', s[1] = ' ';
+
+  return buf;
+}
+
 static void _do_expose(TickitWindow *win, const TickitRect *rect, TickitRenderBuffer *rb)
 {
+  DEBUG_LOGF("Wx", "%sExpose " WINDOW_PRINTF_FMT " " RECT_PRINTF_FMT,
+      _gen_indent(win), WINDOW_PRINTF_ARGS(win), RECT_PRINTF_ARGS(*rect));
+
   if(win->pen)
     tickit_renderbuffer_setpen(rb, win->pen);
 
