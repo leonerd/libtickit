@@ -75,7 +75,7 @@ static void _request_hierarchy_change(HierarchyChangeType, TickitWindow *);
 static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *parent, TickitWindow *win);
 static void _purge_hierarchy_changes(TickitWindow *win);
 static int _handle_key(TickitWindow *win, TickitKeyEventInfo *args);
-static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
+static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
 
 static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user)
 {
@@ -1070,10 +1070,10 @@ static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
   return 0;
 }
 
-static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
+static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
 {
   if(!win->is_visible)
-    return 0;
+    return NULL;
 
   for(TickitWindow *child = win->first_child; child; child = child->next) {
     int child_line = info->line - child->rect.top;
@@ -1090,12 +1090,13 @@ static int _handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
     childinfo.line = child_line;
     childinfo.col  = child_col;
 
-    if(_handle_mouse(child, &childinfo))
-      return 1;
+    TickitWindow *ret;
+    if((ret = _handle_mouse(child, &childinfo)))
+      return ret;
   }
 
   if(run_events_whilefalse(win, TICKIT_EV_MOUSE, info))
-    return 1;
+    return win;
 
   return 0;
 }
