@@ -39,7 +39,25 @@ The event types recognised are:
 A key has been pressed on the keyboard while this window has input focus (or is set to steal input). \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_KEY\fP event described in \fBtickit_term\fP(7).
 .TP
 .B TICKIT_EV_MOUSE
-A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled while the cursor is within the bounds of this window (or the window is set to steal input). \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_MOUSE\fP event described in \fBtickit_term\fP(7), except that the position given by the \fIline\fP and \fIcol\fP fields will be relative to the window, rather than the terminal as a whole.
+A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled while the cursor is within the bounds of this window (or the window is set to steal input), or certain kinds of mouse dragging behaviour have happened.
+.IP
+\fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_MOUSE\fP event described in \fBtickit_term\fP(7), except that the position given by the \fIline\fP and \fIcol\fP fields will be relative to the window, rather than the terminal as a whole.
+.IP
+In addition to the basic mouse events found at the terminal layer, there are a few additional kinds of events that occur during mouse dragging. These give information about mouse drag motions within a window or between different windows.
+.RS
+.TP
+.B TICKIT_MOUSEEV_DRAG_START
+A dragging motion has started. This event is delivered just before the \fBTICKIT_MOUSEEV_DRAG\fP event, and gives the original position of the mouse before it started dragging (i.e. the position of the press event).
+.TP
+.B TICKIT_MOUSEEV_DRAG_OUTSIDE
+A dragging motion that was started within this window has now moved outside it. In this case, the position given by the event will be somewhere outside the bounds of the window it is delivered to. This event is delivered directly to the source window; i.e. the window that handled the \fBTICKIT_MOUSEEV_DRAG_START\fP event.
+.TP
+.B TICKIT_MOUSEEV_DRAG_DROP
+A dragging motion has stopped by the mouse button being released. This event is delivered normally at the position of the mouse cursor.
+.TP
+.B TICKIT_MOUSEEV_DRAG_STOP
+A dragging motion has stopped by the mouse button being released. This event is delivered directly to the source window; i.e. the window that handled the \fBTICKIT_MOUSEEV_DRAG_START\fP event. If that is a different window than the one that received the \fBTICKIT_MOUSEEV_DRAG_STOP\fP event then the position may be outside the bounds of the window.
+.RE
 .TP
 .B TICKIT_EV_GEOMCHANGE
 At least one of the fields of the window geometry have been changed, meaning it now occupies a different area of the screen. \fIinfo\fP will point to a structure defined as:

@@ -67,6 +67,13 @@ struct TickitRootWindow {
   bool needs_later_processing;
 
   int event_id;
+
+  // Drag/drop context handling
+  bool mouse_dragging;
+  int mouse_last_button;
+  int mouse_last_line;
+  int mouse_last_col;
+  TickitWindow *drag_source_window;
 };
 
 static void _request_restore(TickitRootWindow *root);
@@ -129,7 +136,63 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
     DEBUG_LOGF("Im", "Mouse event %s %d @%d,%d (mod=%02x)",
         evnames[info->type], info->button, info->col, info->line, info->mod);
 
-    _handle_mouse(win, info);
+    if(info->type == TICKIT_MOUSEEV_PRESS) {
+      /* Save the last press location in case of drag */
+      root->mouse_last_button = info->button;
+      root->mouse_last_line   = info->line;
+      root->mouse_last_col    = info->col;
+    }
+    else if(info->type == TICKIT_MOUSEEV_DRAG && !root->mouse_dragging) {
+      TickitMouseEventInfo draginfo = {
+        .type   = TICKIT_MOUSEEV_DRAG_START,
+        .button = root->mouse_last_button,
+        .line   = root->mouse_last_line,
+        .col    = root->mouse_last_col,
+      };
+
+      root->drag_source_window = _handle_mouse(win, &draginfo);
+      root->mouse_dragging = true;
+    }
+    else if(info->type == TICKIT_MOUSEEV_RELEASE && root->mouse_dragging) {
+      TickitMouseEventInfo draginfo = {
+        .type   = TICKIT_MOUSEEV_DRAG_DROP,
+        .button = info->button,
+        .line   = info->line,
+        .col    = info->col,
+      };
+
+      _handle_mouse(win, &draginfo);
+
+      if(root->drag_source_window) {
+        TickitRect geom = tickit_window_get_abs_geometry(root->drag_source_window);
+        TickitMouseEventInfo draginfo = {
+          .type   = TICKIT_MOUSEEV_DRAG_STOP,
+          .button = info->button,
+          .line   = info->line - geom.top,
+          .col    = info->col  - geom.left,
+        };
+
+        _handle_mouse(root->drag_source_window, &draginfo);
+      }
+
+      root->mouse_dragging = false;
+    }
+
+    TickitWindow *handled = _handle_mouse(win, info);
+
+    if(info->type == TICKIT_MOUSEEV_DRAG &&
+       root->drag_source_window &&
+       (!handled || handled != root->drag_source_window)) {
+      TickitRect geom = tickit_window_get_abs_geometry(root->drag_source_window);
+      TickitMouseEventInfo draginfo = {
+        .type   = TICKIT_MOUSEEV_DRAG_OUTSIDE,
+        .button = info->button,
+        .line   = info->line - geom.top,
+        .col    = info->col  - geom.left,
+      };
+
+      _handle_mouse(root->drag_source_window, &draginfo);
+    }
   }
 
   return 1;
@@ -180,6 +243,8 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
 
   root->event_id = tickit_term_bind_event(term, TICKIT_EV_RESIZE|TICKIT_EV_KEY|TICKIT_EV_MOUSE,
       &on_term, root);
+
+  root->mouse_dragging = false;
 
   tickit_window_expose(ROOT_AS_WINDOW(root), NULL);
 
