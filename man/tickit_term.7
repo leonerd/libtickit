@@ -54,9 +54,21 @@ A key has been pressed on the keyboard. \fIinfo\fP will point to a structure def
 .BI "} " TickitKeyEventInfo ;
 .fi
 .IP
-\fItype\fP takes the value \fBTICKIT_KEYEV_KEY\fP for symbolic or function keys, or \fBTICKIT_KEYEV_TEXT\fP for regular Unicode characters. \fIstr\fP will contain the name of the special key, including any applied modifiers, or a
+\fItype\fP is an enumeration that gives the specific type of key event.
+.RS
+.TP
+.B TICKIT_KEYEV_KEY
+a cursor control, arrow key, or function key. i.e. any of the keys that don't directly produce text.
+.TP
+.B TICKIT_KEYEV_TEXT
+regular Unicode characters.
+.RE
+.IP
+\fIstr\fP will contain the name of the special key, including any applied modifiers, or a
 .SM UTF-8
-string of the Unicode character. \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
+string of the Unicode character.
+.IP
+\fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
 .IP
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
@@ -74,7 +86,27 @@ A mouse button has been pressed or released, the mouse cursor moved while draggi
 .BI "} " TickitMouseEventInfo ;
 .fi
 .IP
-\fItype\fP takes one of the values \fBTICKIT_MOUSEEV_PRESS\fP, \fBTICKIT_MOUSEEV_DRAG\fP, \fBTICKIT_MOUSEEV_RELEASE\fP or \fBTICKIT_MOUSEEV_WHEEL\fP. \fIbutton\fP gives the button index for button events, or one of \fBTICKIT_MOUSEWHEEL_UP\fP or \fBTICKIT_MOUSEWHEEL_DOWN\fP for wheel events. \fIline\fP and \fIcol\fP give the position of the mouse cursor for this event. \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
+\fItype\fP is an enumeration that gives the specific type of mouse event.
+.RS
+.TP
+.B TICKIT_MOUSEEV_PRESS
+A mouse button has been pressed.
+.TP
+.B TICKIT_MOUSEEV_DRAG
+The mouse has been moved while a button is being held down.
+.TP 
+.B TICKIT_MOUSEEV_RELEASE
+A mouse button has been released.
+.TP
+.B TICKIT_MOUSEEV_WHEEL
+The wheel has been rolled.
+.RE
+.IP
+\fIbutton\fP gives the button index for button events, or one of \fBTICKIT_MOUSEWHEEL_UP\fP or \fBTICKIT_MOUSEWHEEL_DOWN\fP for wheel events.
+.IP
+\fIline\fP and \fIcol\fP give the position of the mouse cursor for this event.
+.IP
+\fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
 .IP
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
