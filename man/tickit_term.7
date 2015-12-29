@@ -63,13 +63,13 @@ a cursor control, arrow key, or function key. i.e. any of the keys that don't di
 .B TICKIT_KEYEV_TEXT
 regular Unicode characters.
 .RE
-.IP
+.sp
 \fIstr\fP will contain the name of the special key, including any applied modifiers, or a
 .SM UTF-8
 string of the Unicode character.
-.IP
+.sp
 \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
-.IP
+.sp
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
 .TP
@@ -101,13 +101,13 @@ A mouse button has been released.
 .B TICKIT_MOUSEEV_WHEEL
 The wheel has been rolled.
 .RE
-.IP
+.sp
 \fIbutton\fP gives the button index for button events, or one of \fBTICKIT_MOUSEWHEEL_UP\fP or \fBTICKIT_MOUSEWHEEL_DOWN\fP for wheel events.
-.IP
+.sp
 \fIline\fP and \fIcol\fP give the position of the mouse cursor for this event.
-.IP
+.sp
 \fImod\fP will contain a bitmask of \fBTICKIT_MOD_SHIFT\fP, \fBTICKIT_MOD_ALT\fP and \fBTICKIT_MOD_CTRL\fP.
-.IP
+.sp
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
 .SH "SEE ALSO"

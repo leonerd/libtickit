@@ -40,9 +40,9 @@ A key has been pressed on the keyboard while this window has input focus (or is 
 .TP
 .B TICKIT_EV_MOUSE
 A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled while the cursor is within the bounds of this window (or the window is set to steal input), or certain kinds of mouse dragging behaviour have happened.
-.IP
+.sp
 \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_MOUSE\fP event described in \fBtickit_term\fP(7), except that the position given by the \fIline\fP and \fIcol\fP fields will be relative to the window, rather than the terminal as a whole.
-.IP
+.sp
 In addition to the basic mouse events found at the terminal layer, there are a few additional kinds of events that occur during mouse dragging. These give information about mouse drag motions within a window or between different windows.
 .RS
 .TP
