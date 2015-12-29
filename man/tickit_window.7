@@ -2,11 +2,11 @@
 .SH NAME
 TickitWindow \- a window for drawing operations and input
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "typedef struct " TickitWindow ;
-.fi
+.EE
 .sp
 .SH DESCRIPTION
 A \fBTickitWindow\fP instance represents a rectangular region of the screen. Windows are constructed as sub-divisions of existing windows, ultimately coming from a special "root window" is that represents the entire area of the terminal. Each window allows drawing to its region of the screen by responding to an event that signifies damage to that area that needs to be repainted, and has other events that represent user input.
@@ -62,36 +62,36 @@ A dragging motion has stopped by the mouse button being released. This event is 
 .B TICKIT_EV_GEOMCHANGE
 At least one of the fields of the window geometry have been changed, meaning it now occupies a different area of the screen. \fIinfo\fP will point to a structure defined as:
 .sp
-.nf
+.EX
 .B  typedef struct {
 .BI "    TickitRect " rect ;
 .BI "    TickitRect " oldrect ;
 .BI "} " TickitGeomchangeEventInfo ;
-.fi
+.EE
 .IP
 \fIrect\fP gives the new geometry of the window relative to its parent, and \fIoldrect\fP gives the previous geometry.
 .TP
 .B TICKIT_EV_EXPOSE
 An area of the window needs to be re-rendered because it has now been freshly exposed; either because of stacking or visibilty changes of this or sibling windows, a cascaded expose event on its parent, or due to a call to \fBtickit_window_expose\fP(). \fIinfo\fP will point to a structure defined as:
 .sp
-.nf
+.EX
 .B  typedef struct {
 .BI "    TickitRect " rect ;
 .BI "    TickitRenderBuffer *" rb ;
 .BI "} " TickitExposeEventInfo ;
-.fi
+.EE
 .IP
 \fIrect\fP gives the region of the window that needs to be redrawn. This will always be inside the window's bounds. If multiple pending regions need to be exposed, they are output in non-overlapping segments. The handling function or functions should then use the \fBTickitRenderBuffer\fP instance given by the \fIrb\fP field to draw the required contents of the window to. This instance will already be set up with the appropriate drawing pen, clipping rectangle and hole regions to account for the window hierarchy.
 .TP
 .B TICKIT_EV_FOCUS
 This window has either gained or lost the input focus, or a child of it has an this window is set to also notify on that case by using \fBtickit_window_set_focus_child_notify\fP(). \fIinfo\fP will point to a structure defined as:
 .sp
-.nf
+.EX
 .B  typedef struct {
 .BI "    TickitFocusEventType " type ;
 .BI "    TickitWindow *" win ;
 .BI "} " TickitFocusEventInfo ;
-.fi
+.EE
 .IP
 \fItype\fP takes onw of the values \fBTICKIT_FOCUSEV_IN\fP or \fBTICKIT_FOCUSEV_OUT\fP. \fIwin\fP will normally be the window that is invoking the event, except for the case of notifications about child windows, where it will indicate which child has changed focus. When a focus change happens, the window losing focus receives its \fBTICKIT_FOCUSEV_OUT\fP event before the window gaining it receives its \fBTICKIT_FOCUSEV_IN\fP.
 .SH "SEE ALSO"

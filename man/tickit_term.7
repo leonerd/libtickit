@@ -2,11 +2,11 @@
 .SH NAME
 TickitTerm \- abstraction of an interactive terminal
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "typedef struct " TickitTerm ;
-.fi
+.EE
 .sp
 .SH DESCRIPTION
 A \fBTickitTerm\fP instance represents an interactive user terminal. It provides functions to draw content to the terminal, and to accept input and other events from it. It supports a variety of modes of operation; allowing both synchronous and asynchronous filehandle IO, and working abstractly via byte buffers.
@@ -36,23 +36,23 @@ The event types recognised are:
 .B TICKIT_EV_RESIZE
 The terminal has been resized. \fIinfo\fP will point to a structure defined as:
 .sp
-.nf
+.EX
 .B  typedef struct {
 .BI "    int " lines ;
 .BI "    int " cols ;
 .BI "} " TickitResizeEventInfo ;
-.fi
+.EE
 .TP
 .B TICKIT_EV_KEY
 A key has been pressed on the keyboard. \fIinfo\fP will point to a structure defined as:
 .sp
-.nf
+.EX
 .B  typedef struct {
 .BI "    TickitKeyEventType " type ;
 .BI "    int " mod ;
 .BI "    const char *" str ;
 .BI "} " TickitKeyEventInfo ;
-.fi
+.EE
 .IP
 \fItype\fP is an enumeration that gives the specific type of key event.
 .RS
@@ -76,7 +76,7 @@ later handler functions from observing it.
 .B TICKIT_EV_MOUSE
 A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled. \fIinfo\fP will point to a structure defined as:
 .sp
-.nf
+.EX
 .B  typedef struct {
 .BI "    TickitMouseEventType " type ;
 .BI "    int " button ;
@@ -84,7 +84,7 @@ A mouse button has been pressed or released, the mouse cursor moved while draggi
 .BI "    int " line ;
 .BI "    int " col ;
 .BI "} " TickitMouseEventInfo ;
-.fi
+.EE
 .IP
 \fItype\fP is an enumeration that gives the specific type of mouse event.
 .RS

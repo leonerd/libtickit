@@ -2,7 +2,7 @@
 .SH NAME
 tickit_stringpos_limit_... \- set limit fields in string position counters
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "void tickit_stringpos_limit_bytes(TickitStringPos *" pos ", size_t " bytes );
@@ -16,7 +16,7 @@ tickit_stringpos_limit_... \- set limit fields in string position counters
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_GRAPHEMES(" grahpemes )
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_COLUMNS(" columns )
 .BI "#define INIT_TICKIT_STRINGPOS_LIMIT_NONE"
-.fi
+.EE
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
@@ -24,9 +24,9 @@ The first four of these functions each set one of the counter fields in \fIpos\f
 .PP
 Each is also available as a macro which can be used to initialise a new \fBTickitStringPos\fP variable.
 .PP
-.nf
+.EX
   TickitStringPos limit = INIT_TICKIT_STRINGPOS_LIMIT_BYTES(b);
-.fi
+.EE
 .SH "RETURN VALUE"
 The functions all return no value. The macros expand to a struct initialiser expression.
 .SH "SEE ALSO"

@@ -2,7 +2,7 @@
 .SH NAME
 tickit_term_set_output_func \- manage terminal output via a callback function
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "typedef void " TickitTermOutputFunc "(TickitTerm *" tt ", const char *" bytes ,
@@ -10,7 +10,7 @@ tickit_term_set_output_func \- manage terminal output via a callback function
 .sp
 .BI "void tickit_term_set_output_func(TickitTerm *" tt ,
 .BI "    TickitTermOutputFunc *" fn ", void *" user );
-.fi
+.EE
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION

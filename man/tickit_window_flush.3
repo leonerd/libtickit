@@ -2,11 +2,11 @@
 .SH NAME
 tickit_window_flush \- invoke pending events on the window hierarchy
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "void tickit_window_flush(TickitWindow *" win );
-.fi
+.EE
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
@@ -14,13 +14,13 @@ Link with \fI\-ltickit\fP.
 .PP
 An application working at the window level would typically use this function in conjunction with input even waiting, to drive the main loop of the core logic. Such a loop may look like:
 .sp
-.nf
+.EX
 .in
   while(1) {
     tickit_window_flush(rootwin);
     tickit_term_input_wait_msec(term, -1);
   }
-.fi
+.EE
 .PP
 There is no adverse effect of calling this function when here are no pending events on the window instance. An application that makes use of multiple root windows across multiple terminal instances in a multi-head setup can safely invoke it on all the root windows at once.
 .SH "RETURN VALUE"

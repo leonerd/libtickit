@@ -2,11 +2,11 @@
 .SH NAME
 TickitRenderBuffer \- store display content to be drawn to the terminal
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "typedef struct " TickitRenderBuffer ;
-.fi
+.EE
 .sp
 .SH DESCRIPTION
 A \fBTickitRenderBuffer\fP instance stores content waiting to be drawn to the terminal. It provides an efficient place to build the eventual display, by applying drawing operations to it that can alter and overwrite the pending content, before eventually flushing it directly to the terminal in an efficient transfer of state. The buffer stores plain text content along with rendering attributes, and also stores line drawing information, allowing line segments to be merged correctly and rendered using Unicode characters.

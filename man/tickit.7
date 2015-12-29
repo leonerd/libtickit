@@ -8,13 +8,13 @@ The application would likely also maintain a \fBTickitRenderBuffer\fP instance i
 .SH "COMMON TYPES"
 Some API functions take or return the following enum type, to represent a tri-state extended boolean concept of true, false, or some third condition typically indicating a "don't care" or "unknown" state; the exact semantics will vary between specific uses and should be documented specifically.
 .sp
-.nf
+.EX
 .B  typedef enum {
 .BR "  TICKIT_YES" " = 1,"
 .BR "  TICKIT_NO" " = 0,"
 .BR "  TICKIT_MAYBE" " = -1",
 .BI "} " TickitMaybeBool ;
-.fi
+.EE
 .SH "COMMON EVENTS"
 Every object instance that supports events supports the following type of event, in addition to the specific ones listed for that kind of object:
 .TP

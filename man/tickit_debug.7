@@ -2,9 +2,9 @@
 .SH NAME
 Tickit Debug \- debug logging support for \fIlibtickit\fP
 .SH SYNOPSIS
-.nf
+.EX
 $ TICKIT_DEBUG_FLAGS=W TICKIT_DEBUG_FILE=tickit.log a-tickit-program
-.fi
+.EE
 .SH DESCRIPTION
 The \fIlibtickit\fP library contains a debug logging system that other parts of the library use to report on interesting events and behaviours, that may help developers to observe internal details and assist in the development and debugging of applications that use the library.
 .PP
@@ -50,9 +50,9 @@ Gives a file descriptor number to write logging lines to.
 .PP
 One technique that may be useful to observe logging in real-time while the application runs is to arrange for the application to run in a new terminal but have it log debugging output to an existing one. This may be achieved using
 .sp
-.nf
+.EX
 $ TICKIT_DEBUG_FD=3 TICKIT_DEBUG_FLAGS=... $TERM my-tickit-app 3>&2
-.fi
+.EE
 .sp
 This requests that \fIlibtickit\fP log to file descriptor 3, which has been created by dup(2)ing the original shell's standard output. Debug logging will therefore be printed to the existing terminal where this command was executed, while the application itself draws its output to the newly-created one.
 .SH FUNCTIONS

@@ -2,7 +2,7 @@
 .SH NAME
 tickit_window_bind_event, tickit_window_unbind_event_id \- add or remove event handlers
 .SH SYNOPSIS
-.nf
+.EX
 .B #include <tickit.h>
 .sp
 .BI "typedef void " TickitWindowEventFn "(TickitWindow *" win ", TickitEventType " ev ,
@@ -11,7 +11,7 @@ tickit_window_bind_event, tickit_window_unbind_event_id \- add or remove event h
 .BI "int tickit_window_bind_event(TickitWindow *" win ", TickitEventType " ev ,
 .BI "    TickitWindowEventFn *" fn ", void *" user );
 .BI "void tickit_window_unbind_event_id(TickitWindow *" win ", int " id );
-.fi
+.EE
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
