@@ -46,9 +46,6 @@ void tickit_mockterm_clearlog(TickitMockTerm *mt);
 
 void tickit_mockterm_get_position(TickitMockTerm *mt, int *line, int *col);
 
-void tickit_mockterm_press_key(TickitMockTerm *mt, int type, const char *str, int mod);
-void tickit_mockterm_press_mouse(TickitMockTerm *mt, int type, int button, int line, int col, int mod);
-
 #endif
 
 #ifdef __cplusplus

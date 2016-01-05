@@ -128,10 +128,24 @@ failed:
 
 void press_key(int type, char *str, int mod)
 {
-  tickit_mockterm_press_key(mt, type, str, mod);
+  TickitKeyEventInfo info = {
+    .type = type,
+    .mod = mod,
+    .str = str,
+  };
+
+  tickit_term_emit_key((TickitTerm *)mt, &info);
 }
 
 void press_mouse(int type, int button, int line, int col, int mod)
 {
-  tickit_mockterm_press_mouse(mt, type, button, line, col, mod);
+  TickitMouseEventInfo info = {
+    .type = type,
+    .button = button,
+    .line = line,
+    .col = col,
+    .mod = mod,
+  };
+
+  tickit_term_emit_mouse((TickitTerm *)mt, &info);
 }
