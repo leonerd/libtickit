@@ -367,6 +367,9 @@ bool tickit_term_getctl_int(TickitTerm *tt, TickitTermCtl ctl, int *value);
 bool tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value);
 bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value);
 
+void tickit_term_emit_key(TickitTerm *tt, TickitKeyEventInfo *args);
+void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *args);
+
 /* String handling utilities */
 
 int tickit_string_seqlen(long codepoint);

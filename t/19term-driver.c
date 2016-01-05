@@ -82,20 +82,5 @@ int main(int argc, char *argv[])
 
   is_str(buffer, "PRINT(Hello)", "buffer after print");
 
-  {
-    int keytype = -1;
-    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, &on_key, &keytype);
-
-    TickitKeyEventInfo info = {
-      .type = TICKIT_KEYEV_TEXT,
-      .mod = 0,
-      .str = "A",
-    };
-
-    tickit_termdrv_send_key(ttd, &info);
-
-    is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after got_key");
-  }
-
   return exit_status();
 }

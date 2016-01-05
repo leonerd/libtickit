@@ -538,15 +538,14 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
   }
 }
 
-/* Driver API */
-void tickit_termdrv_send_key(TickitTermDriver *ttd, TickitKeyEventInfo *info)
+void tickit_term_emit_key(TickitTerm *tt, TickitKeyEventInfo *info)
 {
-  run_events_whilefalse(ttd->tt, TICKIT_EV_KEY, info);
+  run_events_whilefalse(tt, TICKIT_EV_KEY, info);
 }
 
-void tickit_termdrv_send_mouse(TickitTermDriver *ttd, TickitMouseEventInfo *info)
+void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info)
 {
-  run_events_whilefalse(ttd->tt, TICKIT_EV_MOUSE, info);
+  run_events_whilefalse(tt, TICKIT_EV_MOUSE, info);
 }
 
 static void get_keys(TickitTerm *tt, TermKey *tk)

@@ -58,6 +58,20 @@ int main(int argc, char *argv[])
   tickit_term_bind_event(tt, TICKIT_EV_KEY,   on_key,   NULL);
   tickit_term_bind_event(tt, TICKIT_EV_MOUSE, on_mouse, NULL);
 
+  {
+    TickitKeyEventInfo info = {
+      .type = TICKIT_KEYEV_TEXT,
+      .mod  = 0,
+      .str  = " ",
+    };
+
+    tickit_term_emit_key(tt, &info);
+
+    is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after emit_key");
+    is_str(keystr,  " ",               "keystr after emit_key");
+    is_int(keymod,  0,                 "keymod after emit_key");
+  }
+
   tickit_term_input_push_bytes(tt, "A", 1);
 
   is_int(keytype, TICKIT_KEYEV_TEXT, "keytype after push_bytes A");
@@ -88,6 +102,23 @@ int main(int argc, char *argv[])
   is_int(keymod,  TICKIT_MOD_CTRL,  "keymod after push_bytes C-a");
 
   is_int(tickit_term_input_check_timeout_msec(tt), -1, "term has no timeout after Up");
+
+  {
+    TickitMouseEventInfo info = {
+      .type   = TICKIT_MOUSEEV_PRESS,
+      .button = 1,
+      .line   = 2,
+      .col    = 3,
+      .mod    = 0,
+    };
+
+    tickit_term_emit_mouse(tt, &info);
+
+    is_int(mousetype,   TICKIT_MOUSEEV_PRESS, "mousetype after emit_mouse");
+    is_int(mousebutton, 1,                    "mousebutton after emit_mouse");
+    is_int(mouseline,   2,                    "mouseline after emit_mouse");
+    is_int(mousecol,    3,                    "mousecol after emit_mouse");
+  }
 
   tickit_term_input_push_bytes(tt, "\e[M !!", 6);
 

@@ -606,7 +606,7 @@ void tickit_mockterm_press_key(TickitMockTerm *mt, int type, const char *str, in
     .str = str,
   };
 
-  tickit_termdrv_send_key(tickit_term_get_driver((TickitTerm *)mt), &info);
+  tickit_term_emit_key((TickitTerm *)mt, &info);
 }
 
 void tickit_mockterm_press_mouse(TickitMockTerm *mt, int type, int button, int line, int col, int mod)
@@ -619,5 +619,5 @@ void tickit_mockterm_press_mouse(TickitMockTerm *mt, int type, int button, int l
     .mod = mod,
   };
 
-  tickit_termdrv_send_mouse(tickit_term_get_driver((TickitTerm *)mt), &info);
+  tickit_term_emit_mouse((TickitTerm *)mt, &info);
 }
