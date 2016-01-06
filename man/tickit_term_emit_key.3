@@ -1,0 +1,21 @@
+.TH TICKIT_TERM_EMIT_KEY 3
+.SH NAME
+tickit_term_emit_key, tickit_term_emit_mouse \- emit a fake key or mouse event
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_emit_key(TickitTerm *" tt ", TickitKeyEventInfo *" info );
+.BI "void tickit_term_emit_mouse(TickitTerm *" tt ", TickitMouseEventInfo *" info );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_emit_key\fP() invokes the event handler chain on the terminal instance, as if a key event had been received from the controlling terminal.\fBtickit_term_emit_mouse\fP() invokes the event handler chain on the terminal instance, as if a mouse event had been received from the controlling terminal.
+.PP
+In each case, the event handler chain runs with the usual semantics; each installed handler with the appropriate bit set in its event type mask will be invoked until one returns a true value. Any remaining handlers after this will not get to see the event.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)

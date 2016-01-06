@@ -31,6 +31,8 @@ Input via a filehandle can be received either synchronously by calling \fBtickit
 .SH EVENTS
 A terminal instance stores a set of event handlers. Each event handler consists of a bitmask of one or more event types it is interested in, a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_term_bind_event\fP(3) and removed using \fBtickit_term_unbind_event_id\fP(3).
 .PP
+Fake events can be artificially injected into the event handler chain, as if they had been received from the controlling terminal, by \fBtickit_term_emit_key\fP(3) and \fBtickit_term_emit_mouse\fP(3). These may be useful for testing, event capture-and-replay, or other specialised cases.
+.PP
 The event types recognised are:
 .TP
 .B TICKIT_EV_RESIZE
