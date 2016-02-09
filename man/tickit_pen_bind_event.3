@@ -9,6 +9,7 @@ tickit_pen_bind_event, tickit_pen_unbind_event_id \- add or remove event handler
 .BI "    void *" args ", void *" user );
 .sp
 .BI "int tickit_pen_bind_event(TickitPen *" tt ", TickitEventType " ev ,
+.BI "    TickitBindFlags " flags ,
 .BI "    TickitPenEventFn *" fn ", void *" user );
 .BI "void tickit_pen_unbind_event_id(TickitPen *" tt ", int " id );
 .EE

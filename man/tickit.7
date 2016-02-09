@@ -6,6 +6,17 @@ tickit \- Terminal Interface Construction KIT
 .PP
 The application would likely also maintain a \fBTickitRenderBuffer\fP instance into which to draw updates to the screen, before flushing them to the terminal in reaction to user input or other events.
 .SH "COMMON TYPES"
+The \fIflags\fP argument to the various \fB_bind_event\fP() functions should be zero, or a bitmask of the following constants.
+.sp
+.EX
+.B  typedef enum {
+.BR  "  TICKIT_BIND_FIRST" ,
+.BI "} " TickitBindFlags ;
+.EE
+.sp
+.PP
+\fBTICKIT_BIND_FIRST\fP indicates that this handler should be inserted at the start of the list, rather than the default position at the end.
+.PP
 Some API functions take or return the following enum type, to represent a tri-state extended boolean concept of true, false, or some third condition typically indicating a "don't care" or "unknown" state; the exact semantics will vary between specific uses and should be documented specifically.
 .sp
 .EX

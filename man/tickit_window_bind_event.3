@@ -9,6 +9,7 @@ tickit_window_bind_event, tickit_window_unbind_event_id \- add or remove event h
 .BI "    void *" info ", void *" user );
 .sp
 .BI "int tickit_window_bind_event(TickitWindow *" win ", TickitEventType " ev ,
+.BI "    TickitBindFlags " flags ,
 .BI "    TickitWindowEventFn *" fn ", void *" user );
 .BI "void tickit_window_unbind_event_id(TickitWindow *" win ", int " id );
 .EE

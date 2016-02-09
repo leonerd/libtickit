@@ -9,6 +9,7 @@ tickit_term_bind_event, tickit_term_unbind_event_id \- add or remove event handl
 .BI "    void *" info ", void *" user );
 .sp
 .BI "int tickit_term_bind_event(TickitTerm *" tt ", TickitEventType " ev ,
+.BI "    TickitBindFlags " flags ,
 .BI "    TickitTermEventFn *" fn ", void *" user );
 .BI "void tickit_term_unbind_event_id(TickitTerm *" tt ", int " id );
 .EE

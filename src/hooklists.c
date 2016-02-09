@@ -34,22 +34,29 @@ int tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, T
 {
   int max_id = 0;
 
-  /* Find the end of a linked list, and find the highest ID in use while we're
-   * at it
-   */
-  struct TickitEventHook **newhook = hooklist;
-  for(; *newhook; newhook = &(*newhook)->next)
-    if((*newhook)->id > max_id)
-      max_id = (*newhook)->id;
+  struct TickitEventHook **newhookp = hooklist;
+  struct TickitEventHook *next = NULL;
 
-  *newhook = malloc(sizeof(struct TickitEventHook)); // TODO: malloc failure
+  if(flags & TICKIT_BIND_FIRST) {
+    next = *hooklist;
+    for(struct TickitEventHook *hook = *newhookp; hook; hook = hook->next)
+      if(hook->id > max_id)
+        max_id = hook->id;
+  }
+  else {
+    for(; *newhookp; newhookp = &(*newhookp)->next)
+      if((*newhookp)->id > max_id)
+        max_id = (*newhookp)->id;
+  }
 
-  (*newhook)->next = NULL;
-  (*newhook)->ev = ev;
-  (*newhook)->fn = fn;
-  (*newhook)->data = data;
+  *newhookp = malloc(sizeof(struct TickitEventHook)); // TODO: malloc failure
 
-  return (*newhook)->id = max_id + 1;
+  (*newhookp)->next = next;
+  (*newhookp)->ev = ev;
+  (*newhookp)->fn = fn;
+  (*newhookp)->data = data;
+
+  return (*newhookp)->id = max_id + 1;
 }
 
 void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *owner, int id)

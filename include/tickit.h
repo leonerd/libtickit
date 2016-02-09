@@ -35,7 +35,7 @@ typedef struct {
  */
 
 typedef enum {
-  TICKIT_BIND_DUMMY = 0, /* temporary flag */
+  TICKIT_BIND_FIRST = 1<<0,
 } TickitBindFlags;
 
 typedef enum {

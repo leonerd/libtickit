@@ -189,6 +189,28 @@ int main(int argc, char *argv[])
     tickit_term_unbind_event_id(tt, bind_id);
   }
 
+  {
+    char events[2];
+    uint8_t i = 0;
+
+    int on_key_push(TickitTerm *tt, TickitEventType ev, void *info, void *user)
+    {
+      events[i++] = *(char*)user;
+      return 0;
+    }
+
+    int bindA_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, 0,                 &on_key_push, "A");
+    int bindB_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, TICKIT_BIND_FIRST, &on_key_push, "B");
+
+    tickit_term_input_push_bytes(tt, "X", 1);
+
+    is_int(i, 2, "two events fired");
+    is_int(events[0], 'B', "TICKIT_BIND_FIRST event fired first");
+
+    tickit_term_unbind_event_id(tt, bindA_id);
+    tickit_term_unbind_event_id(tt, bindB_id);
+  }
+
   tickit_term_destroy(tt);
 
   return exit_status();
