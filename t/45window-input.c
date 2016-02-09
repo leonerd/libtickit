@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
   tickit_window_flush(root);
 
   struct LastEvent win_last = { .ret = 1 };
-  int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_input_capture, &win_last);
+  int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_input_capture, &win_last);
 
   // Key events
   {
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
 
     struct LastEvent subwin_last = { .ret = 1 };
-    int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_input_capture, &subwin_last);
+    int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_input_capture, &subwin_last);
 
     win_last.type = 0;
 
@@ -145,9 +145,9 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
 
     int bind_ids[] = {
-      tickit_window_bind_event(win,      TICKIT_EV_KEY, &on_input_push, "win"),
-      tickit_window_bind_event(subwin,   TICKIT_EV_KEY, &on_input_push, "subwin"),
-      tickit_window_bind_event(otherwin, TICKIT_EV_KEY, &on_input_push, "otherwin"),
+      tickit_window_bind_event(win,      TICKIT_EV_KEY, 0, &on_input_push, "win"),
+      tickit_window_bind_event(subwin,   TICKIT_EV_KEY, 0, &on_input_push, "subwin"),
+      tickit_window_bind_event(otherwin, TICKIT_EV_KEY, 0, &on_input_push, "otherwin"),
     };
 
     press_key(TICKIT_EV_KEY, "D", 0);
@@ -184,11 +184,11 @@ int main(int argc, char *argv[])
         return 0;
 
       childwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
-      tickit_window_bind_event(childwin, TICKIT_EV_MOUSE, &on_input_incr_int, &childmouse);
+      tickit_window_bind_event(childwin, TICKIT_EV_MOUSE, 0, &on_input_incr_int, &childmouse);
       return 0;
     }
 
-    int id = tickit_window_bind_event(win, TICKIT_EV_MOUSE, &win_on_mouse, NULL);
+    int id = tickit_window_bind_event(win, TICKIT_EV_MOUSE, 0, &win_on_mouse, NULL);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
 
@@ -216,11 +216,11 @@ int main(int argc, char *argv[])
         return 0;
 
       siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
-      tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, &on_input_incr_int, &siblingmouse);
+      tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, 0, &on_input_incr_int, &siblingmouse);
       return 0;
     }
 
-    int id = tickit_window_bind_event(win, TICKIT_EV_MOUSE, &win_on_mouse, NULL);
+    int id = tickit_window_bind_event(win, TICKIT_EV_MOUSE, 0, &win_on_mouse, NULL);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
 

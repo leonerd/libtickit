@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   TickitWindow *win = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
 
   int focused;
-  tickit_window_bind_event(win, TICKIT_EV_FOCUS, &on_focus, &focused);
+  tickit_window_bind_event(win, TICKIT_EV_FOCUS, 0, &on_focus, &focused);
 
   int value;
 
@@ -170,8 +170,8 @@ int main(int argc, char *argv[])
 
     int focusA = 0;
     int focusB = 0;
-    tickit_window_bind_event(winA, TICKIT_EV_FOCUS, &on_focus, &focusA);
-    tickit_window_bind_event(winB, TICKIT_EV_FOCUS, &on_focus, &focusB);
+    tickit_window_bind_event(winA, TICKIT_EV_FOCUS, 0, &on_focus, &focusA);
+    tickit_window_bind_event(winB, TICKIT_EV_FOCUS, 0, &on_focus, &focusB);
 
     tickit_window_take_focus(winA);
     tickit_window_flush(root);
@@ -222,8 +222,8 @@ int main(int argc, char *argv[])
   {
     TickitWindow *subwin = tickit_window_new(win, (TickitRect){1, 1, 2, 2}, 0);
 
-    int bind_id = tickit_window_bind_event(win, TICKIT_EV_FOCUS, &on_focus_push, NULL);
-    tickit_window_bind_event(subwin, TICKIT_EV_FOCUS, &on_focus_push, NULL);
+    int bind_id = tickit_window_bind_event(win, TICKIT_EV_FOCUS, 0, &on_focus_push, NULL);
+    tickit_window_bind_event(subwin, TICKIT_EV_FOCUS, 0, &on_focus_push, NULL);
 
     tickit_window_set_focus_child_notify(win, true);
     tickit_window_flush(root);

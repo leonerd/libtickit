@@ -29,7 +29,8 @@ int tickit_hooklist_run_event_whilefalse(struct TickitEventHook *hooks, void *ow
   return 0;
 }
 
-int tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, TickitEventType ev, TickitEventFn *fn, void *data)
+int tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, TickitEventType ev, TickitBindFlags flags,
+    TickitEventFn *fn, void *data)
 {
   int max_id = 0;
 

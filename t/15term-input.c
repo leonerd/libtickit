@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
 
   ok(tickit_term_get_utf8(tt), "get_utf8 true");
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY,   on_key,   NULL);
-  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, on_mouse, NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_KEY,   0, on_key,   NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, 0, on_mouse, NULL);
 
   {
     TickitKeyEventInfo info = {
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
   {
     int count = 0;
-    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, &on_key_incr, &count);
+    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, 0, &on_key_incr, &count);
 
     keytype = -1;
     on_key_return = 1;

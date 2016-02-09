@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   // Resize events
   {
     int geom_changed = 0;
-    tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, &on_geom_changed, &geom_changed);
+    tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, 0, &on_geom_changed, &geom_changed);
     is_int(geom_changed, 0, "geometry not yet changed");
 
     int nextrect = 0;
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
       rects[nextrect++] = info->rect;
       return 1;
     }
-    tickit_window_bind_event(root, TICKIT_EV_EXPOSE, &push_on_expose, NULL);
+    tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &push_on_expose, NULL);
 
     tickit_mockterm_resize(tt, 30, 100);
     tickit_window_flush(root);

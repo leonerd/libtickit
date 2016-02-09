@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
   is_int(tickit_term_get_input_fd(tt), fd[0], "tickit_term_get_input_fd");
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY, on_key, NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_KEY, 0, on_key, NULL);
 
   write(fd[1], "A", 1);
   tickit_term_input_readable(tt);

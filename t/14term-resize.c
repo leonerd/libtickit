@@ -41,14 +41,14 @@ int main(int argc, char *argv[])
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_size(tt, 25, 80);
 
-  int hookid = tickit_term_bind_event(tt, TICKIT_EV_RESIZE|TICKIT_EV_UNBIND, on_resize, NULL);
+  int hookid = tickit_term_bind_event(tt, TICKIT_EV_RESIZE|TICKIT_EV_UNBIND, 0, on_resize, NULL);
 
   tickit_term_set_size(tt, 30, 100);
 
   is_int(new_lines,  30, "new_lines from event handler after set_size");
   is_int(new_cols,  100, "new_cols from event handler after set_size");
 
-  tickit_term_bind_event(tt, TICKIT_EV_RESIZE, on_resize2, NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_RESIZE, 0, on_resize2, NULL);
 
   tickit_term_set_size(tt, 35, 110);
 

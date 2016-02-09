@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   // Geometry change event
   {
     int geom_changed = 0;
-    tickit_window_bind_event(win, TICKIT_EV_GEOMCHANGE, on_geom_changed, &geom_changed);
+    tickit_window_bind_event(win, TICKIT_EV_GEOMCHANGE, 0, on_geom_changed, &geom_changed);
     is_int(geom_changed, 0, "geometry not yet changed");
 
     tickit_window_resize(win, 4, 15);

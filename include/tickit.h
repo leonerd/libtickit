@@ -35,6 +35,10 @@ typedef struct {
  */
 
 typedef enum {
+  TICKIT_BIND_DUMMY = 0, /* temporary flag */
+} TickitBindFlags;
+
+typedef enum {
   TICKIT_CURSORSHAPE_BLOCK = 1,
   TICKIT_CURSORSHAPE_UNDER,
   TICKIT_CURSORSHAPE_LEFT_BAR,
@@ -257,7 +261,8 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite);
 
 typedef int TickitPenEventFn(TickitPen *tt, TickitEventType ev, void *info, void *user);
 
-int  tickit_pen_bind_event(TickitPen *tt, TickitEventType ev, TickitPenEventFn *fn, void *user);
+int  tickit_pen_bind_event(TickitPen *tt, TickitEventType ev, TickitBindFlags flags,
+    TickitPenEventFn *fn, void *user);
 void tickit_pen_unbind_event_id(TickitPen *tt, int id);
 
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
@@ -346,7 +351,8 @@ void tickit_term_refresh_size(TickitTerm *tt);
 
 void tickit_term_observe_sigwinch(TickitTerm *tt, bool observe);
 
-int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitTermEventFn *fn, void *user);
+int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitBindFlags flags,
+    TickitTermEventFn *fn, void *user);
 void tickit_term_unbind_event_id(TickitTerm *tt, int id);
 
 void tickit_term_print(TickitTerm *tt, const char *str);
@@ -510,7 +516,8 @@ TickitWindow *tickit_window_root(const TickitWindow *win);
 
 void tickit_window_destroy(TickitWindow *win);
 
-int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitWindowEventFn *fn, void *user);
+int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitBindFlags flags,
+    TickitWindowEventFn *fn, void *user);
 void tickit_window_unbind_event_id(TickitWindow *win, int id);
 
 void tickit_window_raise(TickitWindow *win);

@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 
   {
     int type = 0;
-    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, &on_event_get_type, &type);
+    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_event_get_type, &type);
 
     press_key(TICKIT_KEYEV_TEXT, "A", 0);
     is_int(type, TICKIT_KEYEV_TEXT, "type is TICKIT_KEYEV_TEXT after press_key()");
