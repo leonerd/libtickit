@@ -79,8 +79,8 @@ void tickit_hooklist_unbind_and_destroy(struct TickitEventHook *hooks, void *own
 {
   for(struct TickitEventHook *hook = hooks; hook;) {
     struct TickitEventHook *next = hook->next;
-    if(hook->ev & TICKIT_EV_UNBIND)
-      (*hook->fn)(owner, TICKIT_EV_UNBIND, NULL, hook->data);
+    if(hook->ev & (TICKIT_EV_UNBIND|TICKIT_EV_DESTROY))
+      (*hook->fn)(owner, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, NULL, hook->data);
     free(hook);
     hook = next;
   }

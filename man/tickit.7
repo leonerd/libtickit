@@ -29,8 +29,11 @@ Some API functions take or return the following enum type, to represent a tri-st
 .SH "COMMON EVENTS"
 Every object instance that supports events supports the following type of event, in addition to the specific ones listed for that kind of object:
 .TP
+.B TICKIT_EV_DESTROY
+Invoked when the object instance is being destroyed. This will be the last time the application can use the stored \fIdata\fP argument; it may perform any resource reclaiming operations that are required at this time. The \fIinfo\fP pointer will be \fBNULL\fP.
+.TP
 .B TICKIT_EV_UNBIND
-Invoked when the event handler is about to be removed, either because it was unbound individually, or because the object instance itself is being destroyed. This will be the last time the application can use the stored \fIdata\fP argument; it may perform any resource reclaiming operations that are required at this time. The \fIinfo\fP pointer will be \fBNULL\fP.
+Invoked when the event handler is about to be removed, either because it was unbound individually, or because the object instance itself is being destroyed. In the former case, this event handler is invoked individually; in the latter case the entire list is invoked as normal and the \fBTICKIT_EV_DESTROY\fP flag will also be set.
 .SH "SEE ALSO"
 .BR tickit_term (7),
 .BR tickit_pen (7),

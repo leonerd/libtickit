@@ -144,7 +144,8 @@ typedef enum {
   TICKIT_EV_EXPOSE     = 0x20,
   TICKIT_EV_FOCUS      = 0x40,
 
-  TICKIT_EV_UNBIND = 0x80000000, // event handler is being unbound
+  TICKIT_EV_DESTROY = 0x40000000, // object is being destroyed
+  TICKIT_EV_UNBIND  = 0x80000000, // event handler is being unbound
 } TickitEventType;
 
 /* TICKIT_EV_RESIZE */

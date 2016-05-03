@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   is_ptr(tickit_pen_ref(pen), pen, "tickit_pen_ref() returns same pen");
 
   int destroyed = 0;
-  tickit_pen_bind_event(pen, TICKIT_EV_UNBIND, 0, on_event_incr, &destroyed);
+  tickit_pen_bind_event(pen, TICKIT_EV_DESTROY, 0, on_event_incr, &destroyed);
 
   tickit_pen_unref(pen);
   ok(!destroyed, "pen not destroyed after first unref");
