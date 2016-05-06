@@ -47,7 +47,7 @@ struct TickitTerm {
   TermKey              *termkey;
   struct timeval        input_timeout_at; /* absolute time */
 
-  const char *termtype;
+  char *termtype;
   TickitMaybeBool is_utf8;
 
   char *outbuffer;
@@ -218,6 +218,9 @@ void tickit_term_free(TickitTerm *tt)
 
   if(tt->tmpbuffer)
     free(tt->tmpbuffer);
+
+  if(tt->termtype)
+    free(tt->termtype);
 
   free(tt);
 }
