@@ -82,5 +82,6 @@ int main(int argc, char *argv[])
 
   is_str(buffer, "PRINT(Hello)", "buffer after print");
 
+  tickit_term_destroy(tt);
   return exit_status();
 }

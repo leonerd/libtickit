@@ -135,6 +135,7 @@ int main(int argc, char *argv[])
   }
 
   tickit_renderbuffer_destroy(rb);
+  tickit_term_destroy(tt);
 
   return exit_status();
 }

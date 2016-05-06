@@ -106,6 +106,8 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer, "\e[39;49;4m", "setpen resets colours, enables under");
 
+  tickit_pen_unref(pen);
   tickit_term_destroy(tt);
+
   return exit_status();
 }

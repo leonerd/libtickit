@@ -238,5 +238,8 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
   }
 
+  tickit_window_destroy(root);
+  tickit_term_destroy(tt);
+
   return exit_status();
 }
