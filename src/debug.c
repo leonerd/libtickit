@@ -43,6 +43,7 @@ void tickit_debug_init(void)
     struct Flag *newflag = malloc(sizeof *newflag);
     newflag->name = malloc(endp - flags_str + 1);
     strncpy(newflag->name, flags_str, endp - flags_str);
+    newflag->name[endp - flags_str] = 0;
 
     newflag->next = enabled_flags;
     enabled_flags = newflag;

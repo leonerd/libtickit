@@ -1135,6 +1135,7 @@ static size_t get_span_text(TickitRenderBuffer *rb, RBCell *span, int offset, in
           if(len < bytes)
             return -1;
           strncpy(buffer, text + start.bytes, bytes);
+          buffer[bytes] = 0;
         }
         break;
       }
