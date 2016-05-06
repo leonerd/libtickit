@@ -567,7 +567,7 @@ static void _request_later_processing(TickitRootWindow *root)
 
 static bool _cell_visible(TickitWindow *win, int line, int col)
 {
-  TickitWindow *prev;
+  TickitWindow *prev = NULL;
   while(win) {
     if(line < 0 || line >= win->rect.lines ||
        col  < 0 || col  >= win->rect.cols)
