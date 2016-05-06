@@ -305,8 +305,12 @@ void tickit_window_destroy(TickitWindow *win)
   if(win->pen)
     tickit_pen_unref(win->pen);
 
-  for(TickitWindow *child = win->first_child; child; child = child->next)
+  for(TickitWindow *child = win->first_child; child; /**/) {
+    TickitWindow *next = child->next;
+
     tickit_window_destroy(child);
+    child = next;
+  }
 
   _purge_hierarchy_changes(win);
 
