@@ -5,7 +5,7 @@ tickit_window_bind_event, tickit_window_unbind_event_id \- add or remove event h
 .EX
 .B #include <tickit.h>
 .sp
-.BI "typedef void " TickitWindowEventFn "(TickitWindow *" win ", TickitEventType " ev ,
+.BI "typedef int " TickitWindowEventFn "(TickitWindow *" win ", TickitEventType " ev ,
 .BI "    void *" info ", void *" user );
 .sp
 .BI "int tickit_window_bind_event(TickitWindow *" win ", TickitEventType " ev ,

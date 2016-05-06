@@ -5,7 +5,7 @@ tickit_term_bind_event, tickit_term_unbind_event_id \- add or remove event handl
 .EX
 .B #include <tickit.h>
 .sp
-.BI "typedef void " TickitTermEventFn "(TickitTerm *" tt ", TickitEventType " ev ,
+.BI "typedef int " TickitTermEventFn "(TickitTerm *" tt ", TickitEventType " ev ,
 .BI "    void *" info ", void *" user );
 .sp
 .BI "int tickit_term_bind_event(TickitTerm *" tt ", TickitEventType " ev ,
