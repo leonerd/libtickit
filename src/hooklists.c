@@ -4,10 +4,10 @@
 
 struct TickitEventHook {
   struct TickitEventHook *next;
+  int                     id;
   TickitEventType         ev;
   TickitEventFn          *fn;
   void                   *data;
-  int                     id;
 };
 
 void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, void *info)
