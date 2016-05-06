@@ -195,9 +195,6 @@ TickitTerm *tickit_term_open_stdio(void)
 
 void tickit_term_free(TickitTerm *tt)
 {
-  tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
-  tickit_pen_unref(tt->pen);
-
   if(tt->observe_winch)
     tickit_term_observe_sigwinch(tt, false);
 
@@ -209,6 +206,9 @@ void tickit_term_free(TickitTerm *tt)
   }
 
   tickit_term_flush(tt);
+
+  tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
+  tickit_pen_unref(tt->pen);
 
   if(tt->termkey)
     termkey_destroy(tt->termkey);
