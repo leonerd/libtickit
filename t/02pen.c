@@ -6,6 +6,14 @@ static int on_event_incr(TickitPen *pen, TickitEventType ev, void *_info, void *
   return 1;
 }
 
+static int arr[2];
+static int next_arr = 0;
+
+static int on_event_push(TickitPen *pen, TickitEventType ev, void *_info, void *data) {
+  arr[next_arr++] = *(int *)data;
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   TickitPen *pen, *pen2;
@@ -117,14 +125,16 @@ int main(int argc, char *argv[])
 
   is_ptr(tickit_pen_ref(pen), pen, "tickit_pen_ref() returns same pen");
 
-  int destroyed = 0;
-  tickit_pen_bind_event(pen, TICKIT_EV_DESTROY, 0, on_event_incr, &destroyed);
+  tickit_pen_bind_event(pen, TICKIT_EV_DESTROY, 0, on_event_push, (int []){1});
+  tickit_pen_bind_event(pen, TICKIT_EV_DESTROY, 0, on_event_push, (int []){2});
 
   tickit_pen_unref(pen);
-  ok(!destroyed, "pen not destroyed after first unref");
+  ok(!next_arr, "pen not destroyed after first unref");
 
   tickit_pen_unref(pen);
-  ok(destroyed, "pen destroyed after second unref");
+  is_int(next_arr, 2, "pen destroyed after second unref");
+
+  is_int(arr[0]*10 + arr[1], 21, "TICKIT_EV_DESTROY runs in reverse order");
 
   tickit_pen_destroy(pen2);
 

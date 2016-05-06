@@ -77,7 +77,19 @@ void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *ow
 
 void tickit_hooklist_unbind_and_destroy(struct TickitEventHook *hooks, void *owner)
 {
-  for(struct TickitEventHook *hook = hooks; hook;) {
+  /* TICKIT_EV_DESTROY events need to run in reverse order. Since the hooklist
+   * is singly-linked it is easiest just to reverse it then iterate.
+   */
+  struct TickitEventHook *revhooks = NULL;
+  for(struct TickitEventHook *hook = hooks; hook; /**/) {
+    struct TickitEventHook *this = hook;
+    hook = hook->next;
+
+    this->next = revhooks;
+    revhooks = this;
+  }
+
+  for(struct TickitEventHook *hook = revhooks; hook;) {
     struct TickitEventHook *next = hook->next;
     if(hook->ev & (TICKIT_EV_UNBIND|TICKIT_EV_DESTROY))
       (*hook->fn)(owner, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, NULL, hook->data);
