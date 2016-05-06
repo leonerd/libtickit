@@ -61,17 +61,19 @@ int tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, T
 
 void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *owner, int id)
 {
-  struct TickitEventHook **link = hooklist;
-  for(struct TickitEventHook *hook = *hooklist; hook;) {
-    if(hook->id == id) {
-      *link = hook->next;
-      if(hook->ev & TICKIT_EV_UNBIND)
-        (*hook->fn)(owner, TICKIT_EV_UNBIND, NULL, hook->data);
-      free(hook);
-      hook = *link;
+  for(struct TickitEventHook **hookp = hooklist; *hookp; ) {
+    struct TickitEventHook *hook = *hookp;
+    if(hook->id != id) {
+      hookp = &(hook->next);
+      continue;
     }
-    else
-      hook = hook->next;
+
+    if(hook->ev & TICKIT_EV_UNBIND)
+      (*hook->fn)(owner, TICKIT_EV_UNBIND, NULL, hook->data);
+
+    *hookp = hook->next;
+    free(hook);
+    /* no hookp update */
   }
 }
 
