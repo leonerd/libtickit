@@ -4,6 +4,18 @@
 #include <string.h>
 #include <unistd.h>
 
+bool output_eof = false;
+
+void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
+{
+  char *buffer = user;
+
+  if(bytes)
+    strncat(buffer, bytes, len);
+  else
+    output_eof = true;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
@@ -75,9 +87,19 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer, "\e[11G", "buffer after tickit_term_goto col");
 
+  buffer[0] = 0;
+
+  tickit_term_set_output_func(tt, output, buffer);
+
+  tickit_term_print(tt, "Hello, world");
+
+  is_str(buffer, "Hello, world", "buffer after print using output func");
+
   tickit_term_destroy(tt);
 
   ok(1, "tickit_term_destroy");
+
+  ok(output_eof, "output func receives EOF indication after tickit_term_destroy");
 
   return exit_status();
 }

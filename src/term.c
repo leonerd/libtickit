@@ -207,6 +207,9 @@ void tickit_term_free(TickitTerm *tt)
 
   tickit_term_flush(tt);
 
+  if(tt->outfunc)
+    (*tt->outfunc)(tt, NULL, 0, tt->outfunc_user);
+
   tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
   tickit_pen_unref(tt->pen);
 
@@ -363,6 +366,9 @@ int tickit_term_get_output_fd(const TickitTerm *tt)
 
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user)
 {
+  if(tt->outfunc)
+    (*tt->outfunc)(tt, NULL, 0, tt->outfunc_user);
+
   tt->outfunc      = fn;
   tt->outfunc_user = user;
 
