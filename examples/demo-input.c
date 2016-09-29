@@ -149,15 +149,15 @@ int main(int argc, char *argv[])
       .top = 2, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
     }, 0);
 
-  tickit_window_bind_event(keywin, TICKIT_EV_EXPOSE, &render_key, NULL);
-  tickit_window_bind_event(root, TICKIT_EV_KEY, &event_key, NULL);
+  tickit_window_bind_event(keywin, TICKIT_EV_EXPOSE, 0, &render_key, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_KEY, 0, &event_key, NULL);
 
   mousewin = tickit_window_new(root, (TickitRect){
       .top = 8, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
     }, 0);
 
-  tickit_window_bind_event(mousewin, TICKIT_EV_EXPOSE, &render_mouse, NULL);
-  tickit_window_bind_event(root, TICKIT_EV_MOUSE, &event_mouse, NULL);
+  tickit_window_bind_event(mousewin, TICKIT_EV_EXPOSE, 0, &render_mouse, NULL);
+  tickit_window_bind_event(root, TICKIT_EV_MOUSE, 0, &event_mouse, NULL);
 
   tickit_window_take_focus(root);
   tickit_window_set_cursor_visible(root, false);

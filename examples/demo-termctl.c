@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_CLICK);
   tickit_term_clear(tt);
 
-  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, event, NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, 0, event, NULL);
 
   modes.vis = 1;
   modes.blink = 1;

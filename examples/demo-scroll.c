@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_CLICK);
   tickit_term_clear(tt);
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE|TICKIT_EV_RESIZE, event, NULL);
+  tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE|TICKIT_EV_RESIZE, 0, event, NULL);
 
   signal(SIGINT, sigint);
 
