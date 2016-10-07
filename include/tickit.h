@@ -231,7 +231,6 @@ typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *inf
 TickitPen *tickit_pen_new(void);
 TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...);
 TickitPen *tickit_pen_clone(const TickitPen *orig);
-void       tickit_pen_destroy(TickitPen *pen);
 
 TickitPen *tickit_pen_ref(TickitPen *pen);
 void       tickit_pen_unref(TickitPen *pen);

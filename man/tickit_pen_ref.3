@@ -13,11 +13,10 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_pen_ref\fP() increments the stored refcount of the given pen instance by one. It returns the pointer argument itself, so it is useful for chaining.
 .PP
-\fBtickit_pen_unref\fP() decrements the stored refcount of the given pen instance by one. If the refcount drops to zero, the instance is destroyed as if calling \fBtickit_pen_destroy\fP(3).
+\fBtickit_pen_unref\fP() decrements the stored refcount of the given pen instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it and unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate.
 .SH "RETURN VALUE"
 \fBtickit_pen_ref\fP() returns a pen instance pointer. \fBtickit_pen_unref\fP() returns no value.
 .SH "SEE ALSO"
 .BR tickit_pen_new (3),
-.BR tickit_pen_destroy (3),
 .BR tickit_pen (7),
 .BR tickit (7)

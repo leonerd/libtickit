@@ -99,7 +99,7 @@ TickitPen *tickit_pen_clone(const TickitPen *orig)
   return pen;
 }
 
-void tickit_pen_destroy(TickitPen *pen)
+static void tickit_pen_destroy(TickitPen *pen)
 {
   tickit_hooklist_unbind_and_destroy(pen->hooks, pen);
   free(pen);
