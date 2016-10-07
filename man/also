@@ -1,5 +1,5 @@
 tickit_term_new_for_termtype.3 = tickit_term_new.3
-tickit_term_destroy.3 = tickit_term_new.3
+tickit_term_unref.3 = tickit_term_ref.3
 tickit_term_unbind_event_id.3 = tickit_term_bind_event.3
 tickit_term_get_output_fd.3 = tickit_term_set_output_fd.3
 tickit_term_get_input_fd.3 = tickit_term_set_input_fd.3
@@ -18,7 +18,6 @@ tickit_term_await_started_tv.3 = tickit_term_await_started_msec.3
 tickit_term_emit_mouse.3 = tickit_term_emit_key.3
 
 tickit_pen_new_attrs.3 = tickit_pen_new.3
-tickit_pen_destroy.3 = tickit_pen_new.3
 tickit_pen_clone.3 = tickit_pen_new.3
 tickit_pen_unref.3 = tickit_pen_ref.3
 tickit_pen_unbind_event_id.3 = tickit_pen_bind_event.3
@@ -45,7 +44,7 @@ tickit_rect_right.3 = tickit_rect_bottom.3
 tickit_rectset_destroy.3 = tickit_rectset_new.3
 tickit_rectset_get_rects.3 = tickit_rectset_rects.3
 
-tickit_renderbuffer_destroy.3 = tickit_renderbuffer_new.3
+tickit_renderbuffer_unref.3 = tickit_renderbuffer_ref.3
 tickit_renderbuffer_mask.3 = tickit_renderbuffer_clip.3
 tickit_renderbuffer_restore.3 = tickit_renderbuffer_save.3
 tickit_renderbuffer_savepen.3 = tickit_renderbuffer_save.3
@@ -66,6 +65,7 @@ tickit_renderbuffer_clear.3 = tickit_renderbuffer_eraserect.3
 tickit_renderbuffer_char_at.3 = tickit_renderbuffer_char.3
 tickit_renderbuffer_vline_at.3 = tickit_renderbuffer_hline_at.3
 
+tickit_window_unref.3 = tickit_window_ref.3
 tickit_window_root.3 = tickit_window_parent.3
 tickit_window_unbind_event_id.3 = tickit_window_bind_event.3
 tickit_window_raise_to_front.3 = tickit_window_raise.3
