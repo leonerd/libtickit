@@ -30,6 +30,8 @@ This flag is not useful when combined with \fBTICKIT_WINDOW_LOWEST\fP, as the in
 .TP
 .B TICKIT_WINDOW_POPUP
 A convenient shortcut to specifying both \fBTICKIT_WINDOW_ROOT_PARENT\fP and \fBTICKIT_WINDOW_STEAL_INPUT\fP flags. This is useful for implementing popup dialog windows, menus, and other such UI behaviours.
+.PP
+The reference count of a newly-constructed window instance will be one. This can be incremented or decremented using \fBtickit_window_ref\fP(3) and \fBtickit_window_unref\fP(3). When its reference count reaches zero it is destroyed.
 .SH "RETURN VALUE"
 If successful, \fBtickit_window_new\fP() returns a pointer to the new instance.
 .SH "SEE ALSO"

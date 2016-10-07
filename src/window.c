@@ -36,6 +36,7 @@ struct TickitWindow {
   bool steal_input;
   bool focus_child_notify;
 
+  int refcount;
   struct TickitEventHook *hooks;
 };
 
@@ -215,6 +216,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->steal_input = false;
   win->focus_child_notify = false;
 
+  win->refcount = 1;
   win->hooks = NULL;
 }
 
@@ -328,6 +330,19 @@ void tickit_window_destroy(TickitWindow *win)
   }
 
   free(win);
+}
+
+TickitWindow *tickit_window_ref(TickitWindow *win)
+{
+  win->refcount++;
+  return win;
+}
+
+void tickit_window_unref(TickitWindow *win)
+{
+  win->refcount--;
+  if(!win->refcount)
+    tickit_window_destroy(win);
 }
 
 void tickit_window_raise(TickitWindow *win)

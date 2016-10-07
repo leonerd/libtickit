@@ -516,6 +516,9 @@ TickitWindow *tickit_window_root(const TickitWindow *win);
 
 void tickit_window_destroy(TickitWindow *win);
 
+TickitWindow *tickit_window_ref(TickitWindow *win);
+void          tickit_window_unref(TickitWindow *win);
+
 int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitBindFlags flags,
     TickitWindowEventFn *fn, void *user);
 void tickit_window_unbind_event_id(TickitWindow *win, int id);
