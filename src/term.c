@@ -106,8 +106,6 @@ TickitTerm *tickit_term_new(void)
   return tickit_term_new_for_termtype(termtype);
 }
 
-void tickit_term_free(TickitTerm *tt);
-
 TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 {
   for(int i = 0; driver_probes[i]; i++) {
@@ -193,7 +191,7 @@ TickitTerm *tickit_term_open_stdio(void)
   return tt;
 }
 
-void tickit_term_free(TickitTerm *tt)
+void tickit_term_destroy(TickitTerm *tt)
 {
   if(tt->observe_winch)
     tickit_term_observe_sigwinch(tt, false);
@@ -226,11 +224,6 @@ void tickit_term_free(TickitTerm *tt)
     free(tt->termtype);
 
   free(tt);
-}
-
-void tickit_term_destroy(TickitTerm *tt)
-{
-  tickit_term_free(tt);
 }
 
 const char *tickit_term_get_termtype(TickitTerm *tt)
