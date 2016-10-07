@@ -19,7 +19,7 @@ Each window tracks whether a single child window has the "input focus"; this is 
 .PP
 Newly-exposed areas of windows are tracked by the root window, ready to be rendered by expose events. The root window itself will expose new areas caused by terminal resizes, and the entire root window is entirely exposed initially, to allow the application to run its initial rendering on startup. Each window stores a \fBTickitPen\fP instance that can be used to apply a default style to any rendering operations that take place within it or its children.
 .SH FUNCTIONS
-A new top-level \fBTickitWindow\fP instance to represent the entire terminal is created using \fBtickit_window_new_root\fP(3), further sub-divided into regions using \fBtickit_window_new\fP(3). A window instance stores a reference count to make it easier for applications ot manage the lifetime of windows. A new window starts with a count of one, and it can be adjusted using \fBtickit_window_ref\fP(3) and \fBtickit_window_unref\fP(3). When it reaches zero it is destroyed.
+A new top-level \fBTickitWindow\fP instance to represent the entire terminal is created using \fBtickit_window_new_root\fP(3), further sub-divided into regions using \fBtickit_window_new\fP(3). A window instance stores a reference count to make it easier for applications ot manage the lifetime of windows. A new window starts with a count of one, and it can be adjusted using \fBtickit_window_ref\fP(3) and \fBtickit_window_unref\fP(3). When the count reaches zero the instance is destroyed.
 .PP
 The ancestry of a window can be queried using \fBtickit_window_parent\fP(3) and \fBtickit_window_root\fP(3).
 .PP
