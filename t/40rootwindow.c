@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     is_rect(rects+1, "0,25..100,30", "exposed rects[1]");
   }
 
-  tickit_window_destroy(root);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();

@@ -167,11 +167,11 @@ int main(int argc, char *argv[])
     is_str(ids[0], "win",      "ids[0] for E");
     is_str(ids[1], "otherwin", "ids[1] for E");
 
-    tickit_window_destroy(otherwin);
+    tickit_window_unref(otherwin);
     tickit_window_flush(root);
   }
 
-  tickit_window_destroy(subwin);
+  tickit_window_unref(subwin);
 
   // Windows created in input events handlers don't receive events
   //   child windows
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
     is_int(childmouse, 1, "child window has now received an event after flush");
 
     tickit_window_unbind_event_id(win, id);
-    tickit_window_destroy(childwin);
+    tickit_window_unref(childwin);
     tickit_window_flush(root);
   }
 
@@ -234,11 +234,11 @@ int main(int argc, char *argv[])
     is_int(siblingmouse, 1, "sibling window has now received an event after flush");
 
     tickit_window_unbind_event_id(win, id);
-    tickit_window_destroy(siblingwin);
+    tickit_window_unref(siblingwin);
     tickit_window_flush(root);
   }
 
-  tickit_window_destroy(root);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();

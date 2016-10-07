@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     ok(!tickit_window_scroll(win, 1, 0), "window does not support scrolling");
     drain_termlog();
 
-    tickit_window_destroy(win);
+    tickit_window_unref(win);
     tickit_window_flush(root);
   }
 
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
     is_int(next_rect, 1, "pushed 1 exposed rect");
     is_rect(exposed_rects+0, "76,0+4,10", "exposed_rects[0]");
 
-    tickit_window_destroy(child);
+    tickit_window_unref(child);
     tickit_window_flush(root);
   }
 
@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
     is_int(next_rect, 1, "pushed 1 exposed rect");
     is_rect(exposed_rects+0, "0,0+80,2", "exposed_rects[0]");
 
-    tickit_window_destroy(child);
+    tickit_window_unref(child);
     tickit_window_flush(root);
   }
 
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
     is_int(next_rect, 1, "pushed 1 exposed rect");
     is_rect(exposed_rects+0, "0,0+80,2", "exposed_rects[0]");
 
-    tickit_window_destroy(sibling);
+    tickit_window_unref(sibling);
     tickit_window_flush(root);
   }
 
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
         NULL);
   }
 
-  tickit_window_destroy(root);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();

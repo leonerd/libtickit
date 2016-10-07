@@ -119,11 +119,11 @@ int main(int argc, char *argv[])
     is_event_win(events+7, TICKIT_MOUSEEV_DRAG_STOP,    18, 20, winA, "event[7]");
     is_event_win(events+8, TICKIT_MOUSEEV_RELEASE,       3, 20, winB, "event[8]");
 
-    tickit_window_destroy(winA);
-    tickit_window_destroy(winB);
+    tickit_window_unref(winA);
+    tickit_window_unref(winB);
   }
 
-  tickit_window_destroy(root);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();

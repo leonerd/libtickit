@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
     is_int(mouseinfo.line,  -7, "mouse line after press_mouse on popupwin");
     is_int(mouseinfo.col,  -10, "mouse column after press_mouse on popupwin");
 
-    tickit_window_destroy(popupwin);
-    tickit_window_destroy(win);
+    tickit_window_unref(popupwin);
+    tickit_window_unref(win);
 
     tickit_window_unbind_event_id(root, bind_id);
   }
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
         GOTO(10,14), SETPEN(), PRINT("Byenow"),
         NULL);
 
-    tickit_window_destroy(subwin);
+    tickit_window_unref(subwin);
     tickit_window_unbind_event_id(rootfloat, bind_id);
   }
 
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+3, "0,22+80,3", "exposed_rects[3]");
   }
 
-  tickit_window_destroy(root);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();

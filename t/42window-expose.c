@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 
     next_rect = 0;
 
-    tickit_window_destroy(subwin);
+    tickit_window_unref(subwin);
     tickit_window_flush(root);
 
     is_int(next_rect, 1, "pushed 1 exposed rect");
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
         GOTO(3,24), SETPEN(), PRINT("Parent"),
         NULL);
 
-    tickit_window_destroy(sub);
+    tickit_window_unref(sub);
 
     tickit_window_flush(root);
 
@@ -316,11 +316,11 @@ int main(int argc, char *argv[])
         GOTO(3,25), SETPEN(), PRINT("XXXXX"),
         NULL);
 
-    tickit_window_destroy(sub);
+    tickit_window_unref(sub);
     tickit_window_unbind_event_id(win, bind_id);
   }
 
-  tickit_window_destroy(win);
+  tickit_window_unref(win);
 
   // Window ordering
   {
@@ -361,12 +361,12 @@ int main(int argc, char *argv[])
         GOTO(0,0), SETPEN(), PRINT("Window C"),
         NULL);
 
-    tickit_window_destroy(winA);
-    tickit_window_destroy(winB);
-    tickit_window_destroy(winC);
+    tickit_window_unref(winA);
+    tickit_window_unref(winB);
+    tickit_window_unref(winC);
   }
 
-  tickit_window_destroy(root);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();

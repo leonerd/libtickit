@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(value, "Cursor is visible again after lowering child window");
 
-    tickit_window_destroy(child);
+    tickit_window_unref(child);
     tickit_window_flush(root);
     drain_termlog();
   }
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     tickit_term_getctl_int(tt, TICKIT_TERMCTL_CURSORVIS, &value);
     ok(value, "Cursor is visible again after lowering sibling window");
 
-    tickit_window_destroy(sib);
+    tickit_window_unref(sib);
     tickit_window_flush(root);
     drain_termlog();
   }
@@ -213,8 +213,8 @@ int main(int argc, char *argv[])
     is_termlog("Termlog empty after winA take focus while hidden", NULL);
     ok(tickit_window_is_focused(winB), "winB still has focus after take focus while hidden");
 
-    tickit_window_destroy(winA);
-    tickit_window_destroy(winB);
+    tickit_window_unref(winA);
+    tickit_window_unref(winB);
     tickit_window_flush(root);
   }
 
@@ -254,12 +254,12 @@ int main(int argc, char *argv[])
     is_ptr(focus_events[1].win,      win,                "focus_events[1].win");
     is_ptr(focus_events[1].focuswin, subwin,             "focus_events[1].focuswin");
 
-    tickit_window_destroy(otherwin);
-    tickit_window_destroy(subwin);
+    tickit_window_unref(otherwin);
+    tickit_window_unref(subwin);
   }
 
-  tickit_window_destroy(win);
-  tickit_window_destroy(root);
+  tickit_window_unref(win);
+  tickit_window_unref(root);
   tickit_term_destroy(tt);
 
   return exit_status();
