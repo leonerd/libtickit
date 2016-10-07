@@ -72,6 +72,7 @@ struct TickitTerm {
   int colors;
   TickitPen *pen;
 
+  int refcount;
   struct TickitEventHook *hooks;
 };
 
@@ -155,6 +156,7 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   tt->next_sigwinch_observer = NULL;
   tt->window_changed = false;
 
+  tt->refcount = 1;
   tt->hooks = NULL;
 
   /* Initially empty because we don't necessarily know the initial state
@@ -224,6 +226,19 @@ void tickit_term_destroy(TickitTerm *tt)
     free(tt->termtype);
 
   free(tt);
+}
+
+TickitTerm *tickit_term_ref(TickitTerm *tt)
+{
+  tt->refcount++;
+  return tt;
+}
+
+void tickit_term_unref(TickitTerm *tt)
+{
+  tt->refcount--;
+  if(!tt->refcount)
+    tickit_term_destroy(tt);
 }
 
 const char *tickit_term_get_termtype(TickitTerm *tt)

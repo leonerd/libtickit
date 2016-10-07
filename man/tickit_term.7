@@ -11,7 +11,9 @@ TickitTerm \- abstraction of an interactive terminal
 .SH DESCRIPTION
 A \fBTickitTerm\fP instance represents an interactive user terminal. It provides functions to draw content to the terminal, and to accept input and other events from it. It supports a variety of modes of operation; allowing both synchronous and asynchronous filehandle IO, and working abstractly via byte buffers.
 .SH FUNCTIONS
-A new \fBTickitTerm\fP instance is created using the \fBtickit_term_new\fP(3) or \fBtickit_term_new_for_termtype\fP(3) functions, and destroyed using \fBtickit_term_destroy\fP(3). The \fBtickit_term_open_stdio\fP(3) function offers a convenient shortcut to creating a new instance set up to represent the standard input and output streams of the process.
+A new \fBTickitTerm\fP instance is created using the \fBtickit_term_new\fP(3) or \fBtickit_term_new_for_termtype\fP(3) functions. A terminal instance stores a reference count to make it easier for applications to manage the lifetime of terminals. A new terminal starts with reference count of one, and it can be adjusted using \fBtickit_term_ref\fP(3) and \fBtickit_term_unref\fP(3). When it reaches zero it is destroyed.
+.PP
+The \fBtickit_term_open_stdio\fP(3) function offers a convenient shortcut to creating a new instance set up to represent the standard input and output streams of the process.
 .PP
 A terminal instance will need either an output function or an output filehandle set before it can send output. This can be performed by either \fBtickit_term_set_output_func\fP(3) or \fBtickit_term_set_output_fd\fP(3). An output buffer can be defined by \fBtickit_term_set_output_buffer\fP(3). If output is via a filehandle, then the size of that will be queried if it is a
 .SM TTY.

@@ -1,0 +1,22 @@
+.TH TICKIT_TERM_REF 3
+.SH NAME
+tickit_term_ref, tickit_term_unref \- adjust the refcount of a terminal
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitTerm *tickit_term_ref(TickitTerm *" tt );
+.BI "void tickit_term_unref(TickitTerm *" tt );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_ref\fP() increments the stored refcount of the given terminal instance by one. It returns the pointer argument itself, so it is useful for chaining.
+.PP
+\fBtickit_term_unref\fP() decrements the stored refcount of the given terminal instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it and unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate. It will not close any filehandles associated with the instance.
+.SH "RETURN VALUE"
+\fBtickit_term_ref\fP() returns a terminal instance pointer. \fBtickit_term_unref\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_terminal (7),
+.BR tickit (7)

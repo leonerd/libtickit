@@ -314,6 +314,9 @@ TickitTerm *tickit_term_new(void);
 TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_destroy(TickitTerm *tt);
 
+TickitTerm *tickit_term_ref(TickitTerm *tt);
+void        tickit_term_unref(TickitTerm *tt);
+
 TickitTerm *tickit_term_open_stdio(void);
 
 const char *tickit_term_get_termtype(TickitTerm *tt);
