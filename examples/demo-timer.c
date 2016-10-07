@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     tickit_window_expose(root, NULL);
   }
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return 0;
 }

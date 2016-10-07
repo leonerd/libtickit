@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     tickit_term_input_wait_msec(tt, -1);
   }
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return 0;
 }
