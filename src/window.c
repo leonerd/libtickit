@@ -231,7 +231,7 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
 
   init_window(ROOT_AS_WINDOW(root), NULL, (TickitRect) { .top = 0, .left = 0, .lines = lines, .cols = cols });
 
-  root->term = term;
+  root->term = tickit_term_ref(term);
   root->hierarchy_changes = NULL;
   root->needs_expose = false;
   root->needs_restore = false;
@@ -327,6 +327,8 @@ void tickit_window_destroy(TickitWindow *win)
     }
 
     tickit_term_unbind_event_id(root->term, root->event_id);
+
+    tickit_term_unref(root->term);
   }
 
   free(win);

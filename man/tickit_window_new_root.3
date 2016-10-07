@@ -10,7 +10,7 @@ tickit_window_new_root \- create a new toplevel root window
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_window_new_root\fP() creates a new toplevel \fBTickitWindow\fP instance to represent the drawing area on the given terminal instance. The terminal instance is stored by the window itself, and is used for flushing the \fBTickitRenderBuffer\fP to when expose events occur.
+\fBtickit_window_new_root\fP() creates a new toplevel \fBTickitWindow\fP instance to represent the drawing area on the given terminal instance. The terminal instance is stored by the window itself, and is used for flushing the \fBTickitRenderBuffer\fP to when expose events occur. The root window will increase the reference count of its backing terminal by one; this reference will be dropped when the window is destroyed.
 .PP
 The root window behaves similar to other windows within the application, with the following differences:
 .IP *
