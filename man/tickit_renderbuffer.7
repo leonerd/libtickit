@@ -39,7 +39,9 @@ When combined with translation, these two features allow possibly-overlapping re
 .SS "SAVE STACK"
 As a further assistance to applications wishing to divide the screen area into nested regions, a set of functions exist to store the current auxilliary state of the buffer (that is, all of the mutable attributes listed above, but without the actual pending content) and later restore that state to its original values.
 .SH "FUNCTIONS"
-A new \fBTickitRenderBuffer\fP instance is created using \fBtickit_renderbuffer_new\fP(3) and destroyed using \fBtickit_renderbuffer_destroy\fP(3). Its size is fixed after creation and can be queried using \fBtickit_renderbuffer_get_size\fP(3). Its contents can be entirely reset back to its original state using \fBtickit_renderbuffer_reset\fP(3).
+A new \fBTickitRenderBuffer\fP instance is created using \fBtickit_renderbuffer_new\fP(3). A render buffer instance stores a reference count to make it easier for applications to manage the lifetime of buffers. A new buffer starts with a count of one, and it can be adjusted using \fBtickit_renderbuffer_ref\fP(3) and \fBtickit_renderbuffer_unref\fP(3). When it reaches zero it is destroyed.
+.PP
+Its size is fixed after creation and can be queried using \fBtickit_renderbuffer_get_size\fP(3). Its contents can be entirely reset back to its original state using \fBtickit_renderbuffer_reset\fP(3).
 .PP
 A translation offset can be set using \fBtickit_renderbuffer_translate\fP(3), and the clipping region restricted using \fBtickit_renderbuffer_clip\fP(3). Masks can be placed within the current clipping region using \fBtickit_renderbuffer_mask\fP(3).
 .PP

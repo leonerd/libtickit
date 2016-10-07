@@ -73,6 +73,8 @@ struct TickitRenderBuffer {
   char *tmp;
   size_t tmplen;  // actually valid
   size_t tmpsize; // allocated size
+
+  int refcount;
 };
 
 static void free_stack(RBStack *stack)
@@ -469,6 +471,8 @@ TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols)
   rb->tmp = malloc(rb->tmpsize);
   rb->tmplen = 0;
 
+  rb->refcount = 1;
+
   return rb;
 }
 
@@ -506,6 +510,19 @@ void tickit_renderbuffer_destroy(TickitRenderBuffer *rb)
   free(rb->tmp);
 
   free(rb);
+}
+
+TickitRenderBuffer *tickit_renderbuffer_ref(TickitRenderBuffer *rb)
+{
+  rb->refcount++;
+  return rb;
+}
+
+void tickit_renderbuffer_unref(TickitRenderBuffer *rb)
+{
+  rb->refcount--;
+  if(!rb->refcount)
+    tickit_renderbuffer_destroy(rb);
 }
 
 void tickit_renderbuffer_get_size(const TickitRenderBuffer *rb, int *lines, int *cols)

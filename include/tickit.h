@@ -432,6 +432,9 @@ size_t tickit_string_col2byte(const char *str, int col);
 TickitRenderBuffer *tickit_renderbuffer_new(int lines, int cols);
 void tickit_renderbuffer_destroy(TickitRenderBuffer *rb);
 
+TickitRenderBuffer *tickit_renderbuffer_ref(TickitRenderBuffer *rb);
+void                tickit_renderbuffer_unref(TickitRenderBuffer *rb);
+
 void tickit_renderbuffer_get_size(const TickitRenderBuffer *rb, int *lines, int *cols);
 
 void tickit_renderbuffer_translate(TickitRenderBuffer *rb, int downward, int rightward);
