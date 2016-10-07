@@ -32,17 +32,17 @@ endif
 override CFLAGS +=$(shell pkg-config --cflags termkey)
 override LDFLAGS+=$(shell pkg-config --libs   termkey)
 
-CFILES=$(wildcard src/*.c)
-HFILES=$(wildcard include/*.h)
+CFILES=$(sort $(wildcard src/*.c))
+HFILES=$(sort $(wildcard include/*.h))
 OBJECTS=$(CFILES:.c=.lo)
 LIBRARY=libtickit.la
 
-HFILES_INT=$(wildcard src/*.h) $(HFILES)
+HFILES_INT=$(sort $(wildcard src/*.h)) $(HFILES)
 
-TESTSOURCES=$(wildcard t/[0-9]*.c)
+TESTSOURCES=$(sort $(wildcard t/[0-9]*.c))
 TESTFILES=$(TESTSOURCES:.c=.t)
 
-EXAMPLESOURCES=$(wildcard examples/*.c)
+EXAMPLESOURCES=$(sort $(wildcard examples/*.c))
 
 VERSION_CURRENT=0
 VERSION_REVISION=0
