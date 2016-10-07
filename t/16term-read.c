@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
   is_int(tickit_term_input_check_timeout_msec(tt), -1, "term has no timeout after completed Escape");
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

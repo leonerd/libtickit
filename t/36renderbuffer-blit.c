@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 
   tickit_renderbuffer_unref(window);
   tickit_renderbuffer_unref(screen);
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

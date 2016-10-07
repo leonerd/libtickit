@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
 
   tickit_window_unref(win);
   tickit_window_unref(root);
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

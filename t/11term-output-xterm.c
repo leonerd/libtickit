@@ -159,8 +159,8 @@ int main(int argc, char *argv[])
   tickit_term_erasech(tt, 3, 1);
   is_str_escape(buffer, "\e[3X\e[3C", "buffer after tickit_term_erasech 3 move");
 
-  tickit_term_destroy(tt);
-  pass("tickit_term_destroy");
+  tickit_term_unref(tt);
+  pass("tickit_term_unref");
 
   return exit_status();
 }

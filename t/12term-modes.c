@@ -55,11 +55,11 @@ int main(int argc, char *argv[])
   is_str_escape(buffer, "\e]2;title here\e\\", "buffer after set title");
 
   buffer[0] = 0;
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
-  ok(1, "tickit_term_destroy");
+  ok(1, "tickit_term_unref");
 
-  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after termkey_term_destroy resets modes");
+  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after termkey_term_unref resets modes");
 
   return exit_status();
 }

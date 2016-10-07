@@ -95,11 +95,11 @@ int main(int argc, char *argv[])
 
   is_str(buffer, "Hello, world", "buffer after print using output func");
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
-  ok(1, "tickit_term_destroy");
+  ok(1, "tickit_term_unref");
 
-  ok(output_eof, "output func receives EOF indication after tickit_term_destroy");
+  ok(output_eof, "output func receives EOF indication after tickit_term_unref");
 
   return exit_status();
 }

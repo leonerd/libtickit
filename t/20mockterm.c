@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 
   tickit_pen_unref(fg_pen);
   tickit_pen_unref(bg_pen);
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

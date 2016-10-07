@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   tickit_term_flush(tt);
   is_str_escape(buffer, "Hello world!", "buffer contains output after flush");
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

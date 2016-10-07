@@ -63,9 +63,9 @@ int main(int argc, char *argv[])
 
   is_int(new_lines, 35, "new_lines still 35 after unbind event");
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
-  is_int(unbound, 1, "on_resize unbound after tickit_term_destroy");
+  is_int(unbound, 1, "on_resize unbound after tickit_term_unref");
 
   return exit_status();
 }

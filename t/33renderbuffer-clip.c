@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
   }
 
   tickit_renderbuffer_unref(rb);
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

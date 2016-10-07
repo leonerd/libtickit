@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
     tickit_term_unbind_event_id(tt, bindB_id);
   }
 
-  tickit_term_destroy(tt);
+  tickit_term_unref(tt);
 
   return exit_status();
 }

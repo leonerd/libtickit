@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer, "          ", "buffer after tickit_term_erasech 10 move");
 
-  tickit_term_destroy(tt);
-  pass("tickit_term_destroy");
+  tickit_term_unref(tt);
+  pass("tickit_term_unref");
 
   return exit_status();
 }
