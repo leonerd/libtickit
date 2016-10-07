@@ -687,7 +687,7 @@ void tickit_window_flush(TickitWindow *win)
     free(rects);
 
     tickit_renderbuffer_flush_to_term(rb, root->term);
-    tickit_renderbuffer_destroy(rb);
+    tickit_renderbuffer_unref(rb);
 
     root->needs_restore = true;
   }

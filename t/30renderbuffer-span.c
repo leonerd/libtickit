@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
         GOTO(0,0), SETPEN(), PRINT("ABC                                                             "),
         NULL);
 
-    tickit_renderbuffer_destroy(rb);
+    tickit_renderbuffer_unref(rb);
   }
 
   // UTF-8 handling
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
     tickit_pen_unref(bg_pen);
   }
 
-  tickit_renderbuffer_destroy(rb);
+  tickit_renderbuffer_unref(rb);
   tickit_term_destroy(tt);
 
   return exit_status();

@@ -174,8 +174,8 @@ int main(int argc, char *argv[])
     tickit_pen_unref(bg_pen);
   }
 
-  tickit_renderbuffer_destroy(window);
-  tickit_renderbuffer_destroy(screen);
+  tickit_renderbuffer_unref(window);
+  tickit_renderbuffer_unref(screen);
   tickit_term_destroy(tt);
 
   return exit_status();
