@@ -7,7 +7,7 @@ tickit_window_scroll, tickit_window_scrollrect \- scroll the area of a window
 .sp
 .BI "bool tickit_window_scroll(TickitWindow *" win ", int " downward ", int " rightward );
 .BI "bool tickit_window_scrollrect(TickitWindow *" win ", const TickitRect *" rect ,
-.BI "         int " downward ", int " rightward );
+.BI "         int " downward ", int " rightward ", TickitPen *" pen );
 .sp
 .BI "bool tickit_window_scroll_with_children(TickitWindow *" win ,
 .BI "         int " downward ", int " rightward );
@@ -17,7 +17,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_window_scroll\fP() requests that the underlying terminal scroll the contents of the area corresponding to the visible region (or regions) of the given window by the given amount. This takes into account aspects of the visiblity of the window, such as being obscured by siblings or siblings of ancestors, child windows, or whether the window or any parent is hidden. It returns \fBtrue\fP if it managed to perform the required scrolling, or \fBfalse\fP if not.
 .PP
-\fBtickit_window_scrollrect\fP() requests that the terminal scroll the contents of the area corresponding to the given rectangle within the window, and otherwise works analogously to \fBtickit_window_scroll\fP().
+\fBtickit_window_scrollrect\fP() requests that the terminal scroll the contents of the area corresponding to the given rectangle within the window, and otherwise works analogously to \fBtickit_window_scroll\fP(). If the \fIpen\fP argument is non-\fBNULL\fP then it is applied to the terminal before any erase operations within the window are performed, allowing a different background colour if set.
 .PP
 \fBtickit_window_scroll_with_children\fP() is similar again, except that it does not consider obscuring regions by child windows; only siblings or siblings of ancestors. This is intended for scrolling a container of windows, which will move all of the sub-windows too. Note that this function does not actually move the child windows, it simply requests a scrolling operation on the underlying terminal.
 .SH "RETURN VALUE"
