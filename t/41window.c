@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
 
     ok(tickit_window_parent(win) == root, "tickit_window_parent");
     ok(tickit_window_root(win) == root, "tickit_window_root");
+
+    ok(tickit_window_get_term(win) == tt, "tickit_window_get_term");
   }
 
   // Geometry change event

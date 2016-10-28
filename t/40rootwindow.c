@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
 
     ok(tickit_window_parent(root) == NULL, "root tickit_window_parent");
     ok(tickit_window_root(root) == root, "root tickit_window_root");
+
+    ok(tickit_window_get_term(root) == tt, "root tickit_window_get_term");
   }
 
   // Window pen

@@ -1,0 +1,20 @@
+.TH TICKIT_WINDOW_GET_TERM 3
+.SH NAME
+tickit_window_get_term \- query the backing terminal of a window
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitTerm *tickit_window_get_term(const TickitWindow *" win );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_get_term\fP() returns the backing terminal underlying a given window. This is the terminal instance that the window's root window was originally created using.
+.SH "RETURN VALUE"
+\fBtickit_window_get_term\fP() returns a pointer to a terminal instance.
+.SH "SEE ALSO"
+.BR tickit_window_new_root (3),
+.BR tickit_window_root (3),
+.BR tickit_window (7),
+.BR tickit (7)

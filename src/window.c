@@ -300,6 +300,11 @@ TickitWindow *tickit_window_root(const TickitWindow *win)
   return ROOT_AS_WINDOW(_get_root(win));
 }
 
+TickitTerm *tickit_window_get_term(const TickitWindow *win)
+{
+  return _get_root(win)->term;
+}
+
 void tickit_window_destroy(TickitWindow *win)
 {
   tickit_hooklist_unbind_and_destroy(win->hooks, win);
