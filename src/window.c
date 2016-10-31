@@ -300,6 +300,26 @@ TickitWindow *tickit_window_root(const TickitWindow *win)
   return ROOT_AS_WINDOW(_get_root(win));
 }
 
+size_t tickit_window_children(const TickitWindow *win)
+{
+  size_t ret = 0;
+
+  for(TickitWindow *child = win->first_child; child; child = child->next)
+    ret++;
+
+  return ret;
+}
+
+size_t tickit_window_get_children(const TickitWindow *win, TickitWindow *children[], size_t n)
+{
+  size_t ret = 0;
+
+  for(TickitWindow *child = win->first_child; ret < n && child; child = child->next)
+    children[ret++] = child;
+
+  return ret;
+}
+
 TickitTerm *tickit_window_get_term(const TickitWindow *win)
 {
   return _get_root(win)->term;

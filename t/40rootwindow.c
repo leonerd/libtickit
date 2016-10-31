@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
     ok(tickit_window_parent(root) == NULL, "root tickit_window_parent");
     ok(tickit_window_root(root) == root, "root tickit_window_root");
 
+    is_int(tickit_window_children(root), 0, "root tickit_window_children");
+
     ok(tickit_window_get_term(root) == tt, "root tickit_window_get_term");
   }
 

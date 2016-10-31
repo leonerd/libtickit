@@ -520,6 +520,9 @@ TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWin
 TickitWindow *tickit_window_parent(const TickitWindow *win);
 TickitWindow *tickit_window_root(const TickitWindow *win);
 
+size_t tickit_window_children(const TickitWindow *win);
+size_t tickit_window_get_children(const TickitWindow *win, TickitWindow *children[], size_t n);
+
 TickitTerm *tickit_window_get_term(const TickitWindow *win);
 
 void tickit_window_destroy(TickitWindow *win);

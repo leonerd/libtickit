@@ -37,6 +37,13 @@ int main(int argc, char *argv[])
     ok(tickit_window_parent(win) == root, "tickit_window_parent");
     ok(tickit_window_root(win) == root, "tickit_window_root");
 
+    is_int(tickit_window_children(win), 0, "tickit_window_children");
+
+    is_int(tickit_window_children(root), 1, "root tickit_window_children");
+    TickitWindow *children[1] = {0};
+    tickit_window_get_children(root, children, 1);
+    is_ptr(children[0], win, "root tickit_window_get_children result[0]");
+
     ok(tickit_window_get_term(win) == tt, "tickit_window_get_term");
   }
 

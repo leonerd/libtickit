@@ -1,0 +1,24 @@
+.TH TICKIT_WINDOW_CHILDREN 3
+.SH NAME
+tickit_window_children, tickit_window_get_children \- obtain child windows from a window
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "size_t tickit_window_children(const TickitWindow *" win );
+.BI "size_t tickit_window_get_children(const TickitWindow *" win ,
+.BI "    TickitWindow *" children "[], size_t " n );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_children\fP() returns the number of immediate child windows the given window has.
+.PP
+\fBtickit_window_get_children\fP() copies at most \fIn\fP child window pointers into the array given by \fBchildren\fP, and returns the number of pointers it copied (which may be fewer than the total stored, if the array was of insufficient size).
+.SH "RETURN VALUE"
+\fBtickit_window_children\fP() and \fBtickit_window_get_children\fP() return integers giving the number of entries operated on.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window_parent (3),
+.BR tickit_window (7),
+.BR tickit (7)

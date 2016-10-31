@@ -21,7 +21,7 @@ Newly-exposed areas of windows are tracked by the root window, ready to be rende
 .SH FUNCTIONS
 A new top-level \fBTickitWindow\fP instance to represent the entire terminal is created using \fBtickit_window_new_root\fP(3), further sub-divided into regions using \fBtickit_window_new\fP(3). A window instance stores a reference count to make it easier for applications ot manage the lifetime of windows. A new window starts with a count of one, and it can be adjusted using \fBtickit_window_ref\fP(3) and \fBtickit_window_unref\fP(3). When the count reaches zero the instance is destroyed.
 .PP
-The ancestry of a window can be queried using \fBtickit_window_parent\fP(3) and \fBtickit_window_root\fP(3). The backing terminal can be queried with \fBtickit_window_get_term\fP(3).
+The ancestry of a window can be queried using \fBtickit_window_parent\fP(3) and \fBtickit_window_root\fP(3). The stored child windows can be queried by using \fBtickit_window_children\fP(3) and \fBtickit_window_get_children\fP(3). The backing terminal can be queried with \fBtickit_window_get_term\fP(3).
 .PP
 The stacking order of a window among its siblings can be controlled using \fBtickit_window_raise\fP(3), \fBtickit_window_raise_to_front\fP(3), \fBtickit_window_lower\fP(3) and \fBtickit_window_lower_to_back\fP(3). Its visibility can be controlled using \fBtickit_window_show\fP(3) and \fBtickit_window_hide\fP(3), and queried using \fBtickit_window_is_visible\fP(3).
 .PP

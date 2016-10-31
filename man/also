@@ -67,6 +67,7 @@ tickit_renderbuffer_vline_at.3 = tickit_renderbuffer_hline_at.3
 
 tickit_window_unref.3 = tickit_window_ref.3
 tickit_window_root.3 = tickit_window_parent.3
+tickit_window_get_children.3 = tickit_window_children.3
 tickit_window_unbind_event_id.3 = tickit_window_bind_event.3
 tickit_window_raise_to_front.3 = tickit_window_raise.3
 tickit_window_lower.3 = tickit_window_raise.3
