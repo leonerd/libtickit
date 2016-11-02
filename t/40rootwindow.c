@@ -116,7 +116,15 @@ int main(int argc, char *argv[])
     is_rect(rects+1, "0,25..100,30", "exposed rects[1]");
   }
 
-  tickit_window_unref(root);
+  // TICKIT_EV_DESTROY
+  {
+    int destroyed = 0;
+    tickit_window_bind_event(root, TICKIT_EV_DESTROY, 0, &on_event_incr_int, &destroyed);
+
+    tickit_window_unref(root);
+    ok(destroyed, "TICKIT_EV_DESTROY invoked");
+  }
+
   tickit_term_unref(tt);
 
   return exit_status();

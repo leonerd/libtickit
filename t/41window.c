@@ -115,6 +115,15 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
   }
 
+  // TICKIT_EV_DESTROY
+  {
+    int destroyed = 0;
+    tickit_window_bind_event(win, TICKIT_EV_DESTROY, 0, &on_event_incr_int, &destroyed);
+
+    tickit_window_unref(win);
+    ok(destroyed, "TICKIT_EV_DESTROY invoked");
+  }
+
   tickit_window_unref(root);
   tickit_term_unref(tt);
 
