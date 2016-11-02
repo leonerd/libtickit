@@ -3,7 +3,7 @@
 #include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
-int on_geom_changed(TickitWindow *window, TickitEventType ev, void *_info, void *data)
+int on_event_incr_int(TickitWindow *window, TickitEventType ev, void *_info, void *data)
 {
   (*(int*)data)++;
   return 1;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   // Geometry change event
   {
     int geom_changed = 0;
-    tickit_window_bind_event(win, TICKIT_EV_GEOMCHANGE, 0, on_geom_changed, &geom_changed);
+    tickit_window_bind_event(win, TICKIT_EV_GEOMCHANGE, 0, on_event_incr_int, &geom_changed);
     is_int(geom_changed, 0, "geometry not yet changed");
 
     tickit_window_resize(win, 4, 15);
