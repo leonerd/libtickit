@@ -124,6 +124,23 @@ int main(int argc, char *argv[])
     ok(destroyed, "TICKIT_EV_DESTROY invoked");
   }
 
+  // explicit close
+  {
+    TickitWindow *win = tickit_window_new(root, (TickitRect){1, 1, 4, 4}, 0);
+    is_int(tickit_window_children(root), 1, "root window has 1 child before close()");
+
+    int destroyed = 0;
+    tickit_window_bind_event(win, TICKIT_EV_DESTROY, 0, &on_event_incr_int, &destroyed);
+
+    tickit_window_close(win);
+
+    is_int(tickit_window_children(root), 0, "root window has 1 child after close()");
+    ok(!destroyed, "window not destroyed before unref");
+
+    tickit_window_unref(win);
+    ok(destroyed, "window not destroyed after unref");
+  }
+
   tickit_window_unref(root);
   tickit_term_unref(tt);
 

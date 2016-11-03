@@ -33,6 +33,7 @@ struct TickitWindow {
   } cursor;
   bool is_visible;
   bool is_focused;
+  bool is_closed;
   bool steal_input;
   bool focus_child_notify;
 
@@ -213,6 +214,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->cursor.visible = true;
   win->is_visible = true;
   win->is_focused = false;
+  win->is_closed = false;
   win->steal_input = false;
   win->focus_child_notify = false;
 
@@ -325,6 +327,14 @@ TickitTerm *tickit_window_get_term(const TickitWindow *win)
   return _get_root(win)->term;
 }
 
+void tickit_window_close(TickitWindow *win)
+{
+  if(win->parent)
+    _do_hierarchy_change(TICKIT_HIERARCHY_REMOVE, win->parent, win);
+
+  win->is_closed = true;
+}
+
 void tickit_window_destroy(TickitWindow *win)
 {
   tickit_hooklist_unbind_and_destroy(win->hooks, win);
@@ -341,8 +351,8 @@ void tickit_window_destroy(TickitWindow *win)
 
   _purge_hierarchy_changes(win);
 
-  if(win->parent)
-    _do_hierarchy_change(TICKIT_HIERARCHY_REMOVE, win->parent, win);
+  if(!win->is_closed)
+    tickit_window_close(win);
 
   /* Root cleanup */
   if(!win->parent) {
