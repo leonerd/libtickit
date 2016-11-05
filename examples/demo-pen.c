@@ -168,6 +168,8 @@ int main(int argc, char *argv[])
     tickit_term_input_wait_msec(tt, -1);
   }
 
+  tickit_window_close(root);
+  tickit_window_unref(root);
   tickit_term_unref(tt);
 
   return 0;
