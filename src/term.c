@@ -604,9 +604,8 @@ void tickit_term_input_readable(TickitTerm *tt)
   get_keys(tt, tk);
 }
 
-int tickit_term_input_check_timeout_msec(TickitTerm *tt)
+static int get_timeout(TickitTerm *tt)
 {
-  check_resize(tt);
   if(tt->input_timeout_at.tv_sec == -1)
     return -1;
 
@@ -627,6 +626,11 @@ int tickit_term_input_check_timeout_msec(TickitTerm *tt)
   if(tv.tv_sec > 0 || (tv.tv_sec == 0 && tv.tv_usec > 0))
     return tv.tv_sec * 1000 + (tv.tv_usec+MSEC-1)/MSEC;
 
+  return 0;
+}
+
+static void timedout(TickitTerm *tt)
+{
   TermKey *tk = get_termkey(tt);
 
   TermKeyKey key;
@@ -635,15 +639,30 @@ int tickit_term_input_check_timeout_msec(TickitTerm *tt)
   }
 
   tt->input_timeout_at.tv_sec = -1;
+}
+
+int tickit_term_input_check_timeout_msec(TickitTerm *tt)
+{
+  check_resize(tt);
+
+  int msec = get_timeout(tt);
+
+  if(msec != 0)
+    return msec;
+
+  timedout(tt);
   return -1;
 }
 
 void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
 {
-  check_resize(tt);
-
   TermKey *tk = get_termkey(tt);
-  TermKeyKey key;
+
+  int maxwait = get_timeout(tt);
+  if(maxwait > -1) {
+    if(msec == -1 || maxwait < msec)
+      msec = maxwait;
+  }
 
   struct timeval timeout;
   if(msec > -1) {
@@ -654,16 +673,16 @@ void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
   fd_set readfds;
   int fd = termkey_get_fd(tk);
   FD_SET(fd, &readfds);
-  if(select(fd + 1, &readfds, NULL, NULL, msec > -1 ? &timeout : NULL) == 1) {
+  int ret = select(fd + 1, &readfds, NULL, NULL, msec > -1 ? &timeout : NULL);
+
+  if(ret == 0)
+    timedout(tt);
+  else if(ret > 0)
     termkey_advisereadable(tk);
-  }
 
   check_resize(tt);
 
-  /* Might as well get any more that are ready */
-  while(termkey_getkey(tk, &key) == TERMKEY_RES_KEY) {
-    got_key(tt, tk, &key);
-  }
+  get_keys(tt, tk);
 }
 
 void tickit_term_input_wait_tv(TickitTerm *tt, const struct timeval *timeout)
