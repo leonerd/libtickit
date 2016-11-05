@@ -119,6 +119,8 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
       };
       tickit_window_expose(win, &damage);
     }
+
+    return 1;
   }
 
   if(ev & TICKIT_EV_KEY) {
@@ -128,7 +130,7 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
     DEBUG_LOGF("Ik", "Key event %s %s (mod=%02x)",
         evnames[info->type], info->str, info->mod);
 
-    _handle_key(win, info);
+    return _handle_key(win, info);
   }
 
   if(ev & TICKIT_EV_MOUSE) {
@@ -195,9 +197,11 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
 
       _handle_mouse(root->drag_source_window, &draginfo);
     }
+
+    return !!handled;
   }
 
-  return 1;
+  return 0;
 }
 
 static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect)

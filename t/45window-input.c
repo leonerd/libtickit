@@ -13,7 +13,7 @@ struct LastEvent {
   int ret;
 };
 
-int on_input_capture(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_event_capture(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
   struct LastEvent *last_event = data;
 
@@ -40,13 +40,19 @@ int on_input_capture(TickitWindow *win, TickitEventType ev, void *_info, void *d
 int next_idx = 0;
 char *ids[3];
 
-int on_input_push(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_event_push(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
   ids[next_idx++] = data;
   return 0;
 }
 
-int on_input_incr_int(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_event_incr_int(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  ((int *)data)[0]++;
+  return 0;
+}
+
+int on_termevent_incr_int(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
   ((int *)data)[0]++;
   return 0;
@@ -63,7 +69,7 @@ int main(int argc, char *argv[])
   tickit_window_flush(root);
 
   struct LastEvent win_last = { .ret = 1 };
-  int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_input_capture, &win_last);
+  int bind_id = tickit_window_bind_event(win, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_event_capture, &win_last);
 
   // Key events
   {
@@ -94,6 +100,20 @@ int main(int argc, char *argv[])
     is_int(win_last.type, 0, "win_last.type still 0 after press @1,2");
   }
 
+  // Unhandled events are not consumed
+  {
+    int term_invoked = 0;
+    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, 0, &on_termevent_incr_int, &term_invoked);
+
+    win_last.ret = 0;
+
+    press_key(TICKIT_KEYEV_KEY, "A", 0);
+
+    ok(term_invoked, "term event handler invoked after unhandled window event");
+
+    tickit_term_unbind_event_id(tt, bind_id);
+  }
+
   TickitWindow *subwin = tickit_window_new(win, (TickitRect){2, 2, 1, 10}, 0);
 
   // Subwindow
@@ -102,7 +122,7 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
 
     struct LastEvent subwin_last = { .ret = 1 };
-    int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_input_capture, &subwin_last);
+    int sub_bind_id = tickit_window_bind_event(subwin, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_event_capture, &subwin_last);
 
     win_last.type = 0;
 
@@ -145,9 +165,9 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
 
     int bind_ids[] = {
-      tickit_window_bind_event(win,      TICKIT_EV_KEY, 0, &on_input_push, "win"),
-      tickit_window_bind_event(subwin,   TICKIT_EV_KEY, 0, &on_input_push, "subwin"),
-      tickit_window_bind_event(otherwin, TICKIT_EV_KEY, 0, &on_input_push, "otherwin"),
+      tickit_window_bind_event(win,      TICKIT_EV_KEY, 0, &on_event_push, "win"),
+      tickit_window_bind_event(subwin,   TICKIT_EV_KEY, 0, &on_event_push, "subwin"),
+      tickit_window_bind_event(otherwin, TICKIT_EV_KEY, 0, &on_event_push, "otherwin"),
     };
 
     press_key(TICKIT_EV_KEY, "D", 0);
@@ -184,7 +204,7 @@ int main(int argc, char *argv[])
         return 0;
 
       childwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
-      tickit_window_bind_event(childwin, TICKIT_EV_MOUSE, 0, &on_input_incr_int, &childmouse);
+      tickit_window_bind_event(childwin, TICKIT_EV_MOUSE, 0, &on_event_incr_int, &childmouse);
       return 0;
     }
 
@@ -216,7 +236,7 @@ int main(int argc, char *argv[])
         return 0;
 
       siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
-      tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, 0, &on_input_incr_int, &siblingmouse);
+      tickit_window_bind_event(siblingwin, TICKIT_EV_MOUSE, 0, &on_event_incr_int, &siblingmouse);
       return 0;
     }
 
