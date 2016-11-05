@@ -436,14 +436,6 @@ void tickit_term_set_utf8(TickitTerm *tt, bool utf8)
   }
 }
 
-// provide link-time legacy wrappers
-#undef tickit_term_await_started
-
-void tickit_term_await_started(TickitTerm *tt, const struct timeval *timeout)
-{
-  tickit_term_await_started_tv(tt, timeout);
-}
-
 void tickit_term_await_started_msec(TickitTerm *tt, long msec)
 {
   if(msec > -1)
@@ -612,15 +604,6 @@ void tickit_term_input_readable(TickitTerm *tt)
   get_keys(tt, tk);
 }
 
-// provide link-time legacy wrappers
-#undef tickit_term_input_check_timeout
-#undef tickit_term_input_wait
-
-int tickit_term_input_check_timeout(TickitTerm *tt)
-{
-  return tickit_term_input_check_timeout_msec(tt);
-}
-
 int tickit_term_input_check_timeout_msec(TickitTerm *tt)
 {
   check_resize(tt);
@@ -653,11 +636,6 @@ int tickit_term_input_check_timeout_msec(TickitTerm *tt)
 
   tt->input_timeout_at.tv_sec = -1;
   return -1;
-}
-
-void tickit_term_input_wait(TickitTerm *tt, const struct timeval *timeout)
-{
-  tickit_term_input_wait_tv(tt, timeout);
 }
 
 void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
