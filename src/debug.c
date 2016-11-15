@@ -1,6 +1,6 @@
 #define _XOPEN_SOURCE  // fdopen
 
-#include <tickit.h>
+#include "tickit.h"
 
 #include <stdarg.h>
 #include <stdio.h>
