@@ -1,11 +1,17 @@
 /* We need C99 vsnprintf() semantics */
 #define _ISOC99_SOURCE
 
-/* We need strdup and va_copy */
-#define _XOPEN_SOURCE 600
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#  define IS_BSD
+#endif
 
-/* We need SIGWINCH */
-#define _BSD_SOURCE
+/* We need strdup and va_copy */
+/* But if we define this on a BSD platform we lose SIGWINCH. In any case, such
+ * platforms turn out not to need _XOPEN_SOURCE anyway
+ */
+#ifndef IS_BSD
+#  define _XOPEN_SOURCE 600
+#endif
 
 #include "tickit.h"
 
