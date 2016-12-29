@@ -904,7 +904,8 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
     if(!win->is_visible)
       return false;
 
-    tickit_pen_copy(pen, win->pen, false);
+    if(win->pen)
+      tickit_pen_copy(pen, win->pen, false);
 
     TickitWindow *parent = win->parent;
     if(!parent)
