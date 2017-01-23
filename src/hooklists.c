@@ -32,12 +32,9 @@ void tickit_hooklist_run_event(struct TickitHooklist *hooklist, void *owner, Tic
 {
   hooklist->itercount++;
 
-  for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
-    struct TickitEventHook *next = hook->next;
+  for(struct TickitEventHook *hook = hooklist->hooks; hook; hook = hook->next)
     if(hook->ev & ev)
       (*hook->fn)(owner, ev, info, hook->data);
-    hook = next;
-  }
 
   hooklist->itercount--;
   if(!hooklist->itercount)
@@ -50,15 +47,12 @@ int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *
 
   int ret = 0;
 
-  for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
-    struct TickitEventHook *next = hook->next;
+  for(struct TickitEventHook *hook = hooklist->hooks; hook; hook = hook->next)
     if(hook->ev & ev) {
       ret = (*hook->fn)(owner, ev, info, hook->data);
       if(ret)
         goto exit;
     }
-    hook = next;
-  }
 
 exit:
   hooklist->itercount--;
