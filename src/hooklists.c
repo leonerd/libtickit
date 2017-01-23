@@ -10,9 +10,9 @@ struct TickitEventHook {
   void                   *data;
 };
 
-void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, TickitEventType ev, void *info)
+void tickit_hooklist_run_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
 {
-  for(struct TickitEventHook *hook = hooks; hook; /**/) {
+  for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
     struct TickitEventHook *next = hook->next;
     if(hook->ev & ev)
       (*hook->fn)(owner, ev, info, hook->data);
@@ -20,9 +20,9 @@ void tickit_hooklist_run_event(struct TickitEventHook *hooks, void *owner, Ticki
   }
 }
 
-int tickit_hooklist_run_event_whilefalse(struct TickitEventHook *hooks, void *owner, TickitEventType ev, void *info)
+int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
 {
-  for(struct TickitEventHook *hook = hooks; hook; /**/) {
+  for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
     struct TickitEventHook *next = hook->next;
     if(hook->ev & ev) {
       int ret = (*hook->fn)(owner, ev, info, hook->data);
@@ -35,16 +35,16 @@ int tickit_hooklist_run_event_whilefalse(struct TickitEventHook *hooks, void *ow
   return 0;
 }
 
-int tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, TickitEventType ev, TickitBindFlags flags,
+int tickit_hooklist_bind_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, TickitBindFlags flags,
     TickitEventFn *fn, void *data)
 {
   int max_id = 0;
 
-  struct TickitEventHook **newhookp = hooklist;
+  struct TickitEventHook **newhookp = &hooklist->hooks;
   struct TickitEventHook *next = NULL;
 
   if(flags & TICKIT_BIND_FIRST) {
-    next = *hooklist;
+    next = hooklist->hooks;
     for(struct TickitEventHook *hook = *newhookp; hook; hook = hook->next)
       if(hook->id > max_id)
         max_id = hook->id;
@@ -65,9 +65,9 @@ int tickit_hooklist_bind_event(struct TickitEventHook **hooklist, void *owner, T
   return (*newhookp)->id = max_id + 1;
 }
 
-void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *owner, int id)
+void tickit_hooklist_unbind_event_id(struct TickitHooklist *hooklist, void *owner, int id)
 {
-  for(struct TickitEventHook **hookp = hooklist; *hookp; ) {
+  for(struct TickitEventHook **hookp = &hooklist->hooks; *hookp; ) {
     struct TickitEventHook *hook = *hookp;
     if(hook->id != id) {
       hookp = &(hook->next);
@@ -89,13 +89,13 @@ void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *ow
   }
 }
 
-void tickit_hooklist_unbind_and_destroy(struct TickitEventHook *hooks, void *owner)
+void tickit_hooklist_unbind_and_destroy(struct TickitHooklist *hooklist, void *owner)
 {
   /* TICKIT_EV_DESTROY events need to run in reverse order. Since the hooklist
    * is singly-linked it is easiest just to reverse it then iterate.
    */
   struct TickitEventHook *revhooks = NULL;
-  for(struct TickitEventHook *hook = hooks; hook; /**/) {
+  for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
     struct TickitEventHook *this = hook;
     hook = hook->next;
 

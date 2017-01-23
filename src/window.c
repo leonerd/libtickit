@@ -38,7 +38,7 @@ struct TickitWindow {
   bool focus_child_notify;
 
   int refcount;
-  struct TickitEventHook *hooks;
+  struct TickitHooklist hooks;
 };
 
 #define WINDOW_PRINTF_FMT     "[%dx%d abs@%d,%d]"
@@ -223,7 +223,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->focus_child_notify = false;
 
   win->refcount = 1;
-  win->hooks = NULL;
+  win->hooks = (struct TickitHooklist){ NULL };
 }
 
 TickitWindow* tickit_window_new_root(TickitTerm *term)
@@ -341,7 +341,7 @@ void tickit_window_close(TickitWindow *win)
 
 void tickit_window_destroy(TickitWindow *win)
 {
-  tickit_hooklist_unbind_and_destroy(win->hooks, win);
+  tickit_hooklist_unbind_and_destroy(&win->hooks, win);
 
   if(win->pen)
     tickit_pen_unref(win->pen);

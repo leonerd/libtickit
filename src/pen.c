@@ -34,7 +34,7 @@ struct TickitPen {
   } valid;
 
   int refcount;
-  struct TickitEventHook *hooks;
+  struct TickitHooklist hooks;
 };
 
 DEFINE_HOOKLIST_FUNCS(pen,TickitPen,TickitPenEventFn)
@@ -46,7 +46,7 @@ TickitPen *tickit_pen_new(void)
     return NULL;
 
   pen->refcount = 1;
-  pen->hooks = NULL;
+  pen->hooks = (struct TickitHooklist){ NULL };
 
   tickit_pen_clear(pen);
 
@@ -101,7 +101,7 @@ TickitPen *tickit_pen_clone(const TickitPen *orig)
 
 static void destroy(TickitPen *pen)
 {
-  tickit_hooklist_unbind_and_destroy(pen->hooks, pen);
+  tickit_hooklist_unbind_and_destroy(&pen->hooks, pen);
   free(pen);
 }
 

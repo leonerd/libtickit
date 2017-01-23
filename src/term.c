@@ -75,7 +75,7 @@ struct TickitTerm {
   TickitPen *pen;
 
   int refcount;
-  struct TickitEventHook *hooks;
+  struct TickitHooklist hooks;
 };
 
 DEFINE_HOOKLIST_FUNCS(term,TickitTerm,TickitTermEventFn)
@@ -159,7 +159,7 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   tt->window_changed = false;
 
   tt->refcount = 1;
-  tt->hooks = NULL;
+  tt->hooks = (struct TickitHooklist){ NULL };
 
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
@@ -212,7 +212,7 @@ void tickit_term_destroy(TickitTerm *tt)
   if(tt->outfunc)
     (*tt->outfunc)(tt, NULL, 0, tt->outfunc_user);
 
-  tickit_hooklist_unbind_and_destroy(tt->hooks, tt);
+  tickit_hooklist_unbind_and_destroy(&tt->hooks, tt);
   tickit_pen_unref(tt->pen);
 
   if(tt->termkey)

@@ -3,7 +3,7 @@
 
 #include "../src/hooklists.h"
 
-struct TickitEventHook *hooks = NULL;
+struct TickitHooklist hooks = { NULL };
 
 int incr(void *owner, TickitEventType ev, void *info, void *data)
 {
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     int count = 0;
     tickit_hooklist_bind_event(&hooks, NULL, 1<<0, 0, &incr, &count);
 
-    tickit_hooklist_run_event(hooks, NULL, 1<<0, &id);
+    tickit_hooklist_run_event(&hooks, NULL, 1<<0, &id);
 
     is_int(count, 1, "hook after self-removal still invoked");
   }
