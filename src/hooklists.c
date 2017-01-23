@@ -26,24 +26,28 @@ static void cleanup(struct TickitHooklist *hooklist)
 
     free(hook);
   }
+
+  hooklist->needs_delete = false;
 }
 
 void tickit_hooklist_run_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
 {
-  hooklist->itercount++;
+  int was_iterating = hooklist->is_iterating;
+  hooklist->is_iterating = true;
 
   for(struct TickitEventHook *hook = hooklist->hooks; hook; hook = hook->next)
     if(hook->ev & ev)
       (*hook->fn)(owner, ev, info, hook->data);
 
-  hooklist->itercount--;
-  if(!hooklist->itercount)
+  hooklist->is_iterating = was_iterating;
+  if(!was_iterating && hooklist->needs_delete)
     cleanup(hooklist);
 }
 
 int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
 {
-  hooklist->itercount++;
+  int was_iterating = hooklist->is_iterating;
+  hooklist->is_iterating = true;
 
   int ret = 0;
 
@@ -55,8 +59,8 @@ int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *
     }
 
 exit:
-  hooklist->itercount--;
-  if(!hooklist->itercount)
+  hooklist->is_iterating = was_iterating;
+  if(!was_iterating && hooklist->needs_delete)
     cleanup(hooklist);
   return ret;
 }
@@ -107,7 +111,7 @@ void tickit_hooklist_unbind_event_id(struct TickitHooklist *hooklist, void *owne
     hook->ev = 0;
     hook->fn = NULL;
 
-    if(!hooklist->itercount) {
+    if(!hooklist->is_iterating) {
       *hookp = hook->next;
       hook->next = NULL;
 
@@ -115,6 +119,8 @@ void tickit_hooklist_unbind_event_id(struct TickitHooklist *hooklist, void *owne
       /* no hookp update */
     }
     else {
+      hooklist->needs_delete = true;
+
       hook->id = HOOK_ID_TOMBSTONE;
       hookp = &(hook->next);
     }
