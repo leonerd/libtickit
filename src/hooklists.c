@@ -78,6 +78,12 @@ void tickit_hooklist_unbind_event_id(struct TickitEventHook **hooklist, void *ow
       (*hook->fn)(owner, TICKIT_EV_UNBIND, NULL, hook->data);
 
     *hookp = hook->next;
+
+    // zero out the structure
+    hook->next = NULL;
+    hook->ev = 0;
+    hook->fn = NULL;
+
     free(hook);
     /* no hookp update */
   }
