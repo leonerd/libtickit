@@ -112,6 +112,8 @@ void tickit_debug_set_fh(FILE *fh)
     fclose(debug_fh);
 
   debug_fh = fh;
+  if(debug_fh)
+    setvbuf(debug_fh, NULL, _IONBF, 0);
 
   if(debug_func)
     debug_func = NULL;
