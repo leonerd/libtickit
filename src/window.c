@@ -570,6 +570,7 @@ static char *_gen_indent(TickitWindow *win)
     buf[0] = 0;
   }
 
+  buf[depth*2] = 0;
   for(char *s = buf; depth; depth--, s += 2)
     s[0] = '|', s[1] = ' ';
 
