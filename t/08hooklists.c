@@ -26,6 +26,27 @@ int main(int argc, char *argv[])
     tickit_hooklist_run_event(&hooks, NULL, 1<<0, &id);
 
     is_int(count, 1, "hook after self-removal still invoked");
+
+    tickit_hooklist_unbind_and_destroy(&hooks, NULL);
+    hooks.hooks = NULL;
+  }
+
+  {
+    int id1 = tickit_hooklist_bind_event(&hooks, NULL, 1<<1, 0, &delete, NULL);
+
+    int count2 = 0;
+    int id2 = tickit_hooklist_bind_event(&hooks, NULL, 1<<1, 0, &incr, &count2);
+
+    int count3 = 0;
+    tickit_hooklist_bind_event(&hooks, NULL, 1<<1, 0, &incr, &count3);
+
+    tickit_hooklist_run_event(&hooks, NULL, 1<<1, &id2);
+
+    is_int(count2, 0, "removed hook is not invoked");
+    is_int(count3, 1, "hook after removed one still invoked");
+
+    tickit_hooklist_unbind_and_destroy(&hooks, NULL);
+    hooks.hooks = NULL;
   }
 
   return exit_status();

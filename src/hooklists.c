@@ -10,29 +10,61 @@ struct TickitEventHook {
   void                   *data;
 };
 
+#define HOOK_ID_TOMBSTONE -1
+
+static void cleanup(struct TickitHooklist *hooklist)
+{
+  for(struct TickitEventHook **hookp = &hooklist->hooks; *hookp; /**/) {
+    struct TickitEventHook *hook = *hookp;
+    if(hook->id != HOOK_ID_TOMBSTONE) {
+      hookp = &(*hookp)->next;
+      continue;
+    }
+
+    *hookp = hook->next;
+    hook->next = NULL;
+
+    free(hook);
+  }
+}
+
 void tickit_hooklist_run_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
 {
+  hooklist->itercount++;
+
   for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
     struct TickitEventHook *next = hook->next;
     if(hook->ev & ev)
       (*hook->fn)(owner, ev, info, hook->data);
     hook = next;
   }
+
+  hooklist->itercount--;
+  if(!hooklist->itercount)
+    cleanup(hooklist);
 }
 
 int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
 {
+  hooklist->itercount++;
+
+  int ret = 0;
+
   for(struct TickitEventHook *hook = hooklist->hooks; hook; /**/) {
     struct TickitEventHook *next = hook->next;
     if(hook->ev & ev) {
-      int ret = (*hook->fn)(owner, ev, info, hook->data);
+      ret = (*hook->fn)(owner, ev, info, hook->data);
       if(ret)
-        return ret;
+        goto exit;
     }
     hook = next;
   }
 
-  return 0;
+exit:
+  hooklist->itercount--;
+  if(!hooklist->itercount)
+    cleanup(hooklist);
+  return ret;
 }
 
 int tickit_hooklist_bind_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, TickitBindFlags flags,
@@ -77,15 +109,21 @@ void tickit_hooklist_unbind_event_id(struct TickitHooklist *hooklist, void *owne
     if(hook->ev & TICKIT_EV_UNBIND)
       (*hook->fn)(owner, TICKIT_EV_UNBIND, NULL, hook->data);
 
-    *hookp = hook->next;
-
     // zero out the structure
-    hook->next = NULL;
     hook->ev = 0;
     hook->fn = NULL;
 
-    free(hook);
-    /* no hookp update */
+    if(!hooklist->itercount) {
+      *hookp = hook->next;
+      hook->next = NULL;
+
+      free(hook);
+      /* no hookp update */
+    }
+    else {
+      hook->id = HOOK_ID_TOMBSTONE;
+      hookp = &(hook->next);
+    }
   }
 }
 

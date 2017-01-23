@@ -4,6 +4,7 @@ struct TickitEventHook;
 
 struct TickitHooklist {
   struct TickitEventHook *hooks;
+  int itercount;
 };
 
 typedef int TickitEventFn(void *owner, TickitEventType ev, void *info, void *data);
