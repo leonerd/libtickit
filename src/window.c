@@ -1177,16 +1177,19 @@ static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
   if(!win->is_visible)
     return 0;
 
+  int ret = 1;
+  tickit_window_ref(win);
+
   if(win->first_child && win->first_child->steal_input)
     if(_handle_key(win->first_child, info))
-      return 1;
+      goto done;
 
   if(win->focused_child)
     if(_handle_key(win->focused_child, info))
-      return 1;
+      goto done;
 
   if(run_events_whilefalse(win, TICKIT_EV_KEY, info))
-    return 1;
+    goto done;
 
   // Last-ditch attempt to spread it around other children
   for(TickitWindow *child = win->first_child; child; child = child->next) {
@@ -1194,16 +1197,24 @@ static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
       continue;
 
     if(_handle_key(child, info))
-      return 1;
+      goto done;
   }
 
-  return 0;
+  ret = 0;
+  /* fallthough */
+done:
+  tickit_window_unref(win);
+
+  return ret;
 }
 
 static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *info)
 {
   if(!win->is_visible)
     return NULL;
+
+  TickitWindow *ret;
+  tickit_window_ref(win);
 
   for(TickitWindow *child = win->first_child; child; child = child->next) {
     int child_line = info->line - child->rect.top;
@@ -1220,13 +1231,18 @@ static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *info
     childinfo.line = child_line;
     childinfo.col  = child_col;
 
-    TickitWindow *ret;
     if((ret = _handle_mouse(child, &childinfo)))
-      return ret;
+      goto done;
   }
 
+  ret = win;
   if(run_events_whilefalse(win, TICKIT_EV_MOUSE, info))
-    return win;
+    goto done;
 
-  return 0;
+  ret = NULL;
+  /* fallthrough */
+done:
+  tickit_window_unref(win);
+
+  return ret;
 }
