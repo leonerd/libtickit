@@ -370,6 +370,9 @@ void tickit_window_destroy(TickitWindow *win)
     tickit_term_unref(root->term);
   }
 
+  DEBUG_LOGF("W*", "Window destroyed " WINDOW_PRINTF_FMT,
+      WINDOW_PRINTF_ARGS(win));
+
   free(win);
 }
 
