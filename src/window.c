@@ -1192,7 +1192,10 @@ static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
     goto done;
 
   // Last-ditch attempt to spread it around other children
-  for(TickitWindow *child = win->first_child; child; child = child->next) {
+  TickitWindow *next;
+  for(TickitWindow *child = win->first_child; child; child = next) {
+    next = child->next;
+
     if(child == win->focused_child)
       continue;
 
@@ -1216,7 +1219,10 @@ static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *info
   TickitWindow *ret;
   tickit_window_ref(win);
 
-  for(TickitWindow *child = win->first_child; child; child = child->next) {
+  TickitWindow *next;
+  for(TickitWindow *child = win->first_child; child; child = next) {
+    next = child->next;
+
     int child_line = info->line - child->rect.top;
     int child_col  = info->col  - child->rect.left;
 

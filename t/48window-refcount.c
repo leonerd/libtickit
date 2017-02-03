@@ -15,6 +15,14 @@ int on_event_close(TickitWindow *win, TickitEventType ev, void *_info, void *dat
 
   tickit_window_close(target);
   tickit_window_unref(target);
+
+  return 0;
+}
+
+int on_event_incr(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+{
+  (*((int *)data))++;
+  return 0;
 }
 
 int main(int argc, char *argv[])
@@ -35,6 +43,23 @@ int main(int argc, char *argv[])
 
     // We can't really tell here if it worked, but it hasn't crashed.
     pass("Window can close itself in event handler");
+  }
+
+  // Next window sibling unaffected by destruction
+  {
+    TickitWindow *win1 = tickit_window_new(root, (TickitRect){3, 10, 4, 20}, 0);
+    TickitWindow *win2 = tickit_window_new(root, (TickitRect){7, 10, 4, 20}, 0);
+
+    tickit_window_flush(root);
+
+    tickit_window_bind_event(win1, TICKIT_EV_KEY, 0, &on_event_close, win1);
+    int count = 0;
+    tickit_window_bind_event(win2, TICKIT_EV_KEY, 0, &on_event_incr, &count);
+
+    press_key(TICKIT_KEYEV_TEXT, "A", 0);
+    tickit_window_flush(root);
+
+    is_int(count, 1, "Event handler in sibling window is invoked");
   }
 
   tickit_window_unref(root);
