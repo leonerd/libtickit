@@ -855,7 +855,8 @@ static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *paren
     DEBUG_LOGF("Wh", fmt,
         WINDOW_PRINTF_ARGS(parent), WINDOW_PRINTF_ARGS(win));
 
-  tickit_window_expose(parent, &win->rect);
+  if(win->is_visible)
+    tickit_window_expose(parent, &win->rect);
 }
 
 static void _request_hierarchy_change(HierarchyChangeType change, TickitWindow *win)

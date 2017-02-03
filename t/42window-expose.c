@@ -259,6 +259,32 @@ int main(int argc, char *argv[])
     tickit_window_unbind_event_id(win, bind_id_in_win);
   }
 
+  // New hidden windows don't get exposed
+  {
+    next_rect = 0;
+    int bind_id_in_win = tickit_window_bind_event(win, TICKIT_EV_EXPOSE, 0, &on_expose_pushrect, NULL);
+
+    TickitWindow *subwin = tickit_window_new(win, (TickitRect){2, 6, 3, 6}, TICKIT_WINDOW_HIDDEN);
+
+    int exposed = 0;
+    int bind_id_in_sub = tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, 0, &on_expose_incr, &exposed);
+
+    tickit_window_flush(root);
+
+    is_int(exposed, 0, "New hidden child window is not exposed");
+
+    is_int(next_rect, 0, "No exposed rects");
+
+    next_rect = 0;
+
+    tickit_window_unref(subwin);
+    tickit_window_flush(root);
+
+    is_int(next_rect, 0, "No exposed rects");
+
+    tickit_window_unbind_event_id(win, bind_id_in_win);
+  }
+
   // Rendering parent and child simultaneously
   {
     int idx_in_win = 3;
