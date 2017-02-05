@@ -113,6 +113,10 @@ TickitPen *tickit_pen_ref(TickitPen *pen)
 
 void tickit_pen_unref(TickitPen *pen)
 {
+  if(pen->refcount < 1) {
+    fprintf(stderr, "tickit_pen_unref: invalid refcount %d\n", pen->refcount);
+    abort();
+  }
   pen->refcount--;
   if(!pen->refcount)
     destroy(pen);

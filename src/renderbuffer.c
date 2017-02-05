@@ -520,6 +520,10 @@ TickitRenderBuffer *tickit_renderbuffer_ref(TickitRenderBuffer *rb)
 
 void tickit_renderbuffer_unref(TickitRenderBuffer *rb)
 {
+  if(rb->refcount < 1) {
+    fprintf(stderr, "tickit_renderbuffer_unref: invalid refcount %d\n", rb->refcount);
+    abort();
+  }
   rb->refcount--;
   if(!rb->refcount)
     tickit_renderbuffer_destroy(rb);

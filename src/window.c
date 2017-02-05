@@ -384,6 +384,10 @@ TickitWindow *tickit_window_ref(TickitWindow *win)
 
 void tickit_window_unref(TickitWindow *win)
 {
+  if(win->refcount < 1) {
+    fprintf(stderr, "tickit_window_unref: invalid refcount %d\n", win->refcount);
+    abort();
+  }
   win->refcount--;
   if(!win->refcount)
     tickit_window_destroy(win);

@@ -80,7 +80,7 @@ t/%.lo: t/%.c
 
 .PHONY: test
 test: $(TESTFILES)
-	prove -e ""
+	$(LIBTOOL) --mode=execute prove -e ""
 
 .PHONY: clean-test
 clean-test:

@@ -238,6 +238,10 @@ TickitTerm *tickit_term_ref(TickitTerm *tt)
 
 void tickit_term_unref(TickitTerm *tt)
 {
+  if(tt->refcount < 1) {
+    fprintf(stderr, "tickit_term_unref: invalid refcount %d\n", tt->refcount);
+    abort();
+  }
   tt->refcount--;
   if(!tt->refcount)
     tickit_term_destroy(tt);
