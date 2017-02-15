@@ -355,6 +355,7 @@ void tickit_window_destroy(TickitWindow *win)
     TickitWindow *next = child->next;
 
     tickit_window_unref(child);
+    child->parent = NULL;
     child = next;
   }
 
