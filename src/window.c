@@ -31,11 +31,13 @@ struct TickitWindow {
     TickitCursorShape shape;
     bool visible;
   } cursor;
-  bool is_visible;
-  bool is_focused;
-  bool is_closed;
-  bool steal_input;
-  bool focus_child_notify;
+  struct {
+    unsigned int is_visible         : 1;
+    unsigned int is_focused         : 1;
+    unsigned int is_closed          : 1;
+    unsigned int steal_input        : 1;
+    unsigned int focus_child_notify : 1;
+  };
 
   int refcount;
   struct TickitHooklist hooks;
