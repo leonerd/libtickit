@@ -32,6 +32,7 @@ struct TickitWindow {
     bool visible;
   } cursor;
   struct {
+    unsigned int is_root            : 1;
     unsigned int is_visible         : 1;
     unsigned int is_focused         : 1;
     unsigned int is_closed          : 1;
@@ -218,6 +219,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->cursor.col = 0;
   win->cursor.shape = TICKIT_CURSORSHAPE_BLOCK;
   win->cursor.visible = true;
+  win->is_root = false;
   win->is_visible = true;
   win->is_focused = false;
   win->is_closed = false;
@@ -238,6 +240,7 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
     return NULL;
 
   init_window(ROOT_AS_WINDOW(root), NULL, (TickitRect) { .top = 0, .left = 0, .lines = lines, .cols = cols });
+  ROOT_AS_WINDOW(root)->is_root = true;
 
   root->term = tickit_term_ref(term);
   root->hierarchy_changes = NULL;
@@ -361,7 +364,7 @@ void tickit_window_destroy(TickitWindow *win)
     tickit_window_close(win);
 
   /* Root cleanup */
-  if(!win->parent) {
+  if(win->is_root) {
     TickitRootWindow *root = WINDOW_AS_ROOT(win);
     if(root->damage) {
       tickit_rectset_destroy(root->damage);
@@ -542,7 +545,7 @@ void tickit_window_expose(TickitWindow *win, const TickitRect *exposed)
   if(!win->is_visible)
     return;
 
-  if(win->parent) {
+  if(!win->is_root) {
     tickit_rect_translate(&damaged, win->rect.top, win->rect.left);
     tickit_window_expose(win->parent, &damaged);
     return;
