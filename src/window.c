@@ -266,11 +266,15 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
 
 static TickitRootWindow *_get_root(const TickitWindow *win)
 {
-  const TickitWindow *root = win;
-  while(root->parent) {
-    root = root->parent;
+  while(!win->is_root) {
+    if(!win->parent) {
+      fprintf(stderr, "tickit_window:_get_root: orphaned window win=%p\n", win);
+      abort();
+    }
+
+    win = win->parent;
   }
-  return WINDOW_AS_ROOT(root);
+  return WINDOW_AS_ROOT(win);
 }
 
 TickitWindow *tickit_window_new(TickitWindow *parent, TickitRect rect, TickitWindowFlags flags)
@@ -359,7 +363,8 @@ void tickit_window_destroy(TickitWindow *win)
     child = next;
   }
 
-  _purge_hierarchy_changes(win);
+  if(win->parent)
+    _purge_hierarchy_changes(win);
 
   if(!win->is_closed)
     tickit_window_close(win);
