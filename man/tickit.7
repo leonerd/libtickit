@@ -2,9 +2,43 @@
 .SH NAME
 tickit \- Terminal Interface Construction KIT
 .SH DESCRIPTION
-\fBtickit\fP is a library for building full-screen interactive programs that use a terminal interface. Typically a program using \fBtickit\fP would consist of an instance of \fBTickitTerm\fP to represent the user's terminal, on which drawing operations are sent and input events are received.
+\fBtickit\fP is a library for building full-screen interactive programs that use a terminal interface. There are two levels of abstraction that a program might use the library via - a higher-level more abstracted system involving independent regions of the screen called "windows", or a lower-level system directly targetted at the actual terminal instance.
+.SS "Window Level"
+At the higher level of abstraction, a program creates a heirarchial tree of "windows", each an instance of the \fBTickitWindow\fP type. These act to divide the screen area into independent regions of interest, able to receive input events such as keyboard or mouse interactions, and render content to be displayed within its area.
 .PP
-The application would likely also maintain a \fBTickitRenderBuffer\fP instance into which to draw updates to the screen, before flushing them to the terminal in reaction to user input or other events.
+A typical program using this model would start by creating the underlying \fBTickitTerm\fP instance to represent the terminal by calling \fBtickit_term_new\fP(3), then create a root window on it by calling \fBtickit_window_new_root\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_EV_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter its main event loop; see the \fBEVENT LOOP\fP section below.
+.SS "Terminal Level"
+As an alternative to working at the level of windows, a program can operate on a lower level of abstraction by interacting directly with the \fBTickitTerm\fP instance. Operating at this level, it can use \fBtickit_term_bind_event\fP(3) to attach event handlers on the terminal instance itself in order to react to resize or input events. It can arrange for output to be drawn either by directly using the drawing functions on the terminal instance itself, or by constructing a \fBTickitRenderBuffer\fP instance to contain content, and flushing that to the terminal by calling \fBtickit_renderbuffer_flush_to_term\fP(3). As with the window level case, such a program will still need to use a main event loop; see below.
+.SH "EVENT LOOP"
+Once a program has set up its initial objects and event handlers, it must then run the main event loop in order to react to input events and generate output. A later version of \fIlibtickit\fP should provide better support for doing this, but at the current version this requires a certain amount of boilerplate code. This is explained here.
+.PP
+The simplest form of core of the event loop is a \fBwhile\fP loop that calls an \fBtickit_term_input_wait\fP function on the terminal, which will block awaiting for user input such as keyboard, mouse or resize interactions. If the windowing later is used, then \fBtickit_window_flush\fP(3) should be called before every blocking call to wait for input, so that pending damage can be flushed to the terminal, keeping the output up to date.
+.sp
+.EX
+  while(1) {
+    tickit_window_flush(rootwin);
+    tickit_term_input_wait_msec(term, -1);
+  }
+.EE
+.sp
+It is a good idea to install a signal handler for \fBSIGINT\fP so that the terminal can be cleanly shut down on exit, restoring any alterations to altscreen, cursor settings, and so on that the application may have made.
+.sp
+.EX
+  static bool still_running = true;
+  static void sigint(int sig) { still_running = false; }
+  ...
+
+  while(still_running) {
+    tickit_window_flush(rootwin);
+    tickit_term_input_wait_msec(term, -1);
+  }
+
+  tickit_window_close(rootwin);
+  tickit_window_unref(rootwin);
+  tickit_term_unref(term);
+.EE
+.sp
+A more complex program that wanted to perform other IO or timer operations at the same time, would instead make use of \fBtickit_term_input_readable\fP(3) and the \fBtickit_term_input_check_timeout\fP functions to keep the terminal IO working alongside other activity.
 .SH "COMMON TYPES"
 The \fIflags\fP argument to the various \fB_bind_event\fP() functions should be zero, or a bitmask of the following constants.
 .sp
@@ -37,6 +71,7 @@ Any event handlers for this event will be invoked in reverse order; the newest i
 .B TICKIT_EV_UNBIND
 Invoked when the event handler is about to be removed, either because it was unbound individually, or because the object instance itself is being destroyed. In the former case, this event handler is invoked individually; in the latter case the entire list is invoked as normal and the \fBTICKIT_EV_DESTROY\fP flag will also be set.
 .SH "SEE ALSO"
+.BR tickit_window (7),
 .BR tickit_term (7),
 .BR tickit_pen (7),
 .BR tickit_rect (7),
