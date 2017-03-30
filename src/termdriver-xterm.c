@@ -481,11 +481,11 @@ static void gotkey_modereport(struct XTermDriver *xd, int initial, int mode, int
     }
 }
 
-static void gotkey_decrqss(struct XTermDriver *xd, char status, char *args, size_t arglen)
+static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t arglen)
 {
   if(strneq(args + arglen - 2, " q", 2)) { // DECSCUSR
     int value;
-    if(status == '1' && sscanf(args, "%d", &value)) {
+    if(sscanf(args, "%d", &value)) {
       // value==1 or 2 => shape == 1, 3 or 4 => 2, etc..
       int shape = (value+1) / 2;
       xd->mode.cursorshape = shape;
@@ -506,37 +506,16 @@ static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
 
     return 1;
   }
-  // TODO: Long term we'll move libtermkey's code into terminal drivers and
-  // stop using it. Until then we'll have to have our own DCS parser
-  else if(key->type == TERMKEY_TYPE_UNICODE &&
-          key->modifiers == TERMKEY_KEYMOD_ALT &&
-          key->code.codepoint == 'P') {
-    xd->dcs_offset = 0;
-    return 1;
-  }
-  else if(xd->dcs_offset != -1 &&
-          key->type == TERMKEY_TYPE_UNICODE &&
-          key->modifiers == 0) {
-    if(xd->dcs_offset < sizeof xd->dcs_buffer)
-      xd->dcs_buffer[xd->dcs_offset++] = key->utf8[0]; // TODO: UTF-8 in DCS?
-    return 1;
-  }
-  else if(key->type == TERMKEY_TYPE_UNICODE &&
-          key->modifiers == TERMKEY_KEYMOD_ALT &&
-          key->code.codepoint == '\\') {
-    if(xd->dcs_offset == -1)
-      return 1;
+  else if(key->type == TERMKEY_TYPE_DCS) {
+    const char *dcs;
+    if(termkey_interpret_string(tk, key, &dcs) != TERMKEY_RES_KEY)
+      return 0;
 
-    size_t cmdlen = 1;
-    while(cmdlen < xd->dcs_offset &&
-          xd->dcs_buffer[cmdlen-1] < 0x40)
-      cmdlen++;
+    if(strneq(dcs, "1$r", 3)) { // Successful DECRQSS
+      gotkey_decrqss(xd, dcs + 3, strlen(dcs + 3));
+    }
 
-    if(cmdlen == 3 && strneq(xd->dcs_buffer + 1, "$r", 2))
-      gotkey_decrqss(xd, xd->dcs_buffer[0], xd->dcs_buffer + cmdlen, xd->dcs_offset - cmdlen);
-
-    xd->dcs_offset = -1;
-
+    // Just eat all the DCSes
     return 1;
   }
 
