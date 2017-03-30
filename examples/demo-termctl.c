@@ -44,8 +44,6 @@ static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 {
   TickitMouseEventInfo *info = _info;
 
-  fprintf(stderr, "mouse event %d type=%d at %d,%d\n", ev, info->type, info->col, info->line);
-
   if(info->type != TICKIT_MOUSEEV_PRESS || info->button != 1)
     return 0;
 
