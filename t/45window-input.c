@@ -258,6 +258,28 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
   }
 
+  // STEAL_INPUT
+  {
+    TickitWindow *thief = tickit_window_new(root, (TickitRect){2, 5, 3, 3},
+        TICKIT_WINDOW_STEAL_INPUT);
+
+    struct LastEvent thief_last = { .ret = 1 };
+    tickit_window_bind_event(thief, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_event_capture, &thief_last);
+
+    press_key(TICKIT_KEYEV_TEXT, "D", 0);
+
+    is_int(thief_last.type, TICKIT_KEYEV_TEXT, "thief_last.type for D");
+    is_str(thief_last.str, "D",                "thief_last.str for D");
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 1, 1, 0);
+
+    is_int(thief_last.type, TICKIT_MOUSEEV_PRESS, "thief_last.type for press 1@1,1");
+    is_int(thief_last.line, -1,                   "thief_last.line for press 1@1,1");
+    is_int(thief_last.col,  -4,                   "thief_last.col for press 1@1,1");
+
+    tickit_window_unref(thief);
+  }
+
   tickit_window_unref(root);
   tickit_term_unref(tt);
 
