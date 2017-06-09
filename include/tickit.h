@@ -572,6 +572,9 @@ void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(const TickitWindow *win);
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
+bool tickit_window_is_steal_input(const TickitWindow *win);
+void tickit_window_set_steal_input(TickitWindow *win, bool steal);
+
 /* Debug support */
 
 void tickit_debug_init(void);

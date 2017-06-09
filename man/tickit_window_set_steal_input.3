@@ -1,0 +1,24 @@
+.TH TICKIT_WINDOW_SET_STEAL_INPUT 3
+.SH NAME
+tickit_window_set_steal_input \- control whether windows steal all input events
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "bool tickit_window_is_steal_input(const TickitWindow *" win );
+.BI "void tickit_window_set_steal_input(TickitWindow *" win ", bool " steal );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_is_steal_input\fP() returns the current state of the input-stealing setting on the window. If true, this causes the window to have special behaviour on input events that are likely to be useful to implement popup windows. Specifically, the window receives all key events on its parent even before the sibling with the input focus receives them, provided it is the front-most child of its parent. Additionally, the window will receive all mouse events, even those outside of its geometry.
+.PP
+\fBtickit_window_set_steal_input\fP() changes the value of this setting.
+.PP
+The initial value is normally false, unless the \fBTICKIT_WINDOW_STEAL_INPUT\fP flag was passed to the \fBtickit_window_new\fP(3) function call that created the window.
+.SH "RETURN VALUE"
+\fBtickit_window_is_steal_input\fP() returns a boolean. \fBtickit_window_set_steal_input\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_window_new (3),
+.BR tickit_window (7),
+.BR tickit (7)

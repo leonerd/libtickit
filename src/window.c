@@ -1188,6 +1188,16 @@ void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify)
   win->focus_child_notify = notify;
 }
 
+bool tickit_window_is_steal_input(const TickitWindow *win)
+{
+  return win->steal_input;
+}
+
+void tickit_window_set_steal_input(TickitWindow *win, bool steal)
+{
+  win->steal_input = steal;
+}
+
 static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
 {
   if(!win->is_visible)

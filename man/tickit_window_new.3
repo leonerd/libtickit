@@ -24,7 +24,7 @@ Normally the most recently-added child window is ordered at the top of the list 
 The new child window will have the root window of the window tree as its parent, instead of the given window. The position will be automatically adjusted so that the new window still appears at the given geometry position relative to the window passed as the \fIparent\fP argument.
 .TP
 .B TICKIT_WINDOW_STEAL_INPUT
-Causes the child window to have special behaviour on input events that are likely to be useful to implement popup windows. Specifically, the window receives all key events on its parent even before the sibling with the input focus receives them, provided it is the front-most child of its parent. Additionally, the window will receive all mouse events, even those outside of its geometry.
+The new child window will initially be set to steal input events; see \fBtickit_window_set_steal_input\fP(3).
 .IP
 This flag is not useful when combined with \fBTICKIT_WINDOW_LOWEST\fP, as the input-stealing behaviour only applies while the window is front-most within its parent.
 .TP

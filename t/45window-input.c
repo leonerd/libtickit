@@ -266,6 +266,8 @@ int main(int argc, char *argv[])
     struct LastEvent thief_last = { .ret = 1 };
     tickit_window_bind_event(thief, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_event_capture, &thief_last);
 
+    ok(tickit_window_is_steal_input(thief), "tickit_window_is_steal_input() returns true");
+
     press_key(TICKIT_KEYEV_TEXT, "D", 0);
 
     is_int(thief_last.type, TICKIT_KEYEV_TEXT, "thief_last.type for D");
@@ -276,6 +278,16 @@ int main(int argc, char *argv[])
     is_int(thief_last.type, TICKIT_MOUSEEV_PRESS, "thief_last.type for press 1@1,1");
     is_int(thief_last.line, -1,                   "thief_last.line for press 1@1,1");
     is_int(thief_last.col,  -4,                   "thief_last.col for press 1@1,1");
+
+    thief_last.type = 0;
+    win_last.type = 0;
+
+    tickit_window_set_steal_input(thief, false);
+    ok(!tickit_window_is_steal_input(thief), "tickit_window_is_steal_input() returns false");
+
+    press_mouse(TICKIT_MOUSEEV_PRESS, 1, 1, 1, 0);
+
+    is_int(thief_last.type, 0, "thief does not see event after disabling STEAL_INPUT");
 
     tickit_window_unref(thief);
   }
