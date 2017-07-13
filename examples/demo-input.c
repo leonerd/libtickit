@@ -128,22 +128,13 @@ static int event_mouse(TickitWindow *win, TickitEventType ev, void *_info, void 
 
 int main(int argc, char *argv[])
 {
-  TickitTerm *tt;
+  Tickit *t = tickit_new();
 
-  tt = tickit_term_open_stdio();
-  if(!tt) {
+  TickitWindow *root = tickit_get_rootwin(t);
+  if(!root) {
     fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
     return 1;
   }
-  tickit_term_await_started_msec(tt, 50);
-
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_DRAG);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
-  tickit_term_clear(tt);
-
-  TickitWindow *root = tickit_window_new_root(tt);
 
   keywin = tickit_window_new(root, (TickitRect){
       .top = 2, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
@@ -165,13 +156,13 @@ int main(int argc, char *argv[])
   signal(SIGINT, sigint);
 
   while(still_running) {
-    tickit_window_flush(root);
-    tickit_term_input_wait_msec(tt, -1);
+    tickit_tick(t);
   }
 
   tickit_window_close(root);
   tickit_window_unref(root);
-  tickit_term_unref(tt);
+
+  tickit_unref(t);
 
   return 0;
 }

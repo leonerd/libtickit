@@ -23,6 +23,8 @@ typedef struct TickitRenderBuffer TickitRenderBuffer;
 typedef struct TickitTerm TickitTerm;
 typedef struct TickitWindow TickitWindow;
 
+typedef struct Tickit Tickit;
+
 typedef struct {
   int top;
   int left;
@@ -574,6 +576,19 @@ void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
 bool tickit_window_is_steal_input(const TickitWindow *win);
 void tickit_window_set_steal_input(TickitWindow *win, bool steal);
+
+/* Main object */
+
+Tickit *tickit_new(void);
+
+Tickit *tickit_ref(Tickit *t);
+void    tickit_unref(Tickit *t);
+
+TickitTerm *tickit_get_term(Tickit *t);
+
+TickitWindow *tickit_get_rootwin(Tickit *t);
+
+void tickit_tick(Tickit *t);
 
 /* Debug support */
 
