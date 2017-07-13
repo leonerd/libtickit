@@ -63,7 +63,7 @@ TickitTerm *tickit_get_term(Tickit *t)
     t->term = tt;
   }
 
-  return tickit_term_ref(t->term);
+  return t->term;
 }
 
 TickitWindow *tickit_get_rootwin(Tickit *t)
@@ -74,11 +74,9 @@ TickitWindow *tickit_get_rootwin(Tickit *t)
       return NULL;
 
     t->rootwin = tickit_window_new_root(tt);
-
-    tickit_term_unref(tt);
   }
 
-  return tickit_window_ref(t->rootwin);
+  return t->rootwin;
 }
 
 void tickit_tick(Tickit *t)
