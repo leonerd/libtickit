@@ -81,33 +81,28 @@ static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *d
 
 int main(int argc, char *argv[])
 {
-  TickitTerm *tt;
+  Tickit *t = tickit_new();
 
-  tt = tickit_term_open_stdio();
-  if(!tt) {
+  TickitWindow *root = tickit_get_rootwin(t);
+  if(!root) {
     fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
     return 1;
   }
-  tickit_term_await_started_msec(tt, 50);
 
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
-  tickit_term_setctl_str(tt, TICKIT_TERMCTL_TITLE_TEXT, "XTerm256 colour demo");
-  tickit_term_clear(tt);
+  tickit_term_setctl_str(tickit_get_term(t),
+    TICKIT_TERMCTL_TITLE_TEXT, "XTerm256 colour demo");
 
-  TickitWindow *root = tickit_window_new_root(tt);
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose, NULL);
 
   signal(SIGINT, sigint);
 
   while(still_running) {
-    tickit_window_flush(root);
-    tickit_term_input_wait_msec(tt, -1);
+    tickit_tick(t);
   }
 
   tickit_window_close(root);
-  tickit_window_unref(root);
-  tickit_term_unref(tt);
+
+  tickit_unref(t);
 
   return 0;
 }
