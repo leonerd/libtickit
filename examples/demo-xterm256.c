@@ -1,17 +1,9 @@
 #include "tickit.h"
 
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
-int still_running = 1;
-
-static void sigint(int sig)
-{
-  still_running = 0;
-}
 
 static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
@@ -94,11 +86,7 @@ int main(int argc, char *argv[])
 
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose, NULL);
 
-  signal(SIGINT, sigint);
-
-  while(still_running) {
-    tickit_tick(t);
-  }
+  tickit_run(t);
 
   tickit_window_close(root);
 

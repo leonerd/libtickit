@@ -3,23 +3,15 @@
 #include "tickit.h"
 
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
-int still_running = 1;
 
 TickitKeyEventInfo lastkey;
 TickitWindow *keywin;
 
 TickitMouseEventInfo lastmouse;
 TickitWindow *mousewin;
-
-static void sigint(int sig)
-{
-  still_running = 0;
-}
 
 static void render_modifier(TickitRenderBuffer *rb, int mod)
 {
@@ -66,10 +58,6 @@ static int render_key(TickitWindow *win, TickitEventType ev, void *_info, void *
 static int event_key(TickitWindow *win, TickitEventType ev, void *_info, void *data)
 {
   TickitKeyEventInfo *info = _info;
-  if(info->type == TICKIT_KEYEV_KEY && strcmp(info->str, "C-c") == 0) {
-    still_running = 0;
-    return 0;
-  }
 
   if(lastkey.str)
     free((void *)lastkey.str);
@@ -153,11 +141,7 @@ int main(int argc, char *argv[])
   tickit_window_take_focus(root);
   tickit_window_set_cursor_visible(root, false);
 
-  signal(SIGINT, sigint);
-
-  while(still_running) {
-    tickit_tick(t);
-  }
+  tickit_run(t);
 
   tickit_window_close(root);
 

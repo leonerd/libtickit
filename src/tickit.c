@@ -1,5 +1,7 @@
 #include "tickit.h"
 
+#include <signal.h>
+
 struct Tickit {
   int refcount;
 
@@ -85,4 +87,22 @@ void tickit_tick(Tickit *t)
     tickit_window_flush(t->rootwin);
   if(t->term)
     tickit_term_input_wait_msec(t->term, -1);
+}
+
+// TODO: copy the entire SIGWINCH-like structure from term.c
+int still_running;
+
+static void sigint(int sig)
+{
+  still_running = 0;
+}
+
+void tickit_run(Tickit *t)
+{
+  still_running = 1;
+  signal(SIGINT, sigint);
+
+  while(still_running) {
+    tickit_tick(t);
+  }
 }
