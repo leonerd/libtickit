@@ -588,8 +588,6 @@ TickitTerm *tickit_get_term(Tickit *t);
 
 TickitWindow *tickit_get_rootwin(Tickit *t);
 
-void tickit_tick(Tickit *t);
-
 void tickit_run(Tickit *t);
 
 /* Debug support */

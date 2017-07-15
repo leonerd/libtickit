@@ -81,14 +81,6 @@ TickitWindow *tickit_get_rootwin(Tickit *t)
   return t->rootwin;
 }
 
-void tickit_tick(Tickit *t)
-{
-  if(t->rootwin)
-    tickit_window_flush(t->rootwin);
-  if(t->term)
-    tickit_term_input_wait_msec(t->term, -1);
-}
-
 // TODO: copy the entire SIGWINCH-like structure from term.c
 int still_running;
 
@@ -103,6 +95,9 @@ void tickit_run(Tickit *t)
   signal(SIGINT, sigint);
 
   while(still_running) {
-    tickit_tick(t);
+    if(t->rootwin)
+      tickit_window_flush(t->rootwin);
+    if(t->term)
+      tickit_term_input_wait_msec(t->term, -1);
   }
 }
