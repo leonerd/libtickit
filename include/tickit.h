@@ -594,6 +594,7 @@ TickitTerm *tickit_get_term(Tickit *t);
 TickitWindow *tickit_get_rootwin(Tickit *t);
 
 void tickit_run(Tickit *t);
+void tickit_stop(Tickit *t);
 
 int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *user);
 int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallbackFn *fn, void *user);

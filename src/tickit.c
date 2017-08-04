@@ -12,6 +12,8 @@ typedef struct {
 struct Tickit {
   int refcount;
 
+  volatile int still_running;
+
   TickitTerm   *term;
   TickitWindow *rootwin;
 
@@ -96,19 +98,24 @@ TickitWindow *tickit_get_rootwin(Tickit *t)
 }
 
 // TODO: copy the entire SIGWINCH-like structure from term.c
-int still_running;
+// For now we only handle atmost-one running Tickit instance
+
+static Tickit *running_tickit;
 
 static void sigint(int sig)
 {
-  still_running = 0;
+  if(running_tickit)
+    tickit_stop(running_tickit);
 }
 
 void tickit_run(Tickit *t)
 {
-  still_running = 1;
+  t->still_running = 1;
+
+  running_tickit = t;
   signal(SIGINT, sigint);
 
-  while(still_running) {
+  while(t->still_running) {
     if(t->rootwin)
       tickit_window_flush(t->rootwin);
 
@@ -144,6 +151,13 @@ void tickit_run(Tickit *t)
       }
     }
   }
+
+  running_tickit = NULL;
+}
+
+void tickit_stop(Tickit *t)
+{
+  t->still_running = 0;
 }
 
 /* static for now until we decide how to expose it */
