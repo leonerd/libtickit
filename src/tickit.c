@@ -3,11 +3,15 @@
 #include <signal.h>
 #include <sys/time.h>
 
-typedef struct {
+typedef struct Timer Timer;
+
+struct Timer {
+  Timer *next;
+
   struct timeval at;
   TickitCallbackFn *fn;
   void *user;
-} Timer;
+};
 
 struct Tickit {
   int refcount;
@@ -43,8 +47,14 @@ static void tickit_destroy(Tickit *t)
   if(t->term)
     tickit_term_unref(t->term);
 
-  if(t->next_timer)
-    free(t->next_timer);
+  if(t->next_timer) {
+    Timer *this, *next;
+    for(this = t->next_timer; this; this = next) {
+      next = this->next;
+      /* TODO: consider if there should be some sort of destroy invocation? */
+      free(this);
+    }
+  }
 
   free(t);
 }
@@ -140,15 +150,23 @@ void tickit_run(Tickit *t)
       struct timeval now;
       gettimeofday(&now, NULL);
 
-      Timer *tim = t->next_timer;
+      /* timer queue is stored ordered, so we can just eat a prefix
+       * of it
+       */
 
-      if(timercmp(&tim->at, &now, <)) {
-        t->next_timer = NULL;
+      Timer *tim = t->next_timer;
+      while(tim) {
+        if(timercmp(&tim->at, &now, >))
+          break;
 
         (*tim->fn)(t, tim->user);
 
+        Timer *next = tim->next;
         free(tim);
+        tim = next;
       }
+
+      t->next_timer = tim;
     }
   }
 
@@ -163,20 +181,23 @@ void tickit_stop(Tickit *t)
 /* static for now until we decide how to expose it */
 static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn *fn, void *user)
 {
-  if(t->next_timer) {
-    fprintf(stderr, "TODO: multiple pending timer\n");
-    abort();
-  }
-
   Timer *tim = malloc(sizeof(Timer));
   if(!tim)
     return -1;
+
+  tim->next = NULL;
 
   tim->at = *at;
   tim->fn = fn;
   tim->user = user;
 
-  t->next_timer = tim;
+  Timer **prevp = &t->next_timer;
+  /* Try to insert in-order at matching timestamp */
+  while(*prevp && !timercmp(&(*prevp)->at, at, >))
+    prevp = &(*prevp)->next;
+
+  tim->next = *prevp;
+  *prevp = tim;
 
   return 0;
 }
