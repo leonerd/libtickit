@@ -1,18 +1,11 @@
 #include "tickit.h"
 
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-int still_running = 1;
 int term_lines, term_cols;
-
-static void sigint(int sig)
-{
-  still_running = 0;
-}
 
 static void scroll(TickitTerm *tt, int downward, int rightward)
 {
@@ -106,23 +99,17 @@ static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 
 int main(int argc, char *argv[])
 {
-  TickitTerm *tt;
+  Tickit *t = tickit_new();
 
-  tt = tickit_term_open_stdio();
+  TickitTerm *tt = tickit_get_term(t);
   if(!tt) {
     fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
     return 1;
   }
-  tickit_term_await_started_msec(tt, 50);
 
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_CLICK);
-  tickit_term_clear(tt);
 
   tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE|TICKIT_EV_RESIZE, 0, event, NULL);
-
-  signal(SIGINT, sigint);
 
   int lines, cols;
   tickit_term_get_size(tt, &lines, &cols);
@@ -136,10 +123,9 @@ int main(int argc, char *argv[])
     tickit_term_print(tt, buf);
   }
 
-  while(still_running)
-    tickit_term_input_wait_msec(tt, -1);
+  tickit_run(t);
 
-  tickit_term_unref(tt);
+  tickit_unref(t);
 
   return 0;
 }
