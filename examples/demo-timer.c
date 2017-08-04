@@ -1,64 +1,56 @@
 #include "tickit.h"
 
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-int still_running = 1;
-
-static void sigint(int sig)
+static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *user)
 {
-  still_running = 0;
-}
-
-static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
-{
+  int *counterp = user;
   TickitExposeEventInfo *info = _info;
   TickitRenderBuffer *rb = info->rb;
 
   tickit_renderbuffer_eraserect(rb, &info->rect);
 
   tickit_renderbuffer_goto(rb, 5, 5);
-  tickit_renderbuffer_textf(rb, "Counter %d", *((int *)data));
+  tickit_renderbuffer_textf(rb, "Counter %d", *counterp);
 
   return 1;
 }
 
+static void on_timer(Tickit *t, void *user);
+static void on_timer(Tickit *t, void *user)
+{
+  int *counterp = user;
+
+  (*counterp)++;
+  tickit_window_expose(tickit_get_rootwin(t), NULL);
+
+  tickit_timer_after_msec(t, 1000, &on_timer, user);
+}
+
 int main(int argc, char *argv[])
 {
-  TickitTerm *tt;
+  Tickit *t = tickit_new();
 
-  tt = tickit_term_open_stdio();
-  if(!tt) {
+  TickitWindow *root = tickit_get_rootwin(t);
+  if(!root) {
     fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
     return 1;
   }
-  tickit_term_await_started_msec(tt, 50);
-
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
-  tickit_term_clear(tt);
 
   int counter = 0;
 
-  TickitWindow *root = tickit_window_new_root(tt);
   tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose, &counter);
 
-  signal(SIGINT, sigint);
+  tickit_timer_after_msec(t, 1000, &on_timer, &counter);
 
-  while(still_running) {
-    tickit_window_flush(root);
-    tickit_term_input_wait_msec(tt, 1000);
-
-    counter++;
-    tickit_window_expose(root, NULL);
-  }
+  tickit_run(t);
 
   tickit_window_close(root);
-  tickit_window_unref(root);
-  tickit_term_unref(tt);
+
+  tickit_unref(t);
 
   return 0;
 }
