@@ -5,6 +5,9 @@ extern "C" {
 #ifndef __TICKIT_H__
 #define __TICKIT_H__
 
+/* We'd quite like the timer*() functions */
+#define _DEFAULT_SOURCE
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -223,6 +226,8 @@ typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len,
 typedef int TickitTermEventFn(TickitTerm *tt, TickitEventType ev, void *info, void *user);
 
 typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *info, void *user);
+
+typedef void TickitCallbackFn(Tickit *t, void *user);
 
 /*
  * Functions
@@ -589,6 +594,9 @@ TickitTerm *tickit_get_term(Tickit *t);
 TickitWindow *tickit_get_rootwin(Tickit *t);
 
 void tickit_run(Tickit *t);
+
+int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *user);
+int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallbackFn *fn, void *user);
 
 /* Debug support */
 
