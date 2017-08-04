@@ -8,6 +8,7 @@ typedef struct Timer Timer;
 struct Timer {
   Timer *next;
 
+  int id;
   struct timeval at;
   TickitCallbackFn *fn;
   void *user;
@@ -21,7 +22,8 @@ struct Tickit {
   TickitTerm   *term;
   TickitWindow *rootwin;
 
-  Timer *next_timer;
+  Timer *timers;
+  int next_timer_id;
 };
 
 Tickit *tickit_new(void)
@@ -35,7 +37,8 @@ Tickit *tickit_new(void)
   t->term = NULL;
   t->rootwin = NULL;
 
-  t->next_timer = NULL;
+  t->timers = NULL;
+  t->next_timer_id = 1;
 
   return t;
 }
@@ -47,9 +50,9 @@ static void tickit_destroy(Tickit *t)
   if(t->term)
     tickit_term_unref(t->term);
 
-  if(t->next_timer) {
+  if(t->timers) {
     Timer *this, *next;
-    for(this = t->next_timer; this; this = next) {
+    for(this = t->timers; this; this = next) {
       next = this->next;
       /* TODO: consider if there should be some sort of destroy invocation? */
       free(this);
@@ -130,12 +133,12 @@ void tickit_run(Tickit *t)
       tickit_window_flush(t->rootwin);
 
     int msec = -1;
-    if(t->next_timer) {
+    if(t->timers) {
       struct timeval now, delay;
       gettimeofday(&now, NULL);
 
-      /* next_timer->at - now ==> delay */
-      timersub(&t->next_timer->at, &now, &delay);
+      /* timers->at - now ==> delay */
+      timersub(&t->timers->at, &now, &delay);
 
       msec = (delay.tv_sec * 1000) + (delay.tv_usec / 1000);
       if(msec < 0)
@@ -146,7 +149,7 @@ void tickit_run(Tickit *t)
       tickit_term_input_wait_msec(t->term, msec);
     /* else: er... handle msec somehow */
 
-    if(t->next_timer) {
+    if(t->timers) {
       struct timeval now;
       gettimeofday(&now, NULL);
 
@@ -154,7 +157,7 @@ void tickit_run(Tickit *t)
        * of it
        */
 
-      Timer *tim = t->next_timer;
+      Timer *tim = t->timers;
       while(tim) {
         if(timercmp(&tim->at, &now, >))
           break;
@@ -166,7 +169,7 @@ void tickit_run(Tickit *t)
         tim = next;
       }
 
-      t->next_timer = tim;
+      t->timers = tim;
     }
   }
 
@@ -187,11 +190,14 @@ static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn
 
   tim->next = NULL;
 
+  tim->id = t->next_timer_id;
   tim->at = *at;
   tim->fn = fn;
   tim->user = user;
 
-  Timer **prevp = &t->next_timer;
+  t->next_timer_id++;
+
+  Timer **prevp = &t->timers;
   /* Try to insert in-order at matching timestamp */
   while(*prevp && !timercmp(&(*prevp)->at, at, >))
     prevp = &(*prevp)->next;
@@ -199,7 +205,7 @@ static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn
   tim->next = *prevp;
   *prevp = tim;
 
-  return 0;
+  return tim->id;
 }
 
 int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallbackFn *fn, void *user)
@@ -219,4 +225,19 @@ int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *use
       .tv_sec = msec / 1000,
       .tv_usec = (msec % 1000) * 1000,
     }, fn, user);
+}
+
+void tickit_timer_cancel(Tickit *t, int id)
+{
+  Timer **prevp = &t->timers;
+  while(*prevp) {
+    Timer *this = *prevp;
+    if(this->id == id) {
+      *prevp = this->next;
+
+      free(this);
+    }
+
+    prevp = &(*prevp)->next;
+  }
 }

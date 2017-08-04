@@ -54,6 +54,20 @@ int main(int argc, char *argv[])
     is_int(state_b.capture, 1, "tickit_timer_after_msec second capture");
   }
 
+  /* timer cancellation */
+  {
+    int called = 0;
+    tickit_timer_after_msec(t, 10, &on_call_incr, &called);
+    int not_called = 0;
+    int id = tickit_timer_after_msec(t, 5, &on_call_incr, &not_called);
+
+    tickit_timer_cancel(t, id);
+
+    tickit_run(t);
+
+    ok(!not_called, "tickit_timer_cancel prevents invocation");
+  }
+
   tickit_unref(t);
 
   return exit_status();
