@@ -150,7 +150,6 @@ int main(int argc, char *argv[])
   tickit_run(t);
 
   tickit_window_close(root);
-  tickit_window_unref(root);
 
   tickit_unref(t);
 
