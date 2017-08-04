@@ -600,6 +600,8 @@ int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *use
 int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallbackFn *fn, void *user);
 void tickit_timer_cancel(Tickit *t, int id);
 
+int tickit_later(Tickit *t, TickitCallbackFn *fn, void *user);
+
 /* Debug support */
 
 void tickit_debug_init(void);

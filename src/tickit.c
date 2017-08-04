@@ -3,13 +3,13 @@
 #include <signal.h>
 #include <sys/time.h>
 
-typedef struct Timer Timer;
+typedef struct Deferral Deferral;
 
-struct Timer {
-  Timer *next;
+struct Deferral {
+  Deferral *next;
 
   int id;
-  struct timeval at;
+  struct timeval at;  /* only for timers */
   TickitCallbackFn *fn;
   void *user;
 };
@@ -22,8 +22,10 @@ struct Tickit {
   TickitTerm   *term;
   TickitWindow *rootwin;
 
-  Timer *timers;
+  Deferral *timers;
   int next_timer_id;
+
+  Deferral *laters;
 };
 
 Tickit *tickit_new(void)
@@ -40,6 +42,8 @@ Tickit *tickit_new(void)
   t->timers = NULL;
   t->next_timer_id = 1;
 
+  t->laters = NULL;
+
   return t;
 }
 
@@ -51,7 +55,7 @@ static void tickit_destroy(Tickit *t)
     tickit_term_unref(t->term);
 
   if(t->timers) {
-    Timer *this, *next;
+    Deferral *this, *next;
     for(this = t->timers; this; this = next) {
       next = this->next;
       /* TODO: consider if there should be some sort of destroy invocation? */
@@ -145,6 +149,13 @@ void tickit_run(Tickit *t)
         msec = 0;
     }
 
+    /* detach the later queue before running any events */
+    Deferral *later = t->laters;
+    t->laters = NULL;
+
+    if(later)
+      msec = 0;
+
     if(t->term)
       tickit_term_input_wait_msec(t->term, msec);
     /* else: er... handle msec somehow */
@@ -157,19 +168,27 @@ void tickit_run(Tickit *t)
        * of it
        */
 
-      Timer *tim = t->timers;
+      Deferral *tim = t->timers;
       while(tim) {
         if(timercmp(&tim->at, &now, >))
           break;
 
         (*tim->fn)(t, tim->user);
 
-        Timer *next = tim->next;
+        Deferral *next = tim->next;
         free(tim);
         tim = next;
       }
 
       t->timers = tim;
+    }
+
+    while(later) {
+      (*later->fn)(t, later->user);
+
+      Deferral *next = later->next;
+      free(later);
+      later = next;
     }
   }
 
@@ -184,7 +203,7 @@ void tickit_stop(Tickit *t)
 /* static for now until we decide how to expose it */
 static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn *fn, void *user)
 {
-  Timer *tim = malloc(sizeof(Timer));
+  Deferral *tim = malloc(sizeof(Deferral));
   if(!tim)
     return -1;
 
@@ -197,7 +216,7 @@ static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn
 
   t->next_timer_id++;
 
-  Timer **prevp = &t->timers;
+  Deferral **prevp = &t->timers;
   /* Try to insert in-order at matching timestamp */
   while(*prevp && !timercmp(&(*prevp)->at, at, >))
     prevp = &(*prevp)->next;
@@ -229,9 +248,9 @@ int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *use
 
 void tickit_timer_cancel(Tickit *t, int id)
 {
-  Timer **prevp = &t->timers;
+  Deferral **prevp = &t->timers;
   while(*prevp) {
-    Timer *this = *prevp;
+    Deferral *this = *prevp;
     if(this->id == id) {
       *prevp = this->next;
 
@@ -240,4 +259,25 @@ void tickit_timer_cancel(Tickit *t, int id)
 
     prevp = &(*prevp)->next;
   }
+}
+
+int tickit_later(Tickit *t, TickitCallbackFn *fn, void *user)
+{
+  Deferral *later = malloc(sizeof(Deferral));
+  if(!later)
+    return -1;
+
+  later->next = NULL;
+
+  later->fn = fn;
+  later->user = user;
+
+  Deferral **prevp = &t->laters;
+  while(*prevp)
+    prevp = &(*prevp)->next;
+
+  later->next = *prevp;
+  *prevp = later;
+
+  return 1;
 }
