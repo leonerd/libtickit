@@ -71,6 +71,8 @@ struct TickitRootWindow {
   bool needs_restore;
   bool needs_later_processing;
 
+  Tickit *tickit; /* uncounted */
+
   int event_id;
 
   // Drag/drop context handling
@@ -230,7 +232,8 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->hooks = (struct TickitHooklist){ NULL };
 }
 
-TickitWindow* tickit_window_new_root(TickitTerm *term)
+/* INTERNAL */
+TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term)
 {
   int lines, cols;
   tickit_term_get_size(term, &lines, &cols);
@@ -247,6 +250,7 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
   root->needs_expose = false;
   root->needs_restore = false;
   root->needs_later_processing = false;
+  root->tickit = t; /* uncounted */
 
   root->damage = tickit_rectset_new();
   if(!root->damage) {
@@ -262,6 +266,11 @@ TickitWindow* tickit_window_new_root(TickitTerm *term)
   tickit_window_expose(ROOT_AS_WINDOW(root), NULL);
 
   return ROOT_AS_WINDOW(root);
+}
+
+TickitWindow *tickit_window_new_root(TickitTerm *tt)
+{
+  return tickit_window_new_root2(NULL, tt);
 }
 
 static TickitRootWindow *_get_root(const TickitWindow *win)
@@ -635,9 +644,17 @@ static void _request_restore(TickitRootWindow *root)
   _request_later_processing(root);
 }
 
+static void _flush_fn(Tickit *t, void *user)
+{
+  TickitWindow *win = user;
+  tickit_window_flush(win);
+}
+
 static void _request_later_processing(TickitRootWindow *root)
 {
   root->needs_later_processing = true;
+  if(root->tickit)
+    tickit_later(root->tickit, _flush_fn, ROOT_AS_WINDOW(root));
 }
 
 static bool _cell_visible(TickitWindow *win, int line, int col)

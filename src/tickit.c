@@ -3,6 +3,9 @@
 #include <signal.h>
 #include <sys/time.h>
 
+/* INTERNAL */
+TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term);
+
 typedef struct Deferral Deferral;
 
 struct Deferral {
@@ -108,7 +111,7 @@ TickitWindow *tickit_get_rootwin(Tickit *t)
     if(!tt)
       return NULL;
 
-    t->rootwin = tickit_window_new_root(tt);
+    t->rootwin = tickit_window_new_root2(t, tt);
   }
 
   return t->rootwin;
@@ -133,9 +136,6 @@ void tickit_run(Tickit *t)
   signal(SIGINT, sigint);
 
   while(t->still_running) {
-    if(t->rootwin)
-      tickit_window_flush(t->rootwin);
-
     int msec = -1;
     if(t->timers) {
       struct timeval now, delay;
