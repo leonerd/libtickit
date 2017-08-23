@@ -31,7 +31,7 @@ struct Tickit {
   Deferral *laters;
 };
 
-Tickit *tickit_new(void)
+Tickit *tickit_new_stdio(void)
 {
   Tickit *t = malloc(sizeof(Tickit));
   if(!t)

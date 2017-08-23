@@ -116,7 +116,7 @@ static int event_mouse(TickitWindow *win, TickitEventType ev, void *_info, void 
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new();
+  Tickit *t = tickit_new_stdio();
 
   TickitWindow *root = tickit_get_rootwin(t);
   if(!root) {

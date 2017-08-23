@@ -32,7 +32,7 @@ static void on_timer(Tickit *t, void *user)
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new();
+  Tickit *t = tickit_new_stdio();
 
   TickitWindow *root = tickit_get_rootwin(t);
   if(!root) {

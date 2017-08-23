@@ -81,7 +81,7 @@ static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new();
+  Tickit *t = tickit_new_stdio();
 
   TickitTerm *tt = tickit_get_term(t);
   if(!tt) {
