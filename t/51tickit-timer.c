@@ -1,4 +1,5 @@
 #include "tickit.h"
+#include "tickit-mockterm.h"
 #include "taplib.h"
 
 static void on_call_incr(Tickit *t, void *user)
@@ -27,7 +28,7 @@ static void on_call_capture(Tickit *t, void *user)
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_stdio();
+  Tickit *t = tickit_new_for_term(tickit_mockterm_new(25, 80));
 
   {
     int called = 0;

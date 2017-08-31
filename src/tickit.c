@@ -31,7 +31,7 @@ struct Tickit {
   Deferral *laters;
 };
 
-Tickit *tickit_new_stdio(void)
+Tickit *tickit_new_for_term(TickitTerm *tt)
 {
   Tickit *t = malloc(sizeof(Tickit));
   if(!t)
@@ -39,7 +39,10 @@ Tickit *tickit_new_stdio(void)
 
   t->refcount = 1;
 
-  t->term = NULL;
+  if(tt)
+    t->term = tt; /* take ownership */
+  else
+    t->term = NULL;
   t->rootwin = NULL;
 
   t->timers = NULL;
@@ -48,6 +51,11 @@ Tickit *tickit_new_stdio(void)
   t->laters = NULL;
 
   return t;
+}
+
+Tickit *tickit_new_stdio(void)
+{
+  return tickit_new_for_term(NULL);
 }
 
 static void tickit_destroy(Tickit *t)

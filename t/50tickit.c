@@ -1,9 +1,10 @@
 #include "tickit.h"
+#include "tickit-mockterm.h"
 #include "taplib.h"
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_stdio();
+  Tickit *t = tickit_new_for_term(tickit_mockterm_new(25, 80));
 
   ok(!!t, "tickit_new_stdio()");
 

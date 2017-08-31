@@ -584,6 +584,7 @@ void tickit_window_set_steal_input(TickitWindow *win, bool steal);
 
 /* Main object */
 
+Tickit *tickit_new_for_term(TickitTerm *tt);
 Tickit *tickit_new_stdio(void);
 
 Tickit *tickit_ref(Tickit *t);
