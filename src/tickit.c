@@ -89,19 +89,28 @@ TickitTerm *tickit_get_term(Tickit *t)
     if(!tt)
       return NULL;
 
-    tickit_term_await_started_msec(tt, 50);
-
-    tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-    tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
-    tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_DRAG);
-    tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
-
-    tickit_term_clear(tt);
-
     t->term = tt;
   }
 
   return t->term;
+}
+
+static void setupterm(Tickit *t)
+{
+  TickitTerm *tt = tickit_get_term(t);
+
+  tickit_term_await_started_msec(tt, 50);
+
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_DRAG);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
+
+  tickit_term_clear(tt);
+}
+
+static void teardownterm(Tickit *t)
+{
 }
 
 TickitWindow *tickit_get_rootwin(Tickit *t)
@@ -134,6 +143,8 @@ void tickit_run(Tickit *t)
 
   running_tickit = t;
   signal(SIGINT, sigint);
+
+  setupterm(t);
 
   while(t->still_running) {
     int msec = -1;
@@ -191,6 +202,8 @@ void tickit_run(Tickit *t)
       later = next;
     }
   }
+
+  teardownterm(t);
 
   running_tickit = NULL;
 }
