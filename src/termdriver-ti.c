@@ -140,7 +140,7 @@ static void run_ti(TickitTermDriver *ttd, const char *str, int n_params, ...)
 
   va_start(args, n_params);
   for(int i = 0; i < 10 && i < n_params; i++)
-    params[i].i = va_arg(args, int);
+    params[i] = unibi_var_from_num(va_arg(args, int));
 
   char tmp[64];
   char *buf = tmp;
