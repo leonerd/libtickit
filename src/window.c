@@ -73,7 +73,7 @@ struct TickitRootWindow {
 
   Tickit *tickit; /* uncounted */
 
-  int event_id;
+  int event_ids[3];
 
   // Drag/drop context handling
   bool mouse_dragging;
@@ -91,110 +91,98 @@ static void _purge_hierarchy_changes(TickitWindow *win);
 static int _handle_key(TickitWindow *win, TickitKeyEventInfo *args);
 static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
 
-static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user)
+static int on_term_resize(TickitTerm *term, TickitEventType ev, void *_info, void *user)
 {
   TickitRootWindow *root = user;
   TickitWindow *win = ROOT_AS_WINDOW(root);
 
-  if(ev & TICKIT_EV_RESIZE) {
-    TickitResizeEventInfo *info = _info;
-    int oldlines = win->rect.lines;
-    int oldcols  = win->rect.cols;
+  TickitResizeEventInfo *info = _info;
+  int oldlines = win->rect.lines;
+  int oldcols  = win->rect.cols;
 
-    tickit_window_resize(win, info->lines, info->cols);
-    DEBUG_LOGF("Ir", "Resize to %dx%d",
-        info->cols, info->lines);
+  tickit_window_resize(win, info->lines, info->cols);
+  DEBUG_LOGF("Ir", "Resize to %dx%d",
+      info->cols, info->lines);
 
-    if(info->lines > oldlines) {
-      TickitRect damage = {
-        .top   = oldlines,
-        .left  = 0,
-        .lines = info->lines - oldlines,
-        .cols  = info->cols,
-      };
-      tickit_window_expose(win, &damage);
-    }
-
-    if(info->cols > oldcols) {
-      TickitRect damage = {
-        .top   = 0,
-        .left  = oldcols,
-        .lines = oldlines,
-        .cols  = info->cols - oldcols,
-      };
-      tickit_window_expose(win, &damage);
-    }
-
-    return 1;
+  if(info->lines > oldlines) {
+    TickitRect damage = {
+      .top   = oldlines,
+      .left  = 0,
+      .lines = info->lines - oldlines,
+      .cols  = info->cols,
+    };
+    tickit_window_expose(win, &damage);
   }
 
-  if(ev & TICKIT_EV_KEY) {
-    TickitKeyEventInfo *info = _info;
-    static const char * const evnames[] = { NULL, "KEY", "TEXT" };
-
-    DEBUG_LOGF("Ik", "Key event %s %s (mod=%02x)",
-        evnames[info->type], info->str, info->mod);
-
-    return _handle_key(win, info);
+  if(info->cols > oldcols) {
+    TickitRect damage = {
+      .top   = 0,
+      .left  = oldcols,
+      .lines = oldlines,
+      .cols  = info->cols - oldcols,
+    };
+    tickit_window_expose(win, &damage);
   }
 
-  if(ev & TICKIT_EV_MOUSE) {
-    TickitMouseEventInfo *info = _info;
-    static const char * const evnames[] = { NULL, "PRESS", "DRAG", "RELEASE", "WHEEL" };
+  return 1;
+}
 
-    DEBUG_LOGF("Im", "Mouse event %s %d @%d,%d (mod=%02x)",
-        evnames[info->type], info->button, info->col, info->line, info->mod);
+static int on_term_key(TickitTerm *term, TickitEventType ev, void *_info, void *user)
+{
+  TickitRootWindow *root = user;
+  TickitWindow *win = ROOT_AS_WINDOW(root);
 
-    if(info->type == TICKIT_MOUSEEV_PRESS) {
-      /* Save the last press location in case of drag */
-      root->mouse_last_button = info->button;
-      root->mouse_last_line   = info->line;
-      root->mouse_last_col    = info->col;
-    }
-    else if(info->type == TICKIT_MOUSEEV_DRAG && !root->mouse_dragging) {
-      TickitMouseEventInfo draginfo = {
-        .type   = TICKIT_MOUSEEV_DRAG_START,
-        .button = root->mouse_last_button,
-        .line   = root->mouse_last_line,
-        .col    = root->mouse_last_col,
-      };
+  TickitKeyEventInfo *info = _info;
+  static const char * const evnames[] = { NULL, "KEY", "TEXT" };
 
-      root->drag_source_window = _handle_mouse(win, &draginfo);
-      root->mouse_dragging = true;
-    }
-    else if(info->type == TICKIT_MOUSEEV_RELEASE && root->mouse_dragging) {
-      TickitMouseEventInfo draginfo = {
-        .type   = TICKIT_MOUSEEV_DRAG_DROP,
-        .button = info->button,
-        .line   = info->line,
-        .col    = info->col,
-      };
+  DEBUG_LOGF("Ik", "Key event %s %s (mod=%02x)",
+      evnames[info->type], info->str, info->mod);
 
-      _handle_mouse(win, &draginfo);
+  return _handle_key(win, info);
+}
 
-      if(root->drag_source_window) {
-        TickitRect geom = tickit_window_get_abs_geometry(root->drag_source_window);
-        TickitMouseEventInfo draginfo = {
-          .type   = TICKIT_MOUSEEV_DRAG_STOP,
-          .button = info->button,
-          .line   = info->line - geom.top,
-          .col    = info->col  - geom.left,
-        };
+static int on_term_mouse(TickitTerm *term, TickitEventType ev, void *_info, void *user)
+{
+  TickitRootWindow *root = user;
+  TickitWindow *win = ROOT_AS_WINDOW(root);
 
-        _handle_mouse(root->drag_source_window, &draginfo);
-      }
+  TickitMouseEventInfo *info = _info;
+  static const char * const evnames[] = { NULL, "PRESS", "DRAG", "RELEASE", "WHEEL" };
 
-      root->mouse_dragging = false;
-    }
+  DEBUG_LOGF("Im", "Mouse event %s %d @%d,%d (mod=%02x)",
+      evnames[info->type], info->button, info->col, info->line, info->mod);
 
-    TickitWindow *handled = _handle_mouse(win, info);
+  if(info->type == TICKIT_MOUSEEV_PRESS) {
+    /* Save the last press location in case of drag */
+    root->mouse_last_button = info->button;
+    root->mouse_last_line   = info->line;
+    root->mouse_last_col    = info->col;
+  }
+  else if(info->type == TICKIT_MOUSEEV_DRAG && !root->mouse_dragging) {
+    TickitMouseEventInfo draginfo = {
+      .type   = TICKIT_MOUSEEV_DRAG_START,
+      .button = root->mouse_last_button,
+      .line   = root->mouse_last_line,
+      .col    = root->mouse_last_col,
+    };
 
-    if(info->type == TICKIT_MOUSEEV_DRAG &&
-       root->drag_source_window &&
-       (!handled || handled != root->drag_source_window)) {
+    root->drag_source_window = _handle_mouse(win, &draginfo);
+    root->mouse_dragging = true;
+  }
+  else if(info->type == TICKIT_MOUSEEV_RELEASE && root->mouse_dragging) {
+    TickitMouseEventInfo draginfo = {
+      .type   = TICKIT_MOUSEEV_DRAG_DROP,
+      .button = info->button,
+      .line   = info->line,
+      .col    = info->col,
+    };
+
+    _handle_mouse(win, &draginfo);
+
+    if(root->drag_source_window) {
       TickitRect geom = tickit_window_get_abs_geometry(root->drag_source_window);
       TickitMouseEventInfo draginfo = {
-        .type   = TICKIT_MOUSEEV_DRAG_OUTSIDE,
+        .type   = TICKIT_MOUSEEV_DRAG_STOP,
         .button = info->button,
         .line   = info->line - geom.top,
         .col    = info->col  - geom.left,
@@ -203,10 +191,26 @@ static int on_term(TickitTerm *term, TickitEventType ev, void *_info, void *user
       _handle_mouse(root->drag_source_window, &draginfo);
     }
 
-    return !!handled;
+    root->mouse_dragging = false;
   }
 
-  return 0;
+  TickitWindow *handled = _handle_mouse(win, info);
+
+  if(info->type == TICKIT_MOUSEEV_DRAG &&
+     root->drag_source_window &&
+     (!handled || handled != root->drag_source_window)) {
+    TickitRect geom = tickit_window_get_abs_geometry(root->drag_source_window);
+    TickitMouseEventInfo draginfo = {
+      .type   = TICKIT_MOUSEEV_DRAG_OUTSIDE,
+      .button = info->button,
+      .line   = info->line - geom.top,
+      .col    = info->col  - geom.left,
+    };
+
+    _handle_mouse(root->drag_source_window, &draginfo);
+  }
+
+  return !!handled;
 }
 
 static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect)
@@ -258,8 +262,12 @@ TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term)
     return NULL;
   }
 
-  root->event_id = tickit_term_bind_event(term, TICKIT_EV_RESIZE|TICKIT_EV_KEY|TICKIT_EV_MOUSE,
-      0, &on_term, root);
+  root->event_ids[0] = tickit_term_bind_event(term, TICKIT_EV_RESIZE, 0,
+      &on_term_resize, root);
+  root->event_ids[1] = tickit_term_bind_event(term, TICKIT_EV_KEY, 0,
+      &on_term_key, root);
+  root->event_ids[2] = tickit_term_bind_event(term, TICKIT_EV_MOUSE, 0,
+      &on_term_mouse, root);
 
   root->mouse_dragging = false;
 
@@ -385,7 +393,9 @@ void tickit_window_destroy(TickitWindow *win)
       tickit_rectset_destroy(root->damage);
     }
 
-    tickit_term_unbind_event_id(root->term, root->event_id);
+    tickit_term_unbind_event_id(root->term, root->event_ids[0]);
+    tickit_term_unbind_event_id(root->term, root->event_ids[1]);
+    tickit_term_unbind_event_id(root->term, root->event_ids[2]);
 
     tickit_term_unref(root->term);
   }
