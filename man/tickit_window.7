@@ -33,14 +33,17 @@ The \fBTickitPen\fP instance associated with each window for drawing purposes ca
 .PP
 While most drawing operations are performed in a deferred manner using expose events, scrolling of the terminal content can be directly requested using \fBtickit_window_scrollrect\fP(3), \fBtickit_window_scroll\fP(3) or \fBtickit_window_scroll_with_children\fP(3).
 .SH EVENTS
-A window instace stores a set of event handlers. Each event handler consists of a bitmask of one or more event types it is interested in, a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_window_bind_event\fP(3) and removed using \fBtickit_window_unbind_event_id\fP(3).
+A window instance stores a list of event handlers. Each event handler is associated with one event type and stores a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_window_bind_event\fP(3) and removed using \fBtickit_window_unbind_event_id\fP(3).
 .PP
 The event types recognised are:
 .TP
-.B TICKIT_EV_KEY
+.B TICKIT_WINDOW_ON_DESTROY
+The window instance is being destroyed.
+.TP
+.B TICKIT_WINDOW_ON_KEY
 A key has been pressed on the keyboard while this window has input focus (or is set to steal input). \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_KEY\fP event described in \fBtickit_term\fP(7).
 .TP
-.B TICKIT_EV_MOUSE
+.B TICKIT_WINDOW_ON_MOUSE
 A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled while the cursor is within the bounds of this window (or the window is set to steal input), or certain kinds of mouse dragging behaviour have happened.
 .sp
 \fIinfo\fP will point to a structure defined the same as the \fBTICKIT_EV_MOUSE\fP event described in \fBtickit_term\fP(7), except that the position given by the \fIline\fP and \fIcol\fP fields will be relative to the window, rather than the terminal as a whole.
@@ -61,7 +64,7 @@ A dragging motion has stopped by the mouse button being released. This event is 
 A dragging motion has stopped by the mouse button being released. This event is delivered directly to the source window; i.e. the window that handled the \fBTICKIT_MOUSEEV_DRAG_START\fP event. If that is a different window than the one that received the \fBTICKIT_MOUSEEV_DRAG_STOP\fP event then the position may be outside the bounds of the window.
 .RE
 .TP
-.B TICKIT_EV_GEOMCHANGE
+.B TICKIT_WINDOW_ON_GEOMCHANGE
 At least one of the fields of the window geometry have been changed, meaning it now occupies a different area of the screen. \fIinfo\fP will point to a structure defined as:
 .sp
 .EX
@@ -73,7 +76,7 @@ At least one of the fields of the window geometry have been changed, meaning it 
 .IP
 \fIrect\fP gives the new geometry of the window relative to its parent, and \fIoldrect\fP gives the previous geometry.
 .TP
-.B TICKIT_EV_EXPOSE
+.B TICKIT_WINDOW_ON_EXPOSE
 An area of the window needs to be re-rendered because it has now been freshly exposed; either because of stacking or visibilty changes of this or sibling windows, a cascaded expose event on its parent, or due to a call to \fBtickit_window_expose\fP(). \fIinfo\fP will point to a structure defined as:
 .sp
 .EX
@@ -85,7 +88,7 @@ An area of the window needs to be re-rendered because it has now been freshly ex
 .IP
 \fIrect\fP gives the region of the window that needs to be redrawn. This will always be inside the window's bounds. If multiple pending regions need to be exposed, they are output in non-overlapping segments. The handling function or functions should then use the \fBTickitRenderBuffer\fP instance given by the \fIrb\fP field to draw the required contents of the window to. This instance will already be set up with the appropriate drawing pen, clipping rectangle and hole regions to account for the window hierarchy.
 .TP
-.B TICKIT_EV_FOCUS
+.B TICKIT_WINDOW_ON_FOCUS
 This window has either gained or lost the input focus, or a child of it has an this window is set to also notify on that case by using \fBtickit_window_set_focus_child_notify\fP(). \fIinfo\fP will point to a structure defined as:
 .sp
 .EX

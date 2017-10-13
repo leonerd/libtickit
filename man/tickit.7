@@ -6,7 +6,7 @@ tickit \- Terminal Interface Construction KIT
 .SS "Window Level"
 At the higher level of abstraction, a program creates a heirarchial tree of "windows", each an instance of the \fBTickitWindow\fP type. These act to divide the screen area into independent regions of interest, able to receive input events such as keyboard or mouse interactions, and render content to be displayed within its area.
 .PP
-A typical program using this model would start by creating the underlying \fBTickitTerm\fP instance to represent the terminal by calling \fBtickit_term_new\fP(3), then create a root window on it by calling \fBtickit_window_new_root\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_EV_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter its main event loop; see the \fBEVENT LOOP\fP section below.
+A typical program using this model would start by creating the underlying \fBTickitTerm\fP instance to represent the terminal by calling \fBtickit_term_new\fP(3), then create a root window on it by calling \fBtickit_window_new_root\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_WINDOW_ON_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter its main event loop; see the \fBEVENT LOOP\fP section below.
 .SS "Terminal Level"
 As an alternative to working at the level of windows, a program can operate on a lower level of abstraction by interacting directly with the \fBTickitTerm\fP instance. Operating at this level, it can use \fBtickit_term_bind_event\fP(3) to attach event handlers on the terminal instance itself in order to react to resize or input events. It can arrange for output to be drawn either by directly using the drawing functions on the terminal instance itself, or by constructing a \fBTickitRenderBuffer\fP instance to contain content, and flushing that to the terminal by calling \fBtickit_renderbuffer_flush_to_term\fP(3). As with the window level case, such a program will still need to use a main event loop; see below.
 .SH "EVENT LOOP"
@@ -40,16 +40,22 @@ It is a good idea to install a signal handler for \fBSIGINT\fP so that the termi
 .sp
 A more complex program that wanted to perform other IO or timer operations at the same time, would instead make use of \fBtickit_term_input_readable\fP(3) and the \fBtickit_term_input_check_timeout\fP functions to keep the terminal IO working alongside other activity.
 .SH "COMMON TYPES"
-The \fIflags\fP argument to the various \fB_bind_event\fP() functions should be zero, or a bitmask of the following constants.
+The \fIflags\fP argument to the various \fBtickit_..._bind_event\fP() functions should be zero, or a bitmask of the following constants.
 .sp
 .EX
 .B  typedef enum {
 .BR  "  TICKIT_BIND_FIRST" ,
+.BR  "  TICKIT_BIND_UNBIND" ,
+.BR  "  TICKIT_BIND_DESTROY" ,
 .BI "} " TickitBindFlags ;
 .EE
 .sp
 .PP
 \fBTICKIT_BIND_FIRST\fP indicates that this handler should be inserted at the start of the list, rather than the default position at the end.
+.PP
+\fBTICKIT_BIND_UNBIND\fP indicates that this handler should also be invoked at the time it is unbound, either due to a specific call to the \fBtickit_..._unbind_event\fP() function, or because the bound object is being destroyed.
+.PP
+\fBTICKIT_BIND_DESTROY\fP indicates that this handler should also be invoked at the time that the bound object is being destroyed.
 .PP
 Some API functions take or return the following enum type, to represent a tri-state extended boolean concept of true, false, or some third condition typically indicating a "don't care" or "unknown" state; the exact semantics will vary between specific uses and should be documented specifically.
 .sp
@@ -63,13 +69,29 @@ Some API functions take or return the following enum type, to represent a tri-st
 .SH "COMMON EVENTS"
 Every object instance that supports events supports the following type of event, in addition to the specific ones listed for that kind of object:
 .TP
-.B TICKIT_EV_DESTROY
-Invoked when the object instance is being destroyed. This will be the last time the application can use the stored \fIdata\fP argument; it may perform any resource reclaiming operations that are required at this time. The \fIinfo\fP pointer will be \fBNULL\fP.
-.IP
-Any event handlers for this event will be invoked in reverse order; the newest is run first and the oldest last.
+.B TICKIT_..._ON_DESTROY
+Invoked when the object instance is being destroyed. This will be the last time the application can use the stored \fIdata\fP argument; it may perform any resource reclaiming operations that are required at this time.
+.SH "EVENT FLAGS"
+When an event handler function is invoked, it is passed a bitmask of flags to indicate the reason for its invocation.
+.sp
+.EX
+.B  typedef enum {
+.BR "  TICKIT_EV_FIRE" ,
+.BR "  TICKIT_EV_UNBIND" ,
+.BR "  TICKIT_EV_DESTROY" ,
+.BI "} " TickitEventFlags ;
+.EE
+.TP
+.B TICKIT_EV_FIRE
+This handler is being invoked because its associated event has occurred. The \fIinfo\fP pointer will point to a structure containing the relevant information.
 .TP
 .B TICKIT_EV_UNBIND
-Invoked when the event handler is about to be removed, either because it was unbound individually, or because the object instance itself is being destroyed. In the former case, this event handler is invoked individually; in the latter case the entire list is invoked as normal and the \fBTICKIT_EV_DESTROY\fP flag will also be set.
+This handler is being invoked because it is being removed from the object. This will only be observed if it was bound with the \fBTICKIT_BIND_UNBIND\fP flag. The \fIinfo\fP pointer will be \fBNULL\fP.
+.TP
+.B TICKIT_EV_DESTROY
+This handler is being invoked because the object instance itself is being destroyed. This will be observed if it was bound with the \fBTICKIT_BIND_DESTROY\fP flag, or because it is bound to the \fBTICKIT_..._ON_DESTROY\fP event. The \fIinfo\fP pointer will be \fBNULL\fP.
+.IP
+Any event handlers for this event will be invoked in reverse order; the newest is run first and the oldest last.
 .SH "SEE ALSO"
 .BR tickit_window (7),
 .BR tickit_term (7),

@@ -3,7 +3,7 @@
 #include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
-int on_event_incr_int(TickitWindow *window, TickitEventType ev, void *_info, void *data)
+int on_event_incr_int(TickitWindow *window, TickitEventFlags flags, void *_info, void *data)
 {
   (*(int*)data)++;
   return 1;
@@ -90,18 +90,18 @@ int main(int argc, char *argv[])
   // Resize events
   {
     int geom_changed = 0;
-    tickit_window_bind_event(root, TICKIT_EV_GEOMCHANGE, 0, &on_event_incr_int, &geom_changed);
+    tickit_window_bind_event(root, TICKIT_WINDOW_ON_GEOMCHANGE, 0, &on_event_incr_int, &geom_changed);
     is_int(geom_changed, 0, "geometry not yet changed");
 
     int nextrect = 0;
     TickitRect rects[4];
-    int push_on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+    int push_on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
     {
       TickitExposeEventInfo *info = _info;
       rects[nextrect++] = info->rect;
       return 1;
     }
-    tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &push_on_expose, NULL);
+    tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &push_on_expose, NULL);
 
     tickit_mockterm_resize(tt, 30, 100);
     tickit_window_flush(root);
@@ -116,13 +116,13 @@ int main(int argc, char *argv[])
     is_rect(rects+1, "0,25..100,30", "exposed rects[1]");
   }
 
-  // TICKIT_EV_DESTROY
+  // DESTROY
   {
     int destroyed = 0;
-    tickit_window_bind_event(root, TICKIT_EV_DESTROY, 0, &on_event_incr_int, &destroyed);
+    tickit_window_bind_event(root, TICKIT_WINDOW_ON_DESTROY, 0, &on_event_incr_int, &destroyed);
 
     tickit_window_unref(root);
-    ok(destroyed, "TICKIT_EV_DESTROY invoked");
+    ok(destroyed, "TICKIT_WINDOW_ON_DESTROY invoked");
   }
 
   tickit_term_unref(tt);

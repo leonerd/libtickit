@@ -28,9 +28,12 @@ The values of attributes are set or queried on a pen instance by using functions
 .PP
 To test if an attribute has a value set, use \fBtickit_pen_has_attr\fP(3), and to remove the attribute entirely use \fBtickit_pen_clear_attr\fP(3). To test if a pen has any attributes set at all, use \fBtickit_pen_is_nonempty\fP(3), and to test if it has any attributes set to a non-default value use \fBtickit_pen_is_nondefault\fP(3). To remove all the attributes use \fBtickit_pen_clear\fP(3). To copy the value of one attribute from a pen into another pen use \fBtickit_pen_copy_attr\fP(3), to copy the entire pen use \fBtickit_pen_copy\fP(3), and to compare two pens for equallity use \fBtickit_pen_equiv_attr\fP(3).
 .SH EVENTS
-A pen instance stores a set of event handlers. Each event handler consists of a bitmask of one or more event types it is interested in, a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_pen_bind_event\fP(3) and removed using \fBtickit_pen_unbind_event_id\fP(3).
+A pen instance stores a list of event handlers. Each event handler is associated with one event type and stores a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_pen_bind_event\fP(3) and removed using \fBtickit_pen_unbind_event_id\fP(3).
 .PP
 The event types recognised are:
 .TP
-.B TICKIT_EV_CHANGE
+.B TICKIT_PEN_ON_DESTROY
+The pen instance is being destroyed.
+.TP
+.B TICKIT_PEN_ON_CHANGE
 The stored attributes on the pen have changed. The \fIinfo\fP pointer will be \fBNULL\fP.

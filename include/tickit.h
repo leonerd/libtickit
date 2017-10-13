@@ -40,7 +40,9 @@ typedef struct {
  */
 
 typedef enum {
-  TICKIT_BIND_FIRST = 1<<0,
+  TICKIT_BIND_FIRST   = 1<<0,
+  TICKIT_BIND_UNBIND  = 1<<1,
+  TICKIT_BIND_DESTROY = 1<<2,
 } TickitBindFlags;
 
 typedef enum {
@@ -141,24 +143,15 @@ typedef struct {
  */
 
 typedef enum {
-  TICKIT_EV_RESIZE     = 0x01,
-  TICKIT_EV_KEY        = 0x02,
-  TICKIT_EV_MOUSE      = 0x04,
-  TICKIT_EV_CHANGE     = 0x08,
-  TICKIT_EV_GEOMCHANGE = 0x10,
-  TICKIT_EV_EXPOSE     = 0x20,
-  TICKIT_EV_FOCUS      = 0x40,
+  TICKIT_EV_FIRE = (1 << 0),
+  TICKIT_EV_UNBIND = (1 << 1),
+  TICKIT_EV_DESTROY = (1 << 2),
+} TickitEventFlags;
 
-  TICKIT_EV_DESTROY = 0x40000000, // object is being destroyed
-  TICKIT_EV_UNBIND  = 0x80000000, // event handler is being unbound
-} TickitEventType;
-
-/* TICKIT_EV_RESIZE */
 typedef struct {
   int lines, cols;
 } TickitResizeEventInfo;
 
-/* TICKIT_EV_KEY */
 typedef enum {
   TICKIT_KEYEV_KEY = 1,
   TICKIT_KEYEV_TEXT,
@@ -170,7 +163,6 @@ typedef struct {
   const char *str;
 } TickitKeyEventInfo;
 
-/* TICKIT_EV_MOUSE */
 typedef enum {
   TICKIT_MOUSEEV_PRESS = 1,
   TICKIT_MOUSEEV_DRAG,
@@ -195,19 +187,16 @@ typedef struct {
   int line, col;
 } TickitMouseEventInfo;
 
-/* TICKIT_EV_GEOMCHANGE */
 typedef struct {
   TickitRect rect;
   TickitRect oldrect;
 } TickitGeomchangeEventInfo;
 
-/* TICKIT_EV_EXPOSE */
 typedef struct {
   TickitRect rect;
   TickitRenderBuffer *rb;
 } TickitExposeEventInfo;
 
-/* TICKIT_EV_FOCUS */
 typedef enum {
   TICKIT_FOCUSEV_IN = 1,
   TICKIT_FOCUSEV_OUT,
@@ -217,17 +206,6 @@ typedef struct {
   TickitFocusEventType type;
   TickitWindow *win;
 } TickitFocusEventInfo;
-
-/*
- * Callback prototypes
- */
-
-typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len, void *user);
-typedef int TickitTermEventFn(TickitTerm *tt, TickitEventType ev, void *info, void *user);
-
-typedef int TickitWindowEventFn(TickitWindow *win, TickitEventType ev, void *info, void *user);
-
-typedef void TickitCallbackFn(Tickit *t, void *user);
 
 /*
  * Functions
@@ -266,9 +244,14 @@ bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b);
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr);
 void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite);
 
-typedef int TickitPenEventFn(TickitPen *tt, TickitEventType ev, void *info, void *user);
+typedef int TickitPenEventFn(TickitPen *tt, TickitEventFlags flags, void *info, void *user);
 
-int  tickit_pen_bind_event(TickitPen *tt, TickitEventType ev, TickitBindFlags flags,
+typedef enum {
+  TICKIT_PEN_ON_DESTROY,
+  TICKIT_PEN_ON_CHANGE,
+} TickitPenEvent;
+
+int  tickit_pen_bind_event(TickitPen *tt, TickitPenEvent ev, TickitBindFlags flags,
     TickitPenEventFn *fn, void *user);
 void tickit_pen_unbind_event_id(TickitPen *tt, int id);
 
@@ -328,6 +311,8 @@ TickitTerm *tickit_term_open_stdio(void);
 
 const char *tickit_term_get_termtype(TickitTerm *tt);
 
+typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len, void *user);
+
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_output_fd(const TickitTerm *tt);
 void tickit_term_set_output_func(TickitTerm *tt, TickitTermOutputFunc *fn, void *user);
@@ -356,7 +341,16 @@ void tickit_term_refresh_size(TickitTerm *tt);
 
 void tickit_term_observe_sigwinch(TickitTerm *tt, bool observe);
 
-int  tickit_term_bind_event(TickitTerm *tt, TickitEventType ev, TickitBindFlags flags,
+typedef int TickitTermEventFn(TickitTerm *tt, TickitEventFlags flags, void *info, void *user);
+
+typedef enum {
+  TICKIT_TERM_ON_DESTROY,
+  TICKIT_TERM_ON_RESIZE,
+  TICKIT_TERM_ON_KEY,
+  TICKIT_TERM_ON_MOUSE,
+} TickitTermEvent;
+
+int  tickit_term_bind_event(TickitTerm *tt, TickitTermEvent ev, TickitBindFlags flags,
     TickitTermEventFn *fn, void *user);
 void tickit_term_unbind_event_id(TickitTerm *tt, int id);
 
@@ -534,7 +528,18 @@ void tickit_window_destroy(TickitWindow *win);
 TickitWindow *tickit_window_ref(TickitWindow *win);
 void          tickit_window_unref(TickitWindow *win);
 
-int  tickit_window_bind_event(TickitWindow *win, TickitEventType ev, TickitBindFlags flags,
+typedef int TickitWindowEventFn(TickitWindow *win, TickitEventFlags flags, void *info, void *user);
+
+typedef enum {
+  TICKIT_WINDOW_ON_DESTROY,
+  TICKIT_WINDOW_ON_GEOMCHANGE,
+  TICKIT_WINDOW_ON_EXPOSE,
+  TICKIT_WINDOW_ON_FOCUS,
+  TICKIT_WINDOW_ON_KEY,
+  TICKIT_WINDOW_ON_MOUSE,
+} TickitWindowEvent;
+
+int  tickit_window_bind_event(TickitWindow *win, TickitWindowEvent ev, TickitBindFlags flags,
     TickitWindowEventFn *fn, void *user);
 void tickit_window_unbind_event_id(TickitWindow *win, int id);
 
@@ -583,6 +588,8 @@ bool tickit_window_is_steal_input(const TickitWindow *win);
 void tickit_window_set_steal_input(TickitWindow *win, bool steal);
 
 /* Main object */
+
+typedef void TickitCallbackFn(Tickit *t, void *user);
 
 Tickit *tickit_new_for_term(TickitTerm *tt);
 Tickit *tickit_new_stdio(void);

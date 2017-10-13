@@ -31,13 +31,16 @@ Once an output method is defined, a terminal instance can be used for outputting
 .SH INPUT
 Input via a filehandle can be received either synchronously by calling \fBtickit_term_input_wait_msec\fP(3), or asynchronously by calling \fBtickit_term_input_readable\fP(3) and \fBtickit_term_input_check_timeout_msec\fP(3). Any of these functions may cause one or more events to be raised by invoking event handler functions.
 .SH EVENTS
-A terminal instance stores a set of event handlers. Each event handler consists of a bitmask of one or more event types it is interested in, a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_term_bind_event\fP(3) and removed using \fBtickit_term_unbind_event_id\fP(3).
+A terminal instance stores a list of event handlers. Each event handler is associated with one event type and stores a function pointer, and an arbitrary pointer containing user data. Event handlers may be installed using \fBtickit_term_bind_event\fP(3) and removed using \fBtickit_term_unbind_event_id\fP(3).
 .PP
 Fake events can be artificially injected into the event handler chain, as if they had been received from the controlling terminal, by \fBtickit_term_emit_key\fP(3) and \fBtickit_term_emit_mouse\fP(3). These may be useful for testing, event capture-and-replay, or other specialised cases.
 .PP
 The event types recognised are:
 .TP
-.B TICKIT_EV_RESIZE
+.B TICKIT_TERM_ON_DESTROY
+The terminal instance is being destroyed.
+.TP
+.B TICKIT_TERM_ON_RESIZE
 The terminal has been resized. \fIinfo\fP will point to a structure defined as:
 .sp
 .EX
@@ -47,7 +50,7 @@ The terminal has been resized. \fIinfo\fP will point to a structure defined as:
 .BI "} " TickitResizeEventInfo ;
 .EE
 .TP
-.B TICKIT_EV_KEY
+.B TICKIT_TERM_ON_KEY
 A key has been pressed on the keyboard. \fIinfo\fP will point to a structure defined as:
 .sp
 .EX
@@ -77,7 +80,7 @@ string of the Unicode character.
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
 .TP
-.B TICKIT_EV_MOUSE
+.B TICKIT_TERM_ON_MOUSE
 A mouse button has been pressed or released, the mouse cursor moved while dragging a button, or the wheel has been scrolled. \fIinfo\fP will point to a structure defined as:
 .sp
 .EX

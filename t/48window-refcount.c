@@ -9,7 +9,7 @@
  *   $ LD_LIBRARY_PATH=.libs valgrind t/.libs/48window-refcount.t
  */
 
-int on_event_close(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_event_close(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitWindow *target = data;
 
@@ -19,7 +19,7 @@ int on_event_close(TickitWindow *win, TickitEventType ev, void *_info, void *dat
   return 0;
 }
 
-int on_event_incr(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_event_incr(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   (*((int *)data))++;
   return 0;
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     tickit_window_take_focus(win);
     tickit_window_flush(root);
 
-    tickit_window_bind_event(win, TICKIT_EV_KEY, 0, &on_event_close, win);
+    tickit_window_bind_event(win, TICKIT_WINDOW_ON_KEY, 0, &on_event_close, win);
 
     press_key(TICKIT_KEYEV_TEXT, "A", 0);
     tickit_window_flush(root);
@@ -52,9 +52,9 @@ int main(int argc, char *argv[])
 
     tickit_window_flush(root);
 
-    tickit_window_bind_event(win1, TICKIT_EV_KEY, 0, &on_event_close, win1);
+    tickit_window_bind_event(win1, TICKIT_WINDOW_ON_KEY, 0, &on_event_close, win1);
     int count = 0;
-    tickit_window_bind_event(win2, TICKIT_EV_KEY, 0, &on_event_incr, &count);
+    tickit_window_bind_event(win2, TICKIT_WINDOW_ON_KEY, 0, &on_event_incr, &count);
 
     press_key(TICKIT_KEYEV_TEXT, "A", 0);
     tickit_window_flush(root);

@@ -91,7 +91,7 @@ static void _purge_hierarchy_changes(TickitWindow *win);
 static int _handle_key(TickitWindow *win, TickitKeyEventInfo *args);
 static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *args);
 
-static int on_term_resize(TickitTerm *term, TickitEventType ev, void *_info, void *user)
+static int on_term_resize(TickitTerm *term, TickitEventFlags flags, void *_info, void *user)
 {
   TickitRootWindow *root = user;
   TickitWindow *win = ROOT_AS_WINDOW(root);
@@ -127,7 +127,7 @@ static int on_term_resize(TickitTerm *term, TickitEventType ev, void *_info, voi
   return 1;
 }
 
-static int on_term_key(TickitTerm *term, TickitEventType ev, void *_info, void *user)
+static int on_term_key(TickitTerm *term, TickitEventFlags flags, void *_info, void *user)
 {
   TickitRootWindow *root = user;
   TickitWindow *win = ROOT_AS_WINDOW(root);
@@ -141,7 +141,7 @@ static int on_term_key(TickitTerm *term, TickitEventType ev, void *_info, void *
   return _handle_key(win, info);
 }
 
-static int on_term_mouse(TickitTerm *term, TickitEventType ev, void *_info, void *user)
+static int on_term_mouse(TickitTerm *term, TickitEventFlags flags, void *_info, void *user)
 {
   TickitRootWindow *root = user;
   TickitWindow *win = ROOT_AS_WINDOW(root);
@@ -262,11 +262,11 @@ TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term)
     return NULL;
   }
 
-  root->event_ids[0] = tickit_term_bind_event(term, TICKIT_EV_RESIZE, 0,
+  root->event_ids[0] = tickit_term_bind_event(term, TICKIT_TERM_ON_RESIZE, 0,
       &on_term_resize, root);
-  root->event_ids[1] = tickit_term_bind_event(term, TICKIT_EV_KEY, 0,
+  root->event_ids[1] = tickit_term_bind_event(term, TICKIT_TERM_ON_KEY, 0,
       &on_term_key, root);
-  root->event_ids[2] = tickit_term_bind_event(term, TICKIT_EV_MOUSE, 0,
+  root->event_ids[2] = tickit_term_bind_event(term, TICKIT_TERM_ON_MOUSE, 0,
       &on_term_mouse, root);
 
   root->mouse_dragging = false;
@@ -535,7 +535,7 @@ void tickit_window_set_geometry(TickitWindow *win, TickitRect geom)
 
     win->rect = geom;
 
-    run_events(win, TICKIT_EV_GEOMCHANGE, &info);
+    run_events(win, TICKIT_WINDOW_ON_GEOMCHANGE, &info);
   }
 }
 
@@ -645,7 +645,7 @@ static void _do_expose(TickitWindow *win, const TickitRect *rect, TickitRenderBu
     .rect = *rect,
     .rb = rb,
   };
-  run_events(win, TICKIT_EV_EXPOSE, &info);
+  run_events(win, TICKIT_WINDOW_ON_EXPOSE, &info);
 }
 
 static void _request_restore(TickitRootWindow *root)
@@ -1177,11 +1177,11 @@ static void _focus_gained(TickitWindow *win, TickitWindow *child)
     win->is_focused = true;
 
     TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_IN, .win = win };
-    run_events(win, TICKIT_EV_FOCUS, &info);
+    run_events(win, TICKIT_WINDOW_ON_FOCUS, &info);
   }
   else if(win->focus_child_notify) {
     TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_IN, .win = child };
-    run_events(win, TICKIT_EV_FOCUS, &info);
+    run_events(win, TICKIT_WINDOW_ON_FOCUS, &info);
   }
 
   win->focused_child = child;
@@ -1194,14 +1194,14 @@ static void _focus_lost(TickitWindow *win)
 
     if(win->focus_child_notify) {
       TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_OUT, .win = win->focused_child };
-      run_events(win, TICKIT_EV_FOCUS, &info);
+      run_events(win, TICKIT_WINDOW_ON_FOCUS, &info);
     }
   }
 
   if(win->is_focused) {
     win->is_focused = false;
     TickitFocusEventInfo info = { .type = TICKIT_FOCUSEV_OUT, .win = win };
-    run_events(win, TICKIT_EV_FOCUS, &info);
+    run_events(win, TICKIT_WINDOW_ON_FOCUS, &info);
   }
 }
 
@@ -1241,7 +1241,7 @@ static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
     if(_handle_key(win->focused_child, info))
       goto done;
 
-  if(run_events_whilefalse(win, TICKIT_EV_KEY, info))
+  if(run_events_whilefalse(win, TICKIT_WINDOW_ON_KEY, info))
     goto done;
 
   // Last-ditch attempt to spread it around other children
@@ -1295,7 +1295,7 @@ static TickitWindow *_handle_mouse(TickitWindow *win, TickitMouseEventInfo *info
   }
 
   ret = win;
-  if(run_events_whilefalse(win, TICKIT_EV_MOUSE, info))
+  if(run_events_whilefalse(win, TICKIT_WINDOW_ON_MOUSE, info))
     goto done;
 
   ret = NULL;

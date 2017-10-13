@@ -5,12 +5,12 @@
 
 struct TickitHooklist hooks = { NULL };
 
-int incr(void *owner, TickitEventType ev, void *info, void *data)
+int incr(void *owner, TickitEventFlags flags, void *info, void *data)
 {
   ((int *)data)[0]++;
 }
 
-int delete(void *owner, TickitEventType ev, void *info, void *data)
+int delete(void *owner, TickitEventFlags flags, void *info, void *data)
 {
   tickit_hooklist_unbind_event_id(&hooks, NULL, *(int *)info);
 }

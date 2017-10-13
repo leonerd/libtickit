@@ -51,12 +51,15 @@ static void fillterm(TickitTerm *tt)
   tickit_term_print(tt, "2222222222");
 }
 
-int on_event_get_type(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+int on_key_event_get_type(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
 {
-  if(ev & TICKIT_EV_KEY)
-    *((int *)data) = ((TickitKeyEventInfo *)_info)->type;
-  if(ev & TICKIT_EV_MOUSE)
-    *((int *)data) = ((TickitMouseEventInfo *)_info)->type;
+  *((int *)data) = ((TickitKeyEventInfo *)_info)->type;
+  return 0;
+}
+
+int on_mouse_event_get_type(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
+{
+  *((int *)data) = ((TickitMouseEventInfo *)_info)->type;
   return 0;
 }
 
@@ -229,7 +232,10 @@ int main(int argc, char *argv[])
 
   {
     int type = 0;
-    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE, 0, &on_event_get_type, &type);
+    int key_bind_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, 0,
+        &on_key_event_get_type, &type);
+    int mouse_bind_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_MOUSE, 0,
+        &on_mouse_event_get_type, &type);
 
     press_key(TICKIT_KEYEV_TEXT, "A", 0);
     is_int(type, TICKIT_KEYEV_TEXT, "type is TICKIT_KEYEV_TEXT after press_key()");
@@ -239,7 +245,8 @@ int main(int argc, char *argv[])
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 2, 3, 0);
     is_int(type, TICKIT_MOUSEEV_PRESS, "type is TICKIT_MOUSEEV_PRESS after press_mouse()");
 
-    tickit_term_unbind_event_id(tt, bind_id);
+    tickit_term_unbind_event_id(tt, key_bind_id);
+    tickit_term_unbind_event_id(tt, mouse_bind_id);
   }
 
   tickit_pen_unref(fg_pen);

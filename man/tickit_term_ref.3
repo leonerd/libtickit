@@ -13,7 +13,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_term_ref\fP() increments the stored refcount of the given terminal instance by one. It returns the pointer argument itself, so it is useful for chaining.
 .PP
-\fBtickit_term_unref\fP() decrements the stored refcount of the given terminal instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it and unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate. It will not close any filehandles associated with the instance.
+\fBtickit_term_unref\fP() decrements the stored refcount of the given terminal instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it and unbind all the bound event handlers, causing handlers to be invoked with the \fBTICKIT_EV_DESTROY\fP flag if appropriate. It will not close any filehandles associated with the instance.
 .SH "RETURN VALUE"
 \fBtickit_term_ref\fP() returns a terminal instance pointer. \fBtickit_term_unref\fP() returns no value.
 .SH "SEE ALSO"

@@ -290,7 +290,7 @@ void tickit_term_set_size(TickitTerm *tt, int lines, int cols)
     tt->cols  = cols;
 
     TickitResizeEventInfo info = { .lines = lines, .cols = cols };
-    run_events(tt, TICKIT_EV_RESIZE, &info);
+    run_events(tt, TICKIT_TERM_ON_RESIZE, &info);
   }
 }
 
@@ -525,7 +525,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 
     info.mod = key->modifiers;
 
-    run_events_whilefalse(tt, TICKIT_EV_MOUSE, &info);
+    run_events_whilefalse(tt, TICKIT_TERM_ON_MOUSE, &info);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE && !key->modifiers) {
     /* Unmodified unicode */
@@ -535,7 +535,7 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
       .mod  = key->modifiers,
     };
 
-    run_events_whilefalse(tt, TICKIT_EV_KEY, &info);
+    run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, &info);
   }
   else if(key->type == TERMKEY_TYPE_UNICODE ||
           key->type == TERMKEY_TYPE_FUNCTION ||
@@ -549,18 +549,18 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
       .mod  = key->modifiers,
     };
 
-    run_events_whilefalse(tt, TICKIT_EV_KEY, &info);
+    run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, &info);
   }
 }
 
 void tickit_term_emit_key(TickitTerm *tt, TickitKeyEventInfo *info)
 {
-  run_events_whilefalse(tt, TICKIT_EV_KEY, info);
+  run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, info);
 }
 
 void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info)
 {
-  run_events_whilefalse(tt, TICKIT_EV_MOUSE, info);
+  run_events_whilefalse(tt, TICKIT_TERM_ON_MOUSE, info);
 }
 
 static void get_keys(TickitTerm *tt, TermKey *tk)

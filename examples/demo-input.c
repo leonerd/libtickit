@@ -32,7 +32,7 @@ static void render_modifier(TickitRenderBuffer *rb, int mod)
   tickit_renderbuffer_text(rb, ">");
 }
 
-static int render_key(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+static int render_key(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitExposeEventInfo *info = _info;
   TickitRenderBuffer *rb = info->rb;
@@ -55,7 +55,7 @@ static int render_key(TickitWindow *win, TickitEventType ev, void *_info, void *
   return 1;
 }
 
-static int event_key(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+static int event_key(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitKeyEventInfo *info = _info;
 
@@ -70,7 +70,7 @@ static int event_key(TickitWindow *win, TickitEventType ev, void *_info, void *d
   return 1;
 }
 
-static int render_mouse(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+static int render_mouse(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitExposeEventInfo *info = _info;
   TickitRenderBuffer *rb = info->rb;
@@ -103,7 +103,7 @@ static int render_mouse(TickitWindow *win, TickitEventType ev, void *_info, void
   return 1;
 }
 
-static int event_mouse(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+static int event_mouse(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitMouseEventInfo *info = _info;
 
@@ -128,15 +128,15 @@ int main(int argc, char *argv[])
       .top = 2, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
     }, 0);
 
-  tickit_window_bind_event(keywin, TICKIT_EV_EXPOSE, 0, &render_key, NULL);
-  tickit_window_bind_event(root, TICKIT_EV_KEY, 0, &event_key, NULL);
+  tickit_window_bind_event(keywin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_key, NULL);
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_KEY, 0, &event_key, NULL);
 
   mousewin = tickit_window_new(root, (TickitRect){
       .top = 8, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
     }, 0);
 
-  tickit_window_bind_event(mousewin, TICKIT_EV_EXPOSE, 0, &render_mouse, NULL);
-  tickit_window_bind_event(root, TICKIT_EV_MOUSE, 0, &event_mouse, NULL);
+  tickit_window_bind_event(mousewin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_mouse, NULL);
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_MOUSE, 0, &event_mouse, NULL);
 
   tickit_window_take_focus(root);
   tickit_window_set_cursor_visible(root, false);

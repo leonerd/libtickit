@@ -32,7 +32,7 @@ static void render_modes(TickitTerm *tt)
   tickit_term_goto(tt, 20, 20);
 }
 
-static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+static int event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
 {
   TickitMouseEventInfo *info = _info;
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_CLICK);
 
-  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, 0, event, NULL);
+  tickit_term_bind_event(tt, TICKIT_TERM_ON_MOUSE, 0, event, NULL);
 
   modes.vis = 1;
   modes.blink = 1;

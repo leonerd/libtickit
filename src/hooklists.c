@@ -5,7 +5,8 @@
 struct TickitEventHook {
   struct TickitEventHook *next;
   int                     id;
-  TickitEventType         ev;
+  int                     evindex;
+  TickitBindFlags         flags;
   TickitEventFn          *fn;
   void                   *data;
 };
@@ -30,21 +31,21 @@ static void cleanup(struct TickitHooklist *hooklist)
   hooklist->needs_delete = false;
 }
 
-void tickit_hooklist_run_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
+void tickit_hooklist_run_event(struct TickitHooklist *hooklist, void *owner, int evindex, void *info)
 {
   int was_iterating = hooklist->is_iterating;
   hooklist->is_iterating = true;
 
   for(struct TickitEventHook *hook = hooklist->hooks; hook; hook = hook->next)
-    if(hook->ev & ev)
-      (*hook->fn)(owner, ev, info, hook->data);
+    if(hook->evindex == evindex)
+      (*hook->fn)(owner, TICKIT_EV_FIRE, info, hook->data);
 
   hooklist->is_iterating = was_iterating;
   if(!was_iterating && hooklist->needs_delete)
     cleanup(hooklist);
 }
 
-int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, void *info)
+int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *owner, int evindex, void *info)
 {
   int was_iterating = hooklist->is_iterating;
   hooklist->is_iterating = true;
@@ -52,8 +53,8 @@ int tickit_hooklist_run_event_whilefalse(struct TickitHooklist *hooklist, void *
   int ret = 0;
 
   for(struct TickitEventHook *hook = hooklist->hooks; hook; hook = hook->next)
-    if(hook->ev & ev) {
-      ret = (*hook->fn)(owner, ev, info, hook->data);
+    if(hook->evindex == evindex) {
+      ret = (*hook->fn)(owner, TICKIT_EV_FIRE, info, hook->data);
       if(ret)
         goto exit;
     }
@@ -65,7 +66,7 @@ exit:
   return ret;
 }
 
-int tickit_hooklist_bind_event(struct TickitHooklist *hooklist, void *owner, TickitEventType ev, TickitBindFlags flags,
+int tickit_hooklist_bind_event(struct TickitHooklist *hooklist, void *owner, int evindex, TickitBindFlags flags,
     TickitEventFn *fn, void *data)
 {
   int max_id = 0;
@@ -88,7 +89,8 @@ int tickit_hooklist_bind_event(struct TickitHooklist *hooklist, void *owner, Tic
   *newhookp = malloc(sizeof(struct TickitEventHook)); // TODO: malloc failure
 
   (*newhookp)->next = next;
-  (*newhookp)->ev = ev;
+  (*newhookp)->evindex = evindex;
+  (*newhookp)->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
   (*newhookp)->fn = fn;
   (*newhookp)->data = data;
 
@@ -104,11 +106,11 @@ void tickit_hooklist_unbind_event_id(struct TickitHooklist *hooklist, void *owne
       continue;
     }
 
-    if(hook->ev & TICKIT_EV_UNBIND)
+    if(hook->flags & TICKIT_EV_UNBIND)
       (*hook->fn)(owner, TICKIT_EV_UNBIND, NULL, hook->data);
 
     // zero out the structure
-    hook->ev = 0;
+    hook->evindex = -1;
     hook->fn = NULL;
 
     if(!hooklist->is_iterating) {
@@ -143,7 +145,8 @@ void tickit_hooklist_unbind_and_destroy(struct TickitHooklist *hooklist, void *o
 
   for(struct TickitEventHook *hook = revhooks; hook;) {
     struct TickitEventHook *next = hook->next;
-    if(hook->ev & (TICKIT_EV_UNBIND|TICKIT_EV_DESTROY))
+    if(hook->evindex == 0 ||
+        hook->flags & (TICKIT_EV_UNBIND|TICKIT_EV_DESTROY))
       (*hook->fn)(owner, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, NULL, hook->data);
     free(hook);
     hook = next;

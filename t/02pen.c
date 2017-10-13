@@ -1,7 +1,7 @@
 #include "tickit.h"
 #include "taplib.h"
 
-static int on_event_incr(TickitPen *pen, TickitEventType ev, void *_info, void *data) {
+static int on_event_incr(TickitPen *pen, TickitEventFlags flags, void *_info, void *data) {
   ((int *)data)[0]++;
   return 1;
 }
@@ -9,7 +9,7 @@ static int on_event_incr(TickitPen *pen, TickitEventType ev, void *_info, void *
 static int arr[2];
 static int next_arr = 0;
 
-static int on_event_push(TickitPen *pen, TickitEventType ev, void *_info, void *data) {
+static int on_event_push(TickitPen *pen, TickitEventFlags flags, void *_info, void *data) {
   arr[next_arr++] = *(int *)data;
   return 1;
 }
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   ok(!!pen, "tickit_pen_new");
 
   int changed = 0;
-  tickit_pen_bind_event(pen, TICKIT_EV_CHANGE, 0, on_event_incr, &changed);
+  tickit_pen_bind_event(pen, TICKIT_PEN_ON_CHANGE, 0, on_event_incr, &changed);
 
   is_int(tickit_pen_attrtype(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
 
@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
 
   is_ptr(tickit_pen_ref(pen), pen, "tickit_pen_ref() returns same pen");
 
-  tickit_pen_bind_event(pen, TICKIT_EV_DESTROY, 0, on_event_push, (int []){1});
-  tickit_pen_bind_event(pen, TICKIT_EV_DESTROY, 0, on_event_push, (int []){2});
+  tickit_pen_bind_event(pen, TICKIT_PEN_ON_DESTROY, 0, on_event_push, (int []){1});
+  tickit_pen_bind_event(pen, TICKIT_PEN_ON_DESTROY, 0, on_event_push, (int []){2});
 
   tickit_pen_unref(pen);
   ok(!next_arr, "pen not destroyed after first unref");

@@ -212,7 +212,7 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, bool val)
     default:
       return;
   }
-  run_events(pen, TICKIT_EV_CHANGE, NULL);
+  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
 }
 
 int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
@@ -234,7 +234,7 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
     default:
       return;
   }
-  run_events(pen, TICKIT_EV_CHANGE, NULL);
+  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
 }
 
 /* Cheat and pretend the index of a colour attribute is a number attribute */
@@ -259,7 +259,7 @@ void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
     default:
       return;
   }
-  run_events(pen, TICKIT_EV_CHANGE, NULL);
+  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
 }
 
 static struct { const char *name; int colour; } colournames[] = {
@@ -327,7 +327,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
     case TICKIT_N_PEN_ATTRS:
       return;
   }
-  run_events(pen, TICKIT_EV_CHANGE, NULL);
+  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
 }
 
 void tickit_pen_clear(TickitPen *pen)
@@ -435,7 +435,7 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
   }
 
   if(changed)
-    run_events(dst, TICKIT_EV_CHANGE, NULL);
+    run_events(dst, TICKIT_PEN_ON_CHANGE, NULL);
 }
 
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)

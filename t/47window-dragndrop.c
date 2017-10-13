@@ -10,11 +10,8 @@ struct SavedEvent {
   int line, col;
 } events[9];
 
-int on_input_push(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_input_push(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
-  if(!(ev & TICKIT_EV_MOUSE))
-    return 1;
-
   TickitMouseEventInfo *info = _info;
 
   events[next_event].win  = win;
@@ -62,7 +59,7 @@ int main(int argc, char *argv[])
 
   // dragging mouse within one window
   {
-    int event_id = tickit_window_bind_event(root, TICKIT_EV_MOUSE, 0, &on_input_push, NULL);
+    int event_id = tickit_window_bind_event(root, TICKIT_WINDOW_ON_MOUSE, 0, &on_input_push, NULL);
 
     next_event = 0;
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 2, 5, 0);
@@ -93,8 +90,8 @@ int main(int argc, char *argv[])
     TickitWindow *winA = tickit_window_new(root, (TickitRect){ 0, 0, 10, 80}, 0);
     TickitWindow *winB = tickit_window_new(root, (TickitRect){15, 0, 10, 80}, 0);
 
-    tickit_window_bind_event(winA, TICKIT_EV_MOUSE, 0, &on_input_push, NULL);
-    tickit_window_bind_event(winB, TICKIT_EV_MOUSE, 0, &on_input_push, NULL);
+    tickit_window_bind_event(winA, TICKIT_WINDOW_ON_MOUSE, 0, &on_input_push, NULL);
+    tickit_window_bind_event(winB, TICKIT_WINDOW_ON_MOUSE, 0, &on_input_push, NULL);
 
     next_event = 0;
     press_mouse(TICKIT_MOUSEEV_PRESS,   1,  5, 20, 0);

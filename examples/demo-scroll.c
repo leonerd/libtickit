@@ -12,42 +12,7 @@ static void scroll(TickitTerm *tt, int downward, int rightward)
   tickit_term_scrollrect(tt, (TickitRect){ 2, 2, term_lines - 4, term_cols - 4 }, downward, rightward);
 }
 
-static void key_event(TickitTerm *tt, const char *key)
-{
-  if(strcmp(key, "Up") == 0)
-    scroll(tt, -1, 0);
-  else if(strcmp(key, "Down") == 0)
-    scroll(tt, +1, 0);
-  else if(strcmp(key, "Left") == 0)
-    scroll(tt, 0, -1);
-  else if(strcmp(key, "Right") == 0)
-    scroll(tt, 0, +1);
-}
-
-static void mouse_event(TickitTerm *tt, int line, int col)
-{
-  if(line < 1) {
-    scroll(tt, -1, 0);
-    return;
-  }
-
-  if(line > term_lines - 2) {
-    scroll(tt, +1, 0);
-    return;
-  }
-
-  if(col < 1) {
-    scroll(tt, 0, -1);
-    return;
-  }
-
-  if(col > term_cols - 2) {
-    scroll(tt, 0, +1);
-    return;
-  }
-}
-
-static void resize_event(TickitTerm *tt, int lines, int cols)
+static void resize(TickitTerm *tt, int lines, int cols)
 {
   term_lines = lines;
   term_cols  = cols;
@@ -75,24 +40,62 @@ static void resize_event(TickitTerm *tt, int lines, int cols)
   }
 }
 
-static int event(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+static int key_event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
 {
-  if(ev & TICKIT_EV_MOUSE) {
-    TickitMouseEventInfo *info = _info;
-    if(info->button == 1 && info->type == TICKIT_MOUSEEV_PRESS)
-      mouse_event(tt, info->line, info->col);
+  TickitKeyEventInfo *info = _info;
+  if(info->type != TICKIT_KEYEV_KEY)
+    return 1;
+
+  const char *key = info->str;
+
+  if(strcmp(key, "Up") == 0)
+    scroll(tt, -1, 0);
+  else if(strcmp(key, "Down") == 0)
+    scroll(tt, +1, 0);
+  else if(strcmp(key, "Left") == 0)
+    scroll(tt, 0, -1);
+  else if(strcmp(key, "Right") == 0)
+    scroll(tt, 0, +1);
+
+  return 1;
+}
+
+static int mouse_event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
+{
+  TickitMouseEventInfo *info = _info;
+  if(info->button != 1 || info->type != TICKIT_MOUSEEV_PRESS)
+    return 1;
+
+  int line = info->line;
+  int col  = info->col;
+
+  if(line < 1) {
+    scroll(tt, -1, 0);
+    return 1;
   }
 
-  if(ev & TICKIT_EV_KEY) {
-    TickitKeyEventInfo *info = _info;
-    if(info->type == TICKIT_KEYEV_KEY)
-      key_event(tt, info->str);
+  if(line > term_lines - 2) {
+    scroll(tt, +1, 0);
+    return 1;
   }
 
-  if(ev & TICKIT_EV_RESIZE) {
-    TickitResizeEventInfo *info = _info;
-    resize_event(tt, info->lines, info->cols);
+  if(col < 1) {
+    scroll(tt, 0, -1);
+    return 1;
   }
+
+  if(col > term_cols - 2) {
+    scroll(tt, 0, +1);
+    return 1;
+  }
+
+  return 1;
+}
+
+static int resize_event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
+{
+  TickitResizeEventInfo *info = _info;
+  resize(tt, info->lines, info->cols);
 
   return 1;
 }
@@ -109,11 +112,13 @@ int main(int argc, char *argv[])
 
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_CLICK);
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY|TICKIT_EV_MOUSE|TICKIT_EV_RESIZE, 0, event, NULL);
+  tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, 0, &key_event, NULL);
+  tickit_term_bind_event(tt, TICKIT_TERM_ON_MOUSE, 0, &mouse_event, NULL);
+  tickit_term_bind_event(tt, TICKIT_TERM_ON_RESIZE, 0, &resize_event, NULL);
 
   int lines, cols;
   tickit_term_get_size(tt, &lines, &cols);
-  resize_event(tt, lines, cols);
+  resize(tt, lines, cols);
 
   for(int line = 2; line < lines - 2; line++) {
     char buf[64];

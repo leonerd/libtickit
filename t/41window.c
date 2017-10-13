@@ -3,7 +3,7 @@
 #include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
-int on_event_incr_int(TickitWindow *window, TickitEventType ev, void *_info, void *data)
+int on_event_incr_int(TickitWindow *window, TickitEventFlags flags, void *_info, void *data)
 {
   (*(int*)data)++;
   return 1;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   // Geometry change event
   {
     int geom_changed = 0;
-    tickit_window_bind_event(win, TICKIT_EV_GEOMCHANGE, 0, on_event_incr_int, &geom_changed);
+    tickit_window_bind_event(win, TICKIT_WINDOW_ON_GEOMCHANGE, 0, on_event_incr_int, &geom_changed);
     is_int(geom_changed, 0, "geometry not yet changed");
 
     tickit_window_resize(win, 4, 15);
@@ -115,13 +115,13 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
   }
 
-  // TICKIT_EV_DESTROY
+  // TICKIT_WINDOW_ON_DESTROY
   {
     int destroyed = 0;
-    tickit_window_bind_event(win, TICKIT_EV_DESTROY, 0, &on_event_incr_int, &destroyed);
+    tickit_window_bind_event(win, TICKIT_WINDOW_ON_DESTROY, 0, &on_event_incr_int, &destroyed);
 
     tickit_window_unref(win);
-    ok(destroyed, "TICKIT_EV_DESTROY invoked");
+    ok(destroyed, "TICKIT_WINDOW_ON_DESTROY invoked");
   }
 
   // explicit close
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     is_int(tickit_window_children(root), 1, "root window has 1 child before close()");
 
     int destroyed = 0;
-    tickit_window_bind_event(win, TICKIT_EV_DESTROY, 0, &on_event_incr_int, &destroyed);
+    tickit_window_bind_event(win, TICKIT_WINDOW_ON_DESTROY, 0, &on_event_incr_int, &destroyed);
 
     tickit_window_close(win);
 

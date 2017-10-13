@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitExposeEventInfo *info = _info;
   TickitRenderBuffer *rb = info->rb;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
   tickit_term_setctl_str(tickit_get_term(t),
     TICKIT_TERMCTL_TITLE_TEXT, "XTerm256 colour demo");
 
-  tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose, NULL);
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose, NULL);
 
   tickit_run(t);
 

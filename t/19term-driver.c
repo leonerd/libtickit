@@ -53,7 +53,7 @@ void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
   strncat(buffer, bytes, len);
 }
 
-int on_key(TickitTerm *tt, TickitEventType type, void *_info, void *data)
+int on_key(TickitTerm *tt, TickitEventFlags type, void *_info, void *data)
 {
   TickitKeyEventInfo *info = _info;
 

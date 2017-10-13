@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static int on_expose(TickitWindow *win, TickitEventType ev, void *_info, void *user)
+static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, void *user)
 {
   int *counterp = user;
   TickitExposeEventInfo *info = _info;
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
   int counter = 0;
 
-  tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose, &counter);
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose, &counter);
 
   tickit_timer_after_msec(t, 1000, &on_timer, &counter);
 

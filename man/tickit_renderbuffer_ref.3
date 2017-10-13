@@ -13,7 +13,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_renderbuffer_ref\fP() increments the stored refcount of the given render buffer instance by one. It returns the pointer argument itself, so it is useful for chaining.
 .PP
-\fBtickit_renderbuffer_unref\fP() decrements the stored refcount of the given render buffer instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it and unbind all the bound event handlers, causing \fBTICKIT_EV_UNBIND\fP events if appropriate.
+\fBtickit_renderbuffer_unref\fP() decrements the stored refcount of the given render buffer instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it.
 .SH "RETURN VALUE"
 \fBtickit_renderbuffer_ref\fP() returns a render buffer instance pointer. \fBtickit_renderbuffer_unref\fP() returns no value.
 .SH "SEE ALSO"

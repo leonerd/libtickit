@@ -12,7 +12,7 @@ int                keymod;
 
 int on_key_return = 1;
 
-int on_key(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+int on_key(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
 {
   TickitKeyEventInfo *info = _info;
 
@@ -23,7 +23,7 @@ int on_key(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
   return on_key_return;
 }
 
-int on_key_incr(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+int on_key_incr(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
 {
   (*(int *)data)++;
   return 1;
@@ -33,7 +33,7 @@ TickitMouseEventType mousetype;
 int mousebutton, mouseline, mousecol;
 int mousemod;
 
-int on_mouse(TickitTerm *tt, TickitEventType ev, void *_info, void *data)
+int on_mouse(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
 {
   TickitMouseEventInfo *info = _info;
 
@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
 
   ok(tickit_term_get_utf8(tt), "get_utf8 true");
 
-  tickit_term_bind_event(tt, TICKIT_EV_KEY,   0, on_key,   NULL);
-  tickit_term_bind_event(tt, TICKIT_EV_MOUSE, 0, on_mouse, NULL);
+  tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY,   0, on_key,   NULL);
+  tickit_term_bind_event(tt, TICKIT_TERM_ON_MOUSE, 0, on_mouse, NULL);
 
   {
     TickitKeyEventInfo info = {
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
   {
     int count = 0;
-    int bind_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, 0, &on_key_incr, &count);
+    int bind_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, 0, &on_key_incr, &count);
 
     keytype = -1;
     on_key_return = 1;
@@ -193,14 +193,14 @@ int main(int argc, char *argv[])
     char events[2];
     uint8_t i = 0;
 
-    int on_key_push(TickitTerm *tt, TickitEventType ev, void *info, void *user)
+    int on_key_push(TickitTerm *tt, TickitEventFlags flags, void *info, void *user)
     {
       events[i++] = *(char*)user;
       return 0;
     }
 
-    int bindA_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, 0,                 &on_key_push, "A");
-    int bindB_id = tickit_term_bind_event(tt, TICKIT_EV_KEY, TICKIT_BIND_FIRST, &on_key_push, "B");
+    int bindA_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, 0,                 &on_key_push, "A");
+    int bindB_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, TICKIT_BIND_FIRST, &on_key_push, "B");
 
     tickit_term_input_push_bytes(tt, "X", 1);
 

@@ -3,7 +3,7 @@
 #include "taplib-tickit.h"
 #include "taplib-mockterm.h"
 
-int on_expose_fillchr(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_expose_fillchr(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitExposeEventInfo *info = _info;
 
@@ -18,7 +18,7 @@ int on_expose_fillchr(TickitWindow *win, TickitEventType ev, void *_info, void *
   return 1;
 }
 
-int on_expose_textat(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_expose_textat(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitExposeEventInfo *info = _info;
 
@@ -29,7 +29,7 @@ int on_expose_textat(TickitWindow *win, TickitEventType ev, void *_info, void *d
 static int next_rect = 0;
 static TickitRect exposed_rects[16];
 
-int on_expose_pushrect(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_expose_pushrect(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
   TickitExposeEventInfo *info = _info;
 
@@ -40,12 +40,15 @@ int on_expose_pushrect(TickitWindow *win, TickitEventType ev, void *_info, void 
   return 1;
 }
 
-int on_input_capture(TickitWindow *win, TickitEventType ev, void *_info, void *data)
+int on_key_input_capture(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
 {
-  if(ev & TICKIT_EV_KEY)
-    *((TickitKeyEventInfo *)data) = *(TickitKeyEventInfo *)_info;
-  if(ev & TICKIT_EV_MOUSE)
-    *((TickitMouseEventInfo *)data) = *(TickitMouseEventInfo *)_info;
+  *((TickitKeyEventInfo *)data) = *(TickitKeyEventInfo *)_info;
+  return 1;
+}
+
+int on_mouse_input_capture(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
+{
+  *((TickitMouseEventInfo *)data) = *(TickitMouseEventInfo *)_info;
   return 1;
 }
 
@@ -59,7 +62,7 @@ int main(int argc, char *argv[])
 
   // Basics
   {
-    int bind_id = tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose_fillchr, "X");
+    int bind_id = tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_fillchr, "X");
 
     tickit_window_expose(root, &(TickitRect){ .top = 10, .lines = 1, .left = 0, .cols = 80 });
     tickit_window_flush(root);
@@ -71,7 +74,7 @@ int main(int argc, char *argv[])
 
     TickitWindow *win = tickit_window_new(root, (TickitRect){10, 20, 1, 50}, TICKIT_WINDOW_LOWEST);
 
-    tickit_window_bind_event(win, TICKIT_EV_EXPOSE, 0, &on_expose_fillchr, "Y");
+    tickit_window_bind_event(win, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_fillchr, "Y");
 
     tickit_window_expose(win, NULL);
     tickit_window_flush(root);
@@ -87,14 +90,16 @@ int main(int argc, char *argv[])
     is_rect(&geom, "22,12+10,10", "popupwin abs_geometry");
 
     TickitKeyEventInfo keyinfo;
-    tickit_window_bind_event(popupwin, TICKIT_EV_KEY, 0, &on_input_capture, &keyinfo);
+    tickit_window_bind_event(popupwin, TICKIT_WINDOW_ON_KEY, 0,
+        &on_key_input_capture, &keyinfo);
 
     press_key(TICKIT_KEYEV_TEXT, "G", 0);
 
     is_int(keyinfo.type, TICKIT_KEYEV_TEXT, "key type after press_key on popupwin");
 
     TickitMouseEventInfo mouseinfo;
-    tickit_window_bind_event(popupwin, TICKIT_EV_MOUSE, 0, &on_input_capture, &mouseinfo);
+    tickit_window_bind_event(popupwin, TICKIT_WINDOW_ON_MOUSE, 0,
+        &on_mouse_input_capture, &mouseinfo);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 5, 12, 0);
 
@@ -110,7 +115,7 @@ int main(int argc, char *argv[])
 
   // Drawing on floats
   {
-    int bind_id = tickit_window_bind_event(rootfloat, TICKIT_EV_EXPOSE, 0, &on_expose_textat, "|-- Yipee --|");
+    int bind_id = tickit_window_bind_event(rootfloat, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "|-- Yipee --|");
     tickit_window_expose(rootfloat, NULL);
     tickit_window_flush(root);
 
@@ -120,7 +125,7 @@ int main(int argc, char *argv[])
 
     TickitWindow *subwin = tickit_window_new(rootfloat, (TickitRect){0, 4, 1, 6}, 0);
 
-    tickit_window_bind_event(subwin, TICKIT_EV_EXPOSE, 0, &on_expose_textat, "Byenow");
+    tickit_window_bind_event(subwin, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Byenow");
     tickit_window_expose(subwin, NULL);
     tickit_window_flush(root);
 
@@ -134,7 +139,7 @@ int main(int argc, char *argv[])
 
   // Scrolling with float obscurations
   {
-    int bind_id = tickit_window_bind_event(root, TICKIT_EV_EXPOSE, 0, &on_expose_pushrect, NULL);
+    int bind_id = tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_pushrect, NULL);
     tickit_window_flush(root);
     drain_termlog();
 
