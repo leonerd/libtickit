@@ -2,12 +2,18 @@
 #include "tickit-mockterm.h"
 #include "taplib.h"
 
+static int unbound_count;
 static int on_call_incr(Tickit *t, TickitEventFlags flags, void *user)
 {
-  int *ip = user;
-  (*ip)++;
+  if(flags & TICKIT_EV_FIRE) {
+    int *ip = user;
+    (*ip)++;
 
-  tickit_stop(t);
+    tickit_stop(t);
+  }
+  if(flags & TICKIT_EV_UNBIND)
+    unbound_count++;
+
   return 1;
 }
 
@@ -17,14 +23,23 @@ int main(int argc, char *argv[])
 
   {
     int called = 0;
-    tickit_later(t, &on_call_incr, &called);
+    tickit_later(t, 0, &on_call_incr, &called);
 
     tickit_run(t);
 
     is_int(called, 1, "tickit_later invokes callback");
   }
 
-  tickit_unref(t);
+  /* object destruction */
+  {
+    tickit_later(t, TICKIT_BIND_DESTROY, &on_call_incr, NULL);
+
+    unbound_count = 0;
+
+    tickit_unref(t);
+
+    is_int(unbound_count, 1, "unbound_count after tickit_unref");
+  }
 
   return exit_status();
 }

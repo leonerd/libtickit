@@ -604,11 +604,11 @@ TickitWindow *tickit_get_rootwin(Tickit *t);
 void tickit_run(Tickit *t);
 void tickit_stop(Tickit *t);
 
-int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *user);
-int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallbackFn *fn, void *user);
+int tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 void tickit_timer_cancel(Tickit *t, int id);
 
-int tickit_later(Tickit *t, TickitCallbackFn *fn, void *user);
+int tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
 /* Debug support */
 

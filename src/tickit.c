@@ -12,6 +12,7 @@ struct Deferral {
   Deferral *next;
 
   int id;
+  TickitBindFlags flags;
   struct timeval at;  /* only for timers */
   TickitCallbackFn *fn;
   void *user;
@@ -69,7 +70,22 @@ static void tickit_destroy(Tickit *t)
     Deferral *this, *next;
     for(this = t->timers; this; this = next) {
       next = this->next;
-      /* TODO: consider if there should be some sort of destroy invocation? */
+
+      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+        (*this->fn)(t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+      free(this);
+    }
+  }
+
+  if(t->laters) {
+    Deferral *this, *next;
+    for(this = t->laters; this; this = next) {
+      next = this->next;
+
+      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+        (*this->fn)(t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
       free(this);
     }
   }
@@ -192,7 +208,7 @@ void tickit_run(Tickit *t)
         if(timercmp(&tim->at, &now, >))
           break;
 
-        (*tim->fn)(t, TICKIT_EV_FIRE, tim->user);
+        (*tim->fn)(t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, tim->user);
 
         Deferral *next = tim->next;
         free(tim);
@@ -203,7 +219,7 @@ void tickit_run(Tickit *t)
     }
 
     while(later) {
-      (*later->fn)(t, TICKIT_EV_FIRE, later->user);
+      (*later->fn)(t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
 
       Deferral *next = later->next;
       free(later);
@@ -222,7 +238,7 @@ void tickit_stop(Tickit *t)
 }
 
 /* static for now until we decide how to expose it */
-static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn *fn, void *user)
+static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   Deferral *tim = malloc(sizeof(Deferral));
   if(!tim)
@@ -232,6 +248,7 @@ static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn
 
   tim->id = t->next_timer_id;
   tim->at = *at;
+  tim->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
   tim->fn = fn;
   tim->user = user;
 
@@ -248,7 +265,7 @@ static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitCallbackFn
   return tim->id;
 }
 
-int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallbackFn *fn, void *user)
+int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   struct timeval at;
   gettimeofday(&at, NULL);
@@ -256,15 +273,15 @@ int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitCallback
   /* at + after ==> at */
   timeradd(&at, after, &at);
 
-  return tickit_timer_at(t, &at, fn, user);
+  return tickit_timer_at(t, &at, flags, fn, user);
 }
 
-int tickit_timer_after_msec(Tickit *t, int msec, TickitCallbackFn *fn, void *user)
+int tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   return tickit_timer_after_tv(t, &(struct timeval){
       .tv_sec = msec / 1000,
       .tv_usec = (msec % 1000) * 1000,
-    }, fn, user);
+    }, flags, fn, user);
 }
 
 void tickit_timer_cancel(Tickit *t, int id)
@@ -275,6 +292,9 @@ void tickit_timer_cancel(Tickit *t, int id)
     if(this->id == id) {
       *prevp = this->next;
 
+      if(this->flags & TICKIT_BIND_UNBIND)
+        (*this->fn)(t, TICKIT_EV_UNBIND, this->user);
+
       free(this);
     }
 
@@ -282,7 +302,7 @@ void tickit_timer_cancel(Tickit *t, int id)
   }
 }
 
-int tickit_later(Tickit *t, TickitCallbackFn *fn, void *user)
+int tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   Deferral *later = malloc(sizeof(Deferral));
   if(!later)
@@ -290,6 +310,7 @@ int tickit_later(Tickit *t, TickitCallbackFn *fn, void *user)
 
   later->next = NULL;
 
+  later->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
   later->fn = fn;
   later->user = user;
 

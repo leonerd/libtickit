@@ -2,12 +2,19 @@
 #include "tickit-mockterm.h"
 #include "taplib.h"
 
+static int unbound_count;
+
 static int on_call_incr(Tickit *t, TickitEventFlags flags, void *user)
 {
-  int *ip = user;
-  (*ip)++;
+  if(flags & TICKIT_EV_FIRE) {
+    int *ip = user;
+    (*ip)++;
 
-  tickit_stop(t);
+    tickit_stop(t);
+  }
+  if(flags & TICKIT_EV_UNBIND)
+    unbound_count++;
+
   return 1;
 }
 
@@ -35,7 +42,7 @@ int main(int argc, char *argv[])
 
   {
     int called = 0;
-    tickit_timer_after_msec(t, 10, &on_call_incr, &called);
+    tickit_timer_after_msec(t, 10, 0, &on_call_incr, &called);
 
     tickit_run(t);
 
@@ -49,8 +56,8 @@ int main(int argc, char *argv[])
       state_a = { .counterp = &counter },
       state_b = { .counterp = &counter };
 
-    tickit_timer_after_msec(t, 10, &on_call_capture, &state_a);
-    tickit_timer_after_msec(t, 20, &on_call_capture, &state_b);
+    tickit_timer_after_msec(t, 10, 0, &on_call_capture, &state_a);
+    tickit_timer_after_msec(t, 20, 0, &on_call_capture, &state_b);
 
     tickit_run(t);
 
@@ -61,18 +68,29 @@ int main(int argc, char *argv[])
   /* timer cancellation */
   {
     int called = 0;
-    tickit_timer_after_msec(t, 10, &on_call_incr, &called);
+    tickit_timer_after_msec(t, 10, 0, &on_call_incr, &called);
     int not_called = 0;
-    int id = tickit_timer_after_msec(t, 5, &on_call_incr, &not_called);
+    int id = tickit_timer_after_msec(t, 5, TICKIT_BIND_UNBIND, &on_call_incr, &not_called);
 
+    unbound_count = 0;
     tickit_timer_cancel(t, id);
+    is_int(unbound_count, 1, "unbound_count after tickit_timer_cancel");
 
     tickit_run(t);
 
     ok(!not_called, "tickit_timer_cancel prevents invocation");
   }
 
-  tickit_unref(t);
+  /* object destruction */
+  {
+    tickit_timer_after_msec(t, 10, TICKIT_BIND_DESTROY, &on_call_incr, NULL);
+
+    unbound_count = 0;
+
+    tickit_unref(t);
+
+    is_int(unbound_count, 1, "unbound_count after tickit_unref");
+  }
 
   return exit_status();
 }
