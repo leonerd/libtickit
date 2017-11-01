@@ -203,19 +203,19 @@ void tickit_run(Tickit *t)
        * of it
        */
 
-      Deferral *tim = t->timers;
-      while(tim) {
-        if(timercmp(&tim->at, &now, >))
+      Deferral *this = t->timers;
+      while(this) {
+        if(timercmp(&this->at, &now, >))
           break;
 
-        (*tim->fn)(t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, tim->user);
+        (*this->fn)(t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
 
-        Deferral *next = tim->next;
-        free(tim);
-        tim = next;
+        Deferral *next = this->next;
+        free(this);
+        this = next;
       }
 
-      t->timers = tim;
+      t->timers = this;
     }
 
     while(later) {
