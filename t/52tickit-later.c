@@ -2,12 +2,13 @@
 #include "tickit-mockterm.h"
 #include "taplib.h"
 
-static void on_call_incr(Tickit *t, void *user)
+static int on_call_incr(Tickit *t, TickitEventFlags flags, void *user)
 {
   int *ip = user;
   (*ip)++;
 
   tickit_stop(t);
+  return 1;
 }
 
 int main(int argc, char *argv[])

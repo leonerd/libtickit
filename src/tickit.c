@@ -192,7 +192,7 @@ void tickit_run(Tickit *t)
         if(timercmp(&tim->at, &now, >))
           break;
 
-        (*tim->fn)(t, tim->user);
+        (*tim->fn)(t, TICKIT_EV_FIRE, tim->user);
 
         Deferral *next = tim->next;
         free(tim);
@@ -203,7 +203,7 @@ void tickit_run(Tickit *t)
     }
 
     while(later) {
-      (*later->fn)(t, later->user);
+      (*later->fn)(t, TICKIT_EV_FIRE, later->user);
 
       Deferral *next = later->next;
       free(later);

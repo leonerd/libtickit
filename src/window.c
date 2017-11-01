@@ -654,10 +654,11 @@ static void _request_restore(TickitRootWindow *root)
   _request_later_processing(root);
 }
 
-static void _flush_fn(Tickit *t, void *user)
+static int _flush_fn(Tickit *t, TickitEventFlags flags, void *user)
 {
   TickitWindow *win = user;
   tickit_window_flush(win);
+  return 1;
 }
 
 static void _request_later_processing(TickitRootWindow *root)

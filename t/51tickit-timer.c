@@ -2,12 +2,13 @@
 #include "tickit-mockterm.h"
 #include "taplib.h"
 
-static void on_call_incr(Tickit *t, void *user)
+static int on_call_incr(Tickit *t, TickitEventFlags flags, void *user)
 {
   int *ip = user;
   (*ip)++;
 
   tickit_stop(t);
+  return 1;
 }
 
 struct State {
@@ -15,7 +16,7 @@ struct State {
   int capture;
 };
 
-static void on_call_capture(Tickit *t, void *user)
+static int on_call_capture(Tickit *t, TickitEventFlags flags, void *user)
 {
   struct State *state = user;
 
@@ -24,6 +25,8 @@ static void on_call_capture(Tickit *t, void *user)
 
   if(!(*state->counterp))
     tickit_stop(t);
+
+  return 1;
 }
 
 int main(int argc, char *argv[])

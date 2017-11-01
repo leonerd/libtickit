@@ -589,7 +589,7 @@ void tickit_window_set_steal_input(TickitWindow *win, bool steal);
 
 /* Main object */
 
-typedef void TickitCallbackFn(Tickit *t, void *user);
+typedef int TickitCallbackFn(Tickit *t, TickitEventFlags flags, void *user);
 
 Tickit *tickit_new_for_term(TickitTerm *tt);
 Tickit *tickit_new_stdio(void);
