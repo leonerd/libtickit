@@ -9,6 +9,8 @@ tickit_window_new_root \- create a new toplevel root window
 .EE
 .sp
 Link with \fI\-ltickit\fP.
+.SH DEPRECATED
+This function is deprecated and should not be used in new programs. Instead, obtain the root window from the toplevel \fBTickit\fP instance by calling \fBtickit_get_rootwin\fP(3).
 .SH DESCRIPTION
 \fBtickit_window_new_root\fP() creates a new toplevel \fBTickitWindow\fP instance to represent the drawing area on the given terminal instance. The terminal instance is stored by the window itself, and is used for flushing the \fBTickitRenderBuffer\fP to when expose events occur. The root window will increase the reference count of its backing terminal by one; this reference will be dropped when the window is destroyed.
 .PP

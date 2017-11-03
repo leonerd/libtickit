@@ -9,6 +9,8 @@ tickit_window_flush \- invoke pending events on the window hierarchy
 .EE
 .sp
 Link with \fI\-ltickit\fP.
+.SH DEPRECATED
+This function is deprecated and should not be used in new programs. Instead, obtain the root window from the toplevel \fBTickit\fP instance by calling \fBtickit_get_rootwin\fP(3), and its pending events will automatically be managed by the toplevel instance \fBtickit_run\fP(3) function.
 .SH DESCRIPTION
 \fBtickit_window_flush\fP() causes any pending activity in the window hierarchy to be performed. First it makes any window ordering changes that have been queued by \fBtickit_window_raise\fP(3) and \fBtickit_window_lower\fP(3), then fires any \fBTICKIT_EV_EXPOSE\fP events to render newly-exposed areas, before finally resetting the terminal cursor to the state required by whichever window has input focus. This function must be invoked on the root window instance.
 .PP
