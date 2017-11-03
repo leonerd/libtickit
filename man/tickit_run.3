@@ -1,0 +1,21 @@
+.TH TICKIT_RUN 3
+.SH NAME
+tickit_run, tickit_stop \- control the event loop of the toplevel instance
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "void tickit_run(Tickit *" t );
+.BI "void tickit_stop(Tickit *" t );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_run\fP() starts the IO event loop of the main toplevel instance, allowing it to receive and react to terminal input, and to send output content back to it. Once invoked, this function will block processing IO and not return until the \fBtickit_stop\fP() function is called, or until a \fBSIGINT\fP is received (usually by the user pressing \fICtrl-C\fP).
+.PP
+\fBtickit_stop\fP() causes a currently-running call to \fBtickit_run\fP() to return.
+.SH "RETURN VALUE"
+Neither \fBtickit_run\fP() nor \fBtickit_stop\fP() return a value.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit (7)

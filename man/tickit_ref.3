@@ -1,0 +1,21 @@
+.TH TICKIT_REF 3
+.SH NAME
+tickit_ref, tickit_unref \- adjust the refcount of the toplevel instance
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "Tickit *tickit_ref(Tickit *" t );
+.BI "void tickit_unref(Tickit *" t );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_ref\fP() increments the stored refcount of the given toplevel instance by one. It returns the pointer argument itself, so it is useful for chaining.
+.PP
+\fBtickit_unref\fP() decrements the stored refcount of the given toplevel instance by one. If the refcount drops to zero, the instance is destroyed. This will release any resources controlled by it and unbind all pending timer and later callbacks, causing them to be invoked with the \fBTICKIT_EV_DESTROY\fP flag if appropriate. This will also decrement refcount on the terminal and root window instances, which will likely cause them to be destroyed too.
+.SH "RETURN VALUE"
+\fBtickit_ref\fP() returns a toplevel instance pointer. \fBtickit_unref\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit (7)

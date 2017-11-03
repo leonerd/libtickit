@@ -1,0 +1,19 @@
+.TH TICKIT_GET_TERM 3
+.SH NAME
+tickit_get_term \- obtain the terminal from the toplevel instance
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitTerm *tickit_get_term(Tickit *" t );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_get_term\fP() obtains the terminal instance associated with the toplevel instance, creating it first if necessary. Once created, repeated calls to this function will return the same terminal.
+.SH "RETURN VALUE"
+\fBtickit_get_term\fP() returns a terminal instance pointer.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit_term (7),
+.BR tickit (7)

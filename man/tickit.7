@@ -1,44 +1,27 @@
 .TH TICKIT 7
 .SH NAME
 tickit \- Terminal Interface Construction KIT
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "typedef struct " Tickit ;
+.EE
+.sp
 .SH DESCRIPTION
-\fBtickit\fP is a library for building full-screen interactive programs that use a terminal interface. There are two levels of abstraction that a program might use the library via - a higher-level more abstracted system involving independent regions of the screen called "windows", or a lower-level system directly targetted at the actual terminal instance.
-.SS "Window Level"
-At the higher level of abstraction, a program creates a heirarchial tree of "windows", each an instance of the \fBTickitWindow\fP type. These act to divide the screen area into independent regions of interest, able to receive input events such as keyboard or mouse interactions, and render content to be displayed within its area.
+\fItickit\fP is a library for building full-screen interactive programs that use a terminal interface. A program using this library would start by creating a toplevel \fBTickit\fP instance, from which one or more divisions of the terminal area, called "windows" are created. These form a heirarchial tree that subdivides the content area into independent regions that can be managed by different parts of the program structure. Each window can react to input events such as keyboard or mouse interaction.
 .PP
-A typical program using this model would start by creating the underlying \fBTickitTerm\fP instance to represent the terminal by calling \fBtickit_term_new\fP(3), then create a root window on it by calling \fBtickit_window_new_root\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_WINDOW_ON_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter its main event loop; see the \fBEVENT LOOP\fP section below.
-.SS "Terminal Level"
-As an alternative to working at the level of windows, a program can operate on a lower level of abstraction by interacting directly with the \fBTickitTerm\fP instance. Operating at this level, it can use \fBtickit_term_bind_event\fP(3) to attach event handlers on the terminal instance itself in order to react to resize or input events. It can arrange for output to be drawn either by directly using the drawing functions on the terminal instance itself, or by constructing a \fBTickitRenderBuffer\fP instance to contain content, and flushing that to the terminal by calling \fBtickit_renderbuffer_flush_to_term\fP(3). As with the window level case, such a program will still need to use a main event loop; see below.
-.SH "EVENT LOOP"
-Once a program has set up its initial objects and event handlers, it must then run the main event loop in order to react to input events and generate output. A later version of \fIlibtickit\fP should provide better support for doing this, but at the current version this requires a certain amount of boilerplate code. This is explained here.
+As well as creating the initial root window, the toplevel \fBTickit\fP instance also performs a few other jobs for the containing program. It can act as a containing event loop for the program, performing IO multiplexing tasks both for \fItickit\fP's own needs and the needs of the program as a whole.
+.SH FUNCTIONS
+A new toplevel instance is created by using \fBtickit_new_stdio\fP(3). A toplevel instance stores a reference count to make it easier for applications to manage its lifetime. A new toplevel instance starts with a count of one, and it can be adjusted using \fBtickit_ref\fP(3) and \fBtickit_unref\fP(3). When the count reaches zero the instance is destroyed.
 .PP
-The simplest form of core of the event loop is a \fBwhile\fP loop that calls an \fBtickit_term_input_wait\fP function on the terminal, which will block awaiting for user input such as keyboard, mouse or resize interactions. If the windowing later is used, then \fBtickit_window_flush\fP(3) should be called before every blocking call to wait for input, so that pending damage can be flushed to the terminal, keeping the output up to date.
-.sp
-.EX
-  while(1) {
-    tickit_window_flush(rootwin);
-    tickit_term_input_wait_msec(term, -1);
-  }
-.EE
-.sp
-It is a good idea to install a signal handler for \fBSIGINT\fP so that the terminal can be cleanly shut down on exit, restoring any alterations to altscreen, cursor settings, and so on that the application may have made.
-.sp
-.EX
-  static bool still_running = true;
-  static void sigint(int sig) { still_running = false; }
-  ...
-
-  while(still_running) {
-    tickit_window_flush(rootwin);
-    tickit_term_input_wait_msec(term, -1);
-  }
-
-  tickit_window_close(rootwin);
-  tickit_window_unref(rootwin);
-  tickit_term_unref(term);
-.EE
-.sp
-A more complex program that wanted to perform other IO or timer operations at the same time, would instead make use of \fBtickit_term_input_readable\fP(3) and the \fBtickit_term_input_check_timeout\fP functions to keep the terminal IO working alongside other activity.
+The toplevel instance manages a tree of \fBTickitWindow\fP instances. The root of this tree is obtained by \fBtickit_get_rootwin\fP(3) and thereafter can be divided further by other functions on the window, described more in \fBtickit_window\fP(7).
+.PP
+The \fBTickitTerm\fP instance behind the toplevel instance can be obtained by \fBtickit_get_term\fP(3), and is described more in \fBtickit_term\fP(7).
+.PP
+Event handling callback functions can be installed to be called at a later time, by using \fBtickit_timer_after_msec\fP(3), \fBtickit_timer_after_tv\fP(3), or \fBtickit_later\fP(3). The main IO event loop is controlled using \fBtickit_run\fP(3) and \fBtickit_stop\fP(3).
+.SH "TYPICAL STRUCTURE"
+A typical program using this library would start by creating the toplevel instance, by calling \fBtickit_new_stdio\fP(3), then obtain its root window on it by calling \fBtickit_get_rootwin\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_WINDOW_ON_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter the main event loop by invoking \fBtickit_run\fP(3).
 .SH "COMMON TYPES"
 The \fIflags\fP argument to the various \fBtickit_..._bind_event\fP() functions should be zero, or a bitmask of the following constants.
 .sp

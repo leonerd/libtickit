@@ -1,0 +1,19 @@
+.TH TICKIT_GET_ROOTWIN 3
+.SH NAME
+tickit_get_rootwin \- obtain the root window from the toplevel instance
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitWindow *tickit_get_rootwin(Tickit *" t );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_get_rootwin\fP() obtains the root window instance associated with the toplevel instance, creating it first if necessary. Once created, repeated calls to this function will return the same window.
+.SH "RETURN VALUE"
+\fBtickit_get_rootwin\fP() returns a window instance pointer.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit_window (7),
+.BR tickit (7)
