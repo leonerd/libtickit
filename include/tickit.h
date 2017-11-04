@@ -16,6 +16,12 @@ extern "C" {
 
 #include <sys/time.h>
 
+#ifdef __GNUC__
+# define DEPRECATED __attribute__((deprecated))
+#else
+# define DEPRECATED
+#endif
+
 /*
  * Top-level object / structure types
  */
@@ -377,9 +383,12 @@ void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info);
 
 /* String handling utilities */
 
-int tickit_string_seqlen(long codepoint);
+int tickit_utf8_seqlen(long codepoint);
+DEPRECATED int tickit_string_seqlen(long codepoint); /* use tickit_utf8_seqlen() */
+
 /* Does NOT NUL-terminate the buffer */
-size_t tickit_string_putchar(char *str, size_t len, long codepoint);
+size_t tickit_utf8_put(char *str, size_t len, long codepoint);
+DEPRECATED size_t tickit_string_putchar(char *str, size_t len, long codepoint); /* use tickit_utf8_put() */
 
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);

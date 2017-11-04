@@ -1,6 +1,6 @@
 .TH TICKIT_STRING_SEQLEN 3
 .SH NAME
-tickit_string_seqlen \- determine the length of a UTF-8 codepoint encoding
+tickit_string_seqlen \- DEPRECATED
 .SH SYNOPSIS
 .EX
 .B #include <tickit.h>
@@ -10,11 +10,7 @@ tickit_string_seqlen \- determine the length of a UTF-8 codepoint encoding
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_string_seqlen\fP() determines the number of bytes required in the
-.SM UTF-8
-encoding of the given codepoint and returns it.
-.SH "RETURN VALUE"
-\fBtickit_string_seqlen\fP() returns a byte count.
+This function is deprecated. Use \fBtickit_utf8_seqlen\fP(3) instead.
 .SH "SEE ALSO"
-.BR tickit_string_putchar (3),
+.BR tickit_utf8_put (3),
 .BR tickit (7)

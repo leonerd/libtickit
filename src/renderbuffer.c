@@ -249,13 +249,13 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
 
 static void tmp_cat_utf8(TickitRenderBuffer *rb, long codepoint)
 {
-  int seqlen = tickit_string_seqlen(codepoint);
+  int seqlen = tickit_utf8_seqlen(codepoint);
   if(rb->tmpsize < rb->tmplen + seqlen) {
     rb->tmpsize *= 2;
     rb->tmp = realloc(rb->tmp, rb->tmpsize);
   }
 
-  tickit_string_putchar(rb->tmp + rb->tmplen, rb->tmpsize - rb->tmplen, codepoint);
+  tickit_utf8_put(rb->tmp + rb->tmplen, rb->tmpsize - rb->tmplen, codepoint);
   rb->tmplen += seqlen;
 
   /* rb->tmp remains NOT nul-terminated */
@@ -1161,11 +1161,11 @@ static size_t get_span_text(TickitRenderBuffer *rb, RBCell *span, int offset, in
         break;
       }
     case LINE:
-      bytes = tickit_string_putchar(buffer, len, linemask_to_char[span->v.line.mask]);
+      bytes = tickit_utf8_put(buffer, len, linemask_to_char[span->v.line.mask]);
       break;
 
     case CHAR:
-      bytes = tickit_string_putchar(buffer, len, span->v.chr.codepoint);
+      bytes = tickit_utf8_put(buffer, len, span->v.chr.codepoint);
       break;
   }
 

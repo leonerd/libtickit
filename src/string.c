@@ -48,6 +48,11 @@ static int next_utf8(const char *str, size_t len, uint32_t *cp)
 
 int tickit_string_seqlen(long codepoint)
 {
+  return tickit_utf8_seqlen(codepoint);
+}
+
+int tickit_utf8_seqlen(long codepoint)
+{
   if(codepoint < 0x0000080) return 1;
   if(codepoint < 0x0000800) return 2;
   if(codepoint < 0x0010000) return 3;
@@ -58,7 +63,12 @@ int tickit_string_seqlen(long codepoint)
 
 size_t tickit_string_putchar(char *str, size_t len, long codepoint)
 {
-  int nbytes = tickit_string_seqlen(codepoint);
+  return tickit_utf8_put(str, len, codepoint);
+}
+
+size_t tickit_utf8_put(char *str, size_t len, long codepoint)
+{
+  int nbytes = tickit_utf8_seqlen(codepoint);
   if(!str)
     return nbytes;
   if(len < nbytes)

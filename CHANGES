@@ -2,3 +2,6 @@
   * Added tickit_window_{is,set}_steal_focus(3)
   * Added entire toplevel Tickit instance
   * New bind_events API style - one event + flags, instead of bitmask
+  * Renamed:
+     + tickit_string_seqlen  => tickit_utf8_seqlen
+     + tickit_string_putchar => tickit_utf8_put
