@@ -431,9 +431,13 @@ static inline void tickit_stringpos_limit_columns(TickitStringPos *pos, int colu
   pos->columns = columns;
 }
 
-int    tickit_string_mbswidth(const char *str);
-int    tickit_string_byte2col(const char *str, size_t byte);
-size_t tickit_string_col2byte(const char *str, int col);
+DEPRECATED int    tickit_string_mbswidth(const char *str);
+DEPRECATED int    tickit_string_byte2col(const char *str, size_t byte);
+DEPRECATED size_t tickit_string_col2byte(const char *str, int col);
+
+int    tickit_utf8_mbswidth(const char *str);
+int    tickit_utf8_byte2col(const char *str, size_t byte);
+size_t tickit_utf8_col2byte(const char *str, int col);
 
 /* TickitRenderBuffer */
 

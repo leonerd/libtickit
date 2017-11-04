@@ -1,6 +1,6 @@
 .TH TICKIT_STRING_MBSWIDTH 3
 .SH NAME
-tickit_string_mbswidth, tickit_string_byte2col, tickit_string_col2byte \- count the column width of a Unicode string
+tickit_string_mbswidth, tickit_string_byte2col, tickit_string_col2byte \- DEPRECATED
 .SH SYNOPSIS
 .EX
 .B #include <tickit.h>
@@ -13,13 +13,7 @@ tickit_string_mbswidth, tickit_string_byte2col, tickit_string_col2byte \- count 
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-These functions are a set of shortcut wrappers around \fBtickit_string_count\fP(3) for performing a single simple counting operation on a given string. When performing multiple operations on a given string, it is more efficient to use \fBtickit_string_count\fP() directly.
-.PP
-\fBtickit_string_mbswidth\fP() returns the number of columns wide the given Unicode string consumes.
-.PP
-\fBtickit_string_byte2col\fP() and \fBtickit_string_col2byte\fP() convert between byte and column indexes within a given string; returning one when given the other.
-.SH "RETURN VALUE"
-\fBtickit_string_mbswidth\fP() and \fBtickit_string_byte2col\fP() return an integer column count. \fBtickit_string_col2byte\fP() returns an integer byte count.
+These functions are deprecated. Use \fBtickit_utf8_mbswidth\fP(3), \fBtickit_utf8_byte2col\fP(3) or \fBtickit_utf8_col2byte\fP(3) instead.
 .SH "SEE ALSO"
 .BR tickit_string_count (3),
 .BR tickit (7)

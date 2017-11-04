@@ -133,9 +133,9 @@ int main(int argc, char *argv[])
   is_int(tickit_string_count("\x7f", &pos, &limit), -1, "tickit_string_count -1 for DEL");
 
   /* convenience utilities */
-  is_int(tickit_string_mbswidth("caf\xc3\xa9 time"), 9, "tickit_string_mbswidth");
-  is_int(tickit_string_byte2col("caf\xc3\xa9 time", 7), 6, "tickit_string_byte2col");
-  is_int(tickit_string_col2byte("caf\xc3\xa9 time", 6), 7, "tickit_string_col2byte");
+  is_int(tickit_utf8_mbswidth("caf\xc3\xa9 time"), 9, "tickit_utf8_mbswidth");
+  is_int(tickit_utf8_byte2col("caf\xc3\xa9 time", 7), 6, "tickit_utf8_byte2col");
+  is_int(tickit_utf8_col2byte("caf\xc3\xa9 time", 6), 7, "tickit_utf8_col2byte");
 
   return exit_status();
 }
