@@ -19,15 +19,17 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
   return 1;
 }
 
-static void on_timer(Tickit *t, void *user);
-static void on_timer(Tickit *t, void *user)
+static int on_timer(Tickit *t, TickitEventFlags flags, void *user);
+static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
 {
   int *counterp = user;
 
   (*counterp)++;
   tickit_window_expose(tickit_get_rootwin(t), NULL);
 
-  tickit_timer_after_msec(t, 1000, &on_timer, user);
+  tickit_timer_after_msec(t, 1000, 0, &on_timer, user);
+
+  return 0;
 }
 
 int main(int argc, char *argv[])
@@ -44,7 +46,7 @@ int main(int argc, char *argv[])
 
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose, &counter);
 
-  tickit_timer_after_msec(t, 1000, &on_timer, &counter);
+  tickit_timer_after_msec(t, 1000, 0, &on_timer, &counter);
 
   tickit_run(t);
 
