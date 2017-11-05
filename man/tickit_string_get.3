@@ -1,0 +1,19 @@
+.TH TICKIT_STRING_GET 3
+.SH NAME
+tickit_string_get \- obtain the characters from a counted string
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "const char *tickit_string_get(TickitString *" s );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_string_get\fP() returns a pointer to the actual stored character buffer within the counted string instance. This should be considered immutable; the caller must not modify this buffer.
+.SH "RETURN VALUE"
+\fBtickit_string_get\fP() returns a NUL-terminated string pointer.
+.SH "SEE ALSO"
+.BR tickit_string_new (3),
+.BR tickit_string (7),
+.BR tickit (7)

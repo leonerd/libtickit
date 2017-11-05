@@ -29,6 +29,7 @@ extern "C" {
 typedef struct TickitPen TickitPen;
 typedef struct TickitRectSet TickitRectSet;
 typedef struct TickitRenderBuffer TickitRenderBuffer;
+typedef struct TickitString TickitString;
 typedef struct TickitTerm TickitTerm;
 typedef struct TickitWindow TickitWindow;
 
@@ -303,6 +304,13 @@ void tickit_rectset_translate(TickitRectSet *trs, int downward, int rightward);
 
 bool tickit_rectset_intersects(const TickitRectSet *trs, const TickitRect *rect);
 bool tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rect);
+
+/* TickitString */
+
+TickitString *tickit_string_new(const char *str, size_t len);
+TickitString *tickit_string_ref(TickitString *s);
+void tickit_string_unref(TickitString *s);
+const char *tickit_string_get(TickitString *s);
 
 /* TickitTerm */
 

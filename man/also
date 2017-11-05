@@ -47,6 +47,8 @@ tickit_rect_right.3 = tickit_rect_bottom.3
 tickit_rectset_destroy.3 = tickit_rectset_new.3
 tickit_rectset_get_rects.3 = tickit_rectset_rects.3
 
+tickit_string_unref.3 = tickit_string_ref.3
+
 tickit_renderbuffer_unref.3 = tickit_renderbuffer_ref.3
 tickit_renderbuffer_mask.3 = tickit_renderbuffer_clip.3
 tickit_renderbuffer_restore.3 = tickit_renderbuffer_save.3

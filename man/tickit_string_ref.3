@@ -1,0 +1,22 @@
+.TH TICKIT_STRING_REF 3
+.SH NAME
+tickit_string_ref, tickit_string_unref \- adjust the refcount of a counted string
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitString *tickit_string_ref(TickitString *" s );
+.BI "void tickit_string_unref(TickitString *" s );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_string_ref\fP() increments the stored refcount of the given counted string instance by one. It returns the pointer argument itself, so it is useful for chaining.
+.PP
+\fBtickit_string_unref\fP() decrements the stored refcount of the given counted string instance by one. If the refcount drops to zero, the instance is destroyed.
+.SH "RETURN VALUE"
+\fBtickit_string_ref\fP() returns a counted string instance pointer. \fBtickit_string_unref\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_string_new (3),
+.BR tickit_string (7),
+.BR tickit (7)

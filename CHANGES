@@ -9,3 +9,4 @@
      + tickit_string_byte2col => tickit_utf8_byte2col
      + tickit_string_col2byte => tickit_utf8_col2byte
      + tickit_string_count*   => tickit_utf8_count*
+  * Added TickitString

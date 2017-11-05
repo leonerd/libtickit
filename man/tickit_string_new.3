@@ -1,0 +1,21 @@
+.TH TICKIT_STRING_NEW 3
+.SH NAME
+tickit_string_new \- create a counted string
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitString *tickit_string_new(const char *" str ", size_t " len );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_string_new\fP() creates a new \fBTickitString\fP instance. It will be initialised with the contents of the given string buffer.
+.PP
+The reference count of a newly-constructed string instance will be one. This can be incremented or decremented using \fBtickit_string_ref\fP(3) and \fBtickit_string_unref\fP(3). When its reference count reaches zero it is destroyed.
+.SH "RETURN VALUE"
+If successful, \fBtickit_string_new\fP() returns a pointer to the new instance.
+.SH "SEE ALSO"
+.BR tickit_string_get (3),
+.BR tickit_string (7),
+.BR tickit (7)
