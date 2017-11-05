@@ -275,7 +275,7 @@ static void tmp_alloc(TickitRenderBuffer *rb, size_t len)
 static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
 {
   TickitStringPos endpos;
-  len = tickit_string_ncount(text, len, &endpos, NULL);
+  len = tickit_utf8_ncount(text, len, &endpos, NULL);
   if(1 + len == 0)
     return -1;
 
@@ -984,11 +984,11 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
             char *text = rb->texts[cell->v.text.idx];
 
             tickit_stringpos_limit_columns(&limit, cell->v.text.offs);
-            tickit_string_count(text, &start, &limit);
+            tickit_utf8_count(text, &start, &limit);
 
             limit.columns += cell->cols;
             end = start;
-            tickit_string_countmore(text, &end, &limit);
+            tickit_utf8_countmore(text, &end, &limit);
 
             tickit_term_setpen(tt, cell->pen);
             tickit_term_printn(tt, text + start.bytes, end.bytes - start.bytes);
@@ -1075,11 +1075,11 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
             char *text = src->texts[cell->v.text.idx];
 
             tickit_stringpos_limit_columns(&limit, cell->v.text.offs);
-            tickit_string_count(text, &start, &limit);
+            tickit_utf8_count(text, &start, &limit);
 
             limit.columns += cell->cols;
             end = start;
-            tickit_string_countmore(text, &end, &limit);
+            tickit_utf8_countmore(text, &end, &limit);
 
             put_text(dst, line, col, text + start.bytes, end.bytes - start.bytes);
           }
@@ -1141,14 +1141,14 @@ static size_t get_span_text(TickitRenderBuffer *rb, RBCell *span, int offset, in
         TickitStringPos start, end, limit;
 
         tickit_stringpos_limit_columns(&limit, span->v.text.offs + offset);
-        tickit_string_count(text, &start, &limit);
+        tickit_utf8_count(text, &start, &limit);
 
         if(one_grapheme)
           tickit_stringpos_limit_graphemes(&limit, start.graphemes + 1);
         else
           tickit_stringpos_limit_columns(&limit, span->cols);
         end = start;
-        tickit_string_countmore(text, &end, &limit);
+        tickit_utf8_countmore(text, &end, &limit);
 
         bytes = end.bytes - start.bytes;
 

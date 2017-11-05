@@ -13,7 +13,7 @@ tickit_utf8_mbswidth, tickit_utf8_byte2col, tickit_utf8_col2byte \- count the co
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-These functions are a set of shortcut wrappers around \fBtickit_string_count\fP(3) for performing a single simple counting operation on a given string. When performing multiple operations on a given string, it is more efficient to use \fBtickit_string_count\fP() directly.
+These functions are a set of shortcut wrappers around \fBtickit_utf8_count\fP(3) for performing a single simple counting operation on a given string. When performing multiple operations on a given string, it is more efficient to use \fBtickit_utf8_count\fP() directly.
 .PP
 \fBtickit_utf8_mbswidth\fP() returns the number of columns wide the given Unicode string consumes.
 .PP
@@ -21,5 +21,5 @@ These functions are a set of shortcut wrappers around \fBtickit_string_count\fP(
 .SH "RETURN VALUE"
 \fBtickit_utf8_mbswidth\fP() and \fBtickit_utf8_byte2col\fP() return an integer column count. \fBtickit_utf8_col2byte\fP() returns an integer byte count.
 .SH "SEE ALSO"
-.BR tickit_string_count (3),
+.BR tickit_utf8_count (3),
 .BR tickit (7)

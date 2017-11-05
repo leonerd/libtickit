@@ -10,10 +10,10 @@ tickit_stringpos_zero \- clear the fields of a string position counter
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_stringpos_zero\fP() sets the four counter fields of \fIpos\fP to zero. This operation is done implictly by \fBtickit_string_count\fP(3), but this function may be useful to initialise a counter to zeros before entering a loop, and using \fBtickit_string_countmore\fP(3) for every iteration.
+\fBtickit_stringpos_zero\fP() sets the four counter fields of \fIpos\fP to zero. This operation is done implictly by \fBtickit_utf8_count\fP(3), but this function may be useful to initialise a counter to zeros before entering a loop, and using \fBtickit_utf8_countmore\fP(3) for every iteration.
 .SH "RETURN VALUE"
 \fBtickit_stringpos_zero\fP() returns no value.
 .SH "SEE ALSO"
-.BR tickit_string_count (3),
+.BR tickit_utf8_count (3),
 .BR tickit_stringpos_limit_bytes (3),
 .BR tickit (7)

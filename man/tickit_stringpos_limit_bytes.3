@@ -20,7 +20,7 @@ tickit_stringpos_limit_... \- set limit fields in string position counters
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-The first four of these functions each set one of the counter fields in \fIpos\fP to the given value, and the other three to -1. This is useful to create a limit counter to stop \fBtickit_string_count\fP(3) or \fBtickit_string_countmore\fP(3) at the given position. The final function initialises all four fields to -1.
+The first four of these functions each set one of the counter fields in \fIpos\fP to the given value, and the other three to -1. This is useful to create a limit counter to stop \fBtickit_utf8_count\fP(3) or \fBtickit_utf8_countmore\fP(3) at the given position. The final function initialises all four fields to -1.
 .PP
 Each is also available as a macro which can be used to initialise a new \fBTickitStringPos\fP variable.
 .PP
@@ -30,6 +30,6 @@ Each is also available as a macro which can be used to initialise a new \fBTicki
 .SH "RETURN VALUE"
 The functions all return no value. The macros expand to a struct initialiser expression.
 .SH "SEE ALSO"
-.BR tickit_string_count (3),
+.BR tickit_utf8_count (3),
 .BR tickit_stringpos_zero (3),
 .BR tickit (7)

@@ -390,10 +390,15 @@ DEPRECATED int tickit_string_seqlen(long codepoint); /* use tickit_utf8_seqlen()
 size_t tickit_utf8_put(char *str, size_t len, long codepoint);
 DEPRECATED size_t tickit_string_putchar(char *str, size_t len, long codepoint); /* use tickit_utf8_put() */
 
-size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
-size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
-size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
-size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_utf8_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_utf8_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_utf8_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
+size_t tickit_utf8_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
+
+DEPRECATED size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+DEPRECATED size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
+DEPRECATED size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
+DEPRECATED size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
 
 // Some convenient mutators for TickitStringPos structs
 

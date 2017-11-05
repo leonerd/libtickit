@@ -1,0 +1,75 @@
+.TH TICKIT_UTF8_COUNT 3
+.SH NAME
+tickit_utf8_count, tickit_utf8_countmore \- count characters in Unicode strings
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.B  "typedef struct {"
+.BI "    size_t " bytes ;
+.BI "    int    " codepoints ;
+.BI "    int    " graphemes ;
+.BI "    int    " columns ;
+.BI "} " TickitStringPos ;
+.sp
+.BI "size_t tickit_utf8_count(const char *" str ", TickitStringPos *" pos ,
+.BI "    const TickitStringPos *" limit );
+.BI "size_t tickit_utf8_countmore(const char *" str ", TickitStringPos *" pos ,
+.BI "    const TickitStringPos *" limit );
+.sp
+.BI "size_t tickit_utf8_ncount(const char *" str ", size_t " len ,
+.BI "    TickitStringPos *" pos ", const TickitStringPos *" limit );
+.BI "size_t tickit_utf8_ncountmore(const char *" str ,
+.BI "    TickitStringPos *" pos ", const TickitStringPos *" limit );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_utf8_count\fP() counts characters in the given Unicode string, which must be in
+.SM UTF-8
+encoding. It starts at the beginning of the string and counts forward over codepoints and graphemes, incrementing the counters in \fIpos\fP until it reaches a limit. It will not go further than any of the limits given by the \fIlimits\fP structure (where the value -1 indicates no limit of that type). It will never split a codepoint in the middle of a
+.SM UTF-8
+sequence, nor will it split a grapheme between its codepoints; it is therefore possible that the function returns before any of the limits have been reached, if the next whole grapheme would involve going past at least one of the specified limits. The function will also stop when it reaches the end of \fIstr\fP. It returns the total number of bytes it has counted over.
+.PP
+The \fIbytes\fP member counts
+.SM UTF-8
+bytes which encode individual codepoints. For example the Unicode character
+.SM U+00E9
+is encoded by two bytes 0xc3, 0xa9; it would increment the \fIbytes\fP counter by 2 and the \fIcodepoints\fP counter by 1.
+.PP
+.PP
+The \fIcodepoints\fP member counts individual Unicode codepoints.
+.PP
+The \fIgraphemes\fP member counts whole composed graphical clusters of codepoints, where combining accents which count as individual codepoints do not count as separate graphemes. For example, the codepoint sequence
+.SM "U+0065 U+0301"
+would increment the \fIcodepoint\fP counter by 2 and the \fIgraphemes\fP counter by 1.
+.PP
+The \fIcolumns\fP member counts the number of screen columns consumed by the graphemes. Most graphemes consume only 1 column, but some are defined in Unicode to consume 2.
+.PP
+\fBtickit_utf8_countmore\fP() is similar to \fBtickit_utf8_count\fP() except it will not zero any of the counters before it starts. It can continue counting where a previous call finished. In particular, it will assume that it is starting at the beginning of a
+.SM UTF-8
+sequence that begins a new grapheme; it will not check these facts and the behavior is undefined if these assumptions do not hold. It will begin at the offset given by \fIpos.bytes\fP.
+.PP
+The \fBtickit_utf8_ncount\fP() and \fBtickit_utf8_ncountmore\fP() variants are similar except that they read no more than \fIlen\fP bytes from the string and do not require it to be
+.SM NUL
+terminated. They will still stop at a
+.SM NUL
+byte if one is found before \fIlen\fP bytes have been read.
+.PP
+These functions will all immediately abort if any C0 or C1 control byte other than
+.SM NUL
+is encountered, returning the value -1. In this circumstance, the \fIpos\fP structure will still be updated with the progress so far.
+.SH USAGE
+Typically, these functions would be used either of two ways.
+.PP
+When given a value in \fIlimit.bytes\fP (or no limit and simply using string termination), \fBtickit_utf8_count\fP() will yield the width of the given string in terminal columns, in the \fIlimit.columns\fP field.
+.PP
+When given a value in \fIlimit.columns\fP, \fBtickit_utf8_count\fP() will yield the number of bytes of that string that will consume the given space on the terminal.
+.SH "RETURN VALUE"
+\fBtickit_utf8_count\fP() and \fBtickit_utf8_countmore\fP() return the number of bytes they have skipped over this call, or -1 if they encounter a C0 or C1 byte other than
+.SM NUL .
+.SH "SEE ALSO"
+.BR tickit_stringpos_zero (3),
+.BR tickit_stringpos_limit_bytes (3),
+.BR tickit_utf8_mbswidth (3),
+.BR tickit (7)

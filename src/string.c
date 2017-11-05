@@ -97,21 +97,43 @@ size_t tickit_utf8_put(char *str, size_t len, long codepoint)
 size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
   tickit_stringpos_zero(pos);
-  return tickit_string_ncountmore(str, (size_t)-1, pos, limit);
+  return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
+}
+
+size_t tickit_utf8_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
+{
+  tickit_stringpos_zero(pos);
+  return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
 }
 
 size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
-  return tickit_string_ncountmore(str, (size_t)-1, pos, limit);
+  return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
+}
+
+size_t tickit_utf8_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
+{
+  return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
 }
 
 size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
 {
   tickit_stringpos_zero(pos);
-  return tickit_string_ncountmore(str, len, pos, limit);
+  return tickit_utf8_ncountmore(str, len, pos, limit);
+}
+
+size_t tickit_utf8_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
+{
+  tickit_stringpos_zero(pos);
+  return tickit_utf8_ncountmore(str, len, pos, limit);
 }
 
 size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
+{
+  return tickit_utf8_ncountmore(str, len, pos, limit);
+}
+
+size_t tickit_utf8_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
 {
   TickitStringPos here = *pos;
   size_t start_bytes = pos->bytes;
@@ -171,7 +193,7 @@ int tickit_string_mbswidth(const char *str)
 int tickit_utf8_mbswidth(const char *str)
 {
   TickitStringPos pos;
-  tickit_string_count(str, &pos, NULL);
+  tickit_utf8_count(str, &pos, NULL);
   return pos.columns;
 }
 
@@ -184,7 +206,7 @@ int tickit_utf8_byte2col(const char *str, size_t byte)
 {
   TickitStringPos limit = INIT_TICKIT_STRINGPOS_LIMIT_BYTES(byte);
   TickitStringPos pos;
-  tickit_string_count(str, &pos, &limit);
+  tickit_utf8_count(str, &pos, &limit);
   return pos.columns;
 }
 
@@ -197,6 +219,6 @@ size_t tickit_utf8_col2byte(const char *str, int col)
 {
   TickitStringPos limit = INIT_TICKIT_STRINGPOS_LIMIT_COLUMNS(col);
   TickitStringPos pos;
-  tickit_string_count(str, &pos, &limit);
+  tickit_utf8_count(str, &pos, &limit);
   return pos.bytes;
 }
