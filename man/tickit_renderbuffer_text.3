@@ -30,7 +30,7 @@ Link with \fI\-ltickit\fP.
 .PP
 \fBtickit_renderbuffer_text_at\fP(), \fBtickit_renderbuffer_textn_at\fP(), \fBtickit_renderbuffer_textf_at\fP() and \fBtickit_renderbuffer_vtextf_at\fP() create a text region at the given position, and otherwise operate analogously to their non-\fB_at\fP counterpart. These functions do not use or update the virtual cursor position.
 .PP
-Calls to any of these functions allocate storage owned by the \fITickitRenderBuffer\fP instance itself to store the strings. This storage is only released again by \fBtickit_renderbuffer_reset\fP(3) or by the implicit reset that happens at the end of \fBtickit_renderbuffer_flush_to_term\fP(3).
+Calls to any of these functions allocate storage owned by the \fITickitRenderBuffer\fP instance itself to store the strings. This storage is released again by \fBtickit_renderbuffer_reset\fP(3), the implicit reset that happens at the end of \fBtickit_renderbuffer_flush_to_term\fP(3), or when every cell that was originally part of the region has been overwritten with other content.
 .SH "RETURN VALUE"
 These functions return an integer giving the number of columns the new region occupies.
 .SH "SEE ALSO"
