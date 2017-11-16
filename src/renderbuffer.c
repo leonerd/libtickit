@@ -73,6 +73,26 @@ struct TickitRenderBuffer {
   int refcount;
 };
 
+static void debug_logf(TickitRenderBuffer *rb, const char *flag, const char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+
+  char fmt_with_indent[strlen(fmt) + 3 * rb->depth + 1];
+  {
+    char *s = fmt_with_indent;
+    for(int i = 0; i < rb->depth; i++)
+      s += sprintf(s, "|  ");
+    strcpy(s, fmt);
+  }
+
+  tickit_debug_vlogf(flag, fmt_with_indent, args);
+
+  va_end(args);
+}
+
+#define DEBUG_LOGF  if(tickit_debug_enabled) debug_logf
+
 static void free_stack(RBStack *stack)
 {
   while(stack) {
@@ -82,6 +102,31 @@ static void free_stack(RBStack *stack)
     free(stack);
 
     stack = prev;
+  }
+}
+
+static void tmp_cat_utf8(TickitRenderBuffer *rb, long codepoint)
+{
+  int seqlen = tickit_utf8_seqlen(codepoint);
+  if(rb->tmpsize < rb->tmplen + seqlen) {
+    rb->tmpsize *= 2;
+    rb->tmp = realloc(rb->tmp, rb->tmpsize);
+  }
+
+  tickit_utf8_put(rb->tmp + rb->tmplen, rb->tmpsize - rb->tmplen, codepoint);
+  rb->tmplen += seqlen;
+
+  /* rb->tmp remains NOT nul-terminated */
+}
+
+static void tmp_alloc(TickitRenderBuffer *rb, size_t len)
+{
+  if(rb->tmpsize < len) {
+    free(rb->tmp);
+
+    while(rb->tmpsize < len)
+      rb->tmpsize *= 2;
+    rb->tmp = malloc(rb->tmpsize);
   }
 }
 
@@ -140,26 +185,6 @@ static void cont_cell(RBCell *cell, int startcol)
   cell->cols      = startcol;
   cell->pen       = NULL;
 }
-
-static void debug_logf(TickitRenderBuffer *rb, const char *flag, const char *fmt, ...)
-{
-  va_list args;
-  va_start(args, fmt);
-
-  char fmt_with_indent[strlen(fmt) + 3 * rb->depth + 1];
-  {
-    char *s = fmt_with_indent;
-    for(int i = 0; i < rb->depth; i++)
-      s += sprintf(s, "|  ");
-    strcpy(s, fmt);
-  }
-
-  tickit_debug_vlogf(flag, fmt_with_indent, args);
-
-  va_end(args);
-}
-
-#define DEBUG_LOGF  if(tickit_debug_enabled) debug_logf
 
 static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
 {
@@ -230,30 +255,7 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
   return &cells[line][col];
 }
 
-static void tmp_cat_utf8(TickitRenderBuffer *rb, long codepoint)
-{
-  int seqlen = tickit_utf8_seqlen(codepoint);
-  if(rb->tmpsize < rb->tmplen + seqlen) {
-    rb->tmpsize *= 2;
-    rb->tmp = realloc(rb->tmp, rb->tmpsize);
-  }
-
-  tickit_utf8_put(rb->tmp + rb->tmplen, rb->tmpsize - rb->tmplen, codepoint);
-  rb->tmplen += seqlen;
-
-  /* rb->tmp remains NOT nul-terminated */
-}
-
-static void tmp_alloc(TickitRenderBuffer *rb, size_t len)
-{
-  if(rb->tmpsize < len) {
-    free(rb->tmp);
-
-    while(rb->tmpsize < len)
-      rb->tmpsize *= 2;
-    rb->tmp = malloc(rb->tmpsize);
-  }
-}
+// cell creation functions
 
 static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
 {
