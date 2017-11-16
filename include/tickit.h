@@ -310,8 +310,8 @@ bool tickit_rectset_contains(const TickitRectSet *trs, const TickitRect *rect);
 TickitString *tickit_string_new(const char *str, size_t len);
 TickitString *tickit_string_ref(TickitString *s);
 void tickit_string_unref(TickitString *s);
-const char *tickit_string_get(TickitString *s);
-size_t tickit_string_len(TickitString *s);
+const char *tickit_string_get(const TickitString *s);
+size_t tickit_string_len(const TickitString *s);
 
 /* TickitTerm */
 

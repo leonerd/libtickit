@@ -38,12 +38,12 @@ void tickit_string_unref(TickitString *s)
   free(s);
 }
 
-const char *tickit_string_get(TickitString *s)
+const char *tickit_string_get(const TickitString *s)
 {
   return s->str;
 }
 
-size_t tickit_string_len(TickitString *s)
+size_t tickit_string_len(const TickitString *s)
 {
   return s->len;
 }
