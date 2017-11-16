@@ -257,10 +257,10 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
 
 // cell creation functions
 
-static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
+static int put_string(TickitRenderBuffer *rb, int line, int col, TickitString *s)
 {
   TickitStringPos endpos;
-  len = tickit_utf8_ncount(text, len, &endpos, NULL);
+  size_t len = tickit_utf8_ncount(tickit_string_get(s), tickit_string_len(s), &endpos, NULL);
   if(1 + len == 0)
     return -1;
 
@@ -272,8 +272,6 @@ static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text,
     return ret;
 
   RBCell *linecells = rb->cells[line];
-
-  TickitString *s = tickit_string_new(text, len);
 
   while(cols) {
     while(cols && linecells[col].maskdepth > -1) {
@@ -301,6 +299,15 @@ static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text,
     col      += spanlen;
     startcol += spanlen;
   }
+
+  return ret;
+}
+
+static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len)
+{
+  TickitString *s = tickit_string_new(text, len == -1 ? strlen(text) : len);
+
+  int ret = put_string(rb, line, col, s);
 
   tickit_string_unref(s);
 
@@ -1052,7 +1059,11 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
             end = start;
             tickit_utf8_countmore(text, &end, &limit);
 
-            put_text(dst, line, col, text + start.bytes, end.bytes - start.bytes);
+            if(start.bytes > 0 || end.bytes < tickit_string_len(cell->v.text.s))
+              put_text(dst, line, col, text + start.bytes, end.bytes - start.bytes);
+            else
+              // We can just cheaply copy the entire string
+              put_string(dst, line, col, cell->v.text.s);
           }
           break;
         case ERASE:
