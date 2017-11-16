@@ -273,6 +273,8 @@ static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text,
 
   RBCell *linecells = rb->cells[line];
 
+  TickitString *s = tickit_string_new(text, len);
+
   while(cols) {
     while(cols && linecells[col].maskdepth > -1) {
       col++;
@@ -293,12 +295,14 @@ static int put_text(TickitRenderBuffer *rb, int line, int col, const char *text,
     RBCell *cell = make_span(rb, line, col, spanlen);
     cell->state       = TEXT;
     cell->pen         = tickit_pen_ref(rb->pen);
-    cell->v.text.s    = tickit_string_new(text, len);
+    cell->v.text.s    = tickit_string_ref(s);
     cell->v.text.offs = startcol;
 
     col      += spanlen;
     startcol += spanlen;
   }
+
+  tickit_string_unref(s);
 
   return ret;
 }
