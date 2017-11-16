@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
   ok(!!s, "tickit_string_new");
 
   is_str(tickit_string_get(s), "Hello, world!", "tickit_string_get");
+  is_int(tickit_string_len(s), 13, "tickit_string_len");
 
   {
     is_ptr(tickit_string_ref(s), s, "tickit_string_ref");

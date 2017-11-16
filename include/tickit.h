@@ -311,6 +311,7 @@ TickitString *tickit_string_new(const char *str, size_t len);
 TickitString *tickit_string_ref(TickitString *s);
 void tickit_string_unref(TickitString *s);
 const char *tickit_string_get(TickitString *s);
+size_t tickit_string_len(TickitString *s);
 
 /* TickitTerm */
 

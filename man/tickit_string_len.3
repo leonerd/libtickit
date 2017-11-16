@@ -1,0 +1,20 @@
+.TH TICKIT_STRING_LEN 3
+.SH NAME
+tickit_string_get \- query the length of a counted string
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "size_t tickit_string_len(TickitString *" s );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_string_len\fP() returns the size in bytes of the stored character buffer within the counted string instance.
+.SH "RETURN VALUE"
+\fBtickit_string_len\fP() returns a size in bytes.
+.SH "SEE ALSO"
+.BR tickit_string_new (3),
+.BR tickit_string_get (3),
+.BR tickit_string (7),
+.BR tickit (7)

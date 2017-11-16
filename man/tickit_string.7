@@ -11,7 +11,7 @@ TickitString \- a reference-counted string buffer
 .SH DESCRIPTION
 A \fBTickitString\fP instance stores a NUL-terminated character buffer (i.e. a plain C string) and a reference count. It allows string buffers to be efficiently shared while their usage is tracked, and reclaimed once no longer required.
 .SH FUNCTIONS
-A new \fBTickitString\fP instance is created by calling \fBtickit_string_new\fP(3). Once constructed, its buffer can be read by calling \fBtickit_string_get\fP(3). The buffer should be considered immutable; it cannot be modified.
+A new \fBTickitString\fP instance is created by calling \fBtickit_string_new\fP(3). Once constructed, its buffer can be read by calling \fBtickit_string_get\fP(3) and its length queried by \fBtickit_string_len\fP(3). The buffer should be considered immutable; it cannot be modified.
 .PP
 A string instance maintains a reference count to make it easier for applications to share and manage the lifetime of these buffers. A new string starts with a count of one, and it can be adjusted using \fBtickit_string_ref\fP(3) and \fBtickit_string_unref\fP(3). When the count reaches zero the instance is destroyed.
 .SH "SEE ALSO"
