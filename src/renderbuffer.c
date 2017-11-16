@@ -32,7 +32,10 @@ enum {
 // Internal cell structure definition
 typedef struct {
   enum TickitRenderBufferCellState state;
-  int cols; // or "startcol" for state == CONT
+  union {
+    int startcol; // for state == CONT
+    int cols;     // otherwise
+  };
   int maskdepth; // -1 if not masked
   TickitPen *pen; // state -> {TEXT, ERASE, LINE, CHAR}
   union {
@@ -182,7 +185,7 @@ static void cont_cell(RBCell *cell, int startcol)
 
   cell->state     = CONT;
   cell->maskdepth = -1;
-  cell->cols      = startcol;
+  cell->startcol  = startcol;
   cell->pen       = NULL;
 }
 
@@ -195,7 +198,7 @@ static RBCell *make_span(TickitRenderBuffer *rb, int line, int col, int cols)
   if(end < rb->cols && cells[line][end].state == CONT) {
     int spanstart = cells[line][end].cols;
     RBCell *spancell = &cells[line][spanstart];
-    int spanend = spanstart + spancell->cols;
+    int spanend = spanstart + spancell->startcol;
     int afterlen = spanend - end;
     RBCell *endcell = &cells[line][end];
 
@@ -1097,8 +1100,8 @@ static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
   *offset = 0;
   RBCell *cell = &rb->cells[line][col];
   if(cell->state == CONT) {
-    *offset = col - cell->cols; // startcol
-    cell = &rb->cells[line][cell->cols];
+    *offset = col - cell->startcol;
+    cell = &rb->cells[line][cell->startcol];
   }
 
   return cell;
