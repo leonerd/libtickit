@@ -1,0 +1,104 @@
+CHANGES
+ - the changelog
+
+CODE-MAP
+ - high-level list and description of files in the repository
+
+CREDITS
+ - list of other contributors to the code
+
+LICENSE
+ - legalese
+
+Makefile
+ - main build file
+
+examples/
+ - contains standalone example programs demonstrating parts of API
+
+include/tickit.h
+ - main include file
+
+include/tickit-mockterm.h
+ - include file for tests using the mock terminal
+
+include/tickit-termdrv.h
+ - include file for terminal drivers
+
+man/
+ - contains the documentation manpages
+
+man/also
+ - lists aliases for manpages; used to create symlinks at install time
+
+src/
+ - contains the source code for the library
+
+src/debug.c
+ - helper functions for printing debug log
+
+src/hooklists.c
+ - (internal) implementation of lists of event handlers
+
+src/hooklists.h
+ - header file for lists of event handlers
+
+src/linechars.inc.PL
+ - script to generate `linechars.inc`
+
+src/linechars.inc
+ - defines an array of unicode codepoints to use in linedrawing
+
+src/mockterm.c
+ - a virtual TickitTerm implementation that supports query; used for unit tests
+
+src/pen.c
+ - implements TickitPen; stores a collection of terminal rendering attributes
+
+src/rect.c
+ - implements TickitRect; utility structure representing a rectangular region
+
+src/rectset.c
+ - implements TickitRectSet; stores a collection of rectangular areas
+
+src/renderbuffer.c
+ - implementes TickitRenderBuffer; store display content to be drawn to the terminal
+
+src/string.c
+ - implements TickitString; a reference-counted string buffer
+
+src/term.c
+ - implements TickitTerm; abstraction of an interactive terminal
+
+src/termdriver-ti.c
+ - a terminal IO driver which uses terminfo
+
+src/termdriver-xterm.c
+ - a terminal IO driver for xterm-like terminals
+
+src/termdriver.h
+ - header file used for terminal drivers
+
+src/tickit.c
+ - implements Tickit; the toplevel instance and event loop controller
+
+src/unicode.h
+ - internal function which handles the terminal width of Unicode codepoints
+
+src/utf8.c
+ - Unicode and UTF-8 string handling functions
+
+src/window.c
+ - implements TickitWindow; a window for drawing operations and input
+
+src/xterm-palette.inc.PL
+ - script to generate `xterm-palette.inc`
+
+src/xterm-palette.inc
+ - defines an array to downsample xterm256 colours to 8- or 16-colour palette
+
+t/
+ - contains unit tests
+
+tickit.pc.in
+ - template for the file installed as `PREFIX/pkgconfig/tickit.pc`
