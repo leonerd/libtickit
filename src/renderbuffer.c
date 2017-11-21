@@ -1036,11 +1036,63 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
   tickit_renderbuffer_reset(rb);
 }
 
-void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
+static void copyrect(TickitRenderBuffer *dst, TickitRenderBuffer *src,
+    const TickitRect *dstrect, const TickitRect *srcrect)
 {
-  for(int line = 0; line < src->lines; line++) {
-    for(int col = 0; col < src->cols; /**/) {
+  if(srcrect->lines == 0 || srcrect->cols == 0)
+    return;
+
+  /* TODO:
+   *   * consider how this works in the presence of a translation offset
+   *     defined on src
+   *   * work out how to handle SKIP regions for copyrect/moverect
+   */
+  int lineoffs = dstrect->top  - srcrect->top,
+      coloffs  = dstrect->left - srcrect->left;
+
+  int bottom = tickit_rect_bottom(srcrect),
+      right  = tickit_rect_right(srcrect);
+
+  /* Several steps have to be done somewhat specially for copies into the same
+   * RB
+   */
+  bool samerb = dst == src;
+
+  if(samerb && lineoffs == 0 && coloffs == 0)
+    return;
+
+  /* iterate lines from the bottom upward if we're coping down in the same RB */
+  bool upwards = samerb && (lineoffs > 0);
+  /* iterate columns leftward if we're copying rightward in the same RB */
+  bool leftwards = samerb && (lineoffs == 0) && (coloffs > 0);
+
+  for(int line = upwards ? bottom - 1           : srcrect->top;
+                 upwards ? line >= srcrect->top : line < bottom;
+                 upwards ? line--               : line++) {
+    for(int col = leftwards ? right - 1            : srcrect->left;
+                  leftwards ? col >= srcrect->left : col < right;
+                              /**/) {
       RBCell *cell = &src->cells[line][col];
+
+      int offset = 0;
+
+      if(cell->state == CONT) {
+        int startcol = cell->startcol;
+        cell = &src->cells[line][startcol];
+
+        if(leftwards) {
+          col = startcol;
+          if(col < srcrect->left)
+            col = srcrect->left;
+        }
+
+        offset = col - startcol;
+      }
+
+      int cols = cell->cols;
+
+      if(col + cols > tickit_rect_right(srcrect))
+        cols = tickit_rect_right(srcrect) - col;
 
       if(cell->state != SKIP) {
         tickit_renderbuffer_savepen(dst);
@@ -1055,28 +1107,33 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
             TickitStringPos start, end, limit;
             const char *text = tickit_string_get(cell->v.text.s);
 
-            tickit_stringpos_limit_columns(&limit, cell->v.text.offs);
+            tickit_stringpos_limit_columns(&limit, cell->v.text.offs + offset);
             tickit_utf8_count(text, &start, &limit);
 
-            limit.columns += cell->cols;
+            limit.columns += cols;
             end = start;
             tickit_utf8_countmore(text, &end, &limit);
 
             if(start.bytes > 0 || end.bytes < tickit_string_len(cell->v.text.s))
-              put_text(dst, line, col, text + start.bytes, end.bytes - start.bytes);
+              put_text(dst, line + lineoffs, col + coloffs,
+                  text + start.bytes, end.bytes - start.bytes);
             else
               // We can just cheaply copy the entire string
-              put_string(dst, line, col, cell->v.text.s);
+              put_string(dst, line + lineoffs, col + coloffs,
+                  cell->v.text.s);
           }
           break;
         case ERASE:
-          erase(dst, line, col, cell->cols);
+          erase(dst, line + lineoffs, col + coloffs,
+              cols);
           break;
         case LINE:
-          linecell(dst, line, col, cell->v.line.mask);
+          linecell(dst, line + lineoffs, col + coloffs,
+              cell->v.line.mask);
           break;
         case CHAR:
-          put_char(dst, line, col, cell->v.chr.codepoint);
+          put_char(dst, line + lineoffs, col + coloffs,
+              cell->v.chr.codepoint);
           break;
         case CONT:
           /* unreachable */
@@ -1086,9 +1143,26 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
       if(cell->state != SKIP)
         tickit_renderbuffer_restore(dst);
 
-      col += cell->cols;
+      if(leftwards)
+        col--; /* we'll jump back to the beginning of a CONT region on the
+                  next iteration
+                */
+      else
+        col += cell->cols;
     }
   }
+}
+
+void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
+{
+  copyrect(dst, src,
+      &(TickitRect){ .top = 0, .left = 0, .lines = src->lines, .cols = src->cols },
+      &(TickitRect){ .top = 0, .left = 0, .lines = src->lines, .cols = src->cols });
+}
+
+void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src)
+{
+  copyrect(rb, rb, &dest, &src);
 }
 
 static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)
