@@ -749,6 +749,14 @@ void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col)
   rb->vc_col = col;
 }
 
+void tickit_renderbuffer_skiprect(TickitRenderBuffer *rb, TickitRect *rect)
+{
+  DEBUG_LOGF(rb, "Bd", "Skip [(%d,%d)..(%d,%d)]", rect->left, rect->top, tickit_rect_right(rect), tickit_rect_bottom(rect));
+
+  for(int line = rect->top; line < tickit_rect_bottom(rect); line++)
+    skip(rb, line, rect->left, rect->cols);
+}
+
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, const char *text)
 {
   return tickit_renderbuffer_textn_at(rb, line, col, text, -1);

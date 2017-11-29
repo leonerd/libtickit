@@ -484,6 +484,7 @@ void tickit_renderbuffer_restore(TickitRenderBuffer *rb);
 void tickit_renderbuffer_skip_at(TickitRenderBuffer *rb, int line, int col, int cols);
 void tickit_renderbuffer_skip(TickitRenderBuffer *rb, int cols);
 void tickit_renderbuffer_skip_to(TickitRenderBuffer *rb, int col);
+void tickit_renderbuffer_skiprect(TickitRenderBuffer *rb, TickitRect *rect);
 int tickit_renderbuffer_text_at(TickitRenderBuffer *rb, int line, int col, const char *text);
 int tickit_renderbuffer_textn_at(TickitRenderBuffer *rb, int line, int col, const char *text, size_t len);
 int tickit_renderbuffer_text(TickitRenderBuffer *rb, const char *text);

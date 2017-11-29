@@ -11,6 +11,9 @@ tickit_renderbuffer_skip, tickit_renderbuffer_skip_at, tickit_renderbuffer_skip_
 .BI "         int " col );
 .BI "void tickit_renderbuffer_skip_at(TickitRenderBuffer *" rb ,
 .BI "         int " line ", int " col ", int " cols );
+.sp
+.BI "void tickit_renderbuffer_skiprect(TickitRenderBuffer *" rb ,
+.BI "         TickitRect *" rect );
 .EE
 .sp
 Link with \fI\-ltickit\fP.
@@ -18,6 +21,8 @@ Link with \fI\-ltickit\fP.
 \fBtickit_renderbuffer_skip\fP() creates a skip region that starts at the current virtual cursor position, continuing on for \fIcols\fP cells. \fBtickit_renderbuffer_skip_to\fP() creates a skip region that continues until the given column if the cursor was before that, or has no effect if it was after. Both of these functions will update the virtual cursor position.
 .PP
 \fBtickit_renderbuffer_skip_at\fP() creates a skip region at the given position and length. This function does not use or update the virtual cursor position.
+.PP
+\fBtickit_renderbuffer_skiprect\fP() creates skip regions for every line in \fIrect\fP within the buffer.
 .SH "RETURN VALUE"
 These functions return nothing
 .SH "SEE ALSO"

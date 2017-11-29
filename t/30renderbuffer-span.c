@@ -233,6 +233,22 @@ int main(int argc, char *argv[])
         NULL);
   }
 
+  // Skiprect
+  {
+    tickit_renderbuffer_eraserect(rb, &(TickitRect){.top = 0, .left = 0, .lines = 4, .cols = 10});
+    tickit_renderbuffer_skiprect(rb, &(TickitRect){.top = 1, .left = 2, .lines = 2, .cols = 6});
+
+    tickit_renderbuffer_flush_to_term(rb, tt);
+    is_termlog("RenderBuffer renders hole around skiprect",
+        GOTO(0,0), SETPEN(), ERASECH(10,-1),
+        GOTO(1,0), SETPEN(), ERASECH(2,-1),
+        GOTO(1,8), SETPEN(), ERASECH(2,-1),
+        GOTO(2,0), SETPEN(), ERASECH(2,-1),
+        GOTO(2,8), SETPEN(), ERASECH(2,-1),
+        GOTO(3,0), SETPEN(), ERASECH(10,-1),
+        NULL);
+  }
+
   // Clear
   {
     TickitPen *bg_pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 3, -1);
