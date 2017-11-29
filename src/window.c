@@ -490,7 +490,7 @@ TickitRect tickit_window_get_abs_geometry(const TickitWindow *win)
 
 int tickit_window_bottom(const TickitWindow *win)
 {
-  return win->rect.top + win->rect.lines;
+  return tickit_rect_bottom(&win->rect);
 }
 
 int tickit_window_right(const TickitWindow *win)
@@ -682,9 +682,9 @@ static bool _cell_visible(TickitWindow *win, int line, int col)
       if(!child->is_visible)
         continue;
 
-      if(line < child->rect.top  || line >= child->rect.top + child->rect.lines)
+      if(line < child->rect.top  || line >= tickit_rect_bottom(&child->rect))
         continue;
-      if(col  < child->rect.left || col  >= child->rect.left + child->rect.cols)
+      if(col  < child->rect.left || col  >= tickit_rect_right(&child->rect))
         continue;
 
       return false;
@@ -1040,7 +1040,7 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
       if(downward > 0) {
         // "scroll down" means lines moved upward, so the bottom needs redrawing
         tickit_window_expose(origwin, &(TickitRect){
-            .top  = origrect.top + origrect.lines - downward, .lines = downward,
+            .top  = tickit_rect_bottom(&origrect) - downward, .lines = downward,
             .left = origrect.left,                            .cols  = rect.cols
         });
       }
@@ -1055,8 +1055,8 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
       if(rightward > 0) {
         // "scroll right" means columns moved leftward, so the right edge needs redrawing
         tickit_window_expose(origwin, &(TickitRect){
-            .top  = origrect.top,                              .lines = rect.lines,
-            .left = origrect.left + origrect.cols - rightward, .cols  = rightward,
+            .top  = origrect.top,                             .lines = rect.lines,
+            .left = tickit_rect_right(&origrect) - rightward, .cols  = rightward,
         });
       }
       else if(rightward < 0) {

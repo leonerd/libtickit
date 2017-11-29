@@ -38,7 +38,7 @@ int on_expose_render_text(TickitWindow *win, TickitEventFlags flags, void *_info
       break;
 
     case 2:
-      for(int line = info->rect.top; line < info->rect.top + info->rect.lines; line++) {
+      for(int line = info->rect.top; line < tickit_rect_bottom(&info->rect); line++) {
         char buffer[16];
         sprintf(buffer, "Line %d", line);
         tickit_renderbuffer_text_at(rb, line, 0, buffer);
@@ -62,7 +62,7 @@ int on_expose_fillX(TickitWindow *win, TickitEventFlags flags, void *_info, void
 {
   TickitExposeEventInfo *info = _info;
 
-  for(int line = info->rect.top; line < info->rect.top + info->rect.lines; line++) {
+  for(int line = info->rect.top; line < tickit_rect_bottom(&info->rect); line++) {
     char buffer[80];
     for(int i = 0; i < info->rect.cols; i++)
       buffer[i] = 'X';

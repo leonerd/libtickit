@@ -562,8 +562,8 @@ void tickit_renderbuffer_mask(TickitRenderBuffer *rb, TickitRect *mask)
     hole.left = 0;
   }
 
-  for(int line = hole.top; line < hole.top + hole.lines && line < rb->lines; line++) {
-    for(int col = hole.left; col < hole.left + hole.cols && col < rb->cols; col++) {
+  for(int line = hole.top; line < tickit_rect_bottom(&hole) && line < rb->lines; line++) {
+    for(int col = hole.left; col < tickit_rect_right(&hole) && col < rb->cols; col++) {
       RBCell *cell = &rb->cells[line][col];
       if(cell->maskdepth == -1)
         cell->maskdepth = rb->depth;
@@ -860,7 +860,7 @@ void tickit_renderbuffer_erase_to(TickitRenderBuffer *rb, int col)
 
 void tickit_renderbuffer_eraserect(TickitRenderBuffer *rb, TickitRect *rect)
 {
-  DEBUG_LOGF(rb, "Bd", "Erase [(%d,%d)..(%d,%d)]", rect->left, rect->top, rect->left + rect->cols, rect->top + rect->lines);
+  DEBUG_LOGF(rb, "Bd", "Erase [(%d,%d)..(%d,%d)]", rect->left, rect->top, tickit_rect_right(rect), tickit_rect_bottom(rect));
 
   for(int line = rect->top; line < tickit_rect_bottom(rect); line++)
     erase(rb, line, rect->left, rect->cols);
