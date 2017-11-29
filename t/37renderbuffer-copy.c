@@ -144,5 +144,37 @@ int main(int argc, char *argv[])
         NULL);
   }
 
+  // Move
+  {
+    tickit_renderbuffer_text_at(rb, 0, 0, "Hello");
+    tickit_renderbuffer_char_at(rb, 1, 1, 'A');
+    tickit_renderbuffer_erase_at(rb, 1, 2, 3);
+
+    tickit_renderbuffer_moverect(rb,
+        (TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 10 },
+        (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
+
+    tickit_renderbuffer_flush_to_term(rb, tt);
+    is_termlog("RenderBuffer contents moved after move",
+        GOTO(4,2), SETPEN(), PRINT("Hello"),
+        GOTO(5,3), SETPEN(), PRINT("A"),
+                   SETPEN(), ERASECH(3,-1),
+        NULL);
+  }
+
+  // Move with overlap
+  {
+    tickit_renderbuffer_text_at(rb, 0, 0, "Abcde");
+
+    tickit_renderbuffer_moverect(rb,
+        (TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 10 },
+        (TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 10 });
+
+    tickit_renderbuffer_flush_to_term(rb, tt);
+    is_termlog("RenderBuffer contents moved after move with overlap",
+        GOTO(0,0), SETPEN(), PRINT("de"),
+        NULL);
+  }
+
   return exit_status();
 }

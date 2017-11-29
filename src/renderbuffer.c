@@ -1045,7 +1045,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
 }
 
 static void copyrect(TickitRenderBuffer *dst, TickitRenderBuffer *src,
-    const TickitRect *dstrect, const TickitRect *srcrect)
+    const TickitRect *dstrect, const TickitRect *srcrect, bool copy_skip)
 {
   if(srcrect->lines == 0 || srcrect->cols == 0)
     return;
@@ -1053,7 +1053,6 @@ static void copyrect(TickitRenderBuffer *dst, TickitRenderBuffer *src,
   /* TODO:
    *   * consider how this works in the presence of a translation offset
    *     defined on src
-   *   * work out how to handle SKIP regions for copyrect/moverect
    */
   int lineoffs = dstrect->top  - srcrect->top,
       coloffs  = dstrect->left - srcrect->left;
@@ -1109,6 +1108,9 @@ static void copyrect(TickitRenderBuffer *dst, TickitRenderBuffer *src,
 
       switch(cell->state) {
         case SKIP:
+          if(copy_skip)
+            skip(dst, line + lineoffs, col + coloffs,
+                cols);
           break;
         case TEXT:
           {
@@ -1165,12 +1167,36 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
 {
   copyrect(dst, src,
       &(TickitRect){ .top = 0, .left = 0, .lines = src->lines, .cols = src->cols },
-      &(TickitRect){ .top = 0, .left = 0, .lines = src->lines, .cols = src->cols });
+      &(TickitRect){ .top = 0, .left = 0, .lines = src->lines, .cols = src->cols },
+      false);
 }
 
 void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src)
 {
-  copyrect(rb, rb, &dest, &src);
+  copyrect(rb, rb, &dest, &src, true);
+}
+
+void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src)
+{
+  src.lines = dest.lines;
+  src.cols  = dest.cols;
+
+  copyrect(rb, rb, &dest, &src, true);
+
+  /* Calculate what area of the RB needs skipping due to move */
+  TickitRectSet *cleararea = tickit_rectset_new();
+  tickit_rectset_add(cleararea, &src);
+  tickit_rectset_subtract(cleararea, &dest);
+
+  size_t n = tickit_rectset_rects(cleararea);
+  for(size_t i = 0; i < n; i++) {
+    TickitRect rect;
+    tickit_rectset_get_rect(cleararea, i, &rect);
+
+    tickit_renderbuffer_skiprect(rb, &rect);
+  }
+
+  tickit_rectset_destroy(cleararea);
 }
 
 static RBCell *get_span(TickitRenderBuffer *rb, int line, int col, int *offset)

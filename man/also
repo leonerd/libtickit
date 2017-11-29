@@ -71,6 +71,7 @@ tickit_renderbuffer_erase_at.3 = tickit_renderbuffer_erase.3
 tickit_renderbuffer_clear.3 = tickit_renderbuffer_eraserect.3
 tickit_renderbuffer_char_at.3 = tickit_renderbuffer_char.3
 tickit_renderbuffer_vline_at.3 = tickit_renderbuffer_hline_at.3
+tickit_renderbuffer_moverect.3 = tickit_renderbuffer_copyrect.3
 
 tickit_window_unref.3 = tickit_window_ref.3
 tickit_window_root.3 = tickit_window_parent.3

@@ -12,3 +12,4 @@
   * Added TickitString
   * Added tickit_rectset_get_rect(3)
   * Added tickit_renderbuffer_skiprect(3)
+  * Added tickit_renderbuffer_moverect(3)
