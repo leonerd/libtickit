@@ -149,6 +149,9 @@ int main(int argc, char *argv[])
     // Distinct regions
     tickit_rectset_add(trs, rect_init_strp(&tmp, "10,10+20,5"));
 
+    is_int(tickit_rectset_get_rect(trs, 0, &tmp), 1, "tickit_rectset_get_rect after tickit_rectset_Add");
+    is_rect(&tmp, "10,10+20,5", "tmp after tickit_rectset_get_rect");
+
     is_int(tickit_rectset_get_rects(trs, rects, 4), 1, "tickit_rectset_get_rects after tickit_rectset_add");
     is_rect(rects + 0, "10,10+20,5", "rects[0] after tickit_rectset_add");
 
