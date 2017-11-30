@@ -15,7 +15,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_renderbuffer_copyrect\fP() copies the rectangular region in the buffer from the rectangle given by \fIsrc\fP into the location given by \fIdest\fP.
 .PP
-\fBtickit_renderbuffer_moverect\fP() moves content in the rectangular region in the buffer given by \fBsrc\fP into the location given by \fIdest\fP, resetting the region migrated out from back to the skip state.
+\fBtickit_renderbuffer_moverect\fP() moves content in the rectangular region in the buffer given by \fIsrc\fP into the location given by \fIdest\fP, resetting the region migrated out from back to the skip state.
 .PP
 In each case, the two regions may overlap. These functions will also copy cells in skip state; that is, cells set to skip in the source region are set to skip in the destination.
 .SH "RETURN VALUE"
