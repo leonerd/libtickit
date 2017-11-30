@@ -21,6 +21,11 @@ int main(int argc, char *argv[])
 
   tickit_term_set_output_func(tt, output, buffer);
 
+  is_str(tickit_term_ctlname(TICKIT_TERMCTL_ALTSCREEN), "altscreen",
+      "tickit_term_ctlname on TICKIT_TERMCTL_ALTSCREEN");
+  is_int(tickit_term_lookup_ctl("cursorvis"), TICKIT_TERMCTL_CURSORVIS,
+      "tickit_term_lookup_ctl on cursorvis");
+
   buffer[0] = 0;
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
 

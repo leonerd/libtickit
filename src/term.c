@@ -28,6 +28,8 @@
 #include <sys/select.h>
 #include <sys/time.h>
 
+#define streq(a,b) (!strcmp(a,b))
+
 /* unit multipliers for working in microseconds */
 #define MSEC      1000
 #define SECOND 1000000
@@ -915,4 +917,34 @@ bool tickit_term_setctl_int(TickitTerm *tt, TickitTermCtl ctl, int value)
 bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value)
 {
   return (*tt->driver->vtable->setctl_str)(tt->driver, ctl, value);
+}
+
+const char *tickit_term_ctlname(TickitTermCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_TERMCTL_ALTSCREEN:      return "altscreen";
+    case TICKIT_TERMCTL_CURSORVIS:      return "cursorvis";
+    case TICKIT_TERMCTL_MOUSE:          return "mouse";
+    case TICKIT_TERMCTL_CURSORBLINK:    return "cursorblink";
+    case TICKIT_TERMCTL_CURSORSHAPE:    return "cursorshape";
+    case TICKIT_TERMCTL_ICON_TEXT:      return "icon_text";
+    case TICKIT_TERMCTL_TITLE_TEXT:     return "title_text";
+    case TICKIT_TERMCTL_ICONTITLE_TEXT: return "icontitle_text";
+    case TICKIT_TERMCTL_KEYPAD_APP:     return "keypad_app";
+    case TICKIT_TERMCTL_COLORS:         return "colors";
+
+    case TICKIT_N_TERMCTLS: ;
+  }
+  return NULL;
+}
+
+TickitTermCtl tickit_term_lookup_ctl(const char *name)
+{
+  const char *s;
+
+  for(TickitTermCtl ctl = 1; ctl < TICKIT_N_TERMCTLS; ctl++)
+    if((s = tickit_term_ctlname(ctl)) && streq(name, s))
+      return ctl;
+
+  return -1;
 }

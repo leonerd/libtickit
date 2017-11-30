@@ -108,6 +108,8 @@ typedef enum {
   TICKIT_TERMCTL_ICONTITLE_TEXT,
   TICKIT_TERMCTL_KEYPAD_APP,
   TICKIT_TERMCTL_COLORS, // read-only
+
+  TICKIT_N_TERMCTLS
 } TickitTermCtl;
 
 typedef enum {
@@ -390,6 +392,9 @@ bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value
 
 void tickit_term_emit_key(TickitTerm *tt, TickitKeyEventInfo *info);
 void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info);
+
+const char *tickit_term_ctlname(TickitTermCtl ctl);
+TickitTermCtl tickit_term_lookup_ctl(const char *name);
 
 /* String handling utilities */
 

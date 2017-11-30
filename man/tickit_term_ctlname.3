@@ -1,0 +1,21 @@
+.TH TICKIT_TERM_CTLNAME 3
+.SH NAME
+tickit_term_ctlname \- return the name of a terminal control
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "const char * tickit_term_ctlname(TickitTermCtl " ctl );
+.BI "TickitTermCtl tickit_term_lookup_ctl(const char * " name );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_ctlname\fP() returns the name of the given terminal control. These names are the lowercase strings given in \fBtickit_term\fP(7).
+.PP
+\fBtickit_term_lookup_ctl\fP() returns the control constant for a given name. If the name is not recognised then -1 is returned.
+.SH "RETURN VALUE"
+\fBtickit_term_ctlname\fP() returns a constant string pointer. \fBtickit_term_lookup_ctl\fP() returns an control constant or -1.
+.SH "SEE ALSO"
+.BR tickit_term (7),
+.BR tickit (7)
