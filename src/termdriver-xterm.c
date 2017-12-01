@@ -7,7 +7,8 @@
 #define strneq(a,b,n) (strncmp(a,b,n)==0)
 
 #define CSI_MORE_SUBPARAM 0x80000000
-#define CSI_PARAM(x)      ((x) & 0x7fffffff)
+#define CSI_NEXT_SUB(x)   ((x) & CSI_MORE_SUBPARAM)
+#define CSI_PARAM(x)      ((x) & ~CSI_MORE_SUBPARAM)
 
 struct XTermDriver {
   TickitTermDriver driver;
@@ -27,6 +28,7 @@ struct XTermDriver {
   struct {
     unsigned int cursorshape:1;
     unsigned int slrm:1;
+    unsigned int csi_sub_colon:1;
   } cap;
 
   struct {
@@ -213,6 +215,8 @@ static struct SgrOnOff { int on, off; } sgr_onoff[] = {
 
 static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
 {
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
   /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
    * 6 single attributes
    */
@@ -287,8 +291,8 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
 
   s += sprintf(s, "\e[");
   for(int i = 0; i < pindex-1; i++)
-    /* TODO: Work out what terminals support :s */
-    s += sprintf(s, "%d%c", CSI_PARAM(params[i]), ';');
+    s += sprintf(s, "%d%c", CSI_PARAM(params[i]),
+        CSI_NEXT_SUB(params[i]) && xd->cap.csi_sub_colon ? ':' : ';');
   if(pindex > 0)
     s += sprintf(s, "%d", CSI_PARAM(params[pindex-1]));
   sprintf(s, "m");
@@ -445,6 +449,9 @@ static void start(TickitTermDriver *ttd)
   // Also query the current cursor visibility, blink status, and shape
   tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p\eP$q q\e\\");
 
+  // Try to work out whether the terminal understands : to separate sub-params
+  tickit_termdrv_write_strf(ttd, "\e[38;5;255m\eP$qm\e\\\e[m");
+
   /* Some terminals (e.g. xfce4-terminal) don't understand DECRQM and print
    * the raw bytes directly as output, while still claiming to be TERM=xterm
    * It doens't hurt at this point to clear the current line just in case.
@@ -495,6 +502,13 @@ static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t argl
       xd->cap.cursorshape = 1;
     }
     xd->initialised.cursorshape = 1;
+  }
+  else if(strneq(args + arglen - 1, "m", 1)) { // SGR
+    // skip the initial number, find the first separator
+    while(arglen && args[0] >= '0' && args[0] <= '9')
+      args++, arglen--;
+    if(arglen && args[0] == ':')
+      xd->cap.csi_sub_colon = 1;
   }
 }
 
