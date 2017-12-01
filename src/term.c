@@ -924,12 +924,14 @@ void tickit_term_pause(TickitTerm *tt)
   if(tt->driver->vtable->pause)
     (*tt->driver->vtable->pause)(tt->driver);
 
-  // TODO: pause termkey
+  if(tt->termkey)
+    termkey_stop(tt->termkey);
 }
 
 void tickit_term_resume(TickitTerm *tt)
 {
-  // TODO: resume termkey
+  if(tt->termkey)
+    termkey_start(tt->termkey);
 
   if(tt->driver->vtable->resume)
     (*tt->driver->vtable->resume)(tt->driver);
