@@ -6,6 +6,9 @@
 
 #define strneq(a,b,n) (strncmp(a,b,n)==0)
 
+#define CSI_MORE_SUBPARAM 0x80000000
+#define CSI_PARAM(x)      ((x) & 0x7fffffff)
+
 struct XTermDriver {
   TickitTermDriver driver;
 
@@ -235,8 +238,8 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       else if(val < 16)
         params[pindex++] = onoff->on+60 + val-8;
       else {
-        params[pindex++] = (onoff->on+8) | 0x80000000;
-        params[pindex++] = 5 | 0x80000000;
+        params[pindex++] = (onoff->on+8) | CSI_MORE_SUBPARAM;
+        params[pindex++] = 5 | CSI_MORE_SUBPARAM;
         params[pindex++] = val;
       }
       break;
@@ -275,7 +278,7 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
 
   size_t len = 3; /* ESC [ ... m */
   for(int i = 0; i < pindex; i++)
-    len += snprintf(NULL, 0, "%d", params[i]&0x7fffffff) + 1;
+    len += snprintf(NULL, 0, "%d", CSI_PARAM(params[i])) + 1;
   if(pindex > 0)
     len--; /* Last one has no final separator */
 
@@ -285,9 +288,9 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   s += sprintf(s, "\e[");
   for(int i = 0; i < pindex-1; i++)
     /* TODO: Work out what terminals support :s */
-    s += sprintf(s, "%d%c", params[i]&0x7fffffff, ';');
+    s += sprintf(s, "%d%c", CSI_PARAM(params[i]), ';');
   if(pindex > 0)
-    s += sprintf(s, "%d", params[pindex-1]&0x7fffffff);
+    s += sprintf(s, "%d", CSI_PARAM(params[pindex-1]));
   sprintf(s, "m");
 
   tickit_termdrv_write_str(ttd, buffer, len);
