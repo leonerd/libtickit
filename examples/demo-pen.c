@@ -1,9 +1,12 @@
 #include "tickit.h"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+#define streq(a,b)  (strcmp(a,b) == 0)
 
 struct {
   char *name;
@@ -135,6 +138,23 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
   return 1;
 }
 
+static int checksuspend(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
+{
+  TickitKeyEventInfo *info = _info;
+  if(info->mod != TICKIT_MOD_CTRL ||
+      !streq(info->str, "C-z"))
+    return 0;
+
+  TickitTerm *term = tickit_window_get_term(win);
+
+  tickit_term_pause(term);
+  raise(SIGSTOP);
+  tickit_term_resume(term);
+  tickit_window_expose(win, NULL);
+
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdio();
@@ -146,6 +166,8 @@ int main(int argc, char *argv[])
   }
 
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose, NULL);
+
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_KEY, 0, &checksuspend, NULL);
 
   tickit_run(t);
 
