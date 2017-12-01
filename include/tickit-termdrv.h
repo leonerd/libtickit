@@ -22,6 +22,8 @@ typedef struct {
   void (*start)(TickitTermDriver *ttd); /* optional */
   bool (*started)(TickitTermDriver *ttd); /* optional */
   void (*stop)(TickitTermDriver *ttd); /* optional */
+  void (*pause)(TickitTermDriver *ttd); /* optional */
+  void (*resume)(TickitTermDriver *ttd); /* optional */
   bool (*print)(TickitTermDriver *ttd, const char *str, size_t len);
   bool (*goto_abs)(TickitTermDriver *ttd, int line, int col);
   bool (*move_rel)(TickitTermDriver *ttd, int downward, int rightward);

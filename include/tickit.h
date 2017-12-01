@@ -340,6 +340,9 @@ void tickit_term_await_started_msec(TickitTerm *tt, long msec);
 void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout);
 void tickit_term_flush(TickitTerm *tt);
 
+void tickit_term_pause(TickitTerm *tt);
+void tickit_term_resume(TickitTerm *tt);
+
 /* fd is allowed to be unset (-1); works abstractly */
 void tickit_term_set_input_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_input_fd(const TickitTerm *tt);

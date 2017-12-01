@@ -522,21 +522,35 @@ static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
   return 0;
 }
 
-static void stop(TickitTermDriver *ttd)
+static void teardown(TickitTermDriver *ttd)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
   if(xd->mode.mouse)
-    setctl_int(ttd, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_OFF);
+    tickit_termdrv_write_strf(ttd, "\e[?%dl\e[?1006l", mode_for_mouse(xd->mode.mouse));
   if(!xd->mode.cursorvis)
-    setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
+    tickit_termdrv_write_str(ttd, "\e[?25h", 0);
   if(xd->mode.altscreen)
-    setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
+    tickit_termdrv_write_str(ttd, "\e[?1049l", 0);
   if(xd->mode.keypad)
-    setctl_int(ttd, TICKIT_TERMCTL_KEYPAD_APP, 0);
+    tickit_termdrv_write_strf(ttd, "\e>");
 
   // Reset pen
   tickit_termdrv_write_str(ttd, "\e[m", 3);
+}
+
+static void resume(TickitTermDriver *ttd)
+{
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
+  if(xd->mode.keypad)
+    tickit_termdrv_write_strf(ttd, "\e=");
+  if(xd->mode.altscreen)
+    tickit_termdrv_write_str(ttd, "\e[?1049h", 0);
+  if(!xd->mode.cursorvis)
+    tickit_termdrv_write_str(ttd, "\e[?25l", 0);
+  if(xd->mode.mouse)
+    tickit_termdrv_write_strf(ttd, "\e[?%dh\e[?1006h", mode_for_mouse(xd->mode.mouse));
 }
 
 static void destroy(TickitTermDriver *ttd)
@@ -550,7 +564,9 @@ static TickitTermDriverVTable xterm_vtable = {
   .destroy    = destroy,
   .start      = start,
   .started    = started,
-  .stop       = stop,
+  .stop       = teardown,
+  .pause      = teardown,
+  .resume     = resume,
   .print      = print,
   .goto_abs   = goto_abs,
   .move_rel   = move_rel,

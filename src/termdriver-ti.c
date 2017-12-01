@@ -425,18 +425,30 @@ static void start(TickitTermDriver *ttd)
   // Nothing needed
 }
 
-static void stop(TickitTermDriver *ttd)
+static void shutdown(TickitTermDriver *ttd)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
   if(td->mode.mouse)
-    setctl_int(ttd, TICKIT_TERMCTL_MOUSE, 0);
+    tickit_termdrv_write_str(ttd, td->extra->exit_mouse_mode, 0);
   if(!td->mode.cursorvis)
-    setctl_int(ttd, TICKIT_TERMCTL_CURSORVIS, 1);
+    run_ti(ttd, td->str.sm_csr, 0);
   if(td->mode.altscreen)
-    setctl_int(ttd, TICKIT_TERMCTL_ALTSCREEN, 0);
+    tickit_termdrv_write_str(ttd, td->extra->exit_altscreen_mode, 0);
 
   run_ti(ttd, td->str.sgr0, 0);
+}
+
+static void resume(TickitTermDriver *ttd)
+{
+  struct TIDriver *td = (struct TIDriver *)ttd;
+
+  if(td->mode.altscreen)
+    tickit_termdrv_write_str(ttd, td->extra->enter_altscreen_mode, 0);
+  if(!td->mode.cursorvis)
+    run_ti(ttd, td->str.rm_csr, 0);
+  if(td->mode.mouse)
+    tickit_termdrv_write_str(ttd, td->extra->enter_mouse_mode, 0);
 }
 
 static void destroy(TickitTermDriver *ttd)
@@ -452,7 +464,9 @@ static TickitTermDriverVTable ti_vtable = {
   .attach     = attach,
   .destroy    = destroy,
   .start      = start,
-  .stop       = stop,
+  .stop       = shutdown,
+  .pause      = shutdown,
+  .resume     = resume,
   .print      = print,
   .goto_abs   = goto_abs,
   .move_rel   = move_rel,

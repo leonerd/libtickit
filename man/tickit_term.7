@@ -17,7 +17,7 @@ The \fBtickit_term_open_stdio\fP(3) function offers a convenient shortcut to cre
 .PP
 A terminal instance will need either an output function or an output filehandle set before it can send output. This can be performed by either \fBtickit_term_set_output_func\fP(3) or \fBtickit_term_set_output_fd\fP(3). An output buffer can be defined by \fBtickit_term_set_output_buffer\fP(3). If output is via a filehandle, then the size of that will be queried if it is a
 .SM TTY.
-If output is via an output function only then the size must be set using \fBtickit_term_set_size\fP(3). An input filehandle can be set using \fBtickit_term_set_input_fd\fP(3), or input can be sent from a byte buffer using \fBtickit_term_input_push_bytes\fP(3). Once input and output methods are set the terminal startup actions are performed, and the \fBtickit_term_await_started_msec\fP(3) function can be used to wait until this is complete.
+If output is via an output function only then the size must be set using \fBtickit_term_set_size\fP(3). An input filehandle can be set using \fBtickit_term_set_input_fd\fP(3), or input can be sent from a byte buffer using \fBtickit_term_input_push_bytes\fP(3). Once input and output methods are set the terminal startup actions are performed, and the \fBtickit_term_await_started_msec\fP(3) function can be used to wait until this is complete. A running instance can be paused using \fBtickit_term_pause\fP(3) and resumed using \fBtickit_term_resume\fP(3).
 .PP
 It supports
 .SM UTF-8

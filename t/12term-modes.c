@@ -60,6 +60,16 @@ int main(int argc, char *argv[])
   is_str_escape(buffer, "\e]2;title here\e\\", "buffer after set title");
 
   buffer[0] = 0;
+  tickit_term_pause(tt);
+
+  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after pause");
+
+  buffer[0] = 0;
+  tickit_term_resume(tt);
+
+  is_str_escape(buffer, "\e[?1049h\e[?25l\e[?1002h\e[?1006h", "buffer after resume");
+
+  buffer[0] = 0;
   tickit_term_unref(tt);
 
   ok(1, "tickit_term_unref");

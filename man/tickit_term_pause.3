@@ -1,0 +1,23 @@
+.TH TICKIT_TERM_PAUSE 3
+.SH NAME
+tickit_term_pause, tickit_term_resume \- pause and resume a terminal instance
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "void tickit_term_pause(TickitTerm *" tt );
+.BI "void tickit_term_resume(TickitTerm *" tt );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_pause\fP() suspends the operation of the terminal by resetting any modes or other persistent state on it as if shutting down. Any modes set within the object instance are remembered however.
+.PP
+\fBtickit_term_resume\fP() returns the terminal back to the state it was operating in before \fBtickit_term_pause\fP() was called, allowing the program to continue as normal.
+.PP
+It is intended these functions be used to create a program-wide suspend feature, where the terminal can be handed back over to the invoking shell while the process backgrounds itself. Typically this is done by the process sending itself a \fBSIGSTOP\fP signal via \fBkill\fP(3). After calling \fBtickit_term_pause\fP(), no other terminal-related functions should be called, nor other IO operations attempted, until after a subsequent \fBtickit_term_resume\fP(3).
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_setctl_int (3),
+.BR tickit_term (7),
+.BR tickit (7)
