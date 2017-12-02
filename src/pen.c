@@ -8,9 +8,11 @@
 
 #define streq(a,b) (!strcmp(a,b))
 
+#define COLOUR_DEFAULT -1
+
 struct TickitPen {
-  signed   int fg      : 9, /* 0 - 255 or -1 */
-               bg      : 9; /* 0 - 255 or -1 */
+  signed   int fg      : 9, /* 0 - 255 or COLOUR_DEFAULT */
+               bg      : 9; /* 0 - 255 or COLOUR_DEFAULT */
 
   unsigned int bold    : 1,
                under   : 1,
@@ -157,7 +159,7 @@ bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
       return true;
     break;
   case TICKIT_PENTYPE_COLOUR:
-    if(tickit_pen_get_colour_attr(pen, attr) > -1)
+    if(tickit_pen_get_colour_attr(pen, attr) != COLOUR_DEFAULT)
       return true;
     break;
   }
@@ -241,7 +243,7 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
 int tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
-    return -1;
+    return COLOUR_DEFAULT;
 
   switch(attr) {
     case TICKIT_PEN_FG: return pen->fg;
