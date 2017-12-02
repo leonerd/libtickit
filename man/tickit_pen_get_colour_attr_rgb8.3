@@ -1,0 +1,46 @@
+.TH TICKIT_PEN_GET_COLOUR_ATTR_RGB8 3
+.SH NAME
+tickit_pen_get_colour_attr_rgb8, tickit_pen_set_colour_attr_rgb8, tickit_pen_has_attr_rgb8 \- manipulate a secondary RGB8 colour pen colour attribute
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.B  "typedef struct {"
+.BI "    uint8_t " r ;
+.BI "    uint8_t " g ;
+.BI "    uint8_t " b ;
+.BI "} " TickitPenRGB8 ;
+.sp
+.BI "TickitPenRGB8 tickit_pen_get_colour_attr_rgb8(const TickitPen *" pen ,
+.BI "    TickitPenAttr " attr );
+.BI "void tickit_pen_set_colour_attr_rgb8(TickitPen *" pen ,
+.BI "    TickitPenAttr " attr ", TickitPenRGB8 " value );
+.sp
+.BI "bool tickit_pen_has_attr_rgb8(const TickitPen *" pen ,
+.BI "    TickitPenAttr " attr );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_pen_get_colour_attr_rgb8\fP() returns the current secondary RGB8 value of the given colour attribute. If the attribute is not defined or does not have a secondary RGB8 value, the return value is not specified.
+.PP
+\fBtickit_pen_set_colour_attr_rgb8\fP() provides a new value for the secondary RGB8 value of the given colour attribute on the pen. This will only be stored if the pen already has a (primary) index value set for the corresponding attribute. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance if it successfully stores the value.
+.PP
+\fBtickit_pen_has_colour_attr_rgb8\fP() returns true if the pen instance currently stores a secondary RGB8 value for the given colour attribute.
+.SH NOTES
+A pen instance will only store a secondary RGB8 value if a primary index value is already set. Additionally, calling \fBtickit_pen_set_colour_attr\fP(3) will clear an associated secondary RGB8 value. This design aims to encourage that any use of an RGB8 colour also has an index as well, to support the majority of terminals which do not in fact understand RGB8 values. It is recommended that applications wishing to make use of these values should set both at the same time, in sequence.
+.sp
+.EX
+.in
+  tickit_pen_set_colour_attr(pen, index);
+  tickit_pen_set_colour_attr_rgb8(pen,
+      (TickitPenRGB8){.r = red, .g = green, .b = blue});
+.EE
+.SH "RETURN VALUE"
+\fBtickit_pen_get_colour_attr_rgb8\fP() returns a three-field colour value structure. \fBtickit_pen_set_colour_attr_rgb8\fP() returns no value. \fBtickit_pen_has_colour_attr_rgb8\fP() returns a boolean.
+.SH "SEE ALSO"
+.BR tickit_pen_new (3),
+.BR tickit_pen_set_colour_attr (3),
+.BR tickit_pen_clear_attr (3),
+.BR tickit_pen (7),
+.BR tickit (7)

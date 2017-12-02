@@ -13,6 +13,8 @@
 struct TickitPen {
   signed   int fgindex : 9, /* 0 - 255 or COLOUR_DEFAULT */
                bgindex : 9; /* 0 - 255 or COLOUR_DEFAULT */
+  TickitPenRGB8 fg_rgb8,
+                bg_rgb8;
 
   unsigned int bold    : 1,
                under   : 1,
@@ -26,6 +28,8 @@ struct TickitPen {
   struct {
     unsigned int fgindex : 1,
                  bgindex : 1,
+                 fg_rgb8 : 1,
+                 bg_rgb8 : 1,
                  bold    : 1,
                  under   : 1,
                  italic  : 1,
@@ -76,7 +80,7 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...)
     if(a < 0)
       break;
 
-    // TODO: accept colour descs
+    // TODO: accept colour descs or rgb8
     switch(tickit_pen_attrtype(a)) {
     case TICKIT_PENTYPE_BOOL:
       val = va_arg(args, int);
@@ -265,7 +269,6 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
   changed(pen);
 }
 
-/* Cheat and pretend the index of a colour attribute is a number attribute */
 int tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
@@ -282,8 +285,52 @@ int tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr)
 void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
 {
   switch(attr) {
-    case TICKIT_PEN_FG: pen->fgindex = val; pen->valid.fgindex = 1; break;
-    case TICKIT_PEN_BG: pen->bgindex = val; pen->valid.bgindex = 1; break;
+    case TICKIT_PEN_FG:
+      pen->fgindex = val; pen->valid.fgindex = 1;
+      pen->valid.fg_rgb8 = 0;
+      break;
+    case TICKIT_PEN_BG:
+      pen->bgindex = val; pen->valid.bgindex = 1;
+      pen->valid.bg_rgb8 = 0;
+      break;
+    default:
+      return;
+  }
+  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+}
+
+bool tickit_pen_has_colour_attr_rgb8(const TickitPen *pen, TickitPenAttr attr)
+{
+  switch(attr) {
+    case TICKIT_PEN_FG: return pen->valid.fgindex && pen->valid.fg_rgb8;
+    case TICKIT_PEN_BG: return pen->valid.bgindex && pen->valid.bg_rgb8;
+    default:
+      return 0;
+  }
+}
+
+TickitPenRGB8 tickit_pen_get_colour_attr_rgb8(const TickitPen *pen, TickitPenAttr attr)
+{
+  if(tickit_pen_has_colour_attr_rgb8(pen, attr))
+    switch(attr) {
+      case TICKIT_PEN_FG: return pen->fg_rgb8;
+      case TICKIT_PEN_BG: return pen->bg_rgb8;
+      default:
+        break;
+    }
+
+  return (TickitPenRGB8){0, 0, 0};
+}
+
+void tickit_pen_set_colour_attr_rgb8(TickitPen *pen, TickitPenAttr attr, TickitPenRGB8 val)
+{
+  /* can only set an RGB8 version if the regular index version is already set */
+  if(!tickit_pen_has_attr(pen, attr))
+    return;
+
+  switch(attr) {
+    case TICKIT_PEN_FG: pen->fg_rgb8 = val; pen->valid.fg_rgb8 = 1; break;
+    case TICKIT_PEN_BG: pen->bg_rgb8 = val; pen->valid.bg_rgb8 = 1; break;
     default:
       return;
   }
@@ -372,7 +419,16 @@ bool tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr
   case TICKIT_PENTYPE_INT:
     return tickit_pen_get_int_attr(a, attr) == tickit_pen_get_int_attr(b, attr);
   case TICKIT_PENTYPE_COLOUR:
-    return tickit_pen_get_colour_attr(a, attr) == tickit_pen_get_colour_attr(b, attr);
+    if(tickit_pen_get_colour_attr(a, attr) != tickit_pen_get_colour_attr(b, attr))
+      return false;
+    /* indexes are equal; now compare RGB8s */
+    if(!tickit_pen_has_colour_attr_rgb8(a, attr) && !tickit_pen_has_colour_attr_rgb8(b, attr))
+      return true;
+    if(!tickit_pen_has_colour_attr_rgb8(a, attr) || !tickit_pen_has_colour_attr_rgb8(b, attr))
+      return false;
+    TickitPenRGB8 acol = tickit_pen_get_colour_attr_rgb8(a, attr),
+                  bcol = tickit_pen_get_colour_attr_rgb8(b, attr);
+    return (acol.r == bcol.r) && (acol.g == bcol.g) && (acol.b == bcol.b);
   }
 
   return false;
@@ -400,7 +456,11 @@ void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr at
     tickit_pen_set_int_attr(dst, attr, tickit_pen_get_int_attr(src, attr));
     return;
   case TICKIT_PENTYPE_COLOUR:
+    freeze(dst);
     tickit_pen_set_colour_attr(dst, attr, tickit_pen_get_colour_attr(src, attr));
+    if(tickit_pen_has_colour_attr_rgb8(src, attr))
+      tickit_pen_set_colour_attr_rgb8(dst, attr, tickit_pen_get_colour_attr_rgb8(src, attr));
+    thaw(dst);
     return;
   }
 

@@ -144,5 +144,45 @@ int main(int argc, char *argv[])
 
   tickit_pen_unref(pen);
 
+  // RGB8 secondary colour attributes
+  {
+    TickitPen *pen = tickit_pen_new();
+    TickitPenRGB8 val;
+
+    ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_FG),
+        "new pen does not have FG RGB8");
+
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 15);
+    ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_FG),
+        "pen still does not have FG RGB after set index");
+
+    tickit_pen_set_colour_attr_rgb8(pen, TICKIT_PEN_FG, (TickitPenRGB8){230, 240, 250});
+    ok(tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_FG),
+        "pen now has FG RGB8 after set RGB8");
+
+    val = tickit_pen_get_colour_attr_rgb8(pen, TICKIT_PEN_FG);
+    is_int(val.r, 230, "val.r from get RGB8");
+    is_int(val.g, 240, "val.g from get RGB8");
+    is_int(val.b, 250, "val.b from get RGB8");
+
+    TickitPen *pen2 = tickit_pen_clone(pen);
+    ok(tickit_pen_has_colour_attr_rgb8(pen2, TICKIT_PEN_FG),
+        "tickit_pen_clone preserves RGB8 attributes");
+
+    ok(tickit_pen_equiv(pen, pen2), "cloned pen is equivalent");
+
+    tickit_pen_clear_attr(pen2, TICKIT_PEN_FG);
+    tickit_pen_set_colour_attr(pen2, TICKIT_PEN_FG, 15);
+    ok(!tickit_pen_equiv(pen, pen2), "pen not equivalent after clearing RGB8");
+
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 20);
+    ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_FG),
+        "pen does not have FG RGB after set new index");
+
+    tickit_pen_set_colour_attr_rgb8(pen, TICKIT_PEN_BG, (TickitPenRGB8){10, 20, 30});
+    ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_BG),
+        "pen does not have BG RGB8 with no index");
+  }
+
   return exit_status();
 }

@@ -15,7 +15,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_pen_get_colour_attr\fP() returns the current value of the given colour attribute on the pen as a palette index, or -1 if that attribute is not defined.
 .PP
-\fBtickit_pen_set_colour_attr\fP() provides a new value for the given colour attribute on the pen as a palette index. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance.
+\fBtickit_pen_set_colour_attr\fP() provides a new value for the given colour attribute on the pen as a palette index. If the pen previously stored a secondary RGB8 value for this attribute it will be cleared. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance.
 .PP
 \fBtickit_pen_set_colour_attr_desc\fP() provides a new value for the given colour attribute on the pen as a textual description string, converting it into a colour index. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance. It recognises decimal integers and the names of the first eight VGA colours (black, red, green, yellow, blue, magenta, cyan and white, respectively). It also recognises the prefix of "hi-" before one of the eight VGA colour names, to indicate the high-brightness versions at colour indexes 8 to 15. If it recognises the given string it returns a true value, or false if not.
 .SH "RETURN VALUE"
