@@ -37,6 +37,8 @@ struct TickitPen {
 
   int refcount;
   struct TickitHooklist hooks;
+  int freezecount;
+  bool changed;
 };
 
 DEFINE_HOOKLIST_FUNCS(pen,TickitPen,TickitPenEventFn)
@@ -49,6 +51,8 @@ TickitPen *tickit_pen_new(void)
 
   pen->refcount = 1;
   pen->hooks = (struct TickitHooklist){ NULL };
+  pen->freezecount = 0;
+  pen->changed = false;
 
   tickit_pen_clear(pen);
 
@@ -105,6 +109,28 @@ static void destroy(TickitPen *pen)
 {
   tickit_hooklist_unbind_and_destroy(&pen->hooks, pen);
   free(pen);
+}
+
+static void changed(TickitPen *pen)
+{
+  if(!pen->freezecount)
+    run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+  else
+    pen->changed = true;
+}
+
+static void freeze(TickitPen *pen)
+{
+  pen->freezecount++;
+}
+
+static void thaw(TickitPen *pen)
+{
+  pen->freezecount--;
+  if(!pen->freezecount && pen->changed) {
+    run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+    pen->changed = false;
+  }
 }
 
 TickitPen *tickit_pen_ref(TickitPen *pen)
@@ -214,7 +240,7 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, bool val)
     default:
       return;
   }
-  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+  changed(pen);
 }
 
 int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
@@ -236,7 +262,7 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
     default:
       return;
   }
-  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+  changed(pen);
 }
 
 /* Cheat and pretend the index of a colour attribute is a number attribute */
@@ -261,7 +287,7 @@ void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
     default:
       return;
   }
-  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+  changed(pen);
 }
 
 static struct { const char *name; int colour; } colournames[] = {
@@ -329,7 +355,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
     case TICKIT_N_PEN_ATTRS:
       return;
   }
-  run_events(pen, TICKIT_PEN_ON_CHANGE, NULL);
+  changed(pen);
 }
 
 void tickit_pen_clear(TickitPen *pen)
@@ -383,7 +409,8 @@ void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr at
 
 void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
 {
-  int changed = 0;
+  freeze(dst);
+
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(!tickit_pen_has_attr(src, attr))
       continue;
@@ -391,53 +418,10 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
        (!overwrite || tickit_pen_equiv_attr(src, dst, attr)))
       continue;
 
-    /* Avoid using copy_attr so it doesn't invoke change events yet */
-    switch(attr) {
-    case TICKIT_PEN_FG:
-      dst->fgindex = src->fgindex;
-      dst->valid.fgindex = 1;
-      break;
-    case TICKIT_PEN_BG:
-      dst->bgindex = src->bgindex;
-      dst->valid.bgindex = 1;
-      break;
-    case TICKIT_PEN_BOLD:
-      dst->bold = src->bold;
-      dst->valid.bold = 1;
-      break;
-    case TICKIT_PEN_ITALIC:
-      dst->italic = src->italic;
-      dst->valid.italic = 1;
-      break;
-    case TICKIT_PEN_UNDER:
-      dst->under = src->under;
-      dst->valid.under = 1;
-      break;
-    case TICKIT_PEN_REVERSE:
-      dst->reverse = src->reverse;
-      dst->valid.reverse = 1;
-      break;
-    case TICKIT_PEN_STRIKE:
-      dst->strike = src->strike;
-      dst->valid.strike = 1;
-      break;
-    case TICKIT_PEN_ALTFONT:
-      dst->altfont = src->altfont;
-      dst->valid.altfont = 1;
-      break;
-    case TICKIT_PEN_BLINK:
-      dst->blink = src->blink;
-      dst->valid.blink = 1;
-      break;
-    case TICKIT_N_PEN_ATTRS:
-      continue;
-    }
-
-    changed++;
+    tickit_pen_copy_attr(dst, src, attr);
   }
 
-  if(changed)
-    run_events(dst, TICKIT_PEN_ON_CHANGE, NULL);
+  thaw(dst);
 }
 
 TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
