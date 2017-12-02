@@ -11,8 +11,8 @@
 #define COLOUR_DEFAULT -1
 
 struct TickitPen {
-  signed   int fg      : 9, /* 0 - 255 or COLOUR_DEFAULT */
-               bg      : 9; /* 0 - 255 or COLOUR_DEFAULT */
+  signed   int fgindex : 9, /* 0 - 255 or COLOUR_DEFAULT */
+               bgindex : 9; /* 0 - 255 or COLOUR_DEFAULT */
 
   unsigned int bold    : 1,
                under   : 1,
@@ -24,8 +24,8 @@ struct TickitPen {
   signed   int altfont : 5; /* 1 - 10 or -1 */
 
   struct {
-    unsigned int fg      : 1,
-                 bg      : 1,
+    unsigned int fgindex : 1,
+                 bgindex : 1,
                  bold    : 1,
                  under   : 1,
                  italic  : 1,
@@ -127,8 +127,8 @@ void tickit_pen_unref(TickitPen *pen)
 bool tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   switch(attr) {
-    case TICKIT_PEN_FG:      return pen->valid.fg;
-    case TICKIT_PEN_BG:      return pen->valid.bg;
+    case TICKIT_PEN_FG:      return pen->valid.fgindex;
+    case TICKIT_PEN_BG:      return pen->valid.bgindex;
     case TICKIT_PEN_BOLD:    return pen->valid.bold;
     case TICKIT_PEN_UNDER:   return pen->valid.under;
     case TICKIT_PEN_ITALIC:  return pen->valid.italic;
@@ -246,8 +246,8 @@ int tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr)
     return COLOUR_DEFAULT;
 
   switch(attr) {
-    case TICKIT_PEN_FG: return pen->fg;
-    case TICKIT_PEN_BG: return pen->bg;
+    case TICKIT_PEN_FG: return pen->fgindex;
+    case TICKIT_PEN_BG: return pen->bgindex;
     default:
       return 0;
   }
@@ -256,8 +256,8 @@ int tickit_pen_get_colour_attr(const TickitPen *pen, TickitPenAttr attr)
 void tickit_pen_set_colour_attr(TickitPen *pen, TickitPenAttr attr, int val)
 {
   switch(attr) {
-    case TICKIT_PEN_FG: pen->fg = val; pen->valid.fg = 1; break;
-    case TICKIT_PEN_BG: pen->bg = val; pen->valid.bg = 1; break;
+    case TICKIT_PEN_FG: pen->fgindex = val; pen->valid.fgindex = 1; break;
+    case TICKIT_PEN_BG: pen->bgindex = val; pen->valid.bgindex = 1; break;
     default:
       return;
   }
@@ -316,8 +316,8 @@ bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
 {
   switch(attr) {
-    case TICKIT_PEN_FG:      pen->valid.fg      = 0; break;
-    case TICKIT_PEN_BG:      pen->valid.bg      = 0; break;
+    case TICKIT_PEN_FG:      pen->valid.fgindex      = 0; break;
+    case TICKIT_PEN_BG:      pen->valid.bgindex      = 0; break;
     case TICKIT_PEN_BOLD:    pen->valid.bold    = 0; break;
     case TICKIT_PEN_UNDER:   pen->valid.under   = 0; break;
     case TICKIT_PEN_ITALIC:  pen->valid.italic  = 0; break;
@@ -394,12 +394,12 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
     /* Avoid using copy_attr so it doesn't invoke change events yet */
     switch(attr) {
     case TICKIT_PEN_FG:
-      dst->fg = src->fg;
-      dst->valid.fg = 1;
+      dst->fgindex = src->fgindex;
+      dst->valid.fgindex = 1;
       break;
     case TICKIT_PEN_BG:
-      dst->bg = src->bg;
-      dst->valid.bg = 1;
+      dst->bgindex = src->bgindex;
+      dst->valid.bgindex = 1;
       break;
     case TICKIT_PEN_BOLD:
       dst->bold = src->bold;
