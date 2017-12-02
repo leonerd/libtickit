@@ -1,6 +1,7 @@
 TODO
   * Added tickit_term_pause(3), tickit_term_resume(3)
   * Added secondary RGB8 pen attributes
+  * Support RGB8 in xterm driver
 
 2017-11-30 01:21  0.2-beta1
   * Added tickit_window_{is,set}_steal_focus(3)

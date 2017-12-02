@@ -29,6 +29,7 @@ struct XTermDriver {
     unsigned int cursorshape:1;
     unsigned int slrm:1;
     unsigned int csi_sub_colon:1;
+    unsigned int rgb8:1;
   } cap;
 
   struct {
@@ -217,10 +218,10 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
-  /* There can be at most 12 SGR parameters; 3 from each of 2 colours, and
+  /* There can be at most 16 SGR parameters; 5 from each of 2 colours, and
    * 6 single attributes
    */
-  int params[12];
+  int params[16];
   int pindex = 0;
 
   for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
@@ -237,6 +238,14 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       val = tickit_pen_get_colour_attr(delta, attr);
       if(val < 0)
         params[pindex++] = onoff->off;
+      else if(xd->cap.rgb8 && tickit_pen_has_colour_attr_rgb8(delta, attr)) {
+        TickitPenRGB8 rgb = tickit_pen_get_colour_attr_rgb8(delta, attr);
+        params[pindex++] = (onoff->on+8) | CSI_MORE_SUBPARAM;
+        params[pindex++] = 2             | CSI_MORE_SUBPARAM;
+        params[pindex++] = rgb.r         | CSI_MORE_SUBPARAM;
+        params[pindex++] = rgb.g         | CSI_MORE_SUBPARAM;
+        params[pindex++] = rgb.b;
+      }
       else if(val < 8)
         params[pindex++] = onoff->on + val;
       else if(val < 16)
@@ -449,8 +458,9 @@ static void start(TickitTermDriver *ttd)
   // Also query the current cursor visibility, blink status, and shape
   tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p\eP$q q\e\\");
 
-  // Try to work out whether the terminal understands : to separate sub-params
-  tickit_termdrv_write_strf(ttd, "\e[38;5;255m\eP$qm\e\\\e[m");
+  // Try to work out whether the terminal supports 24bit cololurs (RGB8) and
+  // whether it understands : to separate sub-params
+  tickit_termdrv_write_strf(ttd, "\e[38;5;255m\e[38:2:0:1:2m\eP$qm\e\\\e[m");
 
   /* Some terminals (e.g. xfce4-terminal) don't understand DECRQM and print
    * the raw bytes directly as output, while still claiming to be TERM=xterm
@@ -507,8 +517,17 @@ static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t argl
     // skip the initial number, find the first separator
     while(arglen && args[0] >= '0' && args[0] <= '9')
       args++, arglen--;
-    if(arglen && args[0] == ':')
+    if(!arglen)
+      return;
+
+    if(args[0] == ':')
       xd->cap.csi_sub_colon = 1;
+    args++, arglen--;
+
+    // If the palette index is 2 then the terminal understands rgb8
+    int value;
+    if(sscanf(args, "%d", &value) && value == 2)
+      xd->cap.rgb8 = 1;
   }
 }
 

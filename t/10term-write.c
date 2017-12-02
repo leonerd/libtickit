@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer,
       "\e[?69h\e[?69$p\e[?25$p\e[?12$p\eP$q q\e\\"
-        "\e[38;5;255m\eP$qm\e\\\e[m"
+        "\e[38;5;255m\e[38:2:0:1:2m\eP$qm\e\\\e[m"
         "\e[G\e[K",
       "buffer after initialisation contains DECSLRM and cursor status probes");
 
