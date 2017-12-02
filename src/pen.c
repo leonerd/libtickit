@@ -342,8 +342,8 @@ bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
 {
   switch(attr) {
-    case TICKIT_PEN_FG:      pen->valid.fgindex      = 0; break;
-    case TICKIT_PEN_BG:      pen->valid.bgindex      = 0; break;
+    case TICKIT_PEN_FG:      pen->valid.fgindex = 0; break;
+    case TICKIT_PEN_BG:      pen->valid.bgindex = 0; break;
     case TICKIT_PEN_BOLD:    pen->valid.bold    = 0; break;
     case TICKIT_PEN_UNDER:   pen->valid.under   = 0; break;
     case TICKIT_PEN_ITALIC:  pen->valid.italic  = 0; break;
