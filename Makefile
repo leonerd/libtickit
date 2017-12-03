@@ -108,7 +108,7 @@ install-inc: $(HFILES)
 	install -d $(DESTDIR)$(INCDIR)
 	install -m644 $(HFILES) $(DESTDIR)$(INCDIR)
 	install -d $(DESTDIR)$(LIBDIR)/pkgconfig
-	sed "s,@LIBDIR@,$(LIBDIR),;s,@INCDIR@,$(INCDIR)," <tickit.pc.in >$(DESTDIR)$(LIBDIR)/pkgconfig/tickit.pc
+	LIBDIR=$(LIBDIR) INCDIR=$(INCDIR) sh tickit.pc.sh >$(DESTDIR)$(LIBDIR)/pkgconfig/tickit.pc
 
 # rm the old binary first in case it's still in use
 install-lib: $(LIBRARY)
