@@ -1,3 +1,7 @@
+TODO
+  * Changed tickit_renderbuffer_{copy,move}rect() to take pointers to
+    TickitRect regions, for API consistency
+
 2017-12-02 22:51  0.2-RC1
   * Added tickit_term_pause(3), tickit_term_resume(3)
   * Added secondary RGB8 pen attributes

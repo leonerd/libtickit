@@ -1171,22 +1171,20 @@ void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
       false);
 }
 
-void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src)
+void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, const TickitRect *dest, const TickitRect *src)
 {
-  copyrect(rb, rb, &dest, &src, true);
+  copyrect(rb, rb, dest, src, true);
 }
 
-void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src)
+void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, const TickitRect *dest, const TickitRect *src)
 {
-  src.lines = dest.lines;
-  src.cols  = dest.cols;
-
-  copyrect(rb, rb, &dest, &src, true);
+  copyrect(rb, rb, dest, src, true);
 
   /* Calculate what area of the RB needs skipping due to move */
   TickitRectSet *cleararea = tickit_rectset_new();
-  tickit_rectset_add(cleararea, &src);
-  tickit_rectset_subtract(cleararea, &dest);
+  tickit_rectset_add(cleararea, src);
+  tickit_rectset_subtract(cleararea, &(TickitRect){
+      .top = dest->top, .left = dest->left, .lines = src->lines, .cols = src->cols});
 
   size_t n = tickit_rectset_rects(cleararea);
   for(size_t i = 0; i < n; i++) {

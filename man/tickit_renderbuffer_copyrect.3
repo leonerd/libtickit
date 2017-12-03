@@ -5,10 +5,10 @@ tickit_renderbuffer_copyrect, tickit_renderbuffer_moverect \- copy or move a rec
 .EX
 .B #include <tickit.h>
 .sp
-.BI "void tickit_renderbuffer_copyrect(TickitRenderBuffer *" rb ", TickitRect " dest ,
-.BI "        TickitRect " src );
-.BI "void tickit_renderbuffer_moverect(TickitRenderBuffer *" rb ", TickitRect " dest ,
-.BI "        TickitRect " src );
+.BI "void tickit_renderbuffer_copyrect(TickitRenderBuffer *" rb ",
+.BI "        const TickitRect *" dest ", const TickitRect *" src );
+.BI "void tickit_renderbuffer_moverect(TickitRenderBuffer *" rb ",
+.BI "        const TickitRect *" dest ", const TickitRect *" src );
 .EE
 .sp
 Link with \fI\-ltickit\fP.

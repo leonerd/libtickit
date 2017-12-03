@@ -523,8 +523,8 @@ void tickit_renderbuffer_hline_at(TickitRenderBuffer *rb, int line, int startcol
 void tickit_renderbuffer_vline_at(TickitRenderBuffer *rb, int startline, int endline, int col,
     TickitLineStyle style, TickitLineCaps caps);
 
-void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src);
-void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, TickitRect dest, TickitRect src);
+void tickit_renderbuffer_copyrect(TickitRenderBuffer *rb, const TickitRect *dest, const TickitRect *src);
+void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, const TickitRect *dest, const TickitRect *src);
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt);
 

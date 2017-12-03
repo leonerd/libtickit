@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_erase_at(rb, 1, 2, 3);
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 10 },
-        (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
+        &(TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 10 },
+        &(TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer contents duplicated after copyrect",
@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_erase_at(rb, 1, 0, 6);
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 4, .left = 0, .lines = 2, .cols = 3 },
-        (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 3 });
+        &(TickitRect){ .top = 4, .left = 0, .lines = 2, .cols = 3 },
+        &(TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 3 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer copyrect can truncate to right",
@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_erase_at(rb, 1, 0, 6);
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 3 },
-        (TickitRect){ .top = 0, .left = 2, .lines = 2, .cols = 3 });
+        &(TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 3 },
+        &(TickitRect){ .top = 0, .left = 2, .lines = 2, .cols = 3 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer copyrect can truncate to left",
@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_text_at(rb, 2, 0, "Klmno");
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 },
-        (TickitRect){ .top = 1, .left = 0, .lines = 2, .cols = 10 });
+        &(TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 },
+        &(TickitRect){ .top = 1, .left = 0, .lines = 2, .cols = 10 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer copyrect can copy upwards",
@@ -97,8 +97,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_text_at(rb, 2, 0, "kLmno");
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 1, .left = 0, .lines = 2, .cols = 10 },
-        (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
+        &(TickitRect){ .top = 1, .left = 0, .lines = 2, .cols = 10 },
+        &(TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer copyrect can copy downwards",
@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_text_at(rb, 0, 6, "Ghi");
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 6 },
-        (TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 6 });
+        &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 6 },
+        &(TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 6 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer copyrect can copy leftwards",
@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_text_at(rb, 0, 6, "gHi");
 
     tickit_renderbuffer_copyrect(rb,
-        (TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 6 },
-        (TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 6 });
+        &(TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 6 },
+        &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 6 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer copyrect can copy rightwards",
@@ -151,8 +151,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_erase_at(rb, 1, 2, 3);
 
     tickit_renderbuffer_moverect(rb,
-        (TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 10 },
-        (TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
+        &(TickitRect){ .top = 4, .left = 2, .lines = 2, .cols = 10 },
+        &(TickitRect){ .top = 0, .left = 0, .lines = 2, .cols = 10 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer contents moved after move",
@@ -167,8 +167,8 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_text_at(rb, 0, 0, "Abcde");
 
     tickit_renderbuffer_moverect(rb,
-        (TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 10 },
-        (TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 10 });
+        &(TickitRect){ .top = 0, .left = 0, .lines = 1, .cols = 10 },
+        &(TickitRect){ .top = 0, .left = 3, .lines = 1, .cols = 10 });
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer contents moved after move with overlap",
