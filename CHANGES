@@ -1,4 +1,4 @@
-TODO
+2017-12-04 16:47  0.2-RC2
   * Changed tickit_renderbuffer_{copy,move}rect() to take pointers to
     TickitRect regions, for API consistency
 
