@@ -1,13 +1,4 @@
-2017-12-04 16:47  0.2-RC2
-  * Changed tickit_renderbuffer_{copy,move}rect() to take pointers to
-    TickitRect regions, for API consistency
-
-2017-12-02 22:51  0.2-RC1
-  * Added tickit_term_pause(3), tickit_term_resume(3)
-  * Added secondary RGB8 pen attributes
-  * Support RGB8 in xterm driver
-
-2017-11-30 01:21  0.2-beta1
+2018-01-05 14:47  0.2
   * Added tickit_window_{is,set}_steal_focus(3)
   * Added entire toplevel Tickit instance
   * New bind_events API style - one event + flags, instead of bitmask
@@ -23,3 +14,6 @@
   * Added tickit_renderbuffer_skiprect(3)
   * Added tickit_renderbuffer_moverect(3)
   * Added tickit_term_ctlname(3) and tickit_term_lookup_ctl(3)
+  * Added tickit_term_pause(3), tickit_term_resume(3)
+  * Added secondary RGB8 pen attributes
+  * Support RGB8 in xterm driver
