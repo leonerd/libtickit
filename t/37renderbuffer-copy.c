@@ -176,5 +176,7 @@ int main(int argc, char *argv[])
         NULL);
   }
 
+  tickit_renderbuffer_unref(rb);
+
   return exit_status();
 }

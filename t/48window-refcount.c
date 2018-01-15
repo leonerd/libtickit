@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
     tickit_window_flush(root);
 
     is_int(count, 1, "Event handler in sibling window is invoked");
+
+    tickit_window_unref(win2);
   }
 
   // Orphan windows can safely outlive their parent

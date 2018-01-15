@@ -182,6 +182,9 @@ int main(int argc, char *argv[])
     tickit_pen_set_colour_attr_rgb8(pen, TICKIT_PEN_BG, (TickitPenRGB8){10, 20, 30});
     ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_BG),
         "pen does not have BG RGB8 with no index");
+
+    tickit_pen_unref(pen2);
+    tickit_pen_unref(pen);
   }
 
   return exit_status();

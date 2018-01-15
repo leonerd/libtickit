@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+3, "0,22+80,3", "exposed_rects[3]");
   }
 
+  tickit_window_unref(rootfloat);
   tickit_window_unref(root);
   tickit_term_unref(tt);
 
