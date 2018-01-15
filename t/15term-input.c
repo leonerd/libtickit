@@ -46,6 +46,15 @@ int on_mouse(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)
   return 1;
 }
 
+char events[2];
+uint8_t i = 0;
+
+int on_key_push(TickitTerm *tt, TickitEventFlags flags, void *info, void *user)
+{
+  events[i++] = *(char*)user;
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt;
@@ -190,15 +199,6 @@ int main(int argc, char *argv[])
   }
 
   {
-    char events[2];
-    uint8_t i = 0;
-
-    int on_key_push(TickitTerm *tt, TickitEventFlags flags, void *info, void *user)
-    {
-      events[i++] = *(char*)user;
-      return 0;
-    }
-
     int bindA_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, 0,                 &on_key_push, "A");
     int bindB_id = tickit_term_bind_event(tt, TICKIT_TERM_ON_KEY, TICKIT_BIND_FIRST, &on_key_push, "B");
 
