@@ -35,9 +35,11 @@ static void is_display_text(char *name, ...)
     diag("Expected    |%s|", expect);
 
     free(got);
+    va_end(args);
     return;
   }
 
+  va_end(args);
   pass(name);
 }
 
