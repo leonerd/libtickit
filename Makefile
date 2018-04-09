@@ -73,7 +73,7 @@ src/linechars.inc: src/linechars.inc.PL
 	perl $^ > $@
 
 t/%.t: t/%.c $(LIBRARY) t/taplib.lo t/mockterm.lo t/taplib-tickit.lo
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ -Iinclude -std=c99 -ggdb $^
+	$(LIBTOOL) --mode=link --tag=CC gcc $(CFLAGS) $(LDFLAGS) -o $@ -Iinclude -std=c99 -ggdb $^
 
 t/%.lo: t/%.c
 	$(LIBTOOL) --mode=compile --tag=CC gcc $(CFLAGS) -o $@ -c $^
