@@ -682,6 +682,9 @@ void tickit_term_input_wait_msec(TickitTerm *tt, long msec)
   FD_ZERO(&readfds);
 
   int fd = termkey_get_fd(tk);
+  if (fd < 0 || fd >= FD_SETSIZE)
+    return;
+
   FD_SET(fd, &readfds);
   int ret = select(fd + 1, &readfds, NULL, NULL, msec > -1 ? &timeout : NULL);
 
