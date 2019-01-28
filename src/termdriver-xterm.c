@@ -257,6 +257,18 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       }
       break;
 
+    case TICKIT_PEN_UNDER:
+      val = tickit_pen_get_int_attr(delta, attr);
+      if(!val)
+        params[pindex++] = onoff->off;
+      else if(val == 1)
+        params[pindex++] = onoff->on;
+      else {
+        params[pindex++] = onoff->on | CSI_MORE_SUBPARAM;
+        params[pindex++] = val;
+      }
+      break;
+
     case TICKIT_PEN_ALTFONT:
       val = tickit_pen_get_int_attr(delta, attr);
       if(val < 0 || val >= 10)
@@ -266,7 +278,6 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
       break;
 
     case TICKIT_PEN_BOLD:
-    case TICKIT_PEN_UNDER:
     case TICKIT_PEN_ITALIC:
     case TICKIT_PEN_REVERSE:
     case TICKIT_PEN_STRIKE:

@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 
   ok(!tickit_pen_equiv_attr(pen, pen2, TICKIT_PEN_BOLD), "pens have non-equiv bold attribute after copy no overwrite");
 
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 0);
+  tickit_pen_set_int_attr(pen, TICKIT_PEN_UNDER, TICKIT_PEN_UNDER_NONE);
   tickit_pen_clear_attr(pen2, TICKIT_PEN_UNDER);
   tickit_pen_copy(pen2, pen, 1);
 
@@ -142,6 +142,25 @@ int main(int argc, char *argv[])
   is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 3, "pen fg attr for new_attrs");
 
   tickit_pen_unref(pen);
+
+  // UNDER bool back-compat
+  {
+    TickitPen *pen = tickit_pen_new();
+
+    ok(!tickit_pen_has_attr(pen, TICKIT_PEN_UNDER), "default pen has no UNDER");
+    is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_UNDER), TICKIT_PEN_UNDER_NONE,
+        "default pen UNDER is 0");
+    ok(!tickit_pen_get_bool_attr(pen, TICKIT_PEN_UNDER), "default pen has no UNDER bool");
+
+    tickit_pen_set_int_attr(pen, TICKIT_PEN_UNDER, TICKIT_PEN_UNDER_DOUBLE);
+
+    ok(tickit_pen_has_attr(pen, TICKIT_PEN_UNDER), "pen has UNDER");
+    is_int(tickit_pen_get_int_attr(pen, TICKIT_PEN_UNDER), TICKIT_PEN_UNDER_DOUBLE,
+        "pen UNDER is DOUBLE");
+    ok(tickit_pen_get_bool_attr(pen, TICKIT_PEN_UNDER), "pen has UNDER bool");
+
+    tickit_pen_unref(pen);
+  }
 
   // RGB8 secondary colour attributes
   {

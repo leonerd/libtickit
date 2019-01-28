@@ -80,7 +80,7 @@ typedef enum {
   TICKIT_PEN_FG,         /* colour */
   TICKIT_PEN_BG,         /* colour */
   TICKIT_PEN_BOLD,       /* bool */
-  TICKIT_PEN_UNDER,      /* bool: TODO - number? */
+  TICKIT_PEN_UNDER,      /* number */
   TICKIT_PEN_ITALIC,     /* bool */
   TICKIT_PEN_REVERSE,    /* bool */
   TICKIT_PEN_STRIKE,     /* bool */
@@ -95,6 +95,15 @@ typedef enum {
   TICKIT_PENTYPE_INT,
   TICKIT_PENTYPE_COLOUR,
 } TickitPenAttrType;
+
+typedef enum {
+  TICKIT_PEN_UNDER_NONE,
+  TICKIT_PEN_UNDER_SINGLE,
+  TICKIT_PEN_UNDER_DOUBLE,
+  TICKIT_PEN_UNDER_WAVY,
+
+  TICKIT_N_PEN_UNDERS
+} TickitPenUnderline;
 
 typedef enum {
   /* This is part of the API so additions must go at the end only */

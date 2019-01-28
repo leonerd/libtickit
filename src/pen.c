@@ -17,12 +17,12 @@ struct TickitPen {
                 bg_rgb8;
 
   unsigned int bold    : 1,
-               under   : 1,
                italic  : 1,
                reverse : 1,
                strike  : 1,
                blink   : 1;
 
+  signed   int under   : 3; /* 0 to 3 or -1 */
   signed   int altfont : 5; /* 1 - 10 or -1 */
 
   struct {
@@ -222,11 +222,14 @@ bool tickit_pen_get_bool_attr(const TickitPen *pen, TickitPenAttr attr)
 
   switch(attr) {
     case TICKIT_PEN_BOLD:    return pen->bold;
-    case TICKIT_PEN_UNDER:   return pen->under;
     case TICKIT_PEN_ITALIC:  return pen->italic;
     case TICKIT_PEN_REVERSE: return pen->reverse;
     case TICKIT_PEN_STRIKE:  return pen->strike;
     case TICKIT_PEN_BLINK:   return pen->blink;
+
+    /* back-compat */
+    case TICKIT_PEN_UNDER:
+      return pen->under > 0;
     default:
       return false;
   }
@@ -236,11 +239,16 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, bool val)
 {
   switch(attr) {
     case TICKIT_PEN_BOLD:    pen->bold    = !!val; pen->valid.bold    = 1; break;
-    case TICKIT_PEN_UNDER:   pen->under   = !!val; pen->valid.under   = 1; break;
     case TICKIT_PEN_ITALIC:  pen->italic  = !!val; pen->valid.italic  = 1; break;
     case TICKIT_PEN_REVERSE: pen->reverse = !!val; pen->valid.reverse = 1; break;
     case TICKIT_PEN_STRIKE:  pen->strike  = !!val; pen->valid.strike  = 1; break;
     case TICKIT_PEN_BLINK:   pen->blink   = !!val; pen->valid.blink   = 1; break;
+
+    /* back-compat */
+    case TICKIT_PEN_UNDER:
+      pen->under       = val ? TICKIT_PEN_UNDER_SINGLE : TICKIT_PEN_UNDER_NONE;
+      pen->valid.under = 1;
+      break;
     default:
       return;
   }
@@ -253,6 +261,7 @@ int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
     return 0;
 
   switch(attr) {
+    case TICKIT_PEN_UNDER:   return pen->under;
     case TICKIT_PEN_ALTFONT: return pen->altfont;
     default:
       return 0;
@@ -262,6 +271,7 @@ int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
 void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
 {
   switch(attr) {
+    case TICKIT_PEN_UNDER:   pen->under   = val; pen->valid.under   = 1; break;
     case TICKIT_PEN_ALTFONT: pen->altfont = val; pen->valid.altfont = 1; break;
     default:
       return;
@@ -492,10 +502,10 @@ TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
       return TICKIT_PENTYPE_COLOUR;
 
     case TICKIT_PEN_ALTFONT:
+    case TICKIT_PEN_UNDER:
       return TICKIT_PENTYPE_INT;
 
     case TICKIT_PEN_BOLD:
-    case TICKIT_PEN_UNDER:
     case TICKIT_PEN_ITALIC:
     case TICKIT_PEN_REVERSE:
     case TICKIT_PEN_STRIKE:

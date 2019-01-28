@@ -20,8 +20,29 @@ foreground and background colours. These are of type \fBTICKIT_PENTYPE_COLOUR\fP
 .PP
 These colour attributes also support a secondary RGB8 (24-bit) specification, which some terminal drivers may prefer over the indexed version.
 .TP
-\fBTICKIT_PEN_BOLD\fP ("b"), \fBTICKIT_PEN_UNDER\fP ("u"), \fBTICKIT_PEN_ITALIC\fP ("i"), \fBTICKIT_PEN_REVERSE\fP ("rv"), \fBTICKIT_PEN_STRIKE\fP ("strike"), \fBTICKIT_PEN_BLINK\fP ("blink")
+\fBTICKIT_PEN_BOLD\fP ("b"), \fBTICKIT_PEN_ITALIC\fP ("i"), \fBTICKIT_PEN_REVERSE\fP ("rv"), \fBTICKIT_PEN_STRIKE\fP ("strike"), \fBTICKIT_PEN_BLINK\fP ("blink")
 boolean rendering attributes. These are of type \fBTICKIT_PENTYPE_BOOL\fP. They are either true or false. Most terminals should support at least bold, underline, reverse and blink, though italic and strikethrough are less commonly supported. Applications are advised not to use these two alone to distinguish significant parts of the user interface.
+.TP
+\fBTICKIT_PEN_UNDER\fP ("u")
+underline. This is of type \fBTICKIT_PENTYPE_INT\fP. Its value is one of the values from the \fBTickitPenUnderline\fP enumeration. Most terminals should support the single underline value, however other values are less commonly supported, and may be drawn instead as a single underline. Applications are advised not to make use of underline style alone to distinguish significant parts of the user interface.
+.IP
+Valid values are:
+.RS
+.TP
+\fBTICKIT_PEN_UNDER_NONE\fB
+No underline.
+.TP
+\fBTICKIT_PEN_UNDER_SINGLE\fB
+Single underline.
+.TP
+\fBTICKIT_PEN_UNDER_DOUBLE\fB
+Double underline.
+.TP
+\fBTICKIT_PEN_UNDER_WAVY\fB
+Single wavy underline, sometimes called "undercurl".
+.RE
+.IP
+For backward-compatibility this attribute will also behave like a boolean-typed attribute. When set to any value other than none, it appears true as a boolean. Setting it to true as a booelan will set its value to single.
 .TP
 \fBTICKIT_PEN_ALTFONT\fP ("af")
 alternate font index. This is of type \fBTICKIT_PENTYPE_INT\fP. It is a value 0 to 9, which selects from the terminal's available fonts. Few terminals actually support this in practice.
