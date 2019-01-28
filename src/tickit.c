@@ -163,6 +163,16 @@ static void sigint(int sig)
     tickit_stop(running_tickit);
 }
 
+static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
+static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user)
+{
+  int timeout = tickit_term_input_check_timeout_msec(t->term);
+  if(timeout > -1)
+    tickit_timer_after_msec(t, timeout, 0, on_term_timeout, NULL);
+
+  return 0;
+}
+
 void tickit_run(Tickit *t)
 {
   t->still_running = 1;
@@ -191,10 +201,6 @@ void tickit_run(Tickit *t)
     int pollret;
 
     if(t->term) {
-      int termmsec = tickit_term_input_check_timeout_msec(t->term);
-      if(termmsec > -1 && (msec == -1 || termmsec < msec))
-        msec = termmsec;
-
       fd.fd = tickit_term_get_input_fd(t->term);
       fd.events = POLLIN;
       nfds++;
@@ -212,6 +218,8 @@ void tickit_run(Tickit *t)
 
     if(t->term && pollret > 0 && fd.revents & (POLLIN|POLLHUP|POLLERR)) {
       tickit_term_input_readable(t->term);
+
+      on_term_timeout(t, TICKIT_EV_FIRE, NULL);
     }
 
     if(t->timers) {
