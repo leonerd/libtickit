@@ -159,6 +159,8 @@ int main(int argc, char *argv[])
     is_rect(exposed_rects+1, "0,10+10,5", "exposed_rects[1]");
     is_rect(exposed_rects+2, "40,10+40,5", "exposed_rects[2]");
     is_rect(exposed_rects+3, "0,22+80,3", "exposed_rects[3]");
+
+    tickit_window_unbind_event_id(root, bind_id);
   }
 
   tickit_window_unref(rootfloat);

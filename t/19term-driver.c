@@ -15,6 +15,9 @@ static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
   switch(ctl) {
     case TICKIT_TERMCTL_COLORS:
       *value = 8; return true;
+
+    default:
+      break;
   }
 
   return false;
@@ -58,6 +61,7 @@ int on_key(TickitTerm *tt, TickitEventFlags type, void *_info, void *data)
   TickitKeyEventInfo *info = _info;
 
   *((int *)data) = info->type;
+  return 0;
 }
 
 int main(int argc, char *argv[])

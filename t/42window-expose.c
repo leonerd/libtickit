@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
     TickitWindow *subwin = tickit_window_new(win, (TickitRect){1, 4, 3, 6}, 0);
 
     int exposed = 0;
-    int bind_id_in_sub = tickit_window_bind_event(subwin, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_incr, &exposed);
+    tickit_window_bind_event(subwin, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_incr, &exposed);
 
     tickit_window_flush(root);
 
@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
     TickitWindow *subwin = tickit_window_new(win, (TickitRect){2, 6, 3, 6}, TICKIT_WINDOW_HIDDEN);
 
     int exposed = 0;
-    int bind_id_in_sub = tickit_window_bind_event(subwin, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_incr, &exposed);
+    tickit_window_bind_event(subwin, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_incr, &exposed);
 
     tickit_window_flush(root);
 
@@ -355,9 +355,9 @@ int main(int argc, char *argv[])
     TickitWindow *winC = tickit_window_new(root, (TickitRect){0, 0, 4, 80}, TICKIT_WINDOW_LOWEST);
     tickit_window_flush(root);
 
-    int bind_idA = tickit_window_bind_event(winA, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Window A");
-    int bind_idB = tickit_window_bind_event(winB, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Window B");
-    int bind_idC = tickit_window_bind_event(winC, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Window C");
+    tickit_window_bind_event(winA, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Window A");
+    tickit_window_bind_event(winB, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Window B");
+    tickit_window_bind_event(winC, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_textat, "Window C");
 
     tickit_window_expose(root, NULL);
     tickit_window_flush(root);

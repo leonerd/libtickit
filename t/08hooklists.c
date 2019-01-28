@@ -8,11 +8,13 @@ struct TickitHooklist hooks = { NULL };
 int incr(void *owner, TickitEventFlags flags, void *info, void *data)
 {
   ((int *)data)[0]++;
+  return 0;
 }
 
 int delete(void *owner, TickitEventFlags flags, void *info, void *data)
 {
   tickit_hooklist_unbind_event_id(&hooks, NULL, *(int *)info);
+  return 0;
 }
 
 int main(int argc, char *argv[])
@@ -32,7 +34,7 @@ int main(int argc, char *argv[])
   }
 
   {
-    int id1 = tickit_hooklist_bind_event(&hooks, NULL, 1<<1, 0, &delete, NULL);
+    tickit_hooklist_bind_event(&hooks, NULL, 1<<1, 0, &delete, NULL);
 
     int count2 = 0;
     int id2 = tickit_hooklist_bind_event(&hooks, NULL, 1<<1, 0, &incr, &count2);

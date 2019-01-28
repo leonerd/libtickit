@@ -17,7 +17,6 @@ static int on_event_push(TickitPen *pen, TickitEventFlags flags, void *_info, vo
 int main(int argc, char *argv[])
 {
   TickitPen *pen, *pen2;
-  TickitPenAttr attr;
 
   pen = tickit_pen_new();
 

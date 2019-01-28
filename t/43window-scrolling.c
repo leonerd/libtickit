@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   TickitWindow *win = tickit_window_new(root, (TickitRect){5, 0, 10, 80}, 0);
   tickit_window_flush(root);
 
-  int bind_id = tickit_window_bind_event(win, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_pushrect, NULL);
+  tickit_window_bind_event(win, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose_pushrect, NULL);
 
   // scroll down
   {

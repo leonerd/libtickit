@@ -6,7 +6,6 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
   TickitRenderBuffer *screen, *window;
-  int len;
 
   screen = tickit_renderbuffer_new(25, 80);
   window = tickit_renderbuffer_new(10, 20);

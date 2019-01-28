@@ -256,6 +256,8 @@ int main(int argc, char *argv[])
 
     tickit_window_unref(otherwin);
     tickit_window_unref(subwin);
+
+    tickit_window_unbind_event_id(win, bind_id);
   }
 
   tickit_window_unref(win);

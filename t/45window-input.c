@@ -199,6 +199,9 @@ int main(int argc, char *argv[])
 
     tickit_window_unref(otherwin);
     tickit_window_flush(root);
+
+    tickit_window_unbind_event_id(win, bind_ids[0]);
+    tickit_window_unbind_event_id(subwin, bind_ids[1]);
   }
 
   tickit_window_unref(subwin);
