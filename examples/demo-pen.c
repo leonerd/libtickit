@@ -132,6 +132,20 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
     tickit_renderbuffer_setpen(rb, attrs[i].pen);
     tickit_renderbuffer_text(rb, attrs[i].name);
 
+    if(attrs[i].attr == TICKIT_PEN_UNDER) {
+      /* show off other styles */
+      TickitPenUnderline under;
+
+      for(under = TICKIT_PEN_UNDER_DOUBLE; under < TICKIT_N_PEN_UNDERS; under++) {
+        TickitPen *pen = tickit_pen_new_attrs(TICKIT_PEN_UNDER, under, -1);
+        tickit_renderbuffer_skip(rb, 4);
+
+        tickit_renderbuffer_setpen(rb, pen);
+        tickit_renderbuffer_text(rb, 
+            (char *[]){NULL, NULL, "double-underline", "undercurl"}[under]);
+      }
+    }
+
     tickit_renderbuffer_restore(rb);
   }
 
