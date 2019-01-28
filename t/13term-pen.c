@@ -13,100 +13,116 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
   char buffer[1024] = { 0 };
-  TickitPen *pen;
 
   tt = tickit_term_new_for_termtype("xterm");
   tickit_term_set_output_func(tt, output, buffer);
 
-  pen = tickit_pen_new();
+  // setpen empty
+  {
+    TickitPen *pen = tickit_pen_new();
 
-  buffer[0] = 0;
-  tickit_term_setpen(tt, pen);
+    buffer[0] = 0;
+    tickit_term_setpen(tt, pen);
 
-  is_str_escape(buffer, "\e[m", "buffer after chpen empty");
+    is_str_escape(buffer, "\e[m", "buffer after setpen empty");
 
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
+    tickit_pen_unref(pen);
+  }
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+  // adjust boolean attributes
+  {
+    TickitPen *pen = tickit_pen_new();
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
 
-  is_str_escape(buffer, "\e[1m", "buffer contains SGR 1 for chpen bold");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    is_str_escape(buffer, "\e[1m", "buffer contains SGR 1 for chpen bold");
 
-  is_str_escape(buffer, "", "chpen again is a no-op");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
+    is_str_escape(buffer, "", "chpen again is a no-op");
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
 
-  is_str_escape(buffer, "\e[m", "chpen disables bold");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 1);
+    is_str_escape(buffer, "\e[m", "chpen disables bold");
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 1);
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 1);
 
-  is_str_escape(buffer, "\e[1;4m", "chpen enables bold and under");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
-  tickit_pen_clear_attr(pen, TICKIT_PEN_UNDER);
+    is_str_escape(buffer, "\e[1;4m", "chpen enables bold and under");
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_BOLD, 0);
+    tickit_pen_clear_attr(pen, TICKIT_PEN_UNDER);
 
-  is_str_escape(buffer, "\e[22m", "chpen disables bold");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    is_str_escape(buffer, "\e[22m", "chpen disables bold");
 
-  is_str_escape(buffer, "", "chpen disable bold again is no-op");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  tickit_pen_clear_attr(pen, TICKIT_PEN_BOLD);
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 0);
+    is_str_escape(buffer, "", "chpen disable bold again is no-op");
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    tickit_pen_clear_attr(pen, TICKIT_PEN_BOLD);
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 0);
 
-  is_str_escape(buffer, "\e[m", "chpen disable under is reset");
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  tickit_pen_clear_attr(pen, TICKIT_PEN_UNDER);
+    is_str_escape(buffer, "\e[m", "chpen disable under is reset");
 
-  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 1);
-  tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, 5);
+    tickit_pen_clear_attr(pen, TICKIT_PEN_UNDER);
 
-  buffer[0] = 0;
-  tickit_term_setpen(tt, pen);
+    tickit_pen_unref(pen);
+  }
 
-  is_str_escape(buffer, "\e[31;45m", "chpen foreground+background");
+  // adjust colours
+  {
+    TickitPen *pen = tickit_pen_new();
 
-  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 9);
-  tickit_pen_clear_attr(pen, TICKIT_PEN_BG);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 1);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_BG, 5);
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    buffer[0] = 0;
+    tickit_term_setpen(tt, pen);
 
-  is_str_escape(buffer, "\e[91m", "chpen foreground high");
+    is_str_escape(buffer, "\e[31;45m", "chpen foreground+background");
 
-  tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 123);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 9);
+    tickit_pen_clear_attr(pen, TICKIT_PEN_BG);
 
-  buffer[0] = 0;
-  tickit_term_chpen(tt, pen);
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  is_str_escape(buffer, "\e[38;5;123m", "chpen foreground xterm256");
+    is_str_escape(buffer, "\e[91m", "chpen foreground high");
 
-  tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
-  tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 1);
+    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 123);
 
-  buffer[0] = 0;
-  tickit_term_setpen(tt, pen);
+    buffer[0] = 0;
+    tickit_term_chpen(tt, pen);
 
-  is_str_escape(buffer, "\e[39;49;4m", "setpen resets colours, enables under");
+    is_str_escape(buffer, "\e[38;5;123m", "chpen foreground xterm256");
 
-  tickit_pen_unref(pen);
+    tickit_pen_clear_attr(pen, TICKIT_PEN_FG);
+    tickit_pen_set_bool_attr(pen, TICKIT_PEN_UNDER, 1);
+
+    buffer[0] = 0;
+    tickit_term_setpen(tt, pen);
+
+    is_str_escape(buffer, "\e[39;49;4m", "setpen resets colours, enables under");
+
+    tickit_pen_unref(pen);
+  }
+
   tickit_term_unref(tt);
 
   return exit_status();
