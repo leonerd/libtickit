@@ -185,7 +185,7 @@ bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
       return true;
     break;
   case TICKIT_PENTYPE_INT:
-    if(tickit_pen_get_int_attr(pen, attr) > -1)
+    if(tickit_pen_get_int_attr(pen, attr) > 0)
       return true;
     break;
   case TICKIT_PENTYPE_COLOUR:
@@ -250,7 +250,7 @@ void tickit_pen_set_bool_attr(TickitPen *pen, TickitPenAttr attr, bool val)
 int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
 {
   if(!tickit_pen_has_attr(pen, attr))
-    return -1;
+    return 0;
 
   switch(attr) {
     case TICKIT_PEN_ALTFONT: return pen->altfont;
