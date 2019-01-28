@@ -662,6 +662,9 @@ TickitWindow *tickit_get_rootwin(Tickit *t);
 void tickit_run(Tickit *t);
 void tickit_stop(Tickit *t);
 
+/* TODO: Consider OUT and HUP conditions too */
+int tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+
 int tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 void tickit_timer_cancel(Tickit *t, int id);

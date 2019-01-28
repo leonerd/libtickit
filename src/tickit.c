@@ -20,6 +20,18 @@ struct Deferral {
   void *user;
 };
 
+typedef struct IOWatch IOWatch;
+
+struct IOWatch {
+  IOWatch *next;
+
+  int idx;
+  TickitBindFlags flags;
+  int fd;
+  TickitCallbackFn *fn;
+  void *user;
+};
+
 struct Tickit {
   int refcount;
 
@@ -28,11 +40,42 @@ struct Tickit {
   TickitTerm   *term;
   TickitWindow *rootwin;
 
+  IOWatch *iowatches;
+  struct pollfd *fds;
+  int nfds;
+  int alloc_fds;
+
   Deferral *timers;
   int next_timer_id;
 
   Deferral *laters;
 };
+
+static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
+static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user)
+{
+  int timeout = tickit_term_input_check_timeout_msec(t->term);
+  if(timeout > -1)
+    tickit_timer_after_msec(t, timeout, 0, on_term_timeout, NULL);
+
+  return 0;
+}
+
+static int on_term_readable(Tickit *t, TickitEventFlags flags, void *user)
+{
+  tickit_term_input_readable(t->term);
+
+  on_term_timeout(t, TICKIT_EV_FIRE, NULL);
+  return 0;
+}
+
+static void setterm(Tickit *t, TickitTerm *tt);
+static void setterm(Tickit *t, TickitTerm *tt)
+{
+  t->term = tt; /* take ownership */
+
+  tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
+}
 
 Tickit *tickit_new_for_term(TickitTerm *tt)
 {
@@ -42,16 +85,21 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
 
   t->refcount = 1;
 
-  if(tt)
-    t->term = tt; /* take ownership */
-  else
-    t->term = NULL;
+  t->term = NULL;
   t->rootwin = NULL;
 
+  t->iowatches = NULL;
   t->timers = NULL;
   t->next_timer_id = 1;
 
   t->laters = NULL;
+
+  t->alloc_fds = 4; /* most programs probably won't use more than 1 FD anyway */
+  t->fds = malloc(sizeof(struct pollfd) * t->alloc_fds);
+  t->nfds = 0;
+
+  if(tt)
+    setterm(t, tt);
 
   return t;
 }
@@ -67,6 +115,18 @@ static void tickit_destroy(Tickit *t)
     tickit_window_unref(t->rootwin);
   if(t->term)
     tickit_term_unref(t->term);
+
+  if(t->iowatches) {
+    IOWatch *this, *next;
+    for(this = t->iowatches; this; this = next) {
+      next = this->next;
+
+      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+        (*this->fn)(t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+      free(this);
+    }
+  }
 
   if(t->timers) {
     Deferral *this, *next;
@@ -115,7 +175,7 @@ TickitTerm *tickit_get_term(Tickit *t)
     if(!tt)
       return NULL;
 
-    t->term = tt;
+    setterm(t, tt);
   }
 
   return t->term;
@@ -163,16 +223,6 @@ static void sigint(int sig)
     tickit_stop(running_tickit);
 }
 
-static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
-static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user)
-{
-  int timeout = tickit_term_input_check_timeout_msec(t->term);
-  if(timeout > -1)
-    tickit_timer_after_msec(t, timeout, 0, on_term_timeout, NULL);
-
-  return 0;
-}
-
 void tickit_run(Tickit *t)
 {
   t->still_running = 1;
@@ -196,15 +246,7 @@ void tickit_run(Tickit *t)
         msec = 0;
     }
 
-    struct pollfd fd;
-    int nfds = 0;
     int pollret;
-
-    if(t->term) {
-      fd.fd = tickit_term_get_input_fd(t->term);
-      fd.events = POLLIN;
-      nfds++;
-    }
 
     /* detach the later queue before running any events */
     Deferral *later = t->laters;
@@ -214,12 +256,13 @@ void tickit_run(Tickit *t)
       msec = 0;
 
     /* TODO: Determine if poll() with nfds=0 is allowed */
-    pollret = poll(&fd, nfds, msec);
+    pollret = poll(t->fds, t->nfds, msec);
 
-    if(t->term && pollret > 0 && fd.revents & (POLLIN|POLLHUP|POLLERR)) {
-      tickit_term_input_readable(t->term);
-
-      on_term_timeout(t, TICKIT_EV_FIRE, NULL);
+    if(pollret > 0) {
+      for(IOWatch *this = t->iowatches; this; this = this->next) {
+        if(t->fds[this->idx].revents & (POLLIN|POLLHUP|POLLERR))
+          (*this->fn)(t, TICKIT_EV_FIRE, this->user);
+      }
     }
 
     if(t->timers) {
@@ -262,6 +305,57 @@ void tickit_run(Tickit *t)
 void tickit_stop(Tickit *t)
 {
   t->still_running = 0;
+}
+
+int tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  IOWatch *watch = malloc(sizeof(IOWatch));
+  if(!watch)
+    return -1;
+
+  int idx;
+  for(idx = 0; idx < t->nfds; idx++)
+    if(t->fds[idx].fd == -1)
+      break;
+
+  if(idx == t->nfds && t->nfds == t->alloc_fds) {
+    /* Allocate and reinitialise a larger pollfd array */
+    struct pollfd *new = malloc(sizeof(struct pollfd) * t->alloc_fds * 2);
+    if(!new)
+      return NULL;
+
+    for(IOWatch *this = t->iowatches; this; this = this->next) {
+      new[this->idx].fd = this->fd;
+      new[this->idx].events = POLLIN;
+    }
+
+    t->alloc_fds *= 2;
+    free(t->fds);
+    t->fds = new;
+  }
+
+  idx = t->nfds;
+  t->nfds++;
+
+  t->fds[idx].fd = fd;
+  t->fds[idx].events = POLLIN;
+
+  watch->next = NULL;
+
+  watch->idx = idx;
+  watch->fd = fd;
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_UNBIND);
+  watch->fn = fn;
+  watch->user = user;
+
+  IOWatch **prevp = &t->iowatches;
+  while(*prevp)
+    prevp = &(*prevp)->next;
+
+  watch->next = *prevp;
+  *prevp = watch;
+
+  return idx;
 }
 
 /* static for now until we decide how to expose it */
