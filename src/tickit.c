@@ -13,7 +13,6 @@ typedef struct Deferral Deferral;
 struct Deferral {
   Deferral *next;
 
-  int id;
   TickitBindFlags flags;
   struct timeval at;  /* only for timers */
   TickitCallbackFn *fn;
@@ -46,7 +45,6 @@ struct Tickit {
   int alloc_fds;
 
   Deferral *timers;
-  int next_timer_id;
 
   Deferral *laters;
 };
@@ -90,7 +88,6 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
 
   t->iowatches = NULL;
   t->timers = NULL;
-  t->next_timer_id = 1;
 
   t->laters = NULL;
 
@@ -307,11 +304,11 @@ void tickit_stop(Tickit *t)
   t->still_running = 0;
 }
 
-int tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   IOWatch *watch = malloc(sizeof(IOWatch));
   if(!watch)
-    return -1;
+    return NULL;
 
   int idx;
   for(idx = 0; idx < t->nfds; idx++)
@@ -355,25 +352,22 @@ int tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbac
   watch->next = *prevp;
   *prevp = watch;
 
-  return idx;
+  return watch;
 }
 
 /* static for now until we decide how to expose it */
-static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+static void *tickit_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   Deferral *tim = malloc(sizeof(Deferral));
   if(!tim)
-    return -1;
+    return NULL;
 
   tim->next = NULL;
 
-  tim->id = t->next_timer_id;
   tim->at = *at;
   tim->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
   tim->fn = fn;
   tim->user = user;
-
-  t->next_timer_id++;
 
   Deferral **prevp = &t->timers;
   /* Try to insert in-order at matching timestamp */
@@ -383,10 +377,10 @@ static int tickit_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags 
   tim->next = *prevp;
   *prevp = tim;
 
-  return tim->id;
+  return tim;
 }
 
-int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   struct timeval at;
   gettimeofday(&at, NULL);
@@ -397,7 +391,7 @@ int tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlag
   return tickit_timer_at(t, &at, flags, fn, user);
 }
 
-int tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   return tickit_timer_after_tv(t, &(struct timeval){
       .tv_sec = msec / 1000,
@@ -405,12 +399,12 @@ int tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCa
     }, flags, fn, user);
 }
 
-void tickit_timer_cancel(Tickit *t, int id)
+void tickit_timer_cancel(Tickit *t, void *cookie)
 {
   Deferral **prevp = &t->timers;
   while(*prevp) {
     Deferral *this = *prevp;
-    if(this->id == id) {
+    if(this == cookie) {
       *prevp = this->next;
 
       if(this->flags & TICKIT_BIND_UNBIND)
@@ -423,11 +417,11 @@ void tickit_timer_cancel(Tickit *t, int id)
   }
 }
 
-int tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   Deferral *later = malloc(sizeof(Deferral));
   if(!later)
-    return -1;
+    return NULL;
 
   later->next = NULL;
 
@@ -442,5 +436,5 @@ int tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *u
   later->next = *prevp;
   *prevp = later;
 
-  return 1;
+  return later;
 }
