@@ -8,45 +8,27 @@
 /* INTERNAL */
 TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term);
 
-typedef struct Deferral Deferral;
+typedef struct {
+  void *(*init)(Tickit *t);
+  void  (*destroy)(void *data);
+  void  (*run)(void *data);
+  void  (*stop)(void *data);
+  void *(*watch_io_read)(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+  void *(*timer)(void *data, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+  void  (*timer_cancel)(void *data, void *cookie);
+  void *(*later)(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+} TickitEventHooks;
 
-struct Deferral {
-  Deferral *next;
-
-  TickitBindFlags flags;
-  struct timeval at;  /* only for timers */
-  TickitCallbackFn *fn;
-  void *user;
-};
-
-typedef struct IOWatch IOWatch;
-
-struct IOWatch {
-  IOWatch *next;
-
-  int idx;
-  TickitBindFlags flags;
-  int fd;
-  TickitCallbackFn *fn;
-  void *user;
-};
+static TickitEventHooks default_event_loop;
 
 struct Tickit {
   int refcount;
 
-  volatile int still_running;
-
   TickitTerm   *term;
   TickitWindow *rootwin;
 
-  IOWatch *iowatches;
-  struct pollfd *fds;
-  int nfds;
-  int alloc_fds;
-
-  Deferral *timers;
-
-  Deferral *laters;
+  TickitEventHooks *evhooks;
+  void             *evdata;
 };
 
 static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
@@ -86,19 +68,19 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
   t->term = NULL;
   t->rootwin = NULL;
 
-  t->iowatches = NULL;
-  t->timers = NULL;
-
-  t->laters = NULL;
-
-  t->alloc_fds = 4; /* most programs probably won't use more than 1 FD anyway */
-  t->fds = malloc(sizeof(struct pollfd) * t->alloc_fds);
-  t->nfds = 0;
+  t->evhooks = &default_event_loop;
+  t->evdata  = (*t->evhooks->init)(t);
+  if(!t->evdata)
+    goto abort;
 
   if(tt)
     setterm(t, tt);
 
   return t;
+
+abort:
+  free(t);
+  return NULL;
 }
 
 Tickit *tickit_new_stdio(void)
@@ -113,41 +95,7 @@ static void tickit_destroy(Tickit *t)
   if(t->term)
     tickit_term_unref(t->term);
 
-  if(t->iowatches) {
-    IOWatch *this, *next;
-    for(this = t->iowatches; this; this = next) {
-      next = this->next;
-
-      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-        (*this->fn)(t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
-
-      free(this);
-    }
-  }
-
-  if(t->timers) {
-    Deferral *this, *next;
-    for(this = t->timers; this; this = next) {
-      next = this->next;
-
-      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-        (*this->fn)(t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
-
-      free(this);
-    }
-  }
-
-  if(t->laters) {
-    Deferral *this, *next;
-    for(this = t->laters; this; this = next) {
-      next = this->next;
-
-      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-        (*this->fn)(t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
-
-      free(this);
-    }
-  }
+  (*t->evhooks->destroy)(t->evdata);
 
   free(t);
 }
@@ -222,77 +170,12 @@ static void sigint(int sig)
 
 void tickit_run(Tickit *t)
 {
-  t->still_running = 1;
-
   running_tickit = t;
   signal(SIGINT, sigint);
 
   setupterm(t);
 
-  while(t->still_running) {
-    int msec = -1;
-    if(t->timers) {
-      struct timeval now, delay;
-      gettimeofday(&now, NULL);
-
-      /* timers->at - now ==> delay */
-      timersub(&t->timers->at, &now, &delay);
-
-      msec = (delay.tv_sec * 1000) + (delay.tv_usec / 1000);
-      if(msec < 0)
-        msec = 0;
-    }
-
-    int pollret;
-
-    /* detach the later queue before running any events */
-    Deferral *later = t->laters;
-    t->laters = NULL;
-
-    if(later)
-      msec = 0;
-
-    /* TODO: Determine if poll() with nfds=0 is allowed */
-    pollret = poll(t->fds, t->nfds, msec);
-
-    if(pollret > 0) {
-      for(IOWatch *this = t->iowatches; this; this = this->next) {
-        if(t->fds[this->idx].revents & (POLLIN|POLLHUP|POLLERR))
-          (*this->fn)(t, TICKIT_EV_FIRE, this->user);
-      }
-    }
-
-    if(t->timers) {
-      struct timeval now;
-      gettimeofday(&now, NULL);
-
-      /* timer queue is stored ordered, so we can just eat a prefix
-       * of it
-       */
-
-      Deferral *this = t->timers;
-      while(this) {
-        if(timercmp(&this->at, &now, >))
-          break;
-
-        (*this->fn)(t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
-
-        Deferral *next = this->next;
-        free(this);
-        this = next;
-      }
-
-      t->timers = this;
-    }
-
-    while(later) {
-      (*later->fn)(t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
-
-      Deferral *next = later->next;
-      free(later);
-      later = next;
-    }
-  }
+  (*t->evhooks->run)(t->evdata);
 
   teardownterm(t);
 
@@ -301,83 +184,18 @@ void tickit_run(Tickit *t)
 
 void tickit_stop(Tickit *t)
 {
-  t->still_running = 0;
+  return (*t->evhooks->stop)(t->evdata);
 }
 
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
-  IOWatch *watch = malloc(sizeof(IOWatch));
-  if(!watch)
-    return NULL;
-
-  int idx;
-  for(idx = 0; idx < t->nfds; idx++)
-    if(t->fds[idx].fd == -1)
-      break;
-
-  if(idx == t->nfds && t->nfds == t->alloc_fds) {
-    /* Allocate and reinitialise a larger pollfd array */
-    struct pollfd *new = malloc(sizeof(struct pollfd) * t->alloc_fds * 2);
-    if(!new)
-      return NULL;
-
-    for(IOWatch *this = t->iowatches; this; this = this->next) {
-      new[this->idx].fd = this->fd;
-      new[this->idx].events = POLLIN;
-    }
-
-    t->alloc_fds *= 2;
-    free(t->fds);
-    t->fds = new;
-  }
-
-  idx = t->nfds;
-  t->nfds++;
-
-  t->fds[idx].fd = fd;
-  t->fds[idx].events = POLLIN;
-
-  watch->next = NULL;
-
-  watch->idx = idx;
-  watch->fd = fd;
-  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_UNBIND);
-  watch->fn = fn;
-  watch->user = user;
-
-  IOWatch **prevp = &t->iowatches;
-  while(*prevp)
-    prevp = &(*prevp)->next;
-
-  watch->next = *prevp;
-  *prevp = watch;
-
-  return watch;
+  return (*t->evhooks->watch_io_read)(t->evdata, fd, flags, fn, user);
 }
 
 /* static for now until we decide how to expose it */
 static void *tickit_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
-  Deferral *tim = malloc(sizeof(Deferral));
-  if(!tim)
-    return NULL;
-
-  tim->next = NULL;
-
-  tim->at = *at;
-  tim->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
-  tim->fn = fn;
-  tim->user = user;
-
-  Deferral **prevp = &t->timers;
-  /* Try to insert in-order at matching timestamp */
-  while(*prevp && !timercmp(&(*prevp)->at, at, >))
-    prevp = &(*prevp)->next;
-
-  tim->next = *prevp;
-  *prevp = tim;
-
-  return tim;
+  return (*t->evhooks->timer)(t->evdata, at, flags, fn, user);
 }
 
 void *tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
@@ -401,14 +219,286 @@ void *tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, Tickit
 
 void tickit_timer_cancel(Tickit *t, void *cookie)
 {
-  Deferral **prevp = &t->timers;
+  (*t->evhooks->timer_cancel)(t->evdata, cookie);
+}
+
+void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  return (*t->evhooks->later)(t->evdata, flags, fn, user);
+
+}
+
+/*
+ * Internal default event loop implementation
+ */
+
+typedef struct IOWatch IOWatch;
+struct IOWatch {
+  IOWatch *next;
+
+  int idx;
+  TickitBindFlags flags;
+  int fd;
+  TickitCallbackFn *fn;
+  void *user;
+};
+
+typedef struct Deferral Deferral;
+struct Deferral {
+  Deferral *next;
+
+  TickitBindFlags flags;
+  struct timeval at;  /* only for timers */
+  TickitCallbackFn *fn;
+  void *user;
+};
+
+typedef struct {
+  Tickit *t;
+
+  volatile int still_running;
+
+  IOWatch *iowatches;
+  struct pollfd *fds;
+  int nfds;
+  int alloc_fds;
+
+  Deferral *timers;
+
+  Deferral *laters;
+} EventLoopData;
+
+static void *evloop_init(Tickit *t)
+{
+  EventLoopData *evdata = malloc(sizeof(*evdata));
+  if(!evdata)
+    return NULL;
+
+  evdata->t = t;
+
+  evdata->iowatches = NULL;
+  evdata->timers = NULL;
+
+  evdata->laters = NULL;
+
+  evdata->alloc_fds = 4; /* most programs probably won't use more than 1 FD anyway */
+  evdata->fds = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
+  evdata->nfds = 0;
+
+  return evdata;
+}
+
+static void evloop_destroy(void *data)
+{
+  EventLoopData *evdata = data;
+
+  if(evdata->iowatches) {
+    IOWatch *this, *next;
+    for(this = evdata->iowatches; this; this = next) {
+      next = this->next;
+
+      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+        (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+      free(this);
+    }
+  }
+
+  if(evdata->timers) {
+    Deferral *this, *next;
+    for(this = evdata->timers; this; this = next) {
+      next = this->next;
+
+      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+        (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+      free(this);
+    }
+  }
+
+  if(evdata->laters) {
+    Deferral *this, *next;
+    for(this = evdata->laters; this; this = next) {
+      next = this->next;
+
+      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+        (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+      free(this);
+    }
+  }
+}
+
+void evloop_run(void *data)
+{
+  EventLoopData *evdata = data;
+
+  evdata->still_running = 1;
+
+  while(evdata->still_running) {
+    int msec = -1;
+    if(evdata->timers) {
+      struct timeval now, delay;
+      gettimeofday(&now, NULL);
+
+      /* timers->at - now ==> delay */
+      timersub(&evdata->timers->at, &now, &delay);
+
+      msec = (delay.tv_sec * 1000) + (delay.tv_usec / 1000);
+      if(msec < 0)
+        msec = 0;
+    }
+
+    int pollret;
+
+    /* detach the later queue before running any events */
+    Deferral *later = evdata->laters;
+    evdata->laters = NULL;
+
+    if(later)
+      msec = 0;
+
+    /* TODO: Determine if poll() with nfds=0 is allowed */
+    pollret = poll(evdata->fds, evdata->nfds, msec);
+
+    if(pollret > 0) {
+      for(IOWatch *this = evdata->iowatches; this; this = this->next) {
+        if(evdata->fds[this->idx].revents & (POLLIN|POLLHUP|POLLERR))
+          (*this->fn)(evdata->t, TICKIT_EV_FIRE, this->user);
+      }
+    }
+
+    if(evdata->timers) {
+      struct timeval now;
+      gettimeofday(&now, NULL);
+
+      /* timer queue is stored ordered, so we can just eat a prefix
+       * of it
+       */
+
+      Deferral *this = evdata->timers;
+      while(this) {
+        if(timercmp(&this->at, &now, >))
+          break;
+
+        (*this->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
+
+        Deferral *next = this->next;
+        free(this);
+        this = next;
+      }
+
+      evdata->timers = this;
+    }
+
+    while(later) {
+      (*later->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
+
+      Deferral *next = later->next;
+      free(later);
+      later = next;
+    }
+  }
+}
+
+void evloop_stop(void *data)
+{
+  EventLoopData *evdata = data;
+
+  evdata->still_running = 0;
+}
+
+void *evloop_watch_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  EventLoopData *evdata = data;
+
+  IOWatch *watch = malloc(sizeof(IOWatch));
+  if(!watch)
+    return NULL;
+
+  int idx;
+  for(idx = 0; idx < evdata->nfds; idx++)
+    if(evdata->fds[idx].fd == -1)
+      break;
+
+  if(idx == evdata->nfds && evdata->nfds == evdata->alloc_fds) {
+    /* Allocate and reinitialise a larger pollfd array */
+    struct pollfd *new = malloc(sizeof(struct pollfd) * evdata->alloc_fds * 2);
+    if(!new)
+      return NULL;
+
+    for(IOWatch *this = evdata->iowatches; this; this = this->next) {
+      new[this->idx].fd = this->fd;
+      new[this->idx].events = POLLIN;
+    }
+
+    evdata->alloc_fds *= 2;
+    free(evdata->fds);
+    evdata->fds = new;
+  }
+
+  idx = evdata->nfds;
+  evdata->nfds++;
+
+  evdata->fds[idx].fd = fd;
+  evdata->fds[idx].events = POLLIN;
+
+  watch->next = NULL;
+
+  watch->idx = idx;
+  watch->fd = fd;
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_UNBIND);
+  watch->fn = fn;
+  watch->user = user;
+
+  IOWatch **prevp = &evdata->iowatches;
+  while(*prevp)
+    prevp = &(*prevp)->next;
+
+  watch->next = *prevp;
+  *prevp = watch;
+
+  return watch;
+}
+
+void *evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  EventLoopData *evdata = data;
+
+  Deferral *tim = malloc(sizeof(Deferral));
+  if(!tim)
+    return NULL;
+
+  tim->next = NULL;
+
+  tim->at = *at;
+  tim->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
+  tim->fn = fn;
+  tim->user = user;
+
+  Deferral **prevp = &evdata->timers;
+  /* Try to insert in-order at matching timestamp */
+  while(*prevp && !timercmp(&(*prevp)->at, at, >))
+    prevp = &(*prevp)->next;
+
+  tim->next = *prevp;
+  *prevp = tim;
+
+  return tim;
+}
+
+void evloop_timer_cancel(void *data, void *cookie)
+{
+  EventLoopData *evdata = data;
+
+  Deferral **prevp = &evdata->timers;
   while(*prevp) {
     Deferral *this = *prevp;
     if(this == cookie) {
       *prevp = this->next;
 
       if(this->flags & TICKIT_BIND_UNBIND)
-        (*this->fn)(t, TICKIT_EV_UNBIND, this->user);
+        (*this->fn)(evdata->t, TICKIT_EV_UNBIND, this->user);
 
       free(this);
     }
@@ -417,8 +507,10 @@ void tickit_timer_cancel(Tickit *t, void *cookie)
   }
 }
 
-void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *evloop_later(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
+  EventLoopData *evdata = data;
+
   Deferral *later = malloc(sizeof(Deferral));
   if(!later)
     return NULL;
@@ -429,7 +521,7 @@ void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void 
   later->fn = fn;
   later->user = user;
 
-  Deferral **prevp = &t->laters;
+  Deferral **prevp = &evdata->laters;
   while(*prevp)
     prevp = &(*prevp)->next;
 
@@ -438,3 +530,14 @@ void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void 
 
   return later;
 }
+
+static TickitEventHooks default_event_loop = {
+  .init          = evloop_init,
+  .destroy       = evloop_destroy,
+  .run           = evloop_run,
+  .stop          = evloop_stop,
+  .watch_io_read = evloop_watch_io_read,
+  .timer         = evloop_timer,
+  .timer_cancel  = evloop_timer_cancel,
+  .later         = evloop_later,
+};
