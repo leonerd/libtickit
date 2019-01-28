@@ -1,5 +1,7 @@
 #include "tickit.h"
 
+#include <errno.h>
+#include <poll.h>
 #include <signal.h>
 #include <sys/time.h>
 
@@ -184,6 +186,20 @@ void tickit_run(Tickit *t)
         msec = 0;
     }
 
+    struct pollfd fd;
+    int nfds = 0;
+    int pollret;
+
+    if(t->term) {
+      int termmsec = tickit_term_input_check_timeout_msec(t->term);
+      if(termmsec > -1 && (msec == -1 || termmsec < msec))
+        msec = termmsec;
+
+      fd.fd = tickit_term_get_input_fd(t->term);
+      fd.events = POLLIN;
+      nfds++;
+    }
+
     /* detach the later queue before running any events */
     Deferral *later = t->laters;
     t->laters = NULL;
@@ -191,9 +207,12 @@ void tickit_run(Tickit *t)
     if(later)
       msec = 0;
 
-    if(t->term)
-      tickit_term_input_wait_msec(t->term, msec);
-    /* else: er... handle msec somehow */
+    /* TODO: Determine if poll() with nfds=0 is allowed */
+    pollret = poll(&fd, nfds, msec);
+
+    if(t->term && pollret > 0 && fd.revents & (POLLIN|POLLHUP|POLLERR)) {
+      tickit_term_input_readable(t->term);
+    }
 
     if(t->timers) {
       struct timeval now;
