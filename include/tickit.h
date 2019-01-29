@@ -665,11 +665,12 @@ void tickit_stop(Tickit *t);
 /* TODO: Consider OUT and HUP conditions too */
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
-void *tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
-void *tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
-void tickit_timer_cancel(Tickit *t, void *cookie);
+void *tickit_watch_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+void *tickit_watch_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
-void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+void tickit_watch_cancel(Tickit *t, void *cookie);
+
+void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
 /* Debug support */
 

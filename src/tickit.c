@@ -13,7 +13,7 @@ typedef struct {
   void  (*destroy)(void *data);
   void  (*run)(void *data);
   void  (*stop)(void *data);
-  void *(*watch_io_read)(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+  void *(*io_read)(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
   void *(*timer)(void *data, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
   void  (*timer_cancel)(void *data, void *cookie);
   void *(*later)(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
@@ -36,7 +36,7 @@ static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user)
 {
   int timeout = tickit_term_input_check_timeout_msec(t->term);
   if(timeout > -1)
-    tickit_timer_after_msec(t, timeout, 0, on_term_timeout, NULL);
+    tickit_watch_timer_after_msec(t, timeout, 0, on_term_timeout, NULL);
 
   return 0;
 }
@@ -189,16 +189,16 @@ void tickit_stop(Tickit *t)
 
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
-  return (*t->evhooks->watch_io_read)(t->evdata, fd, flags, fn, user);
+  return (*t->evhooks->io_read)(t->evdata, fd, flags, fn, user);
 }
 
 /* static for now until we decide how to expose it */
-static void *tickit_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+static void *tickit_watch_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   return (*t->evhooks->timer)(t->evdata, at, flags, fn, user);
 }
 
-void *tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_watch_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   struct timeval at;
   gettimeofday(&at, NULL);
@@ -206,26 +206,26 @@ void *tickit_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFl
   /* at + after ==> at */
   timeradd(&at, after, &at);
 
-  return tickit_timer_at(t, &at, flags, fn, user);
+  return tickit_watch_timer_at(t, &at, flags, fn, user);
 }
 
-void *tickit_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_watch_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
-  return tickit_timer_after_tv(t, &(struct timeval){
+  return tickit_watch_timer_after_tv(t, &(struct timeval){
       .tv_sec = msec / 1000,
       .tv_usec = (msec % 1000) * 1000,
     }, flags, fn, user);
 }
 
-void tickit_timer_cancel(Tickit *t, void *cookie)
-{
-  (*t->evhooks->timer_cancel)(t->evdata, cookie);
-}
-
-void *tickit_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   return (*t->evhooks->later)(t->evdata, flags, fn, user);
 
+}
+
+void tickit_watch_cancel(Tickit *t, void *cookie)
+{
+  (*t->evhooks->timer_cancel)(t->evdata, cookie);
 }
 
 /*
@@ -407,7 +407,7 @@ void evloop_stop(void *data)
   evdata->still_running = 0;
 }
 
-void *evloop_watch_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   EventLoopData *evdata = data;
 
@@ -535,7 +535,7 @@ static TickitEventHooks default_event_loop = {
   .destroy       = evloop_destroy,
   .run           = evloop_run,
   .stop          = evloop_stop,
-  .watch_io_read = evloop_watch_io_read,
+  .io_read       = evloop_io_read,
   .timer         = evloop_timer,
   .timer_cancel  = evloop_timer_cancel,
   .later         = evloop_later,

@@ -23,16 +23,16 @@ int main(int argc, char *argv[])
 
   {
     int called = 0;
-    tickit_later(t, 0, &on_call_incr, &called);
+    tickit_watch_later(t, 0, &on_call_incr, &called);
 
     tickit_run(t);
 
-    is_int(called, 1, "tickit_later invokes callback");
+    is_int(called, 1, "tickit_watch_later invokes callback");
   }
 
   /* object destruction */
   {
-    tickit_later(t, TICKIT_BIND_DESTROY, &on_call_incr, NULL);
+    tickit_watch_later(t, TICKIT_BIND_DESTROY, &on_call_incr, NULL);
 
     unbound_count = 0;
 

@@ -664,7 +664,7 @@ static void _request_later_processing(TickitRootWindow *root)
 {
   root->needs_later_processing = true;
   if(root->tickit)
-    tickit_later(root->tickit, 0, _flush_fn, ROOT_AS_WINDOW(root));
+    tickit_watch_later(root->tickit, 0, _flush_fn, ROOT_AS_WINDOW(root));
 }
 
 static bool _cell_visible(TickitWindow *win, int line, int col)
