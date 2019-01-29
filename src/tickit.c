@@ -358,7 +358,6 @@ void evloop_run(void *data)
     if(later)
       msec = 0;
 
-    /* TODO: Determine if poll() with nfds=0 is allowed */
     pollret = poll(evdata->fds, evdata->nfds, msec);
 
     if(pollret > 0) {
