@@ -315,7 +315,7 @@ static void evloop_destroy(void *data)
     destroy_watchlist(evdata, evdata->laters);
 }
 
-void evloop_run(void *data)
+static void evloop_run(void *data)
 {
   EventLoopData *evdata = data;
 
@@ -386,14 +386,14 @@ void evloop_run(void *data)
   }
 }
 
-void evloop_stop(void *data)
+static void evloop_stop(void *data)
 {
   EventLoopData *evdata = data;
 
   evdata->still_running = 0;
 }
 
-void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+static void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   EventLoopData *evdata = data;
 
@@ -449,7 +449,7 @@ reuse_idx:
   return watch;
 }
 
-void *evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+static void *evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   EventLoopData *evdata = data;
 
@@ -477,7 +477,7 @@ void *evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, 
   return watch;
 }
 
-void *evloop_later(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+static void *evloop_later(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   EventLoopData *evdata = data;
 
@@ -502,7 +502,7 @@ void *evloop_later(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void
   return watch;
 }
 
-void evloop_cancel(void *data, void *cookie)
+static void evloop_cancel(void *data, void *cookie)
 {
   EventLoopData *evdata = data;
   Watch *watch = cookie;
