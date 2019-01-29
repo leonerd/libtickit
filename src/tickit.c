@@ -15,8 +15,8 @@ typedef struct {
   void  (*stop)(void *data);
   void *(*io_read)(void *data, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
   void *(*timer)(void *data, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
-  void  (*timer_cancel)(void *data, void *cookie);
   void *(*later)(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+  void  (*cancel)(void *data, void *cookie);
 } TickitEventHooks;
 
 static TickitEventHooks default_event_loop;
@@ -225,32 +225,38 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
 
 void tickit_watch_cancel(Tickit *t, void *cookie)
 {
-  (*t->evhooks->timer_cancel)(t->evdata, cookie);
+  (*t->evhooks->cancel)(t->evdata, cookie);
 }
 
 /*
  * Internal default event loop implementation
  */
 
-typedef struct IOWatch IOWatch;
-struct IOWatch {
-  IOWatch *next;
+typedef struct Watch Watch;
+struct Watch {
+  Watch *next;
 
-  int idx;
-  TickitBindFlags flags;
-  int fd;
-  TickitCallbackFn *fn;
-  void *user;
-};
-
-typedef struct Deferral Deferral;
-struct Deferral {
-  Deferral *next;
+  enum {
+    WATCH_NONE,
+    WATCH_IO,
+    WATCH_TIMER,
+    WATCH_LATER,
+  } type;
 
   TickitBindFlags flags;
-  struct timeval at;  /* only for timers */
   TickitCallbackFn *fn;
   void *user;
+
+  union {
+    struct {
+      int idx;
+      int fd;
+    } io;
+
+    struct {
+      struct timeval at;
+    } timer;
+  };
 };
 
 typedef struct {
@@ -258,14 +264,11 @@ typedef struct {
 
   volatile int still_running;
 
-  IOWatch *iowatches;
+  Watch *iowatches, *timers, *laters;
+
   struct pollfd *fds;
   int nfds;
   int alloc_fds;
-
-  Deferral *timers;
-
-  Deferral *laters;
 } EventLoopData;
 
 static void *evloop_init(Tickit *t)
@@ -277,9 +280,8 @@ static void *evloop_init(Tickit *t)
   evdata->t = t;
 
   evdata->iowatches = NULL;
-  evdata->timers = NULL;
-
-  evdata->laters = NULL;
+  evdata->timers    = NULL;
+  evdata->laters    = NULL;
 
   evdata->alloc_fds = 4; /* most programs probably won't use more than 1 FD anyway */
   evdata->fds = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
@@ -288,45 +290,29 @@ static void *evloop_init(Tickit *t)
   return evdata;
 }
 
+static void destroy_watchlist(EventLoopData *evdata, Watch *watches)
+{
+  Watch *this, *next;
+  for(this = watches; this; this = next) {
+    next = this->next;
+
+    if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
+      (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+    free(this);
+  }
+}
+
 static void evloop_destroy(void *data)
 {
   EventLoopData *evdata = data;
 
-  if(evdata->iowatches) {
-    IOWatch *this, *next;
-    for(this = evdata->iowatches; this; this = next) {
-      next = this->next;
-
-      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-        (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
-
-      free(this);
-    }
-  }
-
-  if(evdata->timers) {
-    Deferral *this, *next;
-    for(this = evdata->timers; this; this = next) {
-      next = this->next;
-
-      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-        (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
-
-      free(this);
-    }
-  }
-
-  if(evdata->laters) {
-    Deferral *this, *next;
-    for(this = evdata->laters; this; this = next) {
-      next = this->next;
-
-      if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-        (*this->fn)(evdata->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
-
-      free(this);
-    }
-  }
+  if(evdata->iowatches)
+    destroy_watchlist(evdata, evdata->iowatches);
+  if(evdata->timers)
+    destroy_watchlist(evdata, evdata->timers);
+  if(evdata->laters)
+    destroy_watchlist(evdata, evdata->laters);
 }
 
 void evloop_run(void *data)
@@ -341,8 +327,8 @@ void evloop_run(void *data)
       struct timeval now, delay;
       gettimeofday(&now, NULL);
 
-      /* timers->at - now ==> delay */
-      timersub(&evdata->timers->at, &now, &delay);
+      /* timers->timer.at - now ==> delay */
+      timersub(&evdata->timers->timer.at, &now, &delay);
 
       msec = (delay.tv_sec * 1000) + (delay.tv_usec / 1000);
       if(msec < 0)
@@ -352,7 +338,7 @@ void evloop_run(void *data)
     int pollret;
 
     /* detach the later queue before running any events */
-    Deferral *later = evdata->laters;
+    Watch *later = evdata->laters;
     evdata->laters = NULL;
 
     if(later)
@@ -361,8 +347,8 @@ void evloop_run(void *data)
     pollret = poll(evdata->fds, evdata->nfds, msec);
 
     if(pollret > 0) {
-      for(IOWatch *this = evdata->iowatches; this; this = this->next) {
-        if(evdata->fds[this->idx].revents & (POLLIN|POLLHUP|POLLERR))
+      for(Watch *this = evdata->iowatches; this; this = this->next) {
+        if(evdata->fds[this->io.idx].revents & (POLLIN|POLLHUP|POLLERR))
           (*this->fn)(evdata->t, TICKIT_EV_FIRE, this->user);
       }
     }
@@ -375,14 +361,14 @@ void evloop_run(void *data)
        * of it
        */
 
-      Deferral *this = evdata->timers;
+      Watch *this = evdata->timers;
       while(this) {
-        if(timercmp(&this->at, &now, >))
+        if(timercmp(&this->timer.at, &now, >))
           break;
 
         (*this->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
 
-        Deferral *next = this->next;
+        Watch *next = this->next;
         free(this);
         this = next;
       }
@@ -393,7 +379,7 @@ void evloop_run(void *data)
     while(later) {
       (*later->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
 
-      Deferral *next = later->next;
+      Watch *next = later->next;
       free(later);
       later = next;
     }
@@ -411,14 +397,14 @@ void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn
 {
   EventLoopData *evdata = data;
 
-  IOWatch *watch = malloc(sizeof(IOWatch));
+  Watch *watch = malloc(sizeof(Watch));
   if(!watch)
     return NULL;
 
   int idx;
   for(idx = 0; idx < evdata->nfds; idx++)
     if(evdata->fds[idx].fd == -1)
-      break;
+      goto reuse_idx;
 
   if(idx == evdata->nfds && evdata->nfds == evdata->alloc_fds) {
     /* Allocate and reinitialise a larger pollfd array */
@@ -426,9 +412,9 @@ void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn
     if(!new)
       return NULL;
 
-    for(IOWatch *this = evdata->iowatches; this; this = this->next) {
-      new[this->idx].fd = this->fd;
-      new[this->idx].events = POLLIN;
+    for(Watch *this = evdata->iowatches; this; this = this->next) {
+      new[this->io.idx].fd = this->io.fd;
+      new[this->io.idx].events = POLLIN;
     }
 
     evdata->alloc_fds *= 2;
@@ -439,18 +425,21 @@ void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCallbackFn
   idx = evdata->nfds;
   evdata->nfds++;
 
+reuse_idx:
   evdata->fds[idx].fd = fd;
   evdata->fds[idx].events = POLLIN;
 
   watch->next = NULL;
+  watch->type = WATCH_IO;
 
-  watch->idx = idx;
-  watch->fd = fd;
   watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_UNBIND);
   watch->fn = fn;
   watch->user = user;
 
-  IOWatch **prevp = &evdata->iowatches;
+  watch->io.idx = idx;
+  watch->io.fd = fd;
+
+  Watch **prevp = &evdata->iowatches;
   while(*prevp)
     prevp = &(*prevp)->next;
 
@@ -464,40 +453,87 @@ void *evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, 
 {
   EventLoopData *evdata = data;
 
-  Deferral *tim = malloc(sizeof(Deferral));
-  if(!tim)
+  Watch *watch = malloc(sizeof(Watch));
+  if(!watch)
     return NULL;
 
-  tim->next = NULL;
+  watch->next = NULL;
+  watch->type = WATCH_TIMER;
 
-  tim->at = *at;
-  tim->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
-  tim->fn = fn;
-  tim->user = user;
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
+  watch->fn = fn;
+  watch->user = user;
 
-  Deferral **prevp = &evdata->timers;
+  watch->timer.at = *at;
+
+  Watch **prevp = &evdata->timers;
   /* Try to insert in-order at matching timestamp */
-  while(*prevp && !timercmp(&(*prevp)->at, at, >))
+  while(*prevp && !timercmp(&(*prevp)->timer.at, at, >))
     prevp = &(*prevp)->next;
 
-  tim->next = *prevp;
-  *prevp = tim;
+  watch->next = *prevp;
+  *prevp = watch;
 
-  return tim;
+  return watch;
 }
 
-void evloop_timer_cancel(void *data, void *cookie)
+void *evloop_later(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   EventLoopData *evdata = data;
 
-  Deferral **prevp = &evdata->timers;
+  Watch *watch = malloc(sizeof(Watch));
+  if(!watch)
+    return NULL;
+
+  watch->next = NULL;
+  watch->type = WATCH_LATER;
+
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
+  watch->fn = fn;
+  watch->user = user;
+
+  Watch **prevp = &evdata->laters;
+  while(*prevp)
+    prevp = &(*prevp)->next;
+
+  watch->next = *prevp;
+  *prevp = watch;
+
+  return watch;
+}
+
+void evloop_cancel(void *data, void *cookie)
+{
+  EventLoopData *evdata = data;
+  Watch *watch = cookie;
+
+  Watch **prevp;
+  switch(watch->type) {
+    case WATCH_IO:
+      prevp = &evdata->timers;
+      break;
+    case WATCH_TIMER:
+      prevp = &evdata->timers;
+      break;
+    case WATCH_LATER:
+      prevp = &evdata->laters;
+      break;
+
+    default:
+      return;
+  }
+
   while(*prevp) {
-    Deferral *this = *prevp;
+    Watch *this = *prevp;
     if(this == cookie) {
       *prevp = this->next;
 
       if(this->flags & TICKIT_BIND_UNBIND)
         (*this->fn)(evdata->t, TICKIT_EV_UNBIND, this->user);
+
+      if(this->type == WATCH_IO) {
+        evdata->fds[this->io.idx].fd = -1;
+      }
 
       free(this);
     }
@@ -506,37 +542,13 @@ void evloop_timer_cancel(void *data, void *cookie)
   }
 }
 
-void *evloop_later(void *data, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
-{
-  EventLoopData *evdata = data;
-
-  Deferral *later = malloc(sizeof(Deferral));
-  if(!later)
-    return NULL;
-
-  later->next = NULL;
-
-  later->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
-  later->fn = fn;
-  later->user = user;
-
-  Deferral **prevp = &evdata->laters;
-  while(*prevp)
-    prevp = &(*prevp)->next;
-
-  later->next = *prevp;
-  *prevp = later;
-
-  return later;
-}
-
 static TickitEventHooks default_event_loop = {
-  .init          = evloop_init,
-  .destroy       = evloop_destroy,
-  .run           = evloop_run,
-  .stop          = evloop_stop,
-  .io_read       = evloop_io_read,
-  .timer         = evloop_timer,
-  .timer_cancel  = evloop_timer_cancel,
-  .later         = evloop_later,
+  .init    = evloop_init,
+  .destroy = evloop_destroy,
+  .run     = evloop_run,
+  .stop    = evloop_stop,
+  .io_read = evloop_io_read,
+  .timer   = evloop_timer,
+  .later   = evloop_later,
+  .cancel  = evloop_cancel,
 };
