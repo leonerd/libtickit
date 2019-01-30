@@ -1,14 +1,13 @@
 #include "tickit.h"
+#include "tickit-evloop.h"
 
 #include <errno.h>
-#include <poll.h>
 #include <signal.h>
 #include <sys/time.h>
 
 /* INTERNAL */
 TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term);
 
-typedef struct Watch Watch;
 struct Watch {
   Watch *next;
 
@@ -35,21 +34,7 @@ struct Watch {
   };
 };
 
-typedef struct {
-  void *(*init)(Tickit *t);
-  void  (*destroy)(void *data);
-  void  (*run)(void *data);
-  void  (*stop)(void *data);
-  bool  (*io_read)(void *data, int fd, TickitBindFlags flags, Watch *watch);
-  void  (*cancel_io)(void *data, Watch *watch);
-  /* Below here is optional */
-  bool  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, Watch *watch);
-  void  (*cancel_timer)(void *data, Watch *watch);
-  bool  (*later)(void *data, TickitBindFlags flags, Watch *watch);
-  void  (*cancel_later)(void *data, Watch *watch);
-  } TickitEventHooks;
-
-static TickitEventHooks default_event_loop;
+extern TickitEventHooks tickit_evloop_default;
 
 struct Tickit {
   int refcount;
@@ -89,11 +74,6 @@ static void setterm(Tickit *t, TickitTerm *tt)
   tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
 }
 
-static void invoke_watch(Tickit *t, Watch *watch, TickitEventFlags flags)
-{
-  (*watch->fn)(t, flags, watch->user);
-}
-
 Tickit *tickit_new_for_term(TickitTerm *tt)
 {
   Tickit *t = malloc(sizeof(Tickit));
@@ -105,7 +85,7 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
   t->term = NULL;
   t->rootwin = NULL;
 
-  t->evhooks = &default_event_loop;
+  t->evhooks = &tickit_evloop_default;
   t->evdata  = (*t->evhooks->init)(t);
   if(!t->evdata)
     goto abort;
@@ -136,7 +116,7 @@ static void destroy_watchlist(Tickit *t, Watch *watches)
     next = this->next;
 
     if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-      invoke_watch(t, this, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY);
+      tickit_evloop_invoke_watch(t, this, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY);
 
     free(this);
   }
@@ -417,7 +397,7 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
   }
 }
 
-static int next_timer_msec(Tickit *t)
+int tickit_evloop_next_timer_msec(Tickit *t)
 {
   if(t->laters)
     return 0;
@@ -438,7 +418,7 @@ static int next_timer_msec(Tickit *t)
   return msec;
 }
 
-static void invoke_timers(Tickit *t)
+void tickit_evloop_invoke_timers(Tickit *t)
 {
   /* detach the later queue before running any events */
   Watch *later = t->laters;
@@ -457,7 +437,7 @@ static void invoke_timers(Tickit *t)
       if(timercmp(&this->timer.at, &now, >))
         break;
 
-      invoke_watch(t, this, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
+      tickit_evloop_invoke_watch(t, this, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
 
       Watch *next = this->next;
       free(this);
@@ -468,7 +448,7 @@ static void invoke_timers(Tickit *t)
   }
 
   while(later) {
-    invoke_watch(t, later, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
+    tickit_evloop_invoke_watch(t, later, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
 
     Watch *next = later->next;
     free(later);
@@ -476,134 +456,17 @@ static void invoke_timers(Tickit *t)
   }
 }
 
-/*
- * Internal default event loop implementation
- */
-
-typedef struct {
-  Tickit *t;
-
-  volatile int still_running;
-
-  int alloc_fds;
-  int nfds;
-  struct pollfd *pollfds;
-  Watch **pollwatches;
-} EventLoopData;
-
-static void *evloop_init(Tickit *t)
+void *tickit_evloop_get_watch_data(Tickit *t, Watch *watch)
 {
-  EventLoopData *evdata = malloc(sizeof(*evdata));
-  if(!evdata)
-    return NULL;
-
-  evdata->t = t;
-
-  evdata->alloc_fds = 4; /* most programs probably won't use more than 1 FD anyway */
-  evdata->nfds = 0;
-
-  evdata->pollfds     = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
-  evdata->pollwatches = malloc(sizeof(Watch *) * evdata->alloc_fds);
-
-  return evdata;
+  return watch->evdata;
 }
 
-static void evloop_destroy(void *data)
+void tickit_evloop_set_watch_data(Tickit *t, Watch *watch, void *data)
 {
-  EventLoopData *evdata = data;
-
-  if(evdata->pollfds)
-    free(evdata->pollfds);
-  if(evdata->pollwatches)
-    free(evdata->pollwatches);
+  watch->evdata = data;
 }
 
-static void evloop_run(void *data)
+void tickit_evloop_invoke_watch(Tickit *t, Watch *watch, TickitEventFlags flags)
 {
-  EventLoopData *evdata = data;
-
-  evdata->still_running = 1;
-
-  while(evdata->still_running) {
-    int msec = next_timer_msec(evdata->t);
-
-    int pollret = poll(evdata->pollfds, evdata->nfds, msec);
-
-    invoke_timers(evdata->t);
-
-    if(pollret > 0) {
-      for(int idx = 0; idx < evdata->nfds; idx++) {
-        if(evdata->pollfds[idx].fd == -1)
-          continue;
-
-        if(evdata->pollfds[idx].revents & (POLLIN|POLLHUP|POLLERR))
-          invoke_watch(evdata->t, evdata->pollwatches[idx], TICKIT_EV_FIRE);
-      }
-    }
-  }
+  (*watch->fn)(t, flags, watch->user);
 }
-
-static void evloop_stop(void *data)
-{
-  EventLoopData *evdata = data;
-
-  evdata->still_running = 0;
-}
-
-static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, Watch *watch)
-{
-  EventLoopData *evdata = data;
-
-  int idx;
-  for(idx = 0; idx < evdata->nfds; idx++)
-    if(evdata->pollfds[idx].fd == -1)
-      goto reuse_idx;
-
-  if(idx == evdata->nfds && evdata->nfds == evdata->alloc_fds) {
-    /* Grow the pollfd array */
-    struct pollfd *newpollfds = realloc(evdata->pollfds,
-        sizeof(struct pollfd) * evdata->alloc_fds * 2);
-    if(!newpollfds)
-      return false;
-    Watch **newpollwatches = realloc(evdata->pollwatches,
-        sizeof(Watch *) * evdata->alloc_fds * 2);
-    if(!newpollwatches)
-      return false;
-
-    evdata->alloc_fds *= 2;
-    evdata->pollfds     = newpollfds;
-    evdata->pollwatches = newpollwatches;
-  }
-
-  idx = evdata->nfds;
-  evdata->nfds++;
-
-reuse_idx:
-  evdata->pollfds[idx].fd = fd;
-  evdata->pollfds[idx].events = POLLIN;
-
-  evdata->pollwatches[idx] = watch;
-
-  watch->evdata = (void *)(intptr_t)idx;
-
-  return true;
-}
-
-static void evloop_cancel_io(void *data, Watch *watch)
-{
-  EventLoopData *evdata = data;
-
-  int idx = (intptr_t)(watch->evdata);
-
-  evdata->pollfds[idx].fd = -1;
-  evdata->pollwatches[idx] = NULL;
-}
-
-static TickitEventHooks default_event_loop = {
-  .init      = evloop_init,
-  .destroy   = evloop_destroy,
-  .run       = evloop_run,
-  .stop      = evloop_stop,
-  .io_read   = evloop_io_read,
-  .cancel_io = evloop_cancel_io,
-};
