@@ -353,9 +353,9 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
   return watch;
 }
 
-void tickit_watch_cancel(Tickit *t, void *cookie)
+void tickit_watch_cancel(Tickit *t, void *_watch)
 {
-  Watch *watch = cookie;
+  Watch *watch = _watch;
 
   Watch **prevp;
   switch(watch->type) {
@@ -375,7 +375,7 @@ void tickit_watch_cancel(Tickit *t, void *cookie)
 
   while(*prevp) {
     Watch *this = *prevp;
-    if(this == cookie) {
+    if(this == watch) {
       *prevp = this->next;
 
       if(this->flags & TICKIT_BIND_UNBIND)

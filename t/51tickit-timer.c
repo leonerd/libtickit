@@ -70,10 +70,10 @@ int main(int argc, char *argv[])
     int called = 0;
     tickit_watch_timer_after_msec(t, 10, 0, &on_call_incr, &called);
     int not_called = 0;
-    void *cookie = tickit_watch_timer_after_msec(t, 5, TICKIT_BIND_UNBIND, &on_call_incr, &not_called);
+    void *watch = tickit_watch_timer_after_msec(t, 5, TICKIT_BIND_UNBIND, &on_call_incr, &not_called);
 
     unbound_count = 0;
-    tickit_watch_cancel(t, cookie);
+    tickit_watch_cancel(t, watch);
     is_int(unbound_count, 1, "unbound_count after tickit_watch_cancel");
 
     tickit_run(t);
