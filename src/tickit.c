@@ -271,6 +271,65 @@ typedef struct {
   int alloc_fds;
 } EventLoopData;
 
+static int next_timer_msec(EventLoopData *evdata)
+{
+  if(evdata->laters)
+    return 0;
+
+  if(!evdata->timers)
+    return -1;
+
+  struct timeval now, delay;
+  gettimeofday(&now, NULL);
+
+  /* timers->timer.at - now ==> delay */
+  timersub(&evdata->timers->timer.at, &now, &delay);
+
+  int msec = (delay.tv_sec * 1000) + (delay.tv_usec / 1000);
+  if(msec < 0)
+    msec = 0;
+
+  return msec;
+}
+
+static void invoke_timers(EventLoopData *evdata)
+{
+  /* detach the later queue before running any events */
+  Watch *later = evdata->laters;
+  evdata->laters = NULL;
+
+  if(evdata->timers) {
+    struct timeval now;
+    gettimeofday(&now, NULL);
+
+    /* timer queue is stored ordered, so we can just eat a prefix
+     * of it
+     */
+
+    Watch *this = evdata->timers;
+    while(this) {
+      if(timercmp(&this->timer.at, &now, >))
+        break;
+
+      (*this->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
+
+      Watch *next = this->next;
+      free(this);
+      this = next;
+    }
+
+    evdata->timers = this;
+  }
+
+  while(later) {
+    (*later->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
+
+    Watch *next = later->next;
+    free(later);
+    later = next;
+  }
+}
+
 static void *evloop_init(Tickit *t)
 {
   EventLoopData *evdata = malloc(sizeof(*evdata));
@@ -322,66 +381,17 @@ static void evloop_run(void *data)
   evdata->still_running = 1;
 
   while(evdata->still_running) {
-    int msec = -1;
-    if(evdata->timers) {
-      struct timeval now, delay;
-      gettimeofday(&now, NULL);
+    int msec = next_timer_msec(evdata);
 
-      /* timers->timer.at - now ==> delay */
-      timersub(&evdata->timers->timer.at, &now, &delay);
+    int pollret = poll(evdata->fds, evdata->nfds, msec);
 
-      msec = (delay.tv_sec * 1000) + (delay.tv_usec / 1000);
-      if(msec < 0)
-        msec = 0;
-    }
-
-    int pollret;
-
-    /* detach the later queue before running any events */
-    Watch *later = evdata->laters;
-    evdata->laters = NULL;
-
-    if(later)
-      msec = 0;
-
-    pollret = poll(evdata->fds, evdata->nfds, msec);
+    invoke_timers(evdata);
 
     if(pollret > 0) {
       for(Watch *this = evdata->iowatches; this; this = this->next) {
         if(evdata->fds[this->io.idx].revents & (POLLIN|POLLHUP|POLLERR))
           (*this->fn)(evdata->t, TICKIT_EV_FIRE, this->user);
       }
-    }
-
-    if(evdata->timers) {
-      struct timeval now;
-      gettimeofday(&now, NULL);
-
-      /* timer queue is stored ordered, so we can just eat a prefix
-       * of it
-       */
-
-      Watch *this = evdata->timers;
-      while(this) {
-        if(timercmp(&this->timer.at, &now, >))
-          break;
-
-        (*this->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
-
-        Watch *next = this->next;
-        free(this);
-        this = next;
-      }
-
-      evdata->timers = this;
-    }
-
-    while(later) {
-      (*later->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
-
-      Watch *next = later->next;
-      free(later);
-      later = next;
     }
   }
 }
