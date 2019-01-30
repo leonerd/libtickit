@@ -40,12 +40,12 @@ typedef struct {
   void  (*destroy)(void *data);
   void  (*run)(void *data);
   void  (*stop)(void *data);
-  void  (*io_read)(void *data, int fd, TickitBindFlags flags, Watch *watch);
+  bool  (*io_read)(void *data, int fd, TickitBindFlags flags, Watch *watch);
   void  (*cancel_io)(void *data, Watch *watch);
   /* Below here is optional */
-  void  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, Watch *watch);
+  bool  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, Watch *watch);
   void  (*cancel_timer)(void *data, Watch *watch);
-  void  (*later)(void *data, TickitBindFlags flags, Watch *watch);
+  bool  (*later)(void *data, TickitBindFlags flags, Watch *watch);
   void  (*cancel_later)(void *data, Watch *watch);
   } TickitEventHooks;
 
@@ -263,8 +263,8 @@ void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallb
 
   watch->io.fd = fd;
 
-  /*TODO errcheck */
-  (*t->evhooks->io_read)(t->evdata, fd, flags, watch);
+  if(!(*t->evhooks->io_read)(t->evdata, fd, flags, watch))
+    goto fail;
 
   Watch **prevp = &t->iowatches;
   while(*prevp)
@@ -274,6 +274,10 @@ void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallb
   *prevp = watch;
 
   return watch;
+
+fail:
+  free(watch);
+  return NULL;
 }
 
 /* static for now until we decide how to expose it */
@@ -293,8 +297,8 @@ static void *tickit_watch_timer_at(Tickit *t, const struct timeval *at, TickitBi
   watch->timer.at = *at;
 
   if(t->evhooks->timer)
-    /* TODO: errcheck */
-    (*t->evhooks->timer)(t->evdata, at, flags, watch);
+    if(!(*t->evhooks->timer)(t->evdata, at, flags, watch))
+      goto fail;
 
   Watch **prevp = &t->timers;
   /* Try to insert in-order at matching timestamp */
@@ -305,6 +309,10 @@ static void *tickit_watch_timer_at(Tickit *t, const struct timeval *at, TickitBi
   *prevp = watch;
 
   return watch;
+
+fail:
+  free(watch);
+  return NULL;
 }
 
 void *tickit_watch_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
@@ -340,8 +348,8 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
   watch->user = user;
 
   if(t->evhooks->later)
-    /* TODO: errcheck */
-    (*t->evhooks->later)(t->evdata, flags, watch);
+    if(!(*t->evhooks->later)(t->evdata, flags, watch))
+      goto fail;
 
   Watch **prevp = &t->laters;
   while(*prevp)
@@ -351,6 +359,10 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
   *prevp = watch;
 
   return watch;
+
+fail:
+  free(watch);
+  return NULL;
 }
 
 void tickit_watch_cancel(Tickit *t, void *_watch)
@@ -538,7 +550,7 @@ static void evloop_stop(void *data)
   evdata->still_running = 0;
 }
 
-static void evloop_io_read(void *data, int fd, TickitBindFlags flags, Watch *watch)
+static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, Watch *watch)
 {
   EventLoopData *evdata = data;
 
@@ -552,11 +564,11 @@ static void evloop_io_read(void *data, int fd, TickitBindFlags flags, Watch *wat
     struct pollfd *newpollfds = realloc(evdata->pollfds,
         sizeof(struct pollfd) * evdata->alloc_fds * 2);
     if(!newpollfds)
-      return;
+      return false;
     Watch **newpollwatches = realloc(evdata->pollwatches,
         sizeof(Watch *) * evdata->alloc_fds * 2);
     if(!newpollwatches)
-      return;
+      return false;
 
     evdata->alloc_fds *= 2;
     evdata->pollfds     = newpollfds;
@@ -573,6 +585,8 @@ reuse_idx:
   evdata->pollwatches[idx] = watch;
 
   watch->evdata = (void *)(intptr_t)idx;
+
+  return true;
 }
 
 static void evloop_cancel_io(void *data, Watch *watch)
