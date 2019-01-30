@@ -266,9 +266,10 @@ typedef struct {
 
   Watch *iowatches, *timers, *laters;
 
-  struct pollfd *fds;
-  int nfds;
   int alloc_fds;
+  int nfds;
+  struct pollfd *pollfds;
+  Watch **pollwatches;
 } EventLoopData;
 
 static int next_timer_msec(EventLoopData *evdata)
@@ -292,6 +293,11 @@ static int next_timer_msec(EventLoopData *evdata)
   return msec;
 }
 
+static void invoke_watch(EventLoopData *evdata, Watch *watch, TickitEventFlags flags)
+{
+  (*watch->fn)(evdata->t, flags, watch->user);
+}
+
 static void invoke_timers(EventLoopData *evdata)
 {
   /* detach the later queue before running any events */
@@ -311,7 +317,7 @@ static void invoke_timers(EventLoopData *evdata)
       if(timercmp(&this->timer.at, &now, >))
         break;
 
-      (*this->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
+      invoke_watch(evdata, this, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
 
       Watch *next = this->next;
       free(this);
@@ -322,7 +328,7 @@ static void invoke_timers(EventLoopData *evdata)
   }
 
   while(later) {
-    (*later->fn)(evdata->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
+    invoke_watch(evdata, later, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
 
     Watch *next = later->next;
     free(later);
@@ -343,8 +349,10 @@ static void *evloop_init(Tickit *t)
   evdata->laters    = NULL;
 
   evdata->alloc_fds = 4; /* most programs probably won't use more than 1 FD anyway */
-  evdata->fds = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
   evdata->nfds = 0;
+
+  evdata->pollfds     = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
+  evdata->pollwatches = malloc(sizeof(Watch *) * evdata->alloc_fds);
 
   return evdata;
 }
@@ -372,6 +380,11 @@ static void evloop_destroy(void *data)
     destroy_watchlist(evdata, evdata->timers);
   if(evdata->laters)
     destroy_watchlist(evdata, evdata->laters);
+
+  if(evdata->pollfds)
+    free(evdata->pollfds);
+  if(evdata->pollwatches)
+    free(evdata->pollwatches);
 }
 
 static void evloop_run(void *data)
@@ -383,14 +396,17 @@ static void evloop_run(void *data)
   while(evdata->still_running) {
     int msec = next_timer_msec(evdata);
 
-    int pollret = poll(evdata->fds, evdata->nfds, msec);
+    int pollret = poll(evdata->pollfds, evdata->nfds, msec);
 
     invoke_timers(evdata);
 
     if(pollret > 0) {
-      for(Watch *this = evdata->iowatches; this; this = this->next) {
-        if(evdata->fds[this->io.idx].revents & (POLLIN|POLLHUP|POLLERR))
-          (*this->fn)(evdata->t, TICKIT_EV_FIRE, this->user);
+      for(int idx = 0; idx < evdata->nfds; idx++) {
+        if(evdata->pollfds[idx].fd == -1)
+          continue;
+
+        if(evdata->pollfds[idx].revents & (POLLIN|POLLHUP|POLLERR))
+          invoke_watch(evdata, evdata->pollwatches[idx], TICKIT_EV_FIRE);
       }
     }
   }
@@ -413,25 +429,33 @@ static void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCal
 
   int idx;
   for(idx = 0; idx < evdata->nfds; idx++)
-    if(evdata->fds[idx].fd == -1)
+    if(evdata->pollfds[idx].fd == -1)
       goto reuse_idx;
 
   if(idx == evdata->nfds && evdata->nfds == evdata->alloc_fds) {
     /* Grow the pollfd array */
-    struct pollfd *new = realloc(evdata->fds, sizeof(struct pollfd) * evdata->alloc_fds * 2);
-    if(!new)
+    struct pollfd *newpollfds = realloc(evdata->pollfds,
+        sizeof(struct pollfd) * evdata->alloc_fds * 2);
+    if(!newpollfds)
+      return NULL;
+    Watch **newpollwatches = realloc(evdata->pollwatches,
+        sizeof(Watch *) * evdata->alloc_fds * 2);
+    if(!newpollwatches)
       return NULL;
 
     evdata->alloc_fds *= 2;
-    evdata->fds = new;
+    evdata->pollfds     = newpollfds;
+    evdata->pollwatches = newpollwatches;
   }
 
   idx = evdata->nfds;
   evdata->nfds++;
 
 reuse_idx:
-  evdata->fds[idx].fd = fd;
-  evdata->fds[idx].events = POLLIN;
+  evdata->pollfds[idx].fd = fd;
+  evdata->pollfds[idx].events = POLLIN;
+
+  evdata->pollwatches[idx] = watch;
 
   watch->next = NULL;
   watch->type = WATCH_IO;
@@ -536,7 +560,8 @@ static void evloop_cancel(void *data, void *cookie)
         (*this->fn)(evdata->t, TICKIT_EV_UNBIND, this->user);
 
       if(this->type == WATCH_IO) {
-        evdata->fds[this->io.idx].fd = -1;
+        evdata->pollfds[this->io.idx].fd = -1;
+        evdata->pollwatches[this->io.idx] = NULL;
       }
 
       free(this);
