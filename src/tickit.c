@@ -417,18 +417,12 @@ static void *evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitCal
       goto reuse_idx;
 
   if(idx == evdata->nfds && evdata->nfds == evdata->alloc_fds) {
-    /* Allocate and reinitialise a larger pollfd array */
-    struct pollfd *new = malloc(sizeof(struct pollfd) * evdata->alloc_fds * 2);
+    /* Grow the pollfd array */
+    struct pollfd *new = realloc(evdata->fds, sizeof(struct pollfd) * evdata->alloc_fds * 2);
     if(!new)
       return NULL;
 
-    for(Watch *this = evdata->iowatches; this; this = this->next) {
-      new[this->io.idx].fd = this->io.fd;
-      new[this->io.idx].events = POLLIN;
-    }
-
     evdata->alloc_fds *= 2;
-    free(evdata->fds);
     evdata->fds = new;
   }
 
