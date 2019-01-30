@@ -42,6 +42,7 @@ typedef struct {
   void  (*stop)(void *data);
   void  (*io_read)(void *data, int fd, TickitBindFlags flags, Watch *watch);
   void  (*cancel_io)(void *data, Watch *watch);
+  /* Below here is optional */
   void  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, Watch *watch);
   void  (*cancel_timer)(void *data, Watch *watch);
   void  (*later)(void *data, TickitBindFlags flags, Watch *watch);
@@ -291,8 +292,9 @@ static void *tickit_watch_timer_at(Tickit *t, const struct timeval *at, TickitBi
 
   watch->timer.at = *at;
 
-  /* TODO: errcheck */
-  (*t->evhooks->timer)(t->evdata, at, flags, watch);
+  if(t->evhooks->timer)
+    /* TODO: errcheck */
+    (*t->evhooks->timer)(t->evdata, at, flags, watch);
 
   Watch **prevp = &t->timers;
   /* Try to insert in-order at matching timestamp */
@@ -337,8 +339,9 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
   watch->fn = fn;
   watch->user = user;
 
-  /* TODO: errcheck */
-  (*t->evhooks->later)(t->evdata, flags, watch);
+  if(t->evhooks->later)
+    /* TODO: errcheck */
+    (*t->evhooks->later)(t->evdata, flags, watch);
 
   Watch **prevp = &t->laters;
   while(*prevp)
@@ -582,16 +585,6 @@ static void evloop_cancel_io(void *data, Watch *watch)
   evdata->pollwatches[idx] = NULL;
 }
 
-static void evloop_timer(void *data, const struct timeval *at, TickitBindFlags flags, Watch *watch)
-{
-  // nothing to do
-}
-
-static void evloop_later(void *data, TickitBindFlags flags, Watch *watch)
-{
-  // nothing to do
-}
-
 static TickitEventHooks default_event_loop = {
   .init      = evloop_init,
   .destroy   = evloop_destroy,
@@ -599,6 +592,4 @@ static TickitEventHooks default_event_loop = {
   .stop      = evloop_stop,
   .io_read   = evloop_io_read,
   .cancel_io = evloop_cancel_io,
-  .timer     = evloop_timer,
-  .later     = evloop_later,
 };
