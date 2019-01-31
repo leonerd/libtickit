@@ -40,6 +40,8 @@ void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data);
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags);
 
+Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks);
+
 #endif
 
 #ifdef __cplusplus

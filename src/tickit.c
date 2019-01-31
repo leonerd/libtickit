@@ -80,7 +80,7 @@ static void setterm(Tickit *t, TickitTerm *tt)
   tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
 }
 
-Tickit *tickit_new_for_term(TickitTerm *tt)
+Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks)
 {
   Tickit *t = malloc(sizeof(Tickit));
   if(!t)
@@ -91,7 +91,7 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
   t->term = NULL;
   t->rootwin = NULL;
 
-  t->evhooks = &tickit_evloop_default;
+  t->evhooks = evhooks;
   t->evdata  = (*t->evhooks->init)(t);
   if(!t->evdata)
     goto abort;
@@ -108,6 +108,11 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
 abort:
   free(t);
   return NULL;
+}
+
+Tickit *tickit_new_for_term(TickitTerm *tt)
+{
+  return tickit_new_with_evloop(tt, &tickit_evloop_default);
 }
 
 Tickit *tickit_new_stdio(void)
