@@ -493,4 +493,32 @@ void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data)
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
 {
   (*watch->fn)(watch->t, flags, watch->user);
+
+  /* Remove oneshot watches from the list */
+  TickitWatch **prevp;
+  switch(watch->type) {
+    case WATCH_NONE:
+    case WATCH_IO:
+      return;
+
+    case WATCH_TIMER:
+      prevp = &watch->t->timers;
+      break;
+
+    case WATCH_LATER:
+      prevp = &watch->t->laters;
+      break;
+  }
+
+  while(*prevp) {
+    if(*prevp == watch) {
+      *prevp = watch->next;
+      watch->next = NULL;
+      watch->type = WATCH_NONE;
+      free(watch);
+      return;
+    }
+
+    prevp = &(*prevp)->next;
+  }
 }
