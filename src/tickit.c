@@ -120,7 +120,7 @@ Tickit *tickit_new_stdio(void)
   return tickit_new_for_term(NULL);
 }
 
-static void destroy_watchlist(Tickit *t, TickitWatch *watches)
+static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc)(void *data, TickitWatch *watch))
 {
   TickitWatch *this, *next;
   for(this = watches; this; this = next) {
@@ -128,6 +128,9 @@ static void destroy_watchlist(Tickit *t, TickitWatch *watches)
 
     if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
       (*this->fn)(this->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+
+    if(cancelfunc)
+      (*cancelfunc)(t->evdata, this);
 
     free(this);
   }
@@ -143,11 +146,11 @@ static void tickit_destroy(Tickit *t)
   (*t->evhooks->destroy)(t->evdata);
 
   if(t->iowatches)
-    destroy_watchlist(t, t->iowatches);
+    destroy_watchlist(t, t->iowatches, t->evhooks->cancel_io);
   if(t->timers)
-    destroy_watchlist(t, t->timers);
+    destroy_watchlist(t, t->timers, t->evhooks->cancel_timer);
   if(t->laters)
-    destroy_watchlist(t, t->laters);
+    destroy_watchlist(t, t->laters, t->evhooks->cancel_later);
 
   free(t);
 }
