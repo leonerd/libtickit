@@ -127,7 +127,7 @@ static void destroy_watchlist(Tickit *t, TickitWatch *watches)
     next = this->next;
 
     if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-      tickit_evloop_invoke_watch(this, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY);
+      (*this->fn)(this->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
 
     free(this);
   }
@@ -451,7 +451,7 @@ void tickit_evloop_invoke_timers(Tickit *t)
       if(timercmp(&this->timer.at, &now, >))
         break;
 
-      tickit_evloop_invoke_watch(this, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
+      (*this->fn)(this->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
 
       TickitWatch *next = this->next;
       free(this);
@@ -462,7 +462,7 @@ void tickit_evloop_invoke_timers(Tickit *t)
   }
 
   while(later) {
-    tickit_evloop_invoke_watch(later, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
+    (*later->fn)(later->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
 
     TickitWatch *next = later->next;
     free(later);
