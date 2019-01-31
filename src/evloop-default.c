@@ -11,7 +11,7 @@ typedef struct {
   int alloc_fds;
   int nfds;
   struct pollfd *pollfds;
-  Watch **pollwatches;
+  TickitWatch **pollwatches;
 } EventLoopData;
 
 static void *evloop_init(Tickit *t)
@@ -26,7 +26,7 @@ static void *evloop_init(Tickit *t)
   evdata->nfds = 0;
 
   evdata->pollfds     = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
-  evdata->pollwatches = malloc(sizeof(Watch *) * evdata->alloc_fds);
+  evdata->pollwatches = malloc(sizeof(TickitWatch *) * evdata->alloc_fds);
 
   return evdata;
 }
@@ -73,7 +73,7 @@ static void evloop_stop(void *data)
   evdata->still_running = 0;
 }
 
-static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, Watch *watch)
+static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
 
@@ -88,8 +88,8 @@ static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, Watch *wat
         sizeof(struct pollfd) * evdata->alloc_fds * 2);
     if(!newpollfds)
       return false;
-    Watch **newpollwatches = realloc(evdata->pollwatches,
-        sizeof(Watch *) * evdata->alloc_fds * 2);
+    TickitWatch **newpollwatches = realloc(evdata->pollwatches,
+        sizeof(TickitWatch *) * evdata->alloc_fds * 2);
     if(!newpollwatches)
       return false;
 
@@ -112,7 +112,7 @@ reuse_idx:
   return true;
 }
 
-static void evloop_cancel_io(void *data, Watch *watch)
+static void evloop_cancel_io(void *data, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
 

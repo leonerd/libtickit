@@ -11,20 +11,20 @@ extern "C" {
  * guarantees at this time.
  */
 
-typedef struct Watch Watch; /* opaque */
+typedef struct TickitWatch TickitWatch; /* opaque */
 
 typedef struct {
   void *(*init)(Tickit *t);
   void  (*destroy)(void *data);
   void  (*run)(void *data);
   void  (*stop)(void *data);
-  bool  (*io_read)(void *data, int fd, TickitBindFlags flags, Watch *watch);
-  void  (*cancel_io)(void *data, Watch *watch);
+  bool  (*io_read)(void *data, int fd, TickitBindFlags flags, TickitWatch *watch);
+  void  (*cancel_io)(void *data, TickitWatch *watch);
   /* Below here is optional */
-  bool  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, Watch *watch);
-  void  (*cancel_timer)(void *data, Watch *watch);
-  bool  (*later)(void *data, TickitBindFlags flags, Watch *watch);
-  void  (*cancel_later)(void *data, Watch *watch);
+  bool  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, TickitWatch *watch);
+  void  (*cancel_timer)(void *data, TickitWatch *watch);
+  bool  (*later)(void *data, TickitBindFlags flags, TickitWatch *watch);
+  void  (*cancel_later)(void *data, TickitWatch *watch);
 } TickitEventHooks;
 
 /* Helper functions for eventloop implementations */
@@ -32,10 +32,10 @@ typedef struct {
 int tickit_evloop_next_timer_msec(Tickit *t);
 void tickit_evloop_invoke_timers(Tickit *t);
 
-void *tickit_evloop_get_watch_data(Watch *watch);
-void  tickit_evloop_set_watch_data(Watch *watch, void *data);
+void *tickit_evloop_get_watch_data(TickitWatch *watch);
+void  tickit_evloop_set_watch_data(TickitWatch *watch, void *data);
 
-void tickit_evloop_invoke_watch(Watch *watch, TickitEventFlags flags);
+void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags);
 
 #endif
 
