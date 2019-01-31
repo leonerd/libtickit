@@ -107,7 +107,7 @@ reuse_idx:
 
   evdata->pollwatches[idx] = watch;
 
-  tickit_evloop_set_watch_data(watch, (void*)(intptr_t)idx);
+  tickit_evloop_set_watch_data_int(watch, idx);
 
   return true;
 }
@@ -116,7 +116,7 @@ static void evloop_cancel_io(void *data, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
 
-  int idx = (intptr_t)tickit_evloop_get_watch_data(watch);
+  int idx = tickit_evloop_get_watch_data_int(watch);
 
   evdata->pollfds[idx].fd = -1;
   evdata->pollwatches[idx] = NULL;

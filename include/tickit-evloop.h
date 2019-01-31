@@ -35,6 +35,9 @@ void tickit_evloop_invoke_timers(Tickit *t);
 void *tickit_evloop_get_watch_data(TickitWatch *watch);
 void  tickit_evloop_set_watch_data(TickitWatch *watch, void *data);
 
+int  tickit_evloop_get_watch_data_int(TickitWatch *watch);
+void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data);
+
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags);
 
 #endif

@@ -23,7 +23,11 @@ struct TickitWatch {
   TickitBindFlags flags;
   TickitCallbackFn *fn;
   void *user;
-  void *evdata;
+
+  union {
+    void *ptr;
+    int   i;
+  } evdata;
 
   union {
     struct {
@@ -463,12 +467,22 @@ void tickit_evloop_invoke_timers(Tickit *t)
 
 void *tickit_evloop_get_watch_data(TickitWatch *watch)
 {
-  return watch->evdata;
+  return watch->evdata.ptr;
 }
 
 void tickit_evloop_set_watch_data(TickitWatch *watch, void *data)
 {
-  watch->evdata = data;
+  watch->evdata.ptr = data;
+}
+
+int  tickit_evloop_get_watch_data_int(TickitWatch *watch)
+{
+  return watch->evdata.i;
+}
+
+void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data)
+{
+  watch->evdata.i = data;
 }
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
