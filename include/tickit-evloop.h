@@ -32,10 +32,10 @@ typedef struct {
 int tickit_evloop_next_timer_msec(Tickit *t);
 void tickit_evloop_invoke_timers(Tickit *t);
 
-void *tickit_evloop_get_watch_data(Tickit *t, Watch *watch);
-void  tickit_evloop_set_watch_data(Tickit *t, Watch *watch, void *data);
+void *tickit_evloop_get_watch_data(Watch *watch);
+void  tickit_evloop_set_watch_data(Watch *watch, void *data);
 
-void tickit_evloop_invoke_watch(Tickit *t, Watch *watch, TickitEventFlags flags);
+void tickit_evloop_invoke_watch(Watch *watch, TickitEventFlags flags);
 
 #endif
 

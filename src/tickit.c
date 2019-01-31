@@ -11,6 +11,8 @@ TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term);
 struct Watch {
   Watch *next;
 
+  Tickit *t; // uncounted
+
   enum {
     WATCH_NONE,
     WATCH_IO,
@@ -116,7 +118,7 @@ static void destroy_watchlist(Tickit *t, Watch *watches)
     next = this->next;
 
     if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-      tickit_evloop_invoke_watch(t, this, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY);
+      tickit_evloop_invoke_watch(this, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY);
 
     free(this);
   }
@@ -235,6 +237,7 @@ void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallb
     return NULL;
 
   watch->next = NULL;
+  watch->t    = t;
   watch->type = WATCH_IO;
 
   watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_UNBIND);
@@ -268,6 +271,7 @@ static void *tickit_watch_timer_at(Tickit *t, const struct timeval *at, TickitBi
     return NULL;
 
   watch->next = NULL;
+  watch->t    = t;
   watch->type = WATCH_TIMER;
 
   watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
@@ -321,6 +325,7 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
     return NULL;
 
   watch->next = NULL;
+  watch->t    = t;
   watch->type = WATCH_LATER;
 
   watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
@@ -437,7 +442,7 @@ void tickit_evloop_invoke_timers(Tickit *t)
       if(timercmp(&this->timer.at, &now, >))
         break;
 
-      tickit_evloop_invoke_watch(t, this, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
+      tickit_evloop_invoke_watch(this, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
 
       Watch *next = this->next;
       free(this);
@@ -448,7 +453,7 @@ void tickit_evloop_invoke_timers(Tickit *t)
   }
 
   while(later) {
-    tickit_evloop_invoke_watch(t, later, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
+    tickit_evloop_invoke_watch(later, TICKIT_EV_FIRE|TICKIT_EV_UNBIND);
 
     Watch *next = later->next;
     free(later);
@@ -456,17 +461,17 @@ void tickit_evloop_invoke_timers(Tickit *t)
   }
 }
 
-void *tickit_evloop_get_watch_data(Tickit *t, Watch *watch)
+void *tickit_evloop_get_watch_data(Watch *watch)
 {
   return watch->evdata;
 }
 
-void tickit_evloop_set_watch_data(Tickit *t, Watch *watch, void *data)
+void tickit_evloop_set_watch_data(Watch *watch, void *data)
 {
   watch->evdata = data;
 }
 
-void tickit_evloop_invoke_watch(Tickit *t, Watch *watch, TickitEventFlags flags)
+void tickit_evloop_invoke_watch(Watch *watch, TickitEventFlags flags)
 {
-  (*watch->fn)(t, flags, watch->user);
+  (*watch->fn)(watch->t, flags, watch->user);
 }

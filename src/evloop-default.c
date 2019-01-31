@@ -60,7 +60,7 @@ static void evloop_run(void *data)
           continue;
 
         if(evdata->pollfds[idx].revents & (POLLIN|POLLHUP|POLLERR))
-          tickit_evloop_invoke_watch(evdata->t, evdata->pollwatches[idx], TICKIT_EV_FIRE);
+          tickit_evloop_invoke_watch(evdata->pollwatches[idx], TICKIT_EV_FIRE);
       }
     }
   }
@@ -107,7 +107,7 @@ reuse_idx:
 
   evdata->pollwatches[idx] = watch;
 
-  tickit_evloop_set_watch_data(evdata->t, watch, (void*)(intptr_t)idx);
+  tickit_evloop_set_watch_data(watch, (void*)(intptr_t)idx);
 
   return true;
 }
@@ -116,7 +116,7 @@ static void evloop_cancel_io(void *data, Watch *watch)
 {
   EventLoopData *evdata = data;
 
-  int idx = (intptr_t)tickit_evloop_get_watch_data(evdata->t, watch);
+  int idx = (intptr_t)tickit_evloop_get_watch_data(watch);
 
   evdata->pollfds[idx].fd = -1;
   evdata->pollwatches[idx] = NULL;
