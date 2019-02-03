@@ -100,6 +100,25 @@ static int resize_event(TickitTerm *tt, TickitEventFlags flags, void *_info, voi
   return 1;
 }
 
+static int render(Tickit *t, TickitEventFlags flags, void *data)
+{
+  TickitTerm *tt = tickit_get_term(t);
+
+  int lines, cols;
+  tickit_term_get_size(tt, &lines, &cols);
+  resize(tt, lines, cols);
+
+  for(int line = 2; line < lines - 2; line++) {
+    char buf[64];
+    sprintf(buf, "content on line %d here", line);
+
+    tickit_term_goto(tt, line, 5);
+    tickit_term_print(tt, buf);
+  }
+
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdio();
@@ -116,17 +135,7 @@ int main(int argc, char *argv[])
   tickit_term_bind_event(tt, TICKIT_TERM_ON_MOUSE, 0, &mouse_event, NULL);
   tickit_term_bind_event(tt, TICKIT_TERM_ON_RESIZE, 0, &resize_event, NULL);
 
-  int lines, cols;
-  tickit_term_get_size(tt, &lines, &cols);
-  resize(tt, lines, cols);
-
-  for(int line = 2; line < lines - 2; line++) {
-    char buf[64];
-    sprintf(buf, "content on line %d here", line);
-
-    tickit_term_goto(tt, line, 5);
-    tickit_term_print(tt, buf);
-  }
+  tickit_watch_later(t, 0, &render, NULL);
 
   tickit_run(t);
 
