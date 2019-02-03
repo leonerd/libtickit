@@ -79,6 +79,17 @@ static int event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data
   return 1;
 }
 
+static int later(Tickit *t, TickitEventFlags flags, void *data)
+{
+  TickitTerm *tt = tickit_get_term(t);
+
+  render_modes(tt);
+
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, modes.vis);
+
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdio();
@@ -93,11 +104,11 @@ int main(int argc, char *argv[])
 
   tickit_term_bind_event(tt, TICKIT_TERM_ON_MOUSE, 0, event, NULL);
 
-  modes.vis = 1;
-  modes.blink = 1;
-  modes.shape = TICKIT_CURSORSHAPE_BLOCK;
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS,   (modes.vis = 1));
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORBLINK, (modes.blink = 1));
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORSHAPE, (modes.shape = TICKIT_CURSORSHAPE_BLOCK));
 
-  render_modes(tt);
+  tickit_watch_later(t, 0, &later, NULL);
 
   tickit_run(t);
 
