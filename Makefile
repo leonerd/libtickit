@@ -91,6 +91,13 @@ clean: clean-test
 	$(LIBTOOL) --mode=clean rm -f $(OBJECTS)
 	$(LIBTOOL) --mode=clean rm -f $(LIBRARY)
 
+ifneq ($(shell pkg-config glib-2.0 && echo 1),1)
+  EXAMPLESOURCES:=$(filter-out examples/evloop-glib.c, $(EXAMPLESOURCES))
+endif
+
+examples/evloop-glib.lo: CFLAGS +=$(shell pkg-config --cflags glib-2.0)
+examples/evloop-glib:    LDFLAGS+=$(shell pkg-config --libs   glib-2.0)
+
 .PHONY: examples
 examples: $(EXAMPLESOURCES:.c=)
 
@@ -98,7 +105,7 @@ examples/%.lo: examples/%.c $(HFILES)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 examples/%: examples/%.lo $(LIBRARY)
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $^
+	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $^ $(LDFLAGS)
 
 .PHONY: install
 install: install-inc install-lib install-man
