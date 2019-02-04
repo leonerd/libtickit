@@ -1,0 +1,20 @@
+.TH TICKIT_WATCH_CANCEL 3
+.SH NAME
+tickit_watch_cancel \- remove a previously-installed callback
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "void tickit_watch_cancel(Tickit *" t ", void *" watch );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_watch_cancel\fP() removes a callback previously registered, by the identifier pointer returned when it was added. If it had been added with the \fBTICKIT_BIND_UNBIND\fP flag then it will be invoked with the \fBTICKIT_EV_UNBIND\fP as it is removed.
+.SH "RETURN VALUE"
+\fBtickit_watch_cancel\fP() returns no value.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit_watch_timer_after_msec (3),
+.BR tickit_watch_later (3),
+.BR tickit (7)
