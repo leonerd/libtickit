@@ -98,6 +98,13 @@ endif
 examples/evloop-glib.lo: CFLAGS +=$(shell pkg-config --cflags glib-2.0)
 examples/evloop-glib:    LDFLAGS+=$(shell pkg-config --libs   glib-2.0)
 
+ifneq ($(shell pkg-config libuv && echo 1),1)
+  EXAMPLESOURCES:=$(filter-out examples/evloop-libuv.c, $(EXAMPLESOURCES))
+endif
+
+examples/evloop-libuv.lo: CFLAGS +=$(shell pkg-config --cflags libuv)
+examples/evloop-libuv:    LDFLAGS+=$(shell pkg-config --libs   libuv)
+
 .PHONY: examples
 examples: $(EXAMPLESOURCES:.c=)
 
