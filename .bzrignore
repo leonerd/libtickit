@@ -3,3 +3,4 @@
 .libs
 t/*.t
 RE:examples/demo-[^.]+
+RE:examples/evloop-[^.]+
