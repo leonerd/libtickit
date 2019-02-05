@@ -152,7 +152,7 @@ TickitEventHooks libuv_evhooks;
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_with_evloop(NULL, &libuv_evhooks);
+  Tickit *t = tickit_new_with_evloop(NULL, &libuv_evhooks, NULL);
 
   TickitWindow *root = tickit_get_rootwin(t);
   if(!root) {
@@ -208,13 +208,17 @@ typedef struct {
   uv_async_t *stop;
 } EventLoopData;
 
-static void *el_init(Tickit *t)
+static void *el_init(Tickit *t, void *initdata)
 {
   EventLoopData *evdata = malloc(sizeof(EventLoopData));
   if(!evdata)
     return NULL;
 
-  evdata->loop = uv_default_loop();
+  if(initdata)
+    evdata->loop = initdata;
+  else
+    evdata->loop = uv_default_loop();
+
   if(!evdata->loop)
     goto abort;
 

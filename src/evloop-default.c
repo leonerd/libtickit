@@ -14,7 +14,7 @@ typedef struct {
   TickitWatch **pollwatches;
 } EventLoopData;
 
-static void *evloop_init(Tickit *t)
+static void *evloop_init(Tickit *t, void *initdata)
 {
   EventLoopData *evdata = malloc(sizeof(*evdata));
   if(!evdata)

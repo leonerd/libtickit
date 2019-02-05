@@ -14,7 +14,7 @@ extern "C" {
 typedef struct TickitWatch TickitWatch; /* opaque */
 
 typedef struct {
-  void *(*init)(Tickit *t);
+  void *(*init)(Tickit *t, void *initdata);
   void  (*destroy)(void *data);
   void  (*run)(void *data);
   void  (*stop)(void *data);
@@ -40,7 +40,7 @@ void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data);
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags);
 
-Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks);
+Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *initdata);
 
 #endif
 
