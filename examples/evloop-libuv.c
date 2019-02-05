@@ -148,11 +148,11 @@ static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
   return 0;
 }
 
-TickitEventHooks glib_evhooks;
+TickitEventHooks libuv_evhooks;
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_with_evloop(NULL, &glib_evhooks);
+  Tickit *t = tickit_new_with_evloop(NULL, &libuv_evhooks);
 
   TickitWindow *root = tickit_get_rootwin(t);
   if(!root) {
@@ -358,7 +358,7 @@ static void el_cancel_later(void *data, TickitWatch *watch)
   uv_close((uv_handle_t *)handle, &destroy_handle);
 }
 
-TickitEventHooks glib_evhooks = {
+TickitEventHooks libuv_evhooks = {
   .init         = el_init,
   .destroy      = el_destroy,
   .run          = el_run,
