@@ -105,5 +105,6 @@ tickit_window_is_steal_input.3 = tickit_window_set_steal_input.3
 tickit_unref.3 = tickit_ref.3
 tickit_stop.3 = tickit_run.3
 tickit_watch_timer_after_tv.3 = tickit_watch_timer_after_msec.3
+tickit_watch_timer_at_tv.3 = tickit_watch_timer_at_epoch.3
 
 tickit_debug_vlogf.3 = tickit_debug_logf.3

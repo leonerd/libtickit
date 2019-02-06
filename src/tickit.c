@@ -275,8 +275,7 @@ fail:
   return NULL;
 }
 
-/* static for now until we decide how to expose it */
-static void *tickit_watch_timer_at(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   TickitWatch *watch = malloc(sizeof(TickitWatch));
   if(!watch)
@@ -311,6 +310,14 @@ fail:
   return NULL;
 }
 
+void *tickit_watch_time_epoch(Tickit *t, time_t at, TickitBindFlags flags, TickitCallbackFn *func, void *user)
+{
+  return tickit_watch_timer_at_tv(t, &(struct timeval){
+      .tv_sec = at,
+      .tv_usec = 0,
+    }, flags, func, user);
+}
+
 void *tickit_watch_timer_after_tv(Tickit *t, const struct timeval *after, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   struct timeval at;
@@ -319,7 +326,7 @@ void *tickit_watch_timer_after_tv(Tickit *t, const struct timeval *after, Tickit
   /* at + after ==> at */
   timeradd(&at, after, &at);
 
-  return tickit_watch_timer_at(t, &at, flags, fn, user);
+  return tickit_watch_timer_at_tv(t, &at, flags, fn, user);
 }
 
 void *tickit_watch_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
