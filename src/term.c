@@ -971,3 +971,28 @@ TickitTermCtl tickit_term_lookup_ctl(const char *name)
 
   return -1;
 }
+
+TickitCtlType tickit_term_ctltype(TickitTermCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_TERMCTL_ALTSCREEN:
+    case TICKIT_TERMCTL_CURSORVIS:
+    case TICKIT_TERMCTL_CURSORBLINK:
+    case TICKIT_TERMCTL_KEYPAD_APP:
+      return TICKIT_CTLTYPE_BOOL;
+
+    case TICKIT_TERMCTL_COLORS:
+    case TICKIT_TERMCTL_CURSORSHAPE:
+    case TICKIT_TERMCTL_MOUSE:
+      return TICKIT_CTLTYPE_INT;
+
+    case TICKIT_TERMCTL_ICON_TEXT:
+    case TICKIT_TERMCTL_ICONTITLE_TEXT:
+    case TICKIT_TERMCTL_TITLE_TEXT:
+      return TICKIT_CTLTYPE_STR;
+
+    case TICKIT_N_TERMCTLS:
+      ;
+  }
+  return TICKIT_CTLTYPE_NONE;
+}

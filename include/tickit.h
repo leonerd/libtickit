@@ -53,6 +53,13 @@ typedef enum {
 } TickitBindFlags;
 
 typedef enum {
+  TICKIT_CTLTYPE_NONE,
+  TICKIT_CTLTYPE_BOOL,
+  TICKIT_CTLTYPE_INT,
+  TICKIT_CTLTYPE_STR,
+} TickitCtlType;
+
+typedef enum {
   TICKIT_CURSORSHAPE_BLOCK = 1,
   TICKIT_CURSORSHAPE_UNDER,
   TICKIT_CURSORSHAPE_LEFT_BAR,
@@ -423,6 +430,8 @@ void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info);
 
 const char *tickit_term_ctlname(TickitTermCtl ctl);
 TickitTermCtl tickit_term_lookup_ctl(const char *name);
+
+TickitCtlType tickit_term_ctltype(TickitTermCtl ctl);
 
 /* String handling utilities */
 
