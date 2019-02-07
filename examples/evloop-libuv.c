@@ -238,11 +238,16 @@ static void el_destroy(void *data)
 {
 }
 
-static void el_run(void *data)
+static void el_run(void *data, TickitRunFlags flags)
 {
   EventLoopData *evdata = data;
 
-  uv_run(evdata->loop, UV_RUN_DEFAULT);
+  if(flags & TICKIT_RUN_NOHANG)
+    uv_run(evdata->loop, UV_RUN_NOWAIT);
+  else if(flags & TICKIT_RUN_ONCE)
+    uv_run(evdata->loop, UV_RUN_ONCE);
+  else
+    uv_run(evdata->loop, UV_RUN_DEFAULT);
 }
 
 static void el_stop(void *data)

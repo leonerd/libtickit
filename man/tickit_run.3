@@ -7,6 +7,8 @@ tickit_run, tickit_stop \- control the event loop of the toplevel instance
 .sp
 .BI "void tickit_run(Tickit *" t );
 .BI "void tickit_stop(Tickit *" t );
+.sp
+.BI "void tickit_tick(Tickit *" t ", TickitRunFlags " flags );
 .EE
 .sp
 Link with \fI\-ltickit\fP.
@@ -14,8 +16,14 @@ Link with \fI\-ltickit\fP.
 \fBtickit_run\fP() starts the IO event loop of the main toplevel instance, allowing it to receive and react to terminal input, and to send output content back to it. Once invoked, this function will block processing IO and not return until the \fBtickit_stop\fP() function is called, or until a \fBSIGINT\fP is received (usually by the user pressing \fICtrl-C\fP).
 .PP
 \fBtickit_stop\fP() causes a currently-running call to \fBtickit_run\fP() to return.
+.PP
+\fBtickit_tick\fP() runs one iteration of the IO loop and returns. Its behaviour is controlled by the \fIflags\fP argument, which should be a bitmask of the following flags:
+.in
+.TP
+.B TICKIT_RUN_NOHANG
+Perform only a single round of IO without blocking. \fBtickit_tick\fP() will check for IO, or timers that are ready, handle those, and return. but will not block further waiting if nothing is yet ready.
 .SH "RETURN VALUE"
-Neither \fBtickit_run\fP() nor \fBtickit_stop\fP() return a value.
+Neither \fBtickit_run\fP(), \fBtickit_stop\fP() nor \fBtickit_tick\fP() return a value.
 .SH "SEE ALSO"
 .BR tickit_new_stdio (3),
 .BR tickit (7)

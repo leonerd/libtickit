@@ -223,6 +223,11 @@ static void sigint(int sig)
     tickit_stop(running_tickit);
 }
 
+void tickit_tick(Tickit *t, TickitRunFlags flags)
+{
+  (*t->evhooks->run)(t->evdata, TICKIT_RUN_ONCE | flags);
+}
+
 void tickit_run(Tickit *t)
 {
   running_tickit = t;
@@ -230,7 +235,7 @@ void tickit_run(Tickit *t)
 
   setupterm(t);
 
-  (*t->evhooks->run)(t->evdata);
+  (*t->evhooks->run)(t->evdata, TICKIT_RUN_DEFAULT);
 
   teardownterm(t);
 

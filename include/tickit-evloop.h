@@ -16,7 +16,7 @@ typedef struct TickitWatch TickitWatch; /* opaque */
 typedef struct {
   void *(*init)(Tickit *t, void *initdata);
   void  (*destroy)(void *data);
-  void  (*run)(void *data);
+  void  (*run)(void *data, TickitRunFlags flags);
   void  (*stop)(void *data);
   bool  (*io_read)(void *data, int fd, TickitBindFlags flags, TickitWatch *watch);
   void  (*cancel_io)(void *data, TickitWatch *watch);

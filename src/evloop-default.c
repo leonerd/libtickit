@@ -41,7 +41,7 @@ static void evloop_destroy(void *data)
     free(evdata->pollwatches);
 }
 
-static void evloop_run(void *data)
+static void evloop_run(void *data, TickitRunFlags flags)
 {
   EventLoopData *evdata = data;
 
@@ -49,6 +49,9 @@ static void evloop_run(void *data)
 
   while(evdata->still_running) {
     int msec = tickit_evloop_next_timer_msec(evdata->t);
+
+    if(flags & TICKIT_RUN_NOHANG)
+      msec = 0;
 
     int pollret = poll(evdata->pollfds, evdata->nfds, msec);
 
@@ -63,6 +66,9 @@ static void evloop_run(void *data)
           tickit_evloop_invoke_watch(evdata->pollwatches[idx], TICKIT_EV_FIRE);
       }
     }
+
+    if(flags & (TICKIT_RUN_ONCE|TICKIT_RUN_NOHANG))
+      return;
   }
 }
 

@@ -226,11 +226,16 @@ static void el_destroy(void *data)
   free(evdata);
 }
 
-static void el_run(void *data)
+static void el_run(void *data, TickitRunFlags flags)
 {
   EventLoopData *evdata = data;
 
-  g_main_loop_run(evdata->loop);
+  if(flags & (TICKIT_RUN_ONCE|TICKIT_RUN_NOHANG)) {
+    GMainContext *context = g_main_loop_get_context(evdata->loop);
+    g_main_context_iteration(context, !(flags & TICKIT_RUN_NOHANG));
+  }
+  else
+    g_main_loop_run(evdata->loop);
 }
 
 static void el_stop(void *data)

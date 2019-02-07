@@ -106,6 +106,12 @@ typedef enum {
 } TickitPenUnderline;
 
 typedef enum {
+  TICKIT_RUN_DEFAULT = 0,
+  TICKIT_RUN_ONCE    = 1<<0,
+  TICKIT_RUN_NOHANG  = 1<<1,
+} TickitRunFlags;
+
+typedef enum {
   /* This is part of the API so additions must go at the end only */
   TICKIT_TERMCTL_ALTSCREEN = 1,
   TICKIT_TERMCTL_CURSORVIS,
@@ -661,6 +667,8 @@ TickitWindow *tickit_get_rootwin(Tickit *t);
 
 void tickit_run(Tickit *t);
 void tickit_stop(Tickit *t);
+
+void tickit_tick(Tickit *t, TickitRunFlags flags);
 
 /* TODO: Consider OUT and HUP conditions too */
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
