@@ -22,6 +22,11 @@ Link with \fI\-ltickit\fP.
 .TP
 .B TICKIT_RUN_NOHANG
 Perform only a single round of IO without blocking. \fBtickit_tick\fP() will check for IO, or timers that are ready, handle those, and return. but will not block further waiting if nothing is yet ready.
+.TP
+.B TICKIT_RUN_NOSETUP
+Do not perform any terminal setup before waiting on IO events. Usually this is only necessary early in startup, if the program is using the Tickit event loop for its own purposes before starting a terminal interface.
+.IP
+Without this flag, terminal setup will be run once the first time \fBtickit_run\fP or \fBtickit_tick\fP is called, and will remain valid until the toplevel instance is destroyed.
 .SH "RETURN VALUE"
 Neither \fBtickit_run\fP(), \fBtickit_stop\fP() nor \fBtickit_tick\fP() return a value.
 .SH "SEE ALSO"

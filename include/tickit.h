@@ -109,6 +109,7 @@ typedef enum {
   TICKIT_RUN_DEFAULT = 0,
   TICKIT_RUN_ONCE    = 1<<0,
   TICKIT_RUN_NOHANG  = 1<<1,
+  TICKIT_RUN_NOSETUP = 1<<2,
 } TickitRunFlags;
 
 typedef enum {

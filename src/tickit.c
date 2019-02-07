@@ -235,6 +235,9 @@ static void sigint(int sig)
 
 void tickit_tick(Tickit *t, TickitRunFlags flags)
 {
+  if(!t->done_setup && !(flags & TICKIT_RUN_NOSETUP))
+    setupterm(t);
+
   (*t->evhooks->run)(t->evdata, TICKIT_RUN_ONCE | flags);
 }
 
@@ -243,7 +246,8 @@ void tickit_run(Tickit *t)
   running_tickit = t;
   signal(SIGINT, sigint);
 
-  setupterm(t);
+  if(!t->done_setup)
+    setupterm(t);
 
   (*t->evhooks->run)(t->evdata, TICKIT_RUN_DEFAULT);
 
