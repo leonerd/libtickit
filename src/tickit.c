@@ -52,6 +52,8 @@ struct Tickit {
 
   TickitEventHooks *evhooks;
   void             *evdata;
+
+  unsigned int done_setup : 1;
 };
 
 static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
@@ -80,6 +82,27 @@ static void setterm(Tickit *t, TickitTerm *tt)
   tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
 }
 
+static void setupterm(Tickit *t)
+{
+  TickitTerm *tt = tickit_get_term(t);
+
+  tickit_term_await_started_msec(tt, 50);
+
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_DRAG);
+  tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
+
+  tickit_term_clear(tt);
+
+  t->done_setup = true;
+}
+
+static void teardownterm(Tickit *t)
+{
+  t->done_setup = false;
+}
+
 Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *initdata)
 {
   Tickit *t = malloc(sizeof(Tickit));
@@ -99,6 +122,8 @@ Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *
   t->iowatches = NULL;
   t->timers    = NULL;
   t->laters    = NULL;
+
+  t->done_setup = false;
 
   if(tt)
     setterm(t, tt);
@@ -138,6 +163,9 @@ static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc
 
 static void tickit_destroy(Tickit *t)
 {
+  if(t->done_setup)
+    teardownterm(t);
+
   if(t->rootwin)
     tickit_window_unref(t->rootwin);
   if(t->term)
@@ -181,24 +209,6 @@ TickitTerm *tickit_get_term(Tickit *t)
   return t->term;
 }
 
-static void setupterm(Tickit *t)
-{
-  TickitTerm *tt = tickit_get_term(t);
-
-  tickit_term_await_started_msec(tt, 50);
-
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_DRAG);
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
-
-  tickit_term_clear(tt);
-}
-
-static void teardownterm(Tickit *t)
-{
-}
-
 TickitWindow *tickit_get_rootwin(Tickit *t)
 {
   if(!t->rootwin) {
@@ -236,8 +246,6 @@ void tickit_run(Tickit *t)
   setupterm(t);
 
   (*t->evhooks->run)(t->evdata, TICKIT_RUN_DEFAULT);
-
-  teardownterm(t);
 
   running_tickit = NULL;
 }
