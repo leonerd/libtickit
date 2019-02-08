@@ -32,7 +32,8 @@ struct TickitWindow {
     int line;
     int col;
     TickitCursorShape shape;
-    bool visible;
+    unsigned int visible : 1;
+    int blink   : 2; /* -1, 0, 1 */
   } cursor;
 
   unsigned int is_root            : 1;
@@ -227,6 +228,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->cursor.col = 0;
   win->cursor.shape = TICKIT_CURSORSHAPE_BLOCK;
   win->cursor.visible = true;
+  win->cursor.blink = -1;
   win->is_root = false;
   win->is_visible = true;
   win->is_focused = false;
@@ -724,6 +726,8 @@ static void _do_restore(TickitRootWindow *root)
     int cursor_col = win->cursor.col + abs_geom.left;
     tickit_term_goto(root->term, cursor_line, cursor_col);
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORSHAPE, win->cursor.shape);
+    if(win->cursor.blink != -1)
+      tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORBLINK, win->cursor.blink);
   }
   else
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 0);
@@ -1237,6 +1241,10 @@ bool tickit_window_getctl_int(TickitWindow *win, TickitWindowCtl ctl, int *value
       *value = win->cursor.visible;
       return true;
 
+    case TICKIT_WINCTL_CURSORBLINK:
+      *value = win->cursor.blink;
+      return true;
+
     case TICKIT_WINCTL_CURSORSHAPE:
       *value = win->cursor.shape;
       return true;
@@ -1260,6 +1268,10 @@ bool tickit_window_setctl_int(TickitWindow *win, TickitWindowCtl ctl, int value)
 
     case TICKIT_WINCTL_CURSORVIS:
       win->cursor.visible = value;
+      goto restore;
+
+    case TICKIT_WINCTL_CURSORBLINK:
+      win->cursor.blink = value ? 1 : 0;
       goto restore;
 
     case TICKIT_WINCTL_CURSORSHAPE:
