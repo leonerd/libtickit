@@ -105,6 +105,10 @@ A window instance has a number of runtime-configuration control options that aff
 The options are given in an enumeration called \fBTickitWindowCtl\fP. The following control values are recognised:
 .in
 .TP
+.B TICKIT_WINCTL_CURSORBLINK (bool)
+The value is a boolean indicating whether the terminal text cursor should blink
+while this window has the input focus.
+.TP
 .B TICKIT_WINCTL_CURSORSHAPE (int)
 The value is an integer from the \fBTickitCursorShape\fP enumeration indicating what shape the terminal's text cursor should be while this window has the input focus. Values are:
 .RS
@@ -118,10 +122,6 @@ An underline below the character.
 .B TICKIT_CURSORSHAPE_LEFT_BAR
 A vertical bar to the left of the character.
 .RE
-.TP
-.B TICKIT_WINCTL_CURSORBLINK (bool)
-The value is a boolean indicating whether the terminal text cursor should blink
-while this window has the input focus.
 .TP
 .B TICKIT_WINCTL_CURSORVIS (bool)
 The value is a boolean indicating whether the terminal text cursor should be visible
