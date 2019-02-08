@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
     thief_last.type = 0;
     win_last.type = 0;
 
-    tickit_window_set_steal_input(thief, false);
+    tickit_window_setctl_int(thief, TICKIT_WINCTL_STEAL_INPUT, false);
     ok(!tickit_window_is_steal_input(thief), "tickit_window_is_steal_input() returns false");
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 1, 1, 0);

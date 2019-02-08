@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
     int bind_id = tickit_window_bind_event(win, TICKIT_WINDOW_ON_FOCUS, 0, &on_focus_push, NULL);
     tickit_window_bind_event(subwin, TICKIT_WINDOW_ON_FOCUS, 0, &on_focus_push, NULL);
 
-    tickit_window_set_focus_child_notify(win, true);
+    tickit_window_setctl_int(win, TICKIT_WINCTL_FOCUS_CHILD_NOTIFY, true);
     tickit_window_flush(root);
 
     tickit_window_set_cursor_position(subwin, 0, 0);
