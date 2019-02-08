@@ -117,6 +117,43 @@ The wheel has been rolled.
 .sp
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
+.SH CONTROLS
+A terminal instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_setctl_str\fP(3), and queried using \fBtickit_term_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_term_ctlname\fP(3) and searched by name using \fBtickit_term_lookup_ctl\fP(3). The type of a control option can be queried using \fBtickit_term_ctltype\fP(3).
+.PP
+The options are given in an enumeration called \fBTickitTermCtl\fP. The following control values are recognised:
+.in
+.TP
+.B TICKIT_TERMCTL_ALTSCREEN (bool)
+The value is a boolean indicating whether the terminal alternate buffer mode should be enabled. When enabled, a temporary buffer is used for drawing, preserving the original contents of the screen. This mode is usually used by full-screen applications to preserve the shell's scrollback state.
+.TP
+.B TICKIT_TERMCTL_COLORS (int, read-only)
+The value indicates how many colors are available. This value is read-only; it can be requested but not set.
+.TP
+.B TICKIT_TERMCTL_CURSORBLINK (bool)
+The value is a boolean indicating whether the terminal text cursor should blink. When disabled, the cursor will appear in a steady state, if visible. When enabled, the cursor will appear blinking, if visible. If the cursor is invisible, this should not have any effect.
+.TP
+.B TICKIT_TERMCTL_CURSORSHAPE (int)
+The value is an integer from the \fBTickitCursorShape\fP enumeration indicating what shape the terminal's text cursor should be. Values are \fBTICKIT_CURSORSHAPE_BLOCK\fP for a solid block filling the entire cell, \fBTICKIT_CURSORSHAPE_UNDER\fP for an underline below the character, or \fBTICKIT_CURSORSHAPE_LEFT_BAR\fP for a vertical bar to the left of the character. Note that not all terminals support setting it, nor to all of the possible values.
+.TP
+.B TICKIT_TERMCTL_CURSORVIS (bool)
+The value is a boolean indicating whether the terminal text cursor should be visible. When disabled the cursor position is not visible. Typically applications will hide the cursor while performing redrawing operations so as not to show a flickering effect as the cursor moves, and show it again when drawing is complete.
+.TP
+.B TICKIT_TERMCTL_ICON_TEXT (str)
+The value is a string for the terminal to use as its minimised icon text.
+.TP
+.B TICKIT_TERMCTL_ICONTITLE_TEXT (str)
+The value is a string for the terminal to use as its minimised icon text and main window title.
+.TP
+.B TICKIT_TERMCTL_KEYPAD_APP (bool)
+The value is a boolean controlling the terminal's keypad mode. When enabled, the terminal is in keypad application mode; in this mode the numerical keypad will send different sequences that can be detected as distinct from regular
+.SM ASCII
+text. When disabled, the keypad will send normal text.
+.TP
+.B TICKIT_TERMCTL_MOUSE (int)
+The value is an integer from the \fBTickitTermMouseMode\fP enumeration indicating what mouse events should be sent. Values are \fBTICKIT_TERM_MOUSEMODE_CLICK\fP to report button press and release events, \fBTICKIT_TERM_MOUSEMODE_DRAG\fP to additionally report movement while a button is held, \fBTICKIT_TERM_MOUSEMODE_MOVE\fP to additionally report all movement even with no buttons held, or \fBTICKIT_TERM_MOUSEMODE_OFF\fP to disable it.
+.TP
+.B TICKIT_TERMCTL_TITLE_TEXT (str)
+The value is a string for the terminal to use as its main window title.
 .SH "SEE ALSO"
 .BR tickit (7),
 .BR tickit_renderbuffer (7)
