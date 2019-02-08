@@ -1,0 +1,21 @@
+.TH TICKIT_WINDOW_SETCTL_INT 3
+.SH NAME
+tickit_window_setctl_int\- set an integer window control
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "bool tickit_window_getctl_int(TickitWindow *" tt ", TickitWindowCtl " ctl ", int *" value );
+.BI "bool tickit_window_setctl_int(TickitWindow *" tt ", TickitWindowCtl " ctl ", int " value );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_window_setctl_int\fP() performs a window control operation, setting the value of a numeric window control option. \fBtickit_window_getctl_int\fP() obtains the value of a window control setting.
+.PP
+For the list of possible \fBTickitWindowCtl\fP values and their meanings, see \fPtickit_window\fP(7).
+.SH "RETURN VALUE"
+\fBtickit_window_getctl_int\fP() returns a true value if it recognised the requested control and managed to return the current value of it; false if not. \fBtickit_window_setctl_int\fP() returns a true value if it recognised the requested control and managed to request the window to change it; false if not.
+.SH "SEE ALSO"
+.BR tickit_window (7),
+.BR tickit (7)

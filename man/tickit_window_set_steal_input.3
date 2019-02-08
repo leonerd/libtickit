@@ -16,6 +16,8 @@ Link with \fI\-ltickit\fP.
 \fBtickit_window_set_steal_input\fP() changes the value of this setting.
 .PP
 The initial value is normally false, unless the \fBTICKIT_WINDOW_STEAL_INPUT\fP flag was passed to the \fBtickit_window_new\fP(3) function call that created the window.
+.PP
+This function is discouraged in favour of using the \fBTICKIT_WINCTL_STEAL_INPUT\fP window control with \fBtickit_window_setctl_int\fP(3).
 .SH "RETURN VALUE"
 \fBtickit_window_is_steal_input\fP() returns a boolean. \fBtickit_window_set_steal_input\fP() returns no value.
 .SH "SEE ALSO"

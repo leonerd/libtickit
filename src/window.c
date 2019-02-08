@@ -2,6 +2,9 @@
 #include "hooklists.h"
 
 #include <stdio.h>
+#include <string.h>
+
+#define streq(a,b) (!strcmp(a,b))
 
 #define ROOT_AS_WINDOW(root) ((TickitWindow*)root)
 #define WINDOW_AS_ROOT(win)  ((TickitRootWindow*)win)
@@ -1139,18 +1142,12 @@ void tickit_window_set_cursor_position(TickitWindow *win, int line, int col)
 
 void tickit_window_set_cursor_visible(TickitWindow *win, bool visible)
 {
-  win->cursor.visible = visible;
-
-  if(win->is_focused)
-    _request_restore(_get_root(win));
+  tickit_window_setctl_int(win, TICKIT_WINCTL_CURSORVIS, visible);
 }
 
 void tickit_window_set_cursor_shape(TickitWindow *win, TickitCursorShape shape)
 {
-  win->cursor.shape = shape;
-
-  if(win->is_focused)
-    _request_restore(_get_root(win));
+  tickit_window_setctl_int(win, TICKIT_WINCTL_CURSORSHAPE, shape);
 }
 
 static void _focus_gained(TickitWindow *win, TickitWindow *child);
@@ -1212,7 +1209,7 @@ bool tickit_window_is_focused(const TickitWindow *win)
 
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify)
 {
-  win->focus_child_notify = notify;
+  tickit_window_setctl_int(win, TICKIT_WINCTL_FOCUS_CHILD_NOTIFY, notify);
 }
 
 bool tickit_window_is_steal_input(const TickitWindow *win)
@@ -1222,7 +1219,63 @@ bool tickit_window_is_steal_input(const TickitWindow *win)
 
 void tickit_window_set_steal_input(TickitWindow *win, bool steal)
 {
-  win->steal_input = steal;
+  tickit_window_setctl_int(win, TICKIT_WINCTL_STEAL_INPUT, steal);
+}
+
+bool tickit_window_getctl_int(TickitWindow *win, TickitWindowCtl ctl, int *value)
+{
+  switch(ctl) {
+    case TICKIT_WINCTL_STEAL_INPUT:
+      *value = win->steal_input;
+      return true;
+
+    case TICKIT_WINCTL_FOCUS_CHILD_NOTIFY:
+      *value = win->focus_child_notify;
+      return true;
+
+    case TICKIT_WINCTL_CURSORVIS:
+      *value = win->cursor.visible;
+      return true;
+
+    case TICKIT_WINCTL_CURSORSHAPE:
+      *value = win->cursor.shape;
+      return true;
+
+    case TICKIT_N_WINCTLS:
+      ;
+  }
+  return false;
+}
+
+bool tickit_window_setctl_int(TickitWindow *win, TickitWindowCtl ctl, int value)
+{
+  switch(ctl) {
+    case TICKIT_WINCTL_STEAL_INPUT:
+      win->steal_input = value;
+      return true;
+
+    case TICKIT_WINCTL_FOCUS_CHILD_NOTIFY:
+      win->focus_child_notify = value;
+      return true;
+
+    case TICKIT_WINCTL_CURSORVIS:
+      win->cursor.visible = value;
+      goto restore;
+
+    case TICKIT_WINCTL_CURSORSHAPE:
+      win->cursor.shape = value;
+      goto restore;
+
+    case TICKIT_N_WINCTLS:
+      ;
+  }
+  return false;
+
+restore:
+  if(win->is_focused)
+    _request_restore(_get_root(win));
+
+  return true;
 }
 
 static int _handle_key(TickitWindow *win, TickitKeyEventInfo *info)
@@ -1304,4 +1357,47 @@ done:
   tickit_window_unref(win);
 
   return ret;
+}
+
+const char *tickit_window_ctlname(TickitWindowCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_WINCTL_STEAL_INPUT:        return "steal-input";
+    case TICKIT_WINCTL_FOCUS_CHILD_NOTIFY: return "focus-child-notify";
+    case TICKIT_WINCTL_CURSORVIS:          return "cursor-visible";
+    case TICKIT_WINCTL_CURSORBLINK:        return "cursor-blink";
+    case TICKIT_WINCTL_CURSORSHAPE:        return "cursor-shape";
+
+    case TICKIT_N_WINCTLS: ;
+  }
+  return NULL;
+}
+
+TickitWindowCtl tickit_window_lookup_ctl(const char *name)
+{
+  const char *s;
+
+  for(TickitWindowCtl ctl = 1; ctl < TICKIT_N_WINCTLS; ctl++)
+    if((s = tickit_window_ctlname(ctl)) && streq(name, s))
+      return ctl;
+
+  return -1;
+}
+
+TickitCtlType tickit_window_ctltype(TickitWindowCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_WINCTL_STEAL_INPUT:
+    case TICKIT_WINCTL_FOCUS_CHILD_NOTIFY:
+    case TICKIT_WINCTL_CURSORVIS:
+    case TICKIT_WINCTL_CURSORBLINK:
+      return TICKIT_CTLTYPE_BOOL;
+
+    case TICKIT_WINCTL_CURSORSHAPE:
+      return TICKIT_CTLTYPE_INT;
+
+    case TICKIT_N_WINCTLS:
+      ;
+  }
+  return TICKIT_CTLTYPE_NONE;
 }

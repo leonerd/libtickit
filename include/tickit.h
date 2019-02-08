@@ -143,6 +143,16 @@ typedef enum {
 } TickitTermMouseMode;
 
 typedef enum {
+  TICKIT_WINCTL_STEAL_INPUT = 1,
+  TICKIT_WINCTL_FOCUS_CHILD_NOTIFY,
+  TICKIT_WINCTL_CURSORVIS,
+  TICKIT_WINCTL_CURSORBLINK, // as yet unimplemented
+  TICKIT_WINCTL_CURSORSHAPE,
+
+  TICKIT_N_WINCTLS
+} TickitWindowCtl;
+
+typedef enum {
   TICKIT_WINDOW_HIDDEN      = 1<<0,
   TICKIT_WINDOW_LOWEST      = 1<<1,
   TICKIT_WINDOW_ROOT_PARENT = 1<<2,
@@ -658,8 +668,16 @@ void tickit_window_take_focus(TickitWindow *win);
 bool tickit_window_is_focused(const TickitWindow *win);
 void tickit_window_set_focus_child_notify(TickitWindow *win, bool notify);
 
+bool tickit_window_getctl_int(TickitWindow *win, TickitWindowCtl ctl, int *value);
+bool tickit_window_setctl_int(TickitWindow *win, TickitWindowCtl ctl, int value);
+
 bool tickit_window_is_steal_input(const TickitWindow *win);
 void tickit_window_set_steal_input(TickitWindow *win, bool steal);
+
+const char *tickit_window_ctlname(TickitWindowCtl ctl);
+TickitWindowCtl tickit_window_lookup_ctl(const char *name);
+
+TickitCtlType tickit_window_ctltype(TickitWindowCtl ctl);
 
 /* Main object */
 

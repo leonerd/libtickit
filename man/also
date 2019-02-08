@@ -102,6 +102,9 @@ tickit_window_set_cursor_shape.3 = tickit_window_set_cursor_position.3
 tickit_window_scrollrect.3 = tickit_window_scroll.3
 tickit_window_scroll_with_children.3 = tickit_window_scroll.3
 tickit_window_is_steal_input.3 = tickit_window_set_steal_input.3
+tickit_window_getctl_int.3 = tickit_window_setctl_int.3
+tickit_window_lookup_ctl.3 = tickit_window_ctlname.3
+tickit_window_ctltype.3 = tickit_window_ctlname.3
 
 tickit_unref.3 = tickit_ref.3
 tickit_stop.3 = tickit_run.3

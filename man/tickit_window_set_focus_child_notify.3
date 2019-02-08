@@ -11,6 +11,8 @@ tickit_window_set_focus_child_notify \- control whether windows are informed of 
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_window_set_focus_child_notify\fP() sets the value of a setting on the given window which controls whether the window will receive \fBTICKIT_EV_FOCUS\fP events when its child windows change focus state (when true), or whether the only focus events it receives are ones relating to itself directly (when false).
+.PP
+This function is discouraged in favour of using the \fBTICKIT_WINCTL_FOCUS_CHILD_NOTIFY\fP window control with \fBtickit_window_setctl_int\fP(3).
 .SH "RETURN VALUE"
 \fBtickit_window_set_focus_child_notify\fP() returns no value.
 .SH "SEE ALSO"
