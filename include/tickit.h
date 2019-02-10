@@ -53,7 +53,7 @@ typedef enum {
 } TickitBindFlags;
 
 typedef enum {
-  TICKIT_CTL_USE_ALTSCREEN,
+  TICKIT_CTL_USE_ALTSCREEN = 1,
 
   TICKIT_N_CTLS
 } TickitCtl;
