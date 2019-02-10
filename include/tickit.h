@@ -53,6 +53,12 @@ typedef enum {
 } TickitBindFlags;
 
 typedef enum {
+  TICKIT_CTL_USE_ALTSCREEN,
+
+  TICKIT_N_CTLS
+} TickitCtl;
+
+typedef enum {
   TICKIT_CTLTYPE_NONE,
   TICKIT_CTLTYPE_BOOL,
   TICKIT_CTLTYPE_INT,
@@ -697,6 +703,14 @@ void tickit_run(Tickit *t);
 void tickit_stop(Tickit *t);
 
 void tickit_tick(Tickit *t, TickitRunFlags flags);
+
+bool tickit_getctl_int(Tickit *tt, TickitCtl ctl, int *value);
+bool tickit_setctl_int(Tickit *tt, TickitCtl ctl, int value);
+
+const char *tickit_ctlname(TickitCtl ctl);
+TickitCtl tickit_lookup_ctl(const char *name);
+
+TickitCtlType tickit_ctltype(TickitCtl ctl);
 
 /* TODO: Consider OUT and HUP conditions too */
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);

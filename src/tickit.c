@@ -3,7 +3,10 @@
 
 #include <errno.h>
 #include <signal.h>
+#include <string.h>
 #include <sys/time.h>
+
+#define streq(a,b) (!strcmp(a,b))
 
 /* INTERNAL */
 TickitWindow* tickit_window_new_root2(Tickit *t, TickitTerm *term);
@@ -53,7 +56,8 @@ struct Tickit {
   TickitEventHooks *evhooks;
   void             *evdata;
 
-  unsigned int done_setup : 1;
+  unsigned int done_setup    : 1,
+               use_altscreen : 1;
 };
 
 static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
@@ -88,7 +92,8 @@ static void setupterm(Tickit *t)
 
   tickit_term_await_started_msec(tt, 50);
 
-  tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
+  if(t->use_altscreen)
+    tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_CURSORVIS, 0);
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_MOUSE, TICKIT_TERM_MOUSEMODE_DRAG);
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
@@ -124,6 +129,8 @@ Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *
   t->laters    = NULL;
 
   t->done_setup = false;
+
+  t->use_altscreen = true;
 
   if(tt)
     setterm(t, tt);
@@ -220,6 +227,32 @@ TickitWindow *tickit_get_rootwin(Tickit *t)
   }
 
   return t->rootwin;
+}
+
+bool tickit_getctl_int(Tickit *t, TickitCtl ctl, int *value)
+{
+  switch(ctl) {
+    case TICKIT_CTL_USE_ALTSCREEN:
+      *value = t->use_altscreen;
+      return true;
+
+    case TICKIT_N_CTLS:
+      ;
+  }
+  return false;
+}
+
+bool tickit_setctl_int(Tickit *t, TickitCtl ctl, int value)
+{
+  switch(ctl) {
+    case TICKIT_CTL_USE_ALTSCREEN:
+      t->use_altscreen = value;
+      return true;
+
+    case TICKIT_N_CTLS:
+      ;
+  }
+  return false;
 }
 
 // TODO: copy the entire SIGWINCH-like structure from term.c
@@ -548,4 +581,37 @@ void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
 
     prevp = &(*prevp)->next;
   }
+}
+
+const char *tickit_ctlname(TickitCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_CTL_USE_ALTSCREEN: return "use-altscreen";
+
+    case TICKIT_N_CTLS: ;
+  }
+  return NULL;
+}
+
+TickitCtl tickit_lookup_ctl(const char *name)
+{
+  const char *s;
+
+  for(TickitCtl ctl = 1; ctl < TICKIT_N_CTLS; ctl++)
+    if((s = tickit_ctlname(ctl)) && streq(name, s))
+      return ctl;
+
+  return -1;
+}
+
+TickitCtlType tickit_ctltype(TickitCtl ctl)
+{
+  switch(ctl) {
+    case TICKIT_CTL_USE_ALTSCREEN:
+      return TICKIT_CTLTYPE_BOOL;
+
+    case TICKIT_N_CTLS:
+      ;
+  }
+  return TICKIT_CTLTYPE_NONE;
 }

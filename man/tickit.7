@@ -75,6 +75,14 @@ This handler is being invoked because it is being removed from the object. This 
 This handler is being invoked because the object instance itself is being destroyed. This will be observed if it was bound with the \fBTICKIT_BIND_DESTROY\fP flag, or because it is bound to the \fBTICKIT_..._ON_DESTROY\fP event. The \fIinfo\fP pointer will be \fBNULL\fP.
 .IP
 Any event handlers for this event will be invoked in reverse order; the newest is run first and the oldest last.
+.SH CONTROLS
+A toplevel instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_setctl_int\fP(3), and queried using \fBtickit_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_ctlname\fP(3) and searched by name using \fBtickit_lookup_ctl\fP(3). The type of a control option can be queried using \fBtickit_ctltype\fP(3).
+.PP
+The options are given in an enumeration called \fBTickitCtl\fP. The following control values are recognised:
+.in
+.TP
+.B TICKIT_CTL_USE_ALTSCREEN (bool)
+The value is a boolean indicating whether the instance will activate the terminal alternate screen buffer mode when started.
 .SH "SEE ALSO"
 .BR tickit_window (7),
 .BR tickit_term (7),
