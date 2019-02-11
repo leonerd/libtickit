@@ -10,8 +10,7 @@
 #define _GNU_SOURCE
 
 #include "tickit.h"
-
-#include "hooklists.h"
+#include "bindings.h"
 #include "termdriver.h"
 
 #include "xterm-palette.inc"
@@ -77,10 +76,10 @@ struct TickitTerm {
   TickitPen *pen;
 
   int refcount;
-  struct TickitHooklist hooks;
+  struct TickitBindings bindings;
 };
 
-DEFINE_HOOKLIST_FUNCS(term,TickitTerm,TickitTermEventFn)
+DEFINE_BINDINGS_FUNCS(term,TickitTerm,TickitTermEventFn)
 
 static TermKey *get_termkey(TickitTerm *tt)
 {
@@ -161,7 +160,7 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   tt->window_changed = false;
 
   tt->refcount = 1;
-  tt->hooks = (struct TickitHooklist){ NULL };
+  tt->bindings = (struct TickitBindings){ NULL };
 
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
@@ -214,7 +213,7 @@ void tickit_term_destroy(TickitTerm *tt)
   if(tt->outfunc)
     (*tt->outfunc)(tt, NULL, 0, tt->outfunc_user);
 
-  tickit_hooklist_unbind_and_destroy(&tt->hooks, tt);
+  tickit_bindings_unbind_and_destroy(&tt->bindings, tt);
   tickit_pen_unref(tt->pen);
 
   if(tt->termkey)

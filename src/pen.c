@@ -1,5 +1,5 @@
 #include "tickit.h"
-#include "hooklists.h"
+#include "bindings.h"
 
 #include <stdarg.h>
 #include <stdio.h>   /* sscanf */
@@ -40,12 +40,12 @@ struct TickitPen {
   } valid;
 
   int refcount;
-  struct TickitHooklist hooks;
+  struct TickitBindings bindings;
   int freezecount;
   bool changed;
 };
 
-DEFINE_HOOKLIST_FUNCS(pen,TickitPen,TickitPenEventFn)
+DEFINE_BINDINGS_FUNCS(pen,TickitPen,TickitPenEventFn)
 
 TickitPen *tickit_pen_new(void)
 {
@@ -54,7 +54,7 @@ TickitPen *tickit_pen_new(void)
     return NULL;
 
   pen->refcount = 1;
-  pen->hooks = (struct TickitHooklist){ NULL };
+  pen->bindings = (struct TickitBindings){ NULL };
   pen->freezecount = 0;
   pen->changed = false;
 
@@ -111,7 +111,7 @@ TickitPen *tickit_pen_clone(const TickitPen *orig)
 
 static void destroy(TickitPen *pen)
 {
-  tickit_hooklist_unbind_and_destroy(&pen->hooks, pen);
+  tickit_bindings_unbind_and_destroy(&pen->bindings, pen);
   free(pen);
 }
 

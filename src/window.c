@@ -1,5 +1,5 @@
 #include "tickit.h"
-#include "hooklists.h"
+#include "bindings.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -44,7 +44,7 @@ struct TickitWindow {
   unsigned int focus_child_notify : 1;
 
   int refcount;
-  struct TickitHooklist hooks;
+  struct TickitBindings bindings;
 };
 
 #define WINDOW_PRINTF_FMT     "[%dx%d abs@%d,%d]"
@@ -53,7 +53,7 @@ struct TickitWindow {
 #define RECT_PRINTF_FMT     "[(%d,%d)..(%d,%d)]"
 #define RECT_PRINTF_ARGS(r) (r).left, (r).top, tickit_rect_right(&(r)), tickit_rect_bottom(&(r))
 
-DEFINE_HOOKLIST_FUNCS(window,TickitWindow,TickitWindowEventFn)
+DEFINE_BINDINGS_FUNCS(window,TickitWindow,TickitWindowEventFn)
 
 typedef struct HierarchyChange HierarchyChange;
 struct HierarchyChange {
@@ -237,7 +237,7 @@ static void init_window(TickitWindow *win, TickitWindow *parent, TickitRect rect
   win->focus_child_notify = false;
 
   win->refcount = 1;
-  win->hooks = (struct TickitHooklist){ NULL };
+  win->bindings = (struct TickitBindings){ NULL };
 }
 
 /* INTERNAL */
@@ -371,7 +371,7 @@ void tickit_window_close(TickitWindow *win)
 
 void tickit_window_destroy(TickitWindow *win)
 {
-  tickit_hooklist_unbind_and_destroy(&win->hooks, win);
+  tickit_bindings_unbind_and_destroy(&win->bindings, win);
 
   if(win->pen)
     tickit_pen_unref(win->pen);
