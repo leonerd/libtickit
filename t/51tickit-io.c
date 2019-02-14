@@ -42,5 +42,7 @@ int main(int argc, char *argv[])
     /* TODO: fds[0] is still readready currently but lets just throw it away */
   }
 
+  tickit_unref(t);
+
   return exit_status();
 }

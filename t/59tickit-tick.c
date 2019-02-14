@@ -32,5 +32,7 @@ int main(int argc, char *argv[])
     is_int(called, 1, "tickit_tick TICKIT_RUN_ONCE stops after invocation");
   }
 
+  tickit_unref(t);
+
   return exit_status();
 }
