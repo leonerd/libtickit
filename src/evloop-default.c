@@ -39,6 +39,8 @@ static void evloop_destroy(void *data)
     free(evdata->pollfds);
   if(evdata->pollwatches)
     free(evdata->pollwatches);
+
+  free(evdata);
 }
 
 static void evloop_run(void *data, TickitRunFlags flags)
