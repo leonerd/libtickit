@@ -178,14 +178,14 @@ static void tickit_destroy(Tickit *t)
   if(t->term)
     tickit_term_unref(t->term);
 
-  (*t->evhooks->destroy)(t->evdata);
-
   if(t->iowatches)
     destroy_watchlist(t, t->iowatches, t->evhooks->cancel_io);
   if(t->timers)
     destroy_watchlist(t, t->timers, t->evhooks->cancel_timer);
   if(t->laters)
     destroy_watchlist(t, t->laters, t->evhooks->cancel_later);
+
+  (*t->evhooks->destroy)(t->evdata);
 
   free(t);
 }
