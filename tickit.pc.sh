@@ -1,3 +1,16 @@
+#!/bin/sh
+
+LIBS='-L${libdir} -ltickit'
+CFLAGS='-I${includedir}'
+
+case "$LIBDIR" in
+  /usr/lib) ;;
+  /usr/local/lib) ;;
+  *)
+    LIBS="$LIBS -Wl,-rpath -Wl,$LIBDIR"
+    ;;
+esac
+
 cat <<EOF
 libdir=$LIBDIR
 includedir=$INCDIR
@@ -5,6 +18,6 @@ includedir=$INCDIR
 Name: tickit
 Description: Terminal Interface Construction KIT
 Version: 0.2
-Libs: -L\${libdir} -ltickit
-Cflags: -I\${includedir}
+Libs: $LIBS
+Cflags: $CFLAGS
 EOF
