@@ -184,6 +184,27 @@ static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
   return 0;
 }
 
+static int event_resize(TickitWindow *root, TickitEventFlags flags, void *_info, void *data)
+{
+  int cols = tickit_window_cols(root);
+
+  tickit_window_set_geometry(keywin, (TickitRect){
+      .top = 2, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_set_geometry(mousewin, (TickitRect){
+      .top = 8, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_set_geometry(timerwin, (TickitRect){
+      .top = 15, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_expose(root, NULL);
+
+  return 1;
+}
+
 TickitEventHooks libuv_evhooks;
 
 int main(int argc, char *argv[])
@@ -216,6 +237,8 @@ int main(int argc, char *argv[])
 
   tickit_window_bind_event(timerwin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_timer, &counter);
 
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_GEOMCHANGE, 0, &event_resize, NULL);
+
   tickit_watch_timer_after_msec(t, 1000, 0, &on_timer, &counter);
 
   tickit_window_take_focus(root);
@@ -242,7 +265,15 @@ static void destroy_handle(uv_handle_t *handle)
 typedef struct {
   uv_loop_t *loop;
   uv_async_t *stop;
+  uv_signal_t *sigwinch;
 } EventLoopData;
+
+static void el_sigwinch(uv_signal_t *handle, int signum)
+{
+  Tickit *t = handle->data;
+
+  tickit_evloop_sigwinch(t);
+}
 
 static void *el_init(Tickit *t, void *initdata)
 {
@@ -262,6 +293,11 @@ static void *el_init(Tickit *t, void *initdata)
   // See also  https://github.com/libuv/libuv/issues/2173
   evdata->stop = malloc(sizeof(uv_async_t));
   uv_async_init(evdata->loop, evdata->stop, NULL);
+
+  evdata->sigwinch = malloc(sizeof(uv_signal_t));
+  uv_signal_init(evdata->loop, evdata->sigwinch);
+  uv_signal_start(evdata->sigwinch, el_sigwinch, SIGWINCH);
+  evdata->sigwinch->data = t;
 
   return evdata;
 
