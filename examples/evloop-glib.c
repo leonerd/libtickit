@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include <glib.h>
+#include <glib-unix.h>
 
 TickitKeyEventInfo lastkey;
 TickitWindow *keywin;
@@ -184,6 +185,27 @@ static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
   return 0;
 }
 
+static int event_resize(TickitWindow *root, TickitEventFlags flags, void *_info, void *data)
+{
+  int cols = tickit_window_cols(root);
+
+  tickit_window_set_geometry(keywin, (TickitRect){
+      .top = 2, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_set_geometry(mousewin, (TickitRect){
+      .top = 8, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_set_geometry(timerwin, (TickitRect){
+      .top = 15, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_expose(root, NULL);
+
+  return 1;
+}
+
 TickitEventHooks glib_evhooks;
 
 int main(int argc, char *argv[])
@@ -216,6 +238,8 @@ int main(int argc, char *argv[])
 
   tickit_window_bind_event(timerwin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_timer, &counter);
 
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_GEOMCHANGE, 0, &event_resize, NULL);
+
   tickit_watch_timer_after_msec(t, 1000, 0, &on_timer, &counter);
 
   tickit_window_take_focus(root);
@@ -238,6 +262,13 @@ typedef struct {
   GMainLoop *loop;
 } EventLoopData;
 
+static gboolean el_sigwinch(gpointer t)
+{
+  tickit_evloop_sigwinch(t);
+
+  return TRUE;
+}
+
 static void *el_init(Tickit *t, void *initdata)
 {
   EventLoopData *evdata = malloc(sizeof(EventLoopData));
@@ -248,6 +279,8 @@ static void *el_init(Tickit *t, void *initdata)
     evdata->loop = initdata;
   else
     evdata->loop = g_main_loop_new(NULL, FALSE);
+
+  g_unix_signal_add(SIGWINCH, el_sigwinch, t);
 
   return evdata;
 }
