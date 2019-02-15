@@ -1,4 +1,4 @@
-TODO
+2019-02-15 23:53 0.3-RC1
   * Renamed:
       + tickit_timer_after_msec => tickit_watch_timer_after_msec
       + tickit_timer_after_tv   => tickit_watch_timer_after_tv
