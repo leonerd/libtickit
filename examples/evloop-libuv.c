@@ -20,6 +20,18 @@ TickitWindow *mousewin;
 int counter = 0;
 TickitWindow *timerwin;
 
+static TickitPen *mkpen_highlight(void)
+{
+  static TickitPen *pen;
+  if(!pen)
+    pen = tickit_pen_new_attrs(
+      TICKIT_PEN_FG,   3,
+      TICKIT_PEN_BOLD, 1,
+      -1);
+
+  return pen;
+}
+
 static void render_modifier(TickitRenderBuffer *rb, int mod)
 {
   if(!mod)
@@ -47,7 +59,14 @@ static int render_key(TickitWindow *win, TickitEventFlags flags, void *_info, vo
   tickit_renderbuffer_eraserect(rb, &info->rect);
 
   tickit_renderbuffer_goto(rb, 0, 0);
-  tickit_renderbuffer_text(rb, "Key:");
+  {
+    tickit_renderbuffer_savepen(rb);
+
+    tickit_renderbuffer_setpen(rb, mkpen_highlight());
+    tickit_renderbuffer_text(rb, "Key:");
+
+    tickit_renderbuffer_restore(rb);
+  }
 
   tickit_renderbuffer_goto(rb, 2, 2);
   switch(lastkey.type) {
@@ -85,7 +104,14 @@ static int render_mouse(TickitWindow *win, TickitEventFlags flags, void *_info, 
   tickit_renderbuffer_eraserect(rb, &info->rect);
 
   tickit_renderbuffer_goto(rb, 0, 0);
-  tickit_renderbuffer_text(rb, "Mouse:");
+  {
+    tickit_renderbuffer_savepen(rb);
+
+    tickit_renderbuffer_setpen(rb, mkpen_highlight());
+    tickit_renderbuffer_text(rb, "Mouse:");
+
+    tickit_renderbuffer_restore(rb);
+  }
 
   tickit_renderbuffer_goto(rb, 2, 2);
   switch(lastmouse.type) {
@@ -130,7 +156,17 @@ static int render_timer(TickitWindow *win, TickitEventFlags flags, void *_info, 
   tickit_renderbuffer_eraserect(rb, &info->rect);
 
   tickit_renderbuffer_goto(rb, 0, 0);
-  tickit_renderbuffer_textf(rb, "Counter %d", *counterp);
+  {
+    tickit_renderbuffer_savepen(rb);
+
+    tickit_renderbuffer_setpen(rb, mkpen_highlight());
+    tickit_renderbuffer_text(rb, "Counter:");
+
+    tickit_renderbuffer_restore(rb);
+  }
+
+  tickit_renderbuffer_goto(rb, 2, 2);
+  tickit_renderbuffer_textf(rb, "%d", *counterp);
 
   return 1;
 }
@@ -175,7 +211,7 @@ int main(int argc, char *argv[])
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_MOUSE, 0, &event_mouse, NULL);
 
   timerwin = tickit_window_new(root, (TickitRect){
-      .top = 15, .left = 2, .lines = 1, .cols = tickit_window_cols(root) - 4
+      .top = 15, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
     }, 0);
 
   tickit_window_bind_event(timerwin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_timer, &counter);
