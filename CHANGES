@@ -1,3 +1,34 @@
+TODO
+  * Renamed:
+      + tickit_timer_after_msec => tickit_watch_timer_after_msec
+      + tickit_timer_after_tv   => tickit_watch_timer_after_tv
+      + tickit_later            => tickit_watch_later
+      + tickit_timer_cancel     => tickit_watch_cancel
+  * Added toplevel Tickit functions for loop control
+      + tickit_tick(3)
+      + tickit_watch_io_read(3)
+      + tickit_timer_at_epoch(3)
+      + tickit_timer_at_tv(3)
+  * Added TickitCtlType
+      + tickit_term_ctltype(3)
+  * Added window controls
+      + tickit_window_getctl_int(3)
+      + tickit_window_setctl_int(3)
+      + tickit_window_ctlname(3)
+      + tickit_window_lookup_ctl(3)
+      + tickit_window_ctltype(3)
+  * Added toplevel Tickit instance controls
+      + tickit_getctl_int(3)
+      + tickit_setctl_int(3)
+      + tickit_ctlname(3)
+      + tickit_lookup_ctl(3)
+      + tickit_ctltype(3)
+  * TICKIT_PEN_UNDER type is now integer, supports single, double, wavy underline
+  * Fixed various example/demo-*.c files so they work again
+  * Added experimental new ability to provide event loop hooks for other event
+    loops
+  * Generated tickit.pc file now provides -rpath linker argument if required
+
 2018-01-05 14:47  0.2
   * Added tickit_window_{is,set}_steal_focus(3)
   * Added entire toplevel Tickit instance
