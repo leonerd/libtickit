@@ -36,6 +36,26 @@ Mouse movement and button or wheel events.
 \f(CwIr\fP
 Terminal resize.
 Transformations (translation, clipping and masking).
+.SS W
+These messages relate to windows.
+.TP
+\f(CwW*\fP
+Window destroyed.
+.TP
+\f(CwWd\fP
+Damage to root window.
+.TP
+\f(CwWx\fP
+Window is exposed.
+.TP
+\f(CwWh\fP
+Window hierarchy changed.
+.TP
+\f(CwWs\fP
+Window scrolls.
+.TP
+\f(CwWsr\fP
+Window propagates a scrollrect to its underlying terminal.
 .SH ENVIRONMENT
 The debugging support is controlled by the following environment variables, which should be set before the application starts, or early during its initialisation before it has invoked any \fIlibtickit\fP functions.
 .TP
