@@ -180,6 +180,27 @@ static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
   return 0;
 }
 
+static int event_resize(TickitWindow *root, TickitEventFlags flags, void *_info, void *data)
+{
+  int cols = tickit_window_cols(root);
+
+  tickit_window_set_geometry(keywin, (TickitRect){
+      .top = 2, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_set_geometry(mousewin, (TickitRect){
+      .top = 8, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_set_geometry(timerwin, (TickitRect){
+      .top = 15, .left = 2, .lines = 3, .cols = cols - 4
+    });
+
+  tickit_window_expose(root, NULL);
+
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdio();
@@ -209,6 +230,8 @@ int main(int argc, char *argv[])
     }, 0);
 
   tickit_window_bind_event(timerwin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_timer, &counter);
+
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_GEOMCHANGE, 0, &event_resize, NULL);
 
   tickit_watch_timer_after_msec(t, 1000, 0, &on_timer, &counter);
 
