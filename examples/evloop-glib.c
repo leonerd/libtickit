@@ -314,7 +314,7 @@ static void el_stop(void *data)
   g_main_loop_quit(evdata->loop);
 }
 
-static gboolean fire_io_event(GIOChannel *source, GIOCondition condition, gpointer watch)
+static gboolean fire_io_event(gint fd, GIOCondition condition, gpointer watch)
 {
   if(condition & G_IO_IN) {
     tickit_evloop_invoke_watch(watch, TICKIT_EV_FIRE);
@@ -325,7 +325,7 @@ static gboolean fire_io_event(GIOChannel *source, GIOCondition condition, gpoint
 
 static bool el_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
 {
-  int id = g_io_add_watch(g_io_channel_unix_new(fd), G_IO_IN, fire_io_event, watch);
+  int id = g_unix_fd_add(fd, G_IO_IN, fire_io_event, watch);
   tickit_evloop_set_watch_data_int(watch, id);
 
   return true;
