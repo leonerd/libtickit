@@ -180,20 +180,73 @@ static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
   return 0;
 }
 
+static int render_root(TickitWindow *win, TickitEventFlags flags, void *_info, void *data)
+{
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
+
+  int right = tickit_window_cols(win) - 1;
+  int bottom = tickit_window_lines(win) - 1;
+
+  tickit_renderbuffer_eraserect(rb, &(TickitRect){
+      .top = 0, .left = 0, .lines = bottom+1, .cols = right+1,
+  });
+
+  static TickitPen *pen_blue;
+  if(!pen_blue)
+    pen_blue = tickit_pen_new_attrs(
+      TICKIT_PEN_FG, 4+8,
+      -1);
+
+  static TickitPen *pen_white;
+  if(!pen_white)
+    pen_white = tickit_pen_new_attrs(
+        TICKIT_PEN_FG, 7+8,
+        -1);
+
+  // Draw a horizontal size marker bar
+  {
+    tickit_renderbuffer_setpen(rb, pen_blue);
+    tickit_renderbuffer_hline_at(rb, 1, 0, right, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_vline_at(rb, 0, 2, 0, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_vline_at(rb, 0, 2, right, TICKIT_LINE_SINGLE, 0);
+
+    tickit_renderbuffer_setpen(rb, pen_white);
+    tickit_renderbuffer_goto(rb, 1, (right / 2) - 2);
+    tickit_renderbuffer_textf(rb, " %d ", right + 1); // cols
+  }
+
+  int left = right - 4;
+
+  // Draw a vertical size marker bar
+  {
+    tickit_renderbuffer_setpen(rb, pen_blue);
+    tickit_renderbuffer_vline_at(rb, 0, bottom, left + 2, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_hline_at(rb, 0, left, right, TICKIT_LINE_SINGLE, 0);
+    tickit_renderbuffer_hline_at(rb, bottom, left, right, TICKIT_LINE_SINGLE, 0);
+
+    tickit_renderbuffer_setpen(rb, pen_white);
+    tickit_renderbuffer_goto(rb, (bottom / 2) - 1, left);
+    tickit_renderbuffer_textf(rb, "%d", bottom + 1); // lines
+  }
+
+  return 1;
+}
+
 static int event_resize(TickitWindow *root, TickitEventFlags flags, void *_info, void *data)
 {
   int cols = tickit_window_cols(root);
 
   tickit_window_set_geometry(keywin, (TickitRect){
-      .top = 2, .left = 2, .lines = 3, .cols = cols - 4
+      .top = 2, .left = 2, .lines = 3, .cols = cols - 7
     });
 
   tickit_window_set_geometry(mousewin, (TickitRect){
-      .top = 8, .left = 2, .lines = 3, .cols = cols - 4
+      .top = 8, .left = 2, .lines = 3, .cols = cols - 7
     });
 
   tickit_window_set_geometry(timerwin, (TickitRect){
-      .top = 15, .left = 2, .lines = 3, .cols = cols - 4
+      .top = 15, .left = 2, .lines = 3, .cols = cols - 7
     });
 
   tickit_window_expose(root, NULL);
@@ -212,25 +265,26 @@ int main(int argc, char *argv[])
   }
 
   keywin = tickit_window_new(root, (TickitRect){
-      .top = 2, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
+      .top = 2, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 7
     }, 0);
 
   tickit_window_bind_event(keywin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_key, NULL);
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_KEY, 0, &event_key, NULL);
 
   mousewin = tickit_window_new(root, (TickitRect){
-      .top = 8, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
+      .top = 8, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 7
     }, 0);
 
   tickit_window_bind_event(mousewin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_mouse, NULL);
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_MOUSE, 0, &event_mouse, NULL);
 
   timerwin = tickit_window_new(root, (TickitRect){
-      .top = 15, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 4
+      .top = 15, .left = 2, .lines = 3, .cols = tickit_window_cols(root) - 7
     }, 0);
 
   tickit_window_bind_event(timerwin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_timer, &counter);
 
+  tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &render_root, NULL);
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_GEOMCHANGE, 0, &event_resize, NULL);
 
   tickit_watch_timer_after_msec(t, 1000, 0, &on_timer, &counter);
