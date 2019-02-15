@@ -13,6 +13,9 @@ TickitWindow *keywin;
 TickitMouseEventInfo lastmouse;
 TickitWindow *mousewin;
 
+int counter = 0;
+TickitWindow *timerwin;
+
 static void render_modifier(TickitRenderBuffer *rb, int mod)
 {
   if(!mod)
@@ -114,6 +117,33 @@ static int event_mouse(TickitWindow *win, TickitEventFlags flags, void *_info, v
   return 1;
 }
 
+static int render_timer(TickitWindow *win, TickitEventFlags flags, void *_info, void *user)
+{
+  int *counterp = user;
+  TickitExposeEventInfo *info = _info;
+  TickitRenderBuffer *rb = info->rb;
+
+  tickit_renderbuffer_eraserect(rb, &info->rect);
+
+  tickit_renderbuffer_goto(rb, 0, 0);
+  tickit_renderbuffer_textf(rb, "Counter %d", *counterp);
+
+  return 1;
+}
+
+static int on_timer(Tickit *t, TickitEventFlags flags, void *user);
+static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
+{
+  int *counterp = user;
+
+  (*counterp)++;
+  tickit_window_expose(timerwin, NULL);
+
+  tickit_watch_timer_after_msec(t, 1000, 0, &on_timer, user);
+
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdio();
@@ -137,6 +167,14 @@ int main(int argc, char *argv[])
 
   tickit_window_bind_event(mousewin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_mouse, NULL);
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_MOUSE, 0, &event_mouse, NULL);
+
+  timerwin = tickit_window_new(root, (TickitRect){
+      .top = 15, .left = 2, .lines = 1, .cols = tickit_window_cols(root) - 4
+    }, 0);
+
+  tickit_window_bind_event(timerwin, TICKIT_WINDOW_ON_EXPOSE, 0, &render_timer, &counter);
+
+  tickit_watch_timer_after_msec(t, 1000, 0, &on_timer, &counter);
 
   tickit_window_take_focus(root);
   tickit_window_set_cursor_visible(root, false);
