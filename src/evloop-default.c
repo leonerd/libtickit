@@ -1,7 +1,9 @@
 #include "tickit.h"
 #include "tickit-evloop.h"
 
+#include <errno.h>
 #include <poll.h>
+#include <signal.h>
 
 typedef struct {
   Tickit *t;
@@ -12,7 +14,20 @@ typedef struct {
   int nfds;
   struct pollfd *pollfds;
   TickitWatch **pollwatches;
+
+  unsigned int pending_sigwinch : 1;
 } EventLoopData;
+
+/* TODO: For now this only allows one toplevel instance
+ */
+
+static EventLoopData *sigwinch_observer;
+
+static void sigwinch(int signum)
+{
+  if(sigwinch_observer)
+    sigwinch_observer->pending_sigwinch = true;
+}
 
 static void *evloop_init(Tickit *t, void *initdata)
 {
@@ -28,6 +43,9 @@ static void *evloop_init(Tickit *t, void *initdata)
   evdata->pollfds     = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
   evdata->pollwatches = malloc(sizeof(TickitWatch *) * evdata->alloc_fds);
 
+  sigwinch_observer = evdata;
+  sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = sigwinch }, NULL);
+
   return evdata;
 }
 
@@ -39,6 +57,9 @@ static void evloop_destroy(void *data)
     free(evdata->pollfds);
   if(evdata->pollwatches)
     free(evdata->pollwatches);
+
+  sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
+  sigwinch_observer = NULL;
 
   free(evdata);
 }
@@ -66,6 +87,13 @@ static void evloop_run(void *data, TickitRunFlags flags)
 
         if(evdata->pollfds[idx].revents & (POLLIN|POLLHUP|POLLERR))
           tickit_evloop_invoke_watch(evdata->pollwatches[idx], TICKIT_EV_FIRE);
+      }
+    }
+    else if(pollret < 0 && errno == EINTR) {
+      /* Check the signal flags */
+      if(evdata->pending_sigwinch) {
+        evdata->pending_sigwinch = false;
+        tickit_evloop_sigwinch(evdata->t);
       }
     }
 

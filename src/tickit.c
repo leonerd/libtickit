@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #define streq(a,b) (!strcmp(a,b))
 
@@ -206,9 +207,14 @@ void tickit_unref(Tickit *t)
 TickitTerm *tickit_get_term(Tickit *t)
 {
   if(!t->term) {
-    TickitTerm *tt = tickit_term_open_stdio();
+    /* Don't use tickit_term_open_stdio() because that observes SIGWINCH
+     */
+    TickitTerm *tt = tickit_term_new();
     if(!tt)
       return NULL;
+
+    tickit_term_set_input_fd(tt, STDIN_FILENO);
+    tickit_term_set_output_fd(tt, STDOUT_FILENO);
 
     setterm(t, tt);
   }
@@ -581,6 +587,14 @@ void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
 
     prevp = &(*prevp)->next;
   }
+}
+
+void tickit_evloop_sigwinch(Tickit *t)
+{
+  if(!t->term)
+    return;
+
+  tickit_term_refresh_size(t->term);
 }
 
 const char *tickit_ctlname(TickitCtl ctl)
