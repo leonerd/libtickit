@@ -72,11 +72,11 @@ src/renderbuffer.lo: src/linechars.inc
 src/linechars.inc: src/linechars.inc.PL
 	perl $^ > $@
 
-t/%.t: t/%.c $(LIBRARY) t/taplib.lo t/mockterm.lo t/taplib-tickit.lo
-	$(LIBTOOL) --mode=link --tag=CC gcc $(CFLAGS) $(LDFLAGS) -o $@ -Iinclude -std=c99 -ggdb $^
+t/%.t: t/%.lo $(LIBRARY) t/taplib.lo t/mockterm.lo t/taplib-tickit.lo
+	$(LIBTOOL) --mode=link --tag=CC $(CC) -o $@ $^ $(LDFLAGS)
 
 t/%.lo: t/%.c
-	$(LIBTOOL) --mode=compile --tag=CC gcc $(CFLAGS) -o $@ -c $^
+	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $^
 
 .PHONY: test
 test: $(TESTFILES)
