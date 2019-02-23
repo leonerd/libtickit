@@ -452,21 +452,14 @@ TickitCtlType tickit_term_ctltype(TickitTermCtl ctl);
 /* String handling utilities */
 
 int tickit_utf8_seqlen(long codepoint);
-DEPRECATED int tickit_string_seqlen(long codepoint); /* use tickit_utf8_seqlen() */
 
 /* Does NOT NUL-terminate the buffer */
 size_t tickit_utf8_put(char *str, size_t len, long codepoint);
-DEPRECATED size_t tickit_string_putchar(char *str, size_t len, long codepoint); /* use tickit_utf8_put() */
 
 size_t tickit_utf8_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
 size_t tickit_utf8_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
 size_t tickit_utf8_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
 size_t tickit_utf8_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
-
-DEPRECATED size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
-DEPRECATED size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit);
-DEPRECATED size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
-DEPRECATED size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit);
 
 // Some convenient mutators for TickitStringPos structs
 
@@ -503,10 +496,6 @@ static inline void tickit_stringpos_limit_columns(TickitStringPos *pos, int colu
   pos->bytes = pos->codepoints = pos->graphemes = -1;
   pos->columns = columns;
 }
-
-DEPRECATED int    tickit_string_mbswidth(const char *str);
-DEPRECATED int    tickit_string_byte2col(const char *str, size_t byte);
-DEPRECATED size_t tickit_string_col2byte(const char *str, int col);
 
 int    tickit_utf8_mbswidth(const char *str);
 int    tickit_utf8_byte2col(const char *str, size_t byte);

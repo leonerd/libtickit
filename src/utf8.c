@@ -46,11 +46,6 @@ static int next_utf8(const char *str, size_t len, uint32_t *cp)
   return nbytes;
 }
 
-int tickit_string_seqlen(long codepoint)
-{
-  return tickit_utf8_seqlen(codepoint);
-}
-
 int tickit_utf8_seqlen(long codepoint)
 {
   if(codepoint < 0x0000080) return 1;
@@ -59,11 +54,6 @@ int tickit_utf8_seqlen(long codepoint)
   if(codepoint < 0x0200000) return 4;
   if(codepoint < 0x4000000) return 5;
   return 6;
-}
-
-size_t tickit_string_putchar(char *str, size_t len, long codepoint)
-{
-  return tickit_utf8_put(str, len, codepoint);
 }
 
 size_t tickit_utf8_put(char *str, size_t len, long codepoint)
@@ -94,20 +84,9 @@ size_t tickit_utf8_put(char *str, size_t len, long codepoint)
   return nbytes;
 }
 
-size_t tickit_string_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
-{
-  tickit_stringpos_zero(pos);
-  return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
-}
-
 size_t tickit_utf8_count(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
 {
   tickit_stringpos_zero(pos);
-  return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
-}
-
-size_t tickit_string_countmore(const char *str, TickitStringPos *pos, const TickitStringPos *limit)
-{
   return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
 }
 
@@ -116,20 +95,9 @@ size_t tickit_utf8_countmore(const char *str, TickitStringPos *pos, const Tickit
   return tickit_utf8_ncountmore(str, (size_t)-1, pos, limit);
 }
 
-size_t tickit_string_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
-{
-  tickit_stringpos_zero(pos);
-  return tickit_utf8_ncountmore(str, len, pos, limit);
-}
-
 size_t tickit_utf8_ncount(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
 {
   tickit_stringpos_zero(pos);
-  return tickit_utf8_ncountmore(str, len, pos, limit);
-}
-
-size_t tickit_string_ncountmore(const char *str, size_t len, TickitStringPos *pos, const TickitStringPos *limit)
-{
   return tickit_utf8_ncountmore(str, len, pos, limit);
 }
 
@@ -185,21 +153,11 @@ size_t tickit_utf8_ncountmore(const char *str, size_t len, TickitStringPos *pos,
   return pos->bytes - start_bytes;
 }
 
-int tickit_string_mbswidth(const char *str)
-{
-  return tickit_utf8_mbswidth(str);
-}
-
 int tickit_utf8_mbswidth(const char *str)
 {
   TickitStringPos pos;
   tickit_utf8_count(str, &pos, NULL);
   return pos.columns;
-}
-
-int tickit_string_byte2col(const char *str, size_t byte)
-{
-  return tickit_utf8_byte2col(str, byte);
 }
 
 int tickit_utf8_byte2col(const char *str, size_t byte)
@@ -208,11 +166,6 @@ int tickit_utf8_byte2col(const char *str, size_t byte)
   TickitStringPos pos;
   tickit_utf8_count(str, &pos, &limit);
   return pos.columns;
-}
-
-size_t tickit_string_col2byte(const char *str, int col)
-{
-  return tickit_utf8_col2byte(str, col);
 }
 
 size_t tickit_utf8_col2byte(const char *str, int col)
