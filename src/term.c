@@ -127,42 +127,42 @@ static TermKey *get_termkey(TickitTerm *tt)
   return tt->termkey;
 }
 
-TickitTerm *tickit_term_new(void)
+static TickitTermDriver *tickit_term_build_driver(struct TickitTermBuilder *builder)
 {
-  const char *termtype = getenv("TERM");
-  if(!termtype)
-    termtype = "xterm";
+  if(builder->driver)
+    return builder->driver;
 
-  return tickit_term_new_for_termtype(termtype);
-}
-
-TickitTerm *tickit_term_new_for_termtype(const char *termtype)
-{
   TickitTermProbeArgs args = {
-    .termtype = termtype,
+    .termtype = builder->termtype,
   };
 
   for(int i = 0; driver_probes[i]; i++) {
     TickitTermDriver *driver = (*driver_probes[i]->new)(&args);
-    if(!driver)
-      continue;
-
-    TickitTerm *tt = tickit_term_new_for_driver(driver);
-
-    if(tt)
-      tt->termtype = strdup(termtype);
-
-    return tt;
+    if(driver)
+      return driver;
   }
 
   errno = ENOENT;
   return NULL;
 }
 
-TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
+TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
 {
+  struct TickitTermBuilder builder = { 0 };
+  if(_builder)
+    builder = *_builder;
+
+  if(!builder.termtype)
+    builder.termtype = getenv("TERM");
+  if(!builder.termtype)
+    builder.termtype = "xterm";
+
   TickitTerm *tt = malloc(sizeof(TickitTerm));
   if(!tt)
+    return NULL;
+
+  TickitTermDriver *driver = tickit_term_build_driver(&builder);
+  if(!driver)
     return NULL;
 
   tt->outfd   = -1;
@@ -197,9 +197,12 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
    */
   tt->pen = tickit_pen_new();
 
-  tt->termtype = NULL;
+  if(builder.termtype)
+    tt->termtype = strdup(builder.termtype);
+  else
+    tt->termtype = NULL;
 
-  tt->driver = ttd;
+  tt->driver = driver;
   tt->driver->tt = tt;
 
   if(tt->driver->vtable->attach)
@@ -211,6 +214,25 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
   tt->state = UNSTARTED;
 
   return tt;
+}
+
+TickitTerm *tickit_term_new(void)
+{
+  return tickit_term_build(NULL);
+}
+
+TickitTerm *tickit_term_new_for_termtype(const char *termtype)
+{
+  return tickit_term_build(&(struct TickitTermBuilder){
+    .termtype = termtype,
+  });
+}
+
+TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
+{
+  return tickit_term_build(&(struct TickitTermBuilder){
+    .driver = ttd,
+  });
 }
 
 TickitTerm *tickit_term_open_stdio(void)

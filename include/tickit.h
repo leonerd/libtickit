@@ -35,6 +35,9 @@ typedef struct TickitWindow TickitWindow;
 
 typedef struct Tickit Tickit;
 
+/* Opaque struct pointers required but not part of official API */
+typedef struct TickitTermDriver TickitTermDriver;
+
 typedef struct {
   int top;
   int left;
@@ -371,6 +374,13 @@ size_t tickit_string_len(const TickitString *s);
 TickitTerm *tickit_term_new(void);
 TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_destroy(TickitTerm *tt);
+
+// Internal use only for now but consider making it public API
+struct TickitTermBuilder {
+  const char *termtype;
+  TickitTermDriver *driver;
+};
+TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
 
 TickitTerm *tickit_term_ref(TickitTerm *tt);
 void        tickit_term_unref(TickitTerm *tt);
