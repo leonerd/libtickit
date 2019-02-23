@@ -3,6 +3,8 @@
 
 typedef struct {
   const char *termtype;
+  const char *(*ti_getstr_hook)(const char *name, const char *value, void *data);
+  void *ti_getstr_data;
 } TickitTermProbeArgs;
 
 typedef struct {
