@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
   // Simple lines, end caps
   {
-    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 1, -1);
+    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 1, 0);
 
     tickit_renderbuffer_setpen(rb, fg_pen);
     tickit_renderbuffer_hline_at(rb, 10, 10, 14, TICKIT_LINE_SINGLE, 0);

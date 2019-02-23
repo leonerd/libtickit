@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
       "          ",
       "          ");
 
-  TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 3, -1);
+  TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 3, 0);
 
   tickit_term_setpen(tt, fg_pen);
 
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
       SETPEN(.fg=3),
       NULL);
 
-  TickitPen *bg_pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 6, -1);
+  TickitPen *bg_pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 6, 0);
 
   tickit_term_chpen(tt, bg_pen);
 

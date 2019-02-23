@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     tickit_renderbuffer_goto(rb, 3, 0);
 
-    tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 1, -1));
+    tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 1, 0));
     tickit_pen_unref(pen);
 
     tickit_renderbuffer_text(rb, "123");
@@ -75,12 +75,12 @@ int main(int argc, char *argv[])
     {
       tickit_renderbuffer_savepen(rb);
 
-      tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 4, -1));
+      tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 4, 0));
       tickit_pen_unref(pen);
 
       tickit_renderbuffer_text(rb, "456");
 
-      tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_BG, -1, -1));
+      tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_BG, -1, 0));
       tickit_pen_unref(pen);
 
       tickit_renderbuffer_text(rb, "789");
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
     tickit_renderbuffer_goto(rb, 4, 0);
 
-    tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_REVERSE, 1, -1));
+    tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_REVERSE, 1, 0));
     tickit_pen_unref(pen);
 
     tickit_renderbuffer_text(rb, "123");
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     {
       tickit_renderbuffer_savepen(rb);
 
-      tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_REVERSE, 0, -1));
+      tickit_renderbuffer_setpen(rb, pen = tickit_pen_new_attrs(TICKIT_PEN_REVERSE, 0, 0));
       tickit_pen_unref(pen);
 
       tickit_renderbuffer_text(rb, "456");

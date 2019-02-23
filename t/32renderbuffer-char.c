@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
   // Absolute characters
   {
-    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 4, -1);
+    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 4, 0);
     tickit_renderbuffer_setpen(rb, fg_pen);
 
     tickit_renderbuffer_char_at(rb, 5, 5, 0x41);
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
   // VC characters
   {
     tickit_renderbuffer_goto(rb, 0, 4);
-    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 5, -1);
+    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 5, 0);
     tickit_renderbuffer_setpen(rb, fg_pen);
 
     tickit_renderbuffer_char(rb, 0x47);

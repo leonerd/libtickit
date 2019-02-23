@@ -125,19 +125,19 @@ int main(int argc, char *argv[])
 
     TickitPen *screen_pen = tickit_pen_new_attrs(
         TICKIT_PEN_FG, 4,
-        -1);
+        0);
     tickit_renderbuffer_setpen(screen, screen_pen);
     tickit_pen_unref(screen_pen);
 
     TickitPen *window_pen = tickit_pen_new_attrs(
         TICKIT_PEN_FG, 5,
-        -1);
+        0);
     tickit_renderbuffer_setpen(window, window_pen);
     tickit_pen_unref(window_pen);
 
     TickitPen *bg_pen = tickit_pen_new_attrs(
         TICKIT_PEN_BG, 6,
-        -1);
+        0);
 
     tickit_renderbuffer_text_at(window, 0, 0, "Hello");
     {

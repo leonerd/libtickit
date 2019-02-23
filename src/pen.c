@@ -77,7 +77,7 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...)
   while(1) {
     int a = first ? attr : va_arg(args, TickitPenAttr);
     first = 0;
-    if(a < 0)
+    if(a < 1)
       break;
 
     // TODO: accept colour descs or rgb8

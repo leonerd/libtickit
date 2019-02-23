@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
   // Absolute spans
   {
-    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 1, -1);
+    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 1, 0);
     tickit_renderbuffer_setpen(rb, fg_pen);
     cols = tickit_renderbuffer_text_at(rb, 0, 1, "text span");
     is_int(cols, 9, "cols from text_at");
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
   // Span splitting
   {
-    TickitPen *b_pen = tickit_pen_new_attrs(TICKIT_PEN_BOLD, 1, -1);
+    TickitPen *b_pen = tickit_pen_new_attrs(TICKIT_PEN_BOLD, 1, 0);
 
     // aaaAAaaa
     // BBBBBBBB
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 
   // VC spans
   {
-    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 3, -1);
+    TickitPen *fg_pen = tickit_pen_new_attrs(TICKIT_PEN_FG, 3, 0);
     tickit_renderbuffer_setpen(rb, fg_pen);
     tickit_renderbuffer_goto(rb, 0, 2);
     cols = tickit_renderbuffer_text(rb, "text span");
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
 
   // Clear
   {
-    TickitPen *bg_pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 3, -1);
+    TickitPen *bg_pen = tickit_pen_new_attrs(TICKIT_PEN_BG, 3, 0);
 
     tickit_renderbuffer_setpen(rb, bg_pen);
     tickit_renderbuffer_clear(rb);

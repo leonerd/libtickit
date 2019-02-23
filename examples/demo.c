@@ -23,7 +23,7 @@ static TickitPen *mkpen_highlight(void)
     pen = tickit_pen_new_attrs(
       TICKIT_PEN_FG,   3,
       TICKIT_PEN_BOLD, 1,
-      -1);
+      0);
 
   return pen;
 }
@@ -196,13 +196,13 @@ static int render_root(TickitWindow *win, TickitEventFlags flags, void *_info, v
   if(!pen_blue)
     pen_blue = tickit_pen_new_attrs(
       TICKIT_PEN_FG, 4+8,
-      -1);
+      0);
 
   static TickitPen *pen_white;
   if(!pen_white)
     pen_white = tickit_pen_new_attrs(
         TICKIT_PEN_FG, 7+8,
-        -1);
+        0);
 
   // Draw a horizontal size marker bar
   {

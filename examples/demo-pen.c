@@ -51,7 +51,7 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
     if(!colours[i].pen_fg)
       colours[i].pen_fg = tickit_pen_new_attrs(
           TICKIT_PEN_FG, colours[i].val,
-          -1);
+          0);
 
     tickit_renderbuffer_setpen(rb, colours[i].pen_fg);
     tickit_renderbuffer_textf(rb, "fg %s", colours[i].name);
@@ -70,7 +70,7 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
     if(!colours[i].pen_fg_hi)
       colours[i].pen_fg_hi = tickit_pen_new_attrs(
           TICKIT_PEN_FG, colours[i].val+8,
-          -1);
+          0);
 
     tickit_renderbuffer_setpen(rb, colours[i].pen_fg_hi);
     tickit_renderbuffer_textf(rb, "fg hi-%s", colours[i].name);
@@ -90,7 +90,7 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
       colours[i].pen_bg = tickit_pen_new_attrs(
           TICKIT_PEN_BG, colours[i].val,
           TICKIT_PEN_FG, 0,
-          -1);
+          0);
 
     tickit_renderbuffer_setpen(rb, colours[i].pen_bg);
     tickit_renderbuffer_textf(rb, "bg %s", colours[i].name);
@@ -110,7 +110,7 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
       colours[i].pen_bg_hi = tickit_pen_new_attrs(
           TICKIT_PEN_BG, colours[i].val+8,
           TICKIT_PEN_FG, 0,
-          -1);
+          0);
 
     tickit_renderbuffer_setpen(rb, colours[i].pen_bg_hi);
     tickit_renderbuffer_textf(rb, "bg hi-%s", colours[i].name);
@@ -127,7 +127,7 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
     tickit_renderbuffer_goto(rb, 8 + 2*i, 0);
 
     if(!attrs[i].pen)
-      attrs[i].pen = tickit_pen_new_attrs(attrs[i].attr, 1, -1);
+      attrs[i].pen = tickit_pen_new_attrs(attrs[i].attr, 1, 0);
 
     tickit_renderbuffer_setpen(rb, attrs[i].pen);
     tickit_renderbuffer_text(rb, attrs[i].name);
@@ -137,7 +137,7 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
       TickitPenUnderline under;
 
       for(under = TICKIT_PEN_UNDER_DOUBLE; under < TICKIT_N_PEN_UNDERS; under++) {
-        TickitPen *pen = tickit_pen_new_attrs(TICKIT_PEN_UNDER, under, -1);
+        TickitPen *pen = tickit_pen_new_attrs(TICKIT_PEN_UNDER, under, 0);
         tickit_renderbuffer_skip(rb, 4);
 
         tickit_renderbuffer_setpen(rb, pen);

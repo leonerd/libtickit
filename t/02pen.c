@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
   tickit_pen_unref(pen2);
 
-  pen = tickit_pen_new_attrs(TICKIT_PEN_BOLD, 1, TICKIT_PEN_FG, 3, -1);
+  pen = tickit_pen_new_attrs(TICKIT_PEN_BOLD, 1, TICKIT_PEN_FG, 3, 0);
   is_int(tickit_pen_get_bool_attr(pen, TICKIT_PEN_BOLD), 1, "pen bold attr for new_attrs");
   is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 3, "pen fg attr for new_attrs");
 
