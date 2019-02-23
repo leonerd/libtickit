@@ -479,9 +479,9 @@ static TickitTermDriverVTable ti_vtable = {
   .setctl_str = setctl_str,
 };
 
-static TickitTermDriver *new(const char *termtype)
+static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
-  unibi_term *ut = unibi_from_term(termtype);
+  unibi_term *ut = unibi_from_term(args->termtype);
   if(!ut)
     return NULL;
 
@@ -540,7 +540,7 @@ static TickitTermDriver *new(const char *termtype)
 
 #else /* not HAVE_UNIBILIUM */
 
-static TickitTermDriver *new(const char *termtype)
+static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
   return NULL;
 }

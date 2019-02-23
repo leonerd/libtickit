@@ -628,8 +628,10 @@ static TickitTermDriverVTable xterm_vtable = {
   .gotkey     = gotkey,
 };
 
-static TickitTermDriver *new(const char *termtype)
+static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
+  const char *termtype = args->termtype;
+
   if(strncmp(termtype, "xterm", 5) != 0)
     return NULL;
 

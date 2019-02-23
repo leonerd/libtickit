@@ -138,8 +138,12 @@ TickitTerm *tickit_term_new(void)
 
 TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 {
+  TickitTermProbeArgs args = {
+    .termtype = termtype,
+  };
+
   for(int i = 0; driver_probes[i]; i++) {
-    TickitTermDriver *driver = (*driver_probes[i]->new)(termtype);
+    TickitTermDriver *driver = (*driver_probes[i]->new)(&args);
     if(!driver)
       continue;
 
