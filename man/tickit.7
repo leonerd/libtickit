@@ -49,6 +49,17 @@ Some API functions take or return the following enum type, to represent a tri-st
 .BR "  TICKIT_MAYBE" " = -1",
 .BI "} " TickitMaybeBool ;
 .EE
+.PP
+The various \fBtickit_*_ctltype\fP() and \fBtickit_pen_attrtype\fP(3) functions return the following enum type, to indicate what type of value each individual control or attribute takes.
+.sp
+.EX
+.B  typedef enum {
+.BR "  TICKIT_TYPE_NONE" ,
+.BR "  TICKIT_TYPE_BOOL" ,
+.BR "  TICKIT_TYPE_INT" ,
+.BR "  TICKIT_TYPE_COLOUR" ,
+.BI "} " TickitType ;
+.EE
 .SH "COMMON EVENTS"
 Every object instance that supports events supports the following type of event, in addition to the specific ones listed for that kind of object:
 .TP

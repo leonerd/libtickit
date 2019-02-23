@@ -8,7 +8,7 @@ tickit_term_ctlname \- return the name of a terminal control
 .BI "const char * tickit_term_ctlname(TickitTermCtl " ctl );
 .BI "TickitTermCtl tickit_term_lookup_ctl(const char * " name );
 .sp
-.BI "TickitCtlType tickit_term_ctltype(TickitTermCtl " ctl );
+.BI "TickitType tickit_term_ctltype(TickitTermCtl " ctl );
 .EE
 .sp
 Link with \fI\-ltickit\fP.
@@ -20,13 +20,13 @@ Link with \fI\-ltickit\fP.
 \fBtickit_term_ctltype\fP() returns the type of the given terminal control, as one of the following constants:
 .in
 .TP
-.B TICKIT_CTLTYPE_BOOL
+.B TICKIT_TYPE_BOOL
 The value is an integer representing a simple boolean choice, where any nonzero value is true. Use \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_getctl_int\fP(3).
 .TP
-.B TICKIT_CTLTYPE_INT
+.B TICKIT_TYPE_INT
 The value is an integer representing a quantity, or a value in some particular enumeration. Use \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_getctl_int\fP(3).
 .TP
-.B TICKIT_CTLTYPE_STR
+.B TICKIT_TYPE_STR
 The value is a string. Use \fBtickit_term_setctl_str\fP(3).
 .PP
 For unrecognised control types, the function returns 0.

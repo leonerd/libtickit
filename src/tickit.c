@@ -618,14 +618,14 @@ TickitCtl tickit_lookup_ctl(const char *name)
   return -1;
 }
 
-TickitCtlType tickit_ctltype(TickitCtl ctl)
+TickitType tickit_ctltype(TickitCtl ctl)
 {
   switch(ctl) {
     case TICKIT_CTL_USE_ALTSCREEN:
-      return TICKIT_CTLTYPE_BOOL;
+      return TICKIT_TYPE_BOOL;
 
     case TICKIT_N_CTLS:
       ;
   }
-  return TICKIT_CTLTYPE_NONE;
+  return TICKIT_TYPE_NONE;
 }

@@ -59,13 +59,6 @@ typedef enum {
 } TickitCtl;
 
 typedef enum {
-  TICKIT_CTLTYPE_NONE,
-  TICKIT_CTLTYPE_BOOL,
-  TICKIT_CTLTYPE_INT,
-  TICKIT_CTLTYPE_STR,
-} TickitCtlType;
-
-typedef enum {
   TICKIT_CURSORSHAPE_BLOCK = 1,
   TICKIT_CURSORSHAPE_UNDER,
   TICKIT_CURSORSHAPE_LEFT_BAR,
@@ -102,12 +95,6 @@ typedef enum {
 
   TICKIT_N_PEN_ATTRS
 } TickitPenAttr;
-
-typedef enum {
-  TICKIT_PENTYPE_BOOL,
-  TICKIT_PENTYPE_INT,
-  TICKIT_PENTYPE_COLOUR,
-} TickitPenAttrType;
 
 typedef enum {
   TICKIT_PEN_UNDER_NONE,
@@ -149,6 +136,14 @@ typedef enum {
 } TickitTermMouseMode;
 
 typedef enum {
+  TICKIT_TYPE_NONE,
+  TICKIT_TYPE_BOOL,
+  TICKIT_TYPE_INT,
+  TICKIT_TYPE_STR,
+  TICKIT_TYPE_COLOUR, // currently unused except by pen
+} TickitType;
+
+typedef enum {
   TICKIT_WINCTL_STEAL_INPUT = 1,
   TICKIT_WINCTL_FOCUS_CHILD_NOTIFY,
   TICKIT_WINCTL_CURSORVIS,
@@ -174,6 +169,13 @@ enum {
   TICKIT_MOD_ALT   = 0x02,
   TICKIT_MOD_CTRL  = 0x04,
 };
+
+/* back-compat name */
+typedef enum {
+  TICKIT_PENTYPE_BOOL   = TICKIT_TYPE_BOOL,
+  TICKIT_PENTYPE_INT    = TICKIT_TYPE_INT,
+  TICKIT_PENTYPE_COLOUR = TICKIT_TYPE_COLOUR,
+} TickitPenAttrType;
 
 /*
  * Secondary structures
@@ -447,7 +449,7 @@ void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info);
 const char *tickit_term_ctlname(TickitTermCtl ctl);
 TickitTermCtl tickit_term_lookup_ctl(const char *name);
 
-TickitCtlType tickit_term_ctltype(TickitTermCtl ctl);
+TickitType tickit_term_ctltype(TickitTermCtl ctl);
 
 /* String handling utilities */
 
@@ -672,7 +674,7 @@ void tickit_window_set_steal_input(TickitWindow *win, bool steal);
 const char *tickit_window_ctlname(TickitWindowCtl ctl);
 TickitWindowCtl tickit_window_lookup_ctl(const char *name);
 
-TickitCtlType tickit_window_ctltype(TickitWindowCtl ctl);
+TickitType tickit_window_ctltype(TickitWindowCtl ctl);
 
 /* Main object */
 
@@ -699,7 +701,7 @@ bool tickit_setctl_int(Tickit *tt, TickitCtl ctl, int value);
 const char *tickit_ctlname(TickitCtl ctl);
 TickitCtl tickit_lookup_ctl(const char *name);
 
-TickitCtlType tickit_ctltype(TickitCtl ctl);
+TickitType tickit_ctltype(TickitCtl ctl);
 
 /* TODO: Consider OUT and HUP conditions too */
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);

@@ -8,7 +8,7 @@ tickit_window_ctlname \- return the name of a window control
 .BI "const char * tickit_window_ctlname(TickitWindowCtl " ctl );
 .BI "TickitWindowCtl tickit_window_lookup_ctl(const char * " name );
 .sp
-.BI "TickitCtlType tickit_window_ctltype(TickitWindowCtl " ctl );
+.BI "TickitType tickit_window_ctltype(TickitWindowCtl " ctl );
 .EE
 .sp
 Link with \fI\-ltickit\fP.
@@ -20,10 +20,10 @@ Link with \fI\-ltickit\fP.
 \fBtickit_window_ctltype\fP() returns the type of the given window control, as one of the following constants:
 .in
 .TP
-.B TICKIT_CTLTYPE_BOOL
+.B TICKIT_TYPE_BOOL
 The value is an integer representing a simple boolean choice, where any nonzero value is true. Use \fBtickit_window_setctl_int\fP(3) and \fBtickit_window_getctl_int\fP(3).
 .TP
-.B TICKIT_CTLTYPE_INT
+.B TICKIT_TYPE_INT
 The value is an integer representing a quantity, or a value in some particular enumeration. Use \fBtickit_window_setctl_int\fP(3) and \fBtickit_window_getctl_int\fP(3).
 .PP
 For unrecognised control types, the function returns 0.

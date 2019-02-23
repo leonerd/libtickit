@@ -1396,20 +1396,20 @@ TickitWindowCtl tickit_window_lookup_ctl(const char *name)
   return -1;
 }
 
-TickitCtlType tickit_window_ctltype(TickitWindowCtl ctl)
+TickitType tickit_window_ctltype(TickitWindowCtl ctl)
 {
   switch(ctl) {
     case TICKIT_WINCTL_STEAL_INPUT:
     case TICKIT_WINCTL_FOCUS_CHILD_NOTIFY:
     case TICKIT_WINCTL_CURSORVIS:
     case TICKIT_WINCTL_CURSORBLINK:
-      return TICKIT_CTLTYPE_BOOL;
+      return TICKIT_TYPE_BOOL;
 
     case TICKIT_WINCTL_CURSORSHAPE:
-      return TICKIT_CTLTYPE_INT;
+      return TICKIT_TYPE_INT;
 
     case TICKIT_N_WINCTLS:
       ;
   }
-  return TICKIT_CTLTYPE_NONE;
+  return TICKIT_TYPE_NONE;
 }
