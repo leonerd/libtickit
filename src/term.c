@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
 
 #include <sys/ioctl.h>
@@ -81,6 +82,32 @@ struct TickitTerm {
 
 DEFINE_BINDINGS_FUNCS(term,TickitTerm,TickitTermEventFn)
 
+static void *get_tmpbuffer(TickitTerm *tt, size_t len);
+
+static const char *getstr_hook(const char *name, const char *value, void *_tt)
+{
+  TickitTerm *tt = _tt;
+
+  if(streq(name, "key_backspace")) {
+    /* Many terminfos lie about backspace. Rather than trust it even a little
+     * tiny smidge, we'll interrogate what termios thinks of the VERASE char
+     * and claim that is the backspace key. It's what neovim does
+     *
+     *   https://github.com/neovim/neovim/blob/1083c626b9a3fc858c552d38250c3c555cda4074/src/nvim/tui/tui.c#L1982
+     */
+    struct termios termios;
+    tcgetattr(tt->infd, &termios);
+
+    char *ret = get_tmpbuffer(tt, 2);
+    ret[0] = termios.c_cc[VERASE];
+    ret[1] = 0;
+
+    return ret;
+  }
+
+  return value;
+}
+
 static TermKey *get_termkey(TickitTerm *tt)
 {
   if(!tt->termkey) {
@@ -90,13 +117,12 @@ static TermKey *get_termkey(TickitTerm *tt)
     else if(tt->is_utf8 == TICKIT_NO)
       flags |= TERMKEY_FLAG_RAW;
 
-    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR | flags);
+    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR|TERMKEY_FLAG_NOSTART | flags);
+    termkey_hook_terminfo_getstr(tt->termkey, getstr_hook, tt);
+    termkey_start(tt->termkey);
 
     tt->is_utf8 = !!(termkey_get_flags(tt->termkey) & TERMKEY_FLAG_UTF8);
   }
-
-  termkey_set_canonflags(tt->termkey,
-      termkey_get_canonflags(tt->termkey) | TERMKEY_CANON_DELBS);
 
   return tt->termkey;
 }
