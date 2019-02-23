@@ -199,7 +199,7 @@ bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
 
 bool tickit_pen_is_nonempty(const TickitPen *pen)
 {
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(tickit_pen_has_attr(pen, attr))
       return true;
   }
@@ -208,7 +208,7 @@ bool tickit_pen_is_nonempty(const TickitPen *pen)
 
 bool tickit_pen_is_nondefault(const TickitPen *pen)
 {
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(tickit_pen_nondefault_attr(pen, attr))
       return true;
   }
@@ -417,7 +417,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
 
 void tickit_pen_clear(TickitPen *pen)
 {
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++)
     tickit_pen_clear_attr(pen, attr);
 }
 
@@ -449,7 +449,7 @@ bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b)
   if(a == b)
     return true;
 
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++)
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++)
     if(!tickit_pen_equiv_attr(a, b, attr))
       return false;
 
@@ -481,7 +481,7 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
 {
   freeze(dst);
 
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(!tickit_pen_has_attr(src, attr))
       continue;
     if(tickit_pen_has_attr(dst, attr) &&

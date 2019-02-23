@@ -90,7 +90,7 @@ typedef enum {
 } TickitMaybeBool;
 
 typedef enum {
-  TICKIT_PEN_FG,         /* colour */
+  TICKIT_PEN_FG = 1,     /* colour */
   TICKIT_PEN_BG,         /* colour */
   TICKIT_PEN_BOLD,       /* bool */
   TICKIT_PEN_UNDER,      /* number */

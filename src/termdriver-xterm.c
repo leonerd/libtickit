@@ -203,6 +203,7 @@ static bool clear(TickitTermDriver *ttd)
 }
 
 static struct SgrOnOff { int on, off; } sgr_onoff[] = {
+  {},         /* none */
   { 30, 39 }, /* fg */
   { 40, 49 }, /* bg */
   {  1, 22 }, /* bold */
@@ -224,7 +225,7 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
   int params[16];
   int pindex = 0;
 
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(!tickit_pen_has_attr(delta, attr))
       continue;
 

@@ -841,7 +841,7 @@ void tickit_term_chpen(TickitTerm *tt, const TickitPen *pen)
 {
   TickitPen *delta = tickit_pen_new();
 
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(!tickit_pen_has_attr(pen, attr))
       continue;
 
@@ -870,7 +870,7 @@ void tickit_term_setpen(TickitTerm *tt, const TickitPen *pen)
 {
   TickitPen *delta = tickit_pen_new();
 
-  for(TickitPenAttr attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+  for(TickitPenAttr attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
     if(tickit_pen_has_attr(tt->pen, attr) && tickit_pen_equiv_attr(tt->pen, pen, attr))
       continue;
 
