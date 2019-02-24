@@ -57,6 +57,8 @@ struct Tickit {
   TickitEventHooks *evhooks;
   void             *evdata;
 
+  struct TickitTerminfoHook ti_hook;
+
   unsigned int done_setup    : 1,
                use_altscreen : 1;
 };
@@ -209,7 +211,11 @@ TickitTerm *tickit_get_term(Tickit *t)
   if(!t->term) {
     /* Don't use tickit_term_open_stdio() because that observes SIGWINCH
      */
-    TickitTerm *tt = tickit_term_new();
+    struct TickitTermBuilder builder = { 0 };
+    if(t->ti_hook.getstr)
+      builder.ti_hook = &t->ti_hook;
+
+    TickitTerm *tt = tickit_term_build(&builder);
     if(!tt)
       return NULL;
 
@@ -259,6 +265,14 @@ bool tickit_setctl_int(Tickit *t, TickitCtl ctl, int value)
       ;
   }
   return false;
+}
+
+void tickit_hook_terminfo(Tickit *t,
+    const char *(*getstr)(const char *name, const char *value, void *data),
+    void         *data)
+{
+  t->ti_hook.getstr = getstr;
+  t->ti_hook.data   = data;
 }
 
 // TODO: copy the entire SIGWINCH-like structure from term.c

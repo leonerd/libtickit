@@ -732,6 +732,11 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
 
 void tickit_watch_cancel(Tickit *t, void *watch);
 
+/* Entirely undocumented right now */
+void tickit_hook_terminfo(Tickit *t,
+    const char *(*getstr)(const char *name, const char *value, void *data),
+    void         *data);
+
 /* Debug support */
 
 void tickit_debug_init(void);
