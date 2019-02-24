@@ -378,7 +378,13 @@ void tickit_term_destroy(TickitTerm *tt);
 // Internal use only for now but consider making it public API
 struct TickitTermBuilder {
   const char *termtype;
+
   TickitTermDriver *driver;
+
+  const struct TickitTerminfoHook {
+    const char *(*getstr)(const char *name, const char *value, void *data);
+    void         *data;
+  } *ti_hook;
 };
 TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
 

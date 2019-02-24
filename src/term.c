@@ -51,6 +51,8 @@ struct TickitTerm {
   TermKey              *termkey;
   struct timeval        input_timeout_at; /* absolute time */
 
+  struct TickitTerminfoHook ti_hook;
+
   char *termtype;
   TickitMaybeBool is_utf8;
 
@@ -102,8 +104,11 @@ static const char *getstr_hook(const char *name, const char *value, void *_tt)
     ret[0] = termios.c_cc[VERASE];
     ret[1] = 0;
 
-    return ret;
+    value = ret;
   }
+
+  if(tt->ti_hook.getstr)
+    value = (*tt->ti_hook.getstr)(name, value, tt->ti_hook.data);
 
   return value;
 }
@@ -133,7 +138,9 @@ static TickitTermDriver *tickit_term_build_driver(struct TickitTermBuilder *buil
     return builder->driver;
 
   TickitTermProbeArgs args = {
-    .termtype = builder->termtype,
+    .termtype       = builder->termtype,
+    .ti_getstr_hook = builder->ti_hook ? builder->ti_hook->getstr : NULL,
+    .ti_getstr_data = builder->ti_hook ? builder->ti_hook->data   : NULL,
   };
 
   for(int i = 0; driver_probes[i]; i++) {
@@ -164,6 +171,11 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
   TickitTermDriver *driver = tickit_term_build_driver(&builder);
   if(!driver)
     return NULL;
+
+  if(builder.ti_hook)
+    tt->ti_hook = *builder.ti_hook;
+  else
+    tt->ti_hook = (struct TickitTerminfoHook){ 0 };
 
   tt->outfd   = -1;
   tt->outfunc = NULL;
