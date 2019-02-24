@@ -138,9 +138,8 @@ static TickitTermDriver *tickit_term_build_driver(struct TickitTermBuilder *buil
     return builder->driver;
 
   TickitTermProbeArgs args = {
-    .termtype       = builder->termtype,
-    .ti_getstr_hook = builder->ti_hook ? builder->ti_hook->getstr : NULL,
-    .ti_getstr_data = builder->ti_hook ? builder->ti_hook->data   : NULL,
+    .termtype = builder->termtype,
+    .ti_hook  = builder->ti_hook,
   };
 
   for(int i = 0; driver_probes[i]; i++) {

@@ -107,8 +107,8 @@ static const char *lookup_ti_string(struct TIDriver *td, const TickitTermProbeAr
     if(fb->cap == s)
       value = fb->value;
 
-  if(args->ti_getstr_hook)
-    value = (*args->ti_getstr_hook)(unibi_name_str(s), value, args->ti_getstr_data); 
+  if(args->ti_hook && args->ti_hook->getstr)
+    value = (*args->ti_hook->getstr)(unibi_name_str(s), value, args->ti_hook->data);
 
   return value;
 }
