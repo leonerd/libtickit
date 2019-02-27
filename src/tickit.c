@@ -63,8 +63,8 @@ struct Tickit {
                use_altscreen : 1;
 };
 
-static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user);
-static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user)
+static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *info, void *user);
+static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *info, void *user)
 {
   int timeout = tickit_term_input_check_timeout_msec(t->term);
   if(timeout > -1)
@@ -73,11 +73,11 @@ static int on_term_timeout(Tickit *t, TickitEventFlags flags, void *user)
   return 0;
 }
 
-static int on_term_readable(Tickit *t, TickitEventFlags flags, void *user)
+static int on_term_readable(Tickit *t, TickitEventFlags flags, void *info, void *user)
 {
   tickit_term_input_readable(t->term);
 
-  on_term_timeout(t, TICKIT_EV_FIRE, NULL);
+  on_term_timeout(t, TICKIT_EV_FIRE, NULL, NULL);
   return 0;
 }
 
@@ -162,7 +162,7 @@ static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc
     next = this->next;
 
     if(this->flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY))
-      (*this->fn)(this->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, this->user);
+      (*this->fn)(this->t, TICKIT_EV_UNBIND|TICKIT_EV_DESTROY, NULL, this->user);
 
     if(cancelfunc)
       (*cancelfunc)(t->evdata, this);
@@ -465,7 +465,7 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
       *prevp = this->next;
 
       if(this->flags & TICKIT_BIND_UNBIND)
-        (*this->fn)(t, TICKIT_EV_UNBIND, this->user);
+        (*this->fn)(t, TICKIT_EV_UNBIND, NULL, this->user);
 
       switch(this->type) {
         case WATCH_IO:
@@ -531,7 +531,8 @@ void tickit_evloop_invoke_timers(Tickit *t)
       if(timercmp(&this->timer.at, &now, >))
         break;
 
-      (*this->fn)(this->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, this->user);
+      /* TODO: consider what info might point at */
+      (*this->fn)(this->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, NULL, this->user);
 
       TickitWatch *next = this->next;
       free(this);
@@ -542,7 +543,7 @@ void tickit_evloop_invoke_timers(Tickit *t)
   }
 
   while(later) {
-    (*later->fn)(later->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, later->user);
+    (*later->fn)(later->t, TICKIT_EV_FIRE|TICKIT_EV_UNBIND, NULL, later->user);
 
     TickitWatch *next = later->next;
     free(later);
@@ -572,7 +573,7 @@ void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data)
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
 {
-  (*watch->fn)(watch->t, flags, watch->user);
+  (*watch->fn)(watch->t, flags, NULL, watch->user);
 
   /* Remove oneshot watches from the list */
   TickitWatch **prevp;

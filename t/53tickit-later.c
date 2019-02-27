@@ -3,7 +3,7 @@
 #include "taplib.h"
 
 static int unbound_count;
-static int on_call_incr(Tickit *t, TickitEventFlags flags, void *user)
+static int on_call_incr(Tickit *t, TickitEventFlags flags, void *info, void *user)
 {
   if(flags & TICKIT_EV_FIRE) {
     int *ip = user;

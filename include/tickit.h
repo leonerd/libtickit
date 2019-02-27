@@ -694,7 +694,7 @@ TickitType tickit_window_ctltype(TickitWindowCtl ctl);
 
 /* Main object */
 
-typedef int TickitCallbackFn(Tickit *t, TickitEventFlags flags, void *user);
+typedef int TickitCallbackFn(Tickit *t, TickitEventFlags flags, void *info, void *user);
 
 Tickit *tickit_new_for_term(TickitTerm *tt);
 Tickit *tickit_new_stdio(void);

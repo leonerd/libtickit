@@ -79,7 +79,7 @@ static int event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data
   return 1;
 }
 
-static int later(Tickit *t, TickitEventFlags flags, void *data)
+static int later(Tickit *t, TickitEventFlags flags, void *_info, void *data)
 {
   TickitTerm *tt = tickit_get_term(t);
 

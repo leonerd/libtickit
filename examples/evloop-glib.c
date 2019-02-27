@@ -172,8 +172,8 @@ static int render_timer(TickitWindow *win, TickitEventFlags flags, void *_info, 
   return 1;
 }
 
-static int on_timer(Tickit *t, TickitEventFlags flags, void *user);
-static int on_timer(Tickit *t, TickitEventFlags flags, void *user)
+static int on_timer(Tickit *t, TickitEventFlags flags, void *_info, void *user);
+static int on_timer(Tickit *t, TickitEventFlags flags, void *_info, void *user)
 {
   int *counterp = user;
 
