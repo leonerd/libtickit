@@ -1,3 +1,15 @@
+2019-02-27 09:28 0.3-RC2
+  * Deleted the deprecated tickit_string_* functions that were renamed to
+    tickit_utf8_*
+  * Renamed TickitCtlType to just TickitType
+  * Renumbered TICKIT_PEN_* constants to start from 1; lists can end with 0
+  * Use termios to know what backspace (VERASE) character is, rather than
+    relying on terminfo - experience from vim, neovim, etc.. is that this is
+    often more reliable
+  * tickit_watch_* callbacks now receive an info pointer, to match the calling
+    style of other object bindings
+  * Removed -rpath workaround from tickit.pc
+
 2019-02-15 23:53 0.3-RC1
   * Renamed:
       + tickit_timer_after_msec => tickit_watch_timer_after_msec
