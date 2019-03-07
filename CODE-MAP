@@ -19,6 +19,9 @@ examples/
 include/tickit.h
  - main include file
 
+include/tickit-evloop.h
+ - include file for implementing custom event loops
+
 include/tickit-mockterm.h
  - include file for tests using the mock terminal
 
@@ -34,14 +37,17 @@ man/also
 src/
  - contains the source code for the library
 
+src/bindings.c
+ - (internal) implementation of lists of event handlers
+
+src/bindings.h
+ - header file for lists of event handlers
+
 src/debug.c
  - helper functions for printing debug log
 
-src/hooklists.c
- - (internal) implementation of lists of event handlers
-
-src/hooklists.h
- - header file for lists of event handlers
+src/evloop-default.c
+ - implements the default event loop used by the toplevel Tickit instance
 
 src/linechars.inc.PL
  - script to generate `linechars.inc`
@@ -62,7 +68,7 @@ src/rectset.c
  - implements TickitRectSet; stores a collection of rectangular areas
 
 src/renderbuffer.c
- - implementes TickitRenderBuffer; store display content to be drawn to the terminal
+ - implements TickitRenderBuffer; store display content to be drawn to the terminal
 
 src/string.c
  - implements TickitString; a reference-counted string buffer
