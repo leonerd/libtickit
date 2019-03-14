@@ -129,6 +129,9 @@ static TermKey *get_termkey(TickitTerm *tt)
     tt->is_utf8 = !!(termkey_get_flags(tt->termkey) & TERMKEY_FLAG_UTF8);
   }
 
+  termkey_set_canonflags(tt->termkey,
+      termkey_get_canonflags(tt->termkey) | TERMKEY_CANON_DELBS);
+
   return tt->termkey;
 }
 
