@@ -9,7 +9,7 @@ includedir=$INCDIR
 
 Name: tickit
 Description: Terminal Interface Construction KIT
-Version: 0.3RC2
+Version: 0.3
 Libs: $LIBS
 Cflags: $CFLAGS
 EOF

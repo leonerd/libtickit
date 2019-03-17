@@ -1,16 +1,4 @@
-2019-02-27 09:28 0.3-RC2
-  * Deleted the deprecated tickit_string_* functions that were renamed to
-    tickit_utf8_*
-  * Renamed TickitCtlType to just TickitType
-  * Renumbered TICKIT_PEN_* constants to start from 1; lists can end with 0
-  * Use termios to know what backspace (VERASE) character is, rather than
-    relying on terminfo - experience from vim, neovim, etc.. is that this is
-    often more reliable
-  * tickit_watch_* callbacks now receive an info pointer, to match the calling
-    style of other object bindings
-  * Removed -rpath workaround from tickit.pc
-
-2019-02-15 23:53 0.3-RC1
+2019-03-17 22:11  0.3
   * Renamed:
       + tickit_timer_after_msec => tickit_watch_timer_after_msec
       + tickit_timer_after_tv   => tickit_watch_timer_after_tv
@@ -19,9 +7,9 @@
   * Added toplevel Tickit functions for loop control
       + tickit_tick(3)
       + tickit_watch_io_read(3)
-      + tickit_timer_at_epoch(3)
-      + tickit_timer_at_tv(3)
-  * Added TickitCtlType
+      + tickit_watch_timer_at_epoch(3)
+      + tickit_watch_timer_at_tv(3)
+  * Added TickitType
       + tickit_term_ctltype(3)
   * Added window controls
       + tickit_window_getctl_int(3)
@@ -39,7 +27,14 @@
   * Fixed various example/demo-*.c files so they work again
   * Added experimental new ability to provide event loop hooks for other event
     loops
-  * Generated tickit.pc file now provides -rpath linker argument if required
+  * Deleted the deprecated tickit_string_* functions that were renamed to
+    tickit_utf8_*
+  * Renumbered TICKIT_PEN_* constants to start from 1; lists can end with 0
+  * Use termios to know what backspace (VERASE) character is, rather than
+    relying on terminfo - experience from vim, neovim, etc.. is that this is
+    often more reliable
+  * tickit_watch_* callbacks now receive an info pointer, to match the calling
+    style of other object bindings
 
 2018-01-05 14:47  0.2
   * Added tickit_window_{is,set}_steal_focus(3)
