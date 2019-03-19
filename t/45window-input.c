@@ -60,6 +60,30 @@ int on_termevent_incr_int(TickitTerm *tt, TickitEventFlags flags, void *_info, v
   return 0;
 }
 
+TickitWindow *childwin = NULL;
+int childmouse = 0;
+
+int win_on_mouse_child(TickitWindow *win, TickitEventFlags flags, void *_info, void *data) {
+  if(childwin)
+    return 0;
+
+  childwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
+  tickit_window_bind_event(childwin, TICKIT_WINDOW_ON_MOUSE, 0, &on_event_incr_int, &childmouse);
+  return 0;
+}
+
+TickitWindow *siblingwin = NULL;
+int siblingmouse = 0;
+
+int win_on_mouse_sibling(TickitWindow *win, TickitEventFlags flags, void *_info, void *data) {
+  if(siblingwin)
+    return 0;
+
+  siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
+  tickit_window_bind_event(siblingwin, TICKIT_WINDOW_ON_MOUSE, 0, &on_event_incr_int, &siblingmouse);
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   TickitTerm *tt = make_term(25, 80);
@@ -209,19 +233,7 @@ int main(int argc, char *argv[])
   // Windows created in input events handlers don't receive events
   //   child windows
   {
-    TickitWindow *childwin = NULL;
-    int childmouse = 0;
-
-    int win_on_mouse(TickitWindow *win, TickitEventFlags flags, void *_info, void *data) {
-      if(childwin)
-        return 0;
-
-      childwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
-      tickit_window_bind_event(childwin, TICKIT_WINDOW_ON_MOUSE, 0, &on_event_incr_int, &childmouse);
-      return 0;
-    }
-
-    int id = tickit_window_bind_event(win, TICKIT_WINDOW_ON_MOUSE, 0, &win_on_mouse, NULL);
+    int id = tickit_window_bind_event(win, TICKIT_WINDOW_ON_MOUSE, 0, &win_on_mouse_child, NULL);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
 
@@ -241,19 +253,7 @@ int main(int argc, char *argv[])
 
   //   sibling windows
   {
-    TickitWindow *siblingwin = NULL;
-    int siblingmouse = 0;
-
-    int win_on_mouse(TickitWindow *win, TickitEventFlags flags, void *_info, void *data) {
-      if(siblingwin)
-        return 0;
-
-      siblingwin = tickit_window_new(win, (TickitRect){0, 0, 2, 2}, 0);
-      tickit_window_bind_event(siblingwin, TICKIT_WINDOW_ON_MOUSE, 0, &on_event_incr_int, &siblingmouse);
-      return 0;
-    }
-
-    int id = tickit_window_bind_event(win, TICKIT_WINDOW_ON_MOUSE, 0, &win_on_mouse, NULL);
+    int id = tickit_window_bind_event(win, TICKIT_WINDOW_ON_MOUSE, 0, &win_on_mouse_sibling, NULL);
 
     press_mouse(TICKIT_MOUSEEV_PRESS, 1, 3, 10, 0);
 
