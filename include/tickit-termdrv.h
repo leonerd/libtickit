@@ -14,8 +14,6 @@ extern "C" {
 #include "tickit.h"
 #include <termkey.h>
 
-typedef struct TickitTermDriver TickitTermDriver;
-
 typedef struct {
   void (*attach)(TickitTermDriver *ttd, TickitTerm *tt); /* optional */
   void (*destroy)(TickitTermDriver *ttd);
