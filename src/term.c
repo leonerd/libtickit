@@ -7,7 +7,9 @@
  * On most BSDs they come automatically
  * On other platforms - I have no idea... bug reports welcome :)
  */
-#define _GNU_SOURCE
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
 
 #include "tickit.h"
 #include "bindings.h"
