@@ -131,6 +131,8 @@ Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *
   t->timers    = NULL;
   t->laters    = NULL;
 
+  t->ti_hook.getstr = NULL;
+
   t->done_setup = false;
 
   t->use_altscreen = true;
