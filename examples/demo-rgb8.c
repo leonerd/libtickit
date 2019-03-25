@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define streq(a,b)  (strcmp(a,b) == 0)
+#define streq(a,b) (!strcmp(a,b))
 
 #define COL_RED   1
 #define COL_GREEN 2

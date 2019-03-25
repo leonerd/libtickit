@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define streq(a,b)  (strcmp(a,b) == 0)
+#define streq(a,b) (!strcmp(a,b))
 
 struct {
   char *name;

@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#define streq(a,b) (strcmp(a,b) == 0)
+#define streq(a,b) (!strcmp(a,b))
 
 static const char *ti_getstr(const char *name, const char *value, void *user)
 {

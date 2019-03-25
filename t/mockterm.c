@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#define streq(a,b) (strcmp(a,b) == 0)
+#define streq(a,b) (!strcmp(a,b))
 
 static char *lognames[] = {
   [EXPECT_GOTO]       = "goto",

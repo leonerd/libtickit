@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#define streq(a,b) (strcmp(a,b)==0)
+#define streq(a,b) (!strcmp(a,b))
 
 #define RECT(t,l,li,co)  (TickitRect){ .top = t, .left = l, .lines = li, .cols = co }
 
