@@ -100,7 +100,7 @@ static int resize_event(TickitTerm *tt, TickitEventFlags flags, void *_info, voi
   return 1;
 }
 
-static int render(Tickit *t, TickitEventFlags flags, void *data)
+static int render(Tickit *t, TickitEventFlags flags, void *data, void *user)
 {
   TickitTerm *tt = tickit_get_term(t);
 
