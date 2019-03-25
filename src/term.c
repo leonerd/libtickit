@@ -170,14 +170,14 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
   if(!tt)
     return NULL;
 
-  TickitTermDriver *driver = tickit_term_build_driver(&builder);
-  if(!driver)
-    return NULL;
-
   if(builder.ti_hook)
     tt->ti_hook = *builder.ti_hook;
   else
     tt->ti_hook = (struct TickitTerminfoHook){ 0 };
+
+  TickitTermDriver *driver = tickit_term_build_driver(&builder);
+  if(!driver)
+    return NULL;
 
   tt->outfd   = -1;
   tt->outfunc = NULL;
