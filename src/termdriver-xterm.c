@@ -470,7 +470,7 @@ static void start(TickitTermDriver *ttd)
   // Also query the current cursor visibility, blink status, and shape
   tickit_termdrv_write_strf(ttd, "\e[?25$p\e[?12$p\eP$q q\e\\");
 
-  // Try to work out whether the terminal supports 24bit cololurs (RGB8) and
+  // Try to work out whether the terminal supports 24bit colours (RGB8) and
   // whether it understands : to separate sub-params
   tickit_termdrv_write_strf(ttd, "\e[38;5;255m\e[38:2:0:1:2m\eP$qm\e\\\e[m");
 
