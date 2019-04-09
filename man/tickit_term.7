@@ -128,6 +128,8 @@ The value is a boolean indicating whether the terminal alternate buffer mode sho
 .TP
 .B TICKIT_TERMCTL_COLORS (int, read-only)
 The value indicates how many colors are available. This value is read-only; it can be requested but not set.
+.IP
+On terminfo-driven terminals this will likely be 8, 16, or 256. On \fIxterm\fP-like terminals this will be 16,777,216 (i.e. \f(Cw1 << 24\fP) if the driver detects that the terminal supports 24-bit RGB8 ("true\-color") palettes, or 256 if not.
 .TP
 .B TICKIT_TERMCTL_CURSORBLINK (bool)
 The value is a boolean indicating whether the terminal text cursor should blink. When disabled, the cursor will appear in a steady state, if visible. When enabled, the cursor will appear blinking, if visible. If the cursor is invisible, this should not have any effect.

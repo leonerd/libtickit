@@ -353,7 +353,7 @@ static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
       return true;
 
     case TICKIT_TERMCTL_COLORS:
-      *value = 256;
+      *value = xd->cap.rgb8 ? (1<<24) : 256;
       return true;
 
     default:
