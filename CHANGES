@@ -1,3 +1,12 @@
+2019-04-10 21:03  0.3.1
+  * Avoid nested functions in unit tests as some versions of gcc dislike this
+  * Bugfixes and unit test for ti_hook
+  * Fix various (harmless) warnings from noisy C compilers
+  * Use only one standard streq() macro across all source
+  * Fix signature of render() in examples/demo-scroll.c
+  * Fix documentation of tickit_utf8_ncountmore(3) to include len param (LP1797763)
+  * Have TICKIT_TERMCTL_COLORS return (1<<24) on RGB8-capable terminals
+
 2019-03-17 22:11  0.3
   * Renamed:
       + tickit_timer_after_msec => tickit_watch_timer_after_msec
