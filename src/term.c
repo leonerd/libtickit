@@ -11,6 +11,9 @@
 # define _GNU_SOURCE
 #endif
 
+/* We need sigaction() and struct sigaction */
+#define _POSIX_C_SOURCE 199309L
+
 #include "tickit.h"
 #include "bindings.h"
 #include "termdriver.h"

@@ -1,3 +1,6 @@
+/* We need sigaction() and struct sigaction */
+#define _POSIX_C_SOURCE 199309L
+
 #include "tickit.h"
 #include "tickit-evloop.h"
 
