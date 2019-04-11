@@ -720,7 +720,6 @@ static void _do_restore(TickitRootWindow *root)
 
   if(win && win->is_focused && win->cursor.visible &&
      _cell_visible(win, win->cursor.line, win->cursor.col)) {
-    tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 1);
     TickitRect abs_geom = tickit_window_get_abs_geometry(win);
     int cursor_line = win->cursor.line + abs_geom.top;
     int cursor_col = win->cursor.col + abs_geom.left;
@@ -728,6 +727,7 @@ static void _do_restore(TickitRootWindow *root)
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORSHAPE, win->cursor.shape);
     if(win->cursor.blink != -1)
       tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORBLINK, win->cursor.blink);
+    tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 1);
   }
   else
     tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 0);
@@ -779,6 +779,11 @@ void tickit_window_flush(TickitWindow *win)
     }
 
     free(rects);
+
+    /* Hide terminal cursor during redraw. _do_restore will show it again if
+     * required
+     */
+    tickit_term_setctl_int(root->term, TICKIT_TERMCTL_CURSORVIS, 0);
 
     tickit_renderbuffer_flush_to_term(rb, root->term);
     tickit_renderbuffer_unref(rb);
