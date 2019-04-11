@@ -479,6 +479,8 @@ static void start(TickitTermDriver *ttd)
    * It doens't hurt at this point to clear the current line just in case.
    */
   tickit_termdrv_write_strf(ttd, "\e[G\e[K");
+
+  tickit_term_flush(ttd->tt);
 }
 
 static bool started(TickitTermDriver *ttd)

@@ -102,6 +102,7 @@ static void setupterm(Tickit *t)
   tickit_term_setctl_int(tt, TICKIT_TERMCTL_KEYPAD_APP, 1);
 
   tickit_term_clear(tt);
+  tickit_term_flush(tt);
 
   t->done_setup = true;
 }
@@ -223,6 +224,7 @@ TickitTerm *tickit_get_term(Tickit *t)
 
     tickit_term_set_input_fd(tt, STDIN_FILENO);
     tickit_term_set_output_fd(tt, STDOUT_FILENO);
+    tickit_term_set_output_buffer(tt, 4096);
 
     setterm(t, tt);
   }
