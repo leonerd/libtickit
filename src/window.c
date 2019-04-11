@@ -1043,6 +1043,7 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
 
     if(!done_pen) {
       // TODO: only bg matters
+      tickit_term_setctl_int(term, TICKIT_TERMCTL_CURSORVIS, 0);
       tickit_term_setpen(term, pen);
       done_pen = true;
     }
@@ -1081,6 +1082,10 @@ static bool _scrollrectset(TickitWindow *win, TickitRectSet *visible, int downwa
       tickit_window_expose(origwin, &origrect);
       ret = false;
     }
+  }
+
+  if(done_pen) {
+    _request_restore(WINDOW_AS_ROOT(win));
   }
 
   return ret;
