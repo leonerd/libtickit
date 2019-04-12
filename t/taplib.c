@@ -15,6 +15,12 @@ void plan_tests(int n)
   plan_printed = 1;
 }
 
+void skip_all(char *reason)
+{
+  printf("1..0 # SKIP %s\n", reason);
+  plan_printed = 1;
+}
+
 void pass(char *name)
 {
   printf("ok %d - %s\n", nexttest++, name);

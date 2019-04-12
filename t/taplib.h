@@ -1,4 +1,5 @@
 void plan_tests(int n);
+void skip_all(char *reason);
 void ok(int cmp, char *name);
 void pass(char *name);
 void fail(char *name);
