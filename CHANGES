@@ -1,3 +1,11 @@
+2019-04-12 16:35  0.3.2
+  * #define _POSIX_C_SOURCE as some platforms need it
+  * Hide terminal cursor around redraws
+  * Fix bug in terminal output buffering logic around split writes
+  * Default 4096 byte output buffer in toplevel Tickit instance
+  * Skip screen-based terminfo test if loading terminfo fails, due to ongoing
+    unibilium issue
+
 2019-04-10 21:03  0.3.1
   * Avoid nested functions in unit tests as some versions of gcc dislike this
   * Bugfixes and unit test for ti_hook
