@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   ok(!!tt, "tickit_term_new_for_termtype");
 
   tickit_term_set_output_func(tt, output, buffer);
-  tickit_term_set_output_buffer(tt, 4096);
+  tickit_term_set_output_buffer(tt, 8);
 
   buffer[0] = 0;
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   is_str_escape(buffer, "", "buffer empty after print");
 
   tickit_term_print(tt, "world!");
-  is_str_escape(buffer, "", "buffer still empty after second print");
+  is_str_escape(buffer, "Hello wo", "buffer contains one spill after second print");
 
   tickit_term_flush(tt);
   is_str_escape(buffer, "Hello world!", "buffer contains output after flush");

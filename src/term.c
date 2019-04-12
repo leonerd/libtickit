@@ -802,6 +802,7 @@ static void write_str(TickitTerm *tt, const char *str, size_t len)
         space = len;
       memcpy(tt->outbuffer + tt->outbuffer_cur, str, space);
       tt->outbuffer_cur += space;
+      str += space;
       len -= space;
       if(tt->outbuffer_cur >= tt->outbuffer_len)
         tickit_term_flush(tt);
