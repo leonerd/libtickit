@@ -1,6 +1,7 @@
 #include "tickit.h"
 #include "taplib.h"
 
+#include <errno.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -19,6 +20,16 @@ int main(int argc, char *argv[])
   int lines, cols;
 
   tt = tickit_term_new_for_termtype("screen");
+  if(!tt && (errno == ENOENT || errno == EINVAL)) {
+    /* Some systems (e.g. FreeBSD) provide extended terminfo cap strings for
+     * screen's terminfo file, which current version of unibilium is unable to
+     * parse. Just skip this test for now
+     * See also
+     *   https://github.com/mauke/unibilium/pull/39
+     */
+    skip_all("unable to load screen terminfo");
+    return exit_status();
+  }
   ok(!!tt, "tickit_term_new_for_termtype");
 
   if(!tt) {
