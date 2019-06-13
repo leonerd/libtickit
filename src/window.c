@@ -882,6 +882,7 @@ static void _do_hierarchy_change(HierarchyChangeType change, TickitWindow *paren
     case TICKIT_HIERARCHY_REMOVE:
       fmt = "Window " WINDOW_PRINTF_FMT " removes " WINDOW_PRINTF_FMT;
       _do_hierarchy_remove(parent, win);
+      win->parent = NULL;
       if(parent->focused_child && parent->focused_child == win)
         parent->focused_child = NULL;
       break;

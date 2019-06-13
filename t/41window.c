@@ -137,6 +137,9 @@ int main(int argc, char *argv[])
     is_int(tickit_window_children(root), 0, "root window has 1 child after close()");
     ok(!destroyed, "window not destroyed before unref");
 
+    // calling close a second time doesn't crash
+    tickit_window_close(win);
+
     tickit_window_unref(win);
     ok(destroyed, "window not destroyed after unref");
   }
