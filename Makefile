@@ -112,7 +112,7 @@ examples/%.lo: examples/%.c $(HFILES)
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 examples/%: examples/%.lo $(LIBRARY)
-	$(LIBTOOL) --mode=link --tag=CC gcc -o $@ $^ $(LDFLAGS)
+	$(LIBTOOL) --mode=link --tag=CC $(CC) -o $@ $^ $(LDFLAGS)
 
 .PHONY: install
 install: install-inc install-lib install-man
