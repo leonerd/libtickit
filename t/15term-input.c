@@ -1,4 +1,6 @@
-#define _XOPEN_SOURCE 500 // usleep
+#ifdef __GLIBC__
+#  define _XOPEN_SOURCE 500 // usleep
+#endif
 
 #include "tickit.h"
 #include "taplib.h"

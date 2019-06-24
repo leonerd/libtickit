@@ -1,18 +1,12 @@
 /* We need C99 vsnprintf() semantics */
-#define _ISOC99_SOURCE
-
-/* We need strdup and va_copy */
-
-/* On Linux we have to ask for them
- * On most BSDs they come automatically
- * On other platforms - I have no idea... bug reports welcome :)
- */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
-
+#ifdef __GLIBC__
+/* We need C99 vsnprintf() semantics */
+#  define _ISOC99_SOURCE
 /* We need sigaction() and struct sigaction */
-#define _POSIX_C_SOURCE 199309L
+#  define _POSIX_C_SOURCE 199309L
+/* We need strdup and va_copy */
+#  define _GNU_SOURCE
+#endif
 
 #include "tickit.h"
 #include "bindings.h"

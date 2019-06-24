@@ -1,4 +1,6 @@
-#define _XOPEN_SOURCE  // fdopen
+#ifdef __GLIBC__
+#  define _XOPEN_SOURCE  // fdopen
+#endif
 
 #include "tickit.h"
 

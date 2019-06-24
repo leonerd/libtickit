@@ -1,4 +1,6 @@
-#define _XOPEN_SOURCE 700
+#ifdef __GLIBC__
+#  define _XOPEN_SOURCE 700
+#endif
 
 #include "tickit.h"
 
