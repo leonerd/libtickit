@@ -1,5 +1,6 @@
-/* We need strdup */
-#define _XOPEN_SOURCE 600
+#ifdef __GLIBC__
+#  define _XOPEN_SOURCE 600 /* strdup */
+#endif
 
 #include "tickit.h"
 

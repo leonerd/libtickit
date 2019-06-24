@@ -1,4 +1,6 @@
-#define _XOPEN_SOURCE 500  /* strdup */
+#ifdef __GLIBC__
+#  define _XOPEN_SOURCE 500  /* strdup */
+#endif
 
 #include "tickit.h"
 #include "tickit-evloop.h"
