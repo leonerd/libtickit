@@ -139,6 +139,14 @@ int main(int argc, char *argv[])
   is_int(mousecol,    0,                    "mousecol after mouse button press");
   is_int(mousemod,    0,                    "mousemod after mouse button press");
 
+  tickit_term_input_push_bytes(tt, "\e[M#!!", 6);
+
+  is_int(mousetype,   TICKIT_MOUSEEV_RELEASE, "mousetype after mouse button release");
+  is_int(mousebutton, 1,                      "mousebutton after mouse button release");
+  is_int(mouseline,   0,                      "mouseline after mouse button release");
+  is_int(mousecol,    0,                      "mousecol after mouse button release");
+  is_int(mousemod,    0,                      "mousemod after mouse button release");
+
   tickit_term_input_push_bytes(tt, "\e[M`!!", 6);
 
   is_int(mousetype,   TICKIT_MOUSEEV_WHEEL, "mousetype after mouse wheel up");

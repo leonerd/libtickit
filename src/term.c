@@ -79,6 +79,8 @@ struct TickitTerm {
 
   int refcount;
   struct TickitBindings bindings;
+
+  int mouse_buttons_held;
 };
 
 DEFINE_BINDINGS_FUNCS(term,TickitTerm,TickitTermEventFn)
@@ -204,6 +206,8 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
 
   tt->refcount = 1;
   tt->bindings = (struct TickitBindings){ NULL };
+
+  tt->mouse_buttons_held = 0;
 
   /* Initially empty because we don't necessarily know the initial state
    * of the terminal
@@ -590,6 +594,23 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     }
 
     info.mod = key->modifiers;
+
+    if(info.type == TICKIT_MOUSEEV_PRESS || info.type == TICKIT_MOUSEEV_DRAG) {
+      tt->mouse_buttons_held |= (1 << info.button);
+    }
+    else if(info.type == TICKIT_MOUSEEV_RELEASE && info.button) {
+      tt->mouse_buttons_held &= ~(1 << info.button);
+    }
+    else if(info.type == TICKIT_MOUSEEV_RELEASE) {
+      /* X10 cannot report which button was released. Just report that they 
+       * all were */
+      for(info.button = 1; tt->mouse_buttons_held; info.button++)
+        if(tt->mouse_buttons_held & (1 << info.button)) {
+          run_events_whilefalse(tt, TICKIT_TERM_ON_MOUSE, &info);
+          tt->mouse_buttons_held &= ~(1 << info.button);
+        }
+      return; // Buttons have been handled
+    }
 
     run_events_whilefalse(tt, TICKIT_TERM_ON_MOUSE, &info);
   }
