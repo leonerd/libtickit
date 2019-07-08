@@ -575,6 +575,10 @@ void tickit_window_expose(TickitWindow *win, const TickitRect *exposed)
     return;
 
   if(!win->is_root) {
+    if(!win->parent)
+      /* During cleanup at shutdown this might be empty already */
+      return;
+
     tickit_rect_translate(&damaged, win->rect.top, win->rect.left);
     tickit_window_expose(win->parent, &damaged);
     return;
