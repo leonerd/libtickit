@@ -1,3 +1,12 @@
+2019-11-18 17:05  0.3.3
+  * Ensure that calling tickit_window_close(3) twice doesn't crash
+    (thanks noctux)
+  * Conditionally #define feature-test macros only on __GLIBC__ because other
+    OSes (e.g. the BSDs) use those macros to hide symbols (LP1824791)
+  * Make sure that examples build with $(CC) rather than hardcoded gcc
+  * Account for X10's lack of mouse button reporting on release events
+  * Avoid SEGV on shutdown if windows get closed after their parent
+
 2019-04-12 16:35  0.3.2
   * #define _POSIX_C_SOURCE as some platforms need it
   * Hide terminal cursor around redraws
