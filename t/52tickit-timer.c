@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_for_term(tickit_mockterm_new(25, 80));
 
+  /* tickit_watch_timer_after_msec */
   {
     int called = 0;
     tickit_watch_timer_after_msec(t, 10, 0, &on_call_incr, &called);
@@ -47,6 +48,23 @@ int main(int argc, char *argv[])
     tickit_run(t);
 
     is_int(called, 1, "tickit_watch_timer_after_msec invokes callback");
+  }
+
+  /* tickit_watch_timer_at_tv */
+  {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    tv.tv_usec += 1000;
+    if(tv.tv_usec >= 1000000)
+      tv.tv_sec++, tv.tv_usec -= 1000000;
+
+    int called = 0;
+    tickit_watch_timer_at_tv(t, &tv, 0, &on_call_incr, &called);
+
+    tickit_run(t);
+
+    is_int(called, 1, "tickit_watch_timer_at_tv invokes callback");
   }
 
   /* two timers with ordering */
