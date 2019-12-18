@@ -384,7 +384,7 @@ fail:
   return NULL;
 }
 
-void *tickit_watch_time_epoch(Tickit *t, time_t at, TickitBindFlags flags, TickitCallbackFn *func, void *user)
+void *tickit_watch_timer_at_epoch(Tickit *t, time_t at, TickitBindFlags flags, TickitCallbackFn *func, void *user)
 {
   return tickit_watch_timer_at_tv(t, &(struct timeval){
       .tv_sec = at,
