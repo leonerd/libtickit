@@ -85,6 +85,11 @@ int main(int argc, char *argv[])
 
   /* timer cancellation */
   {
+    void *watch = tickit_watch_timer_after_msec(t, 5, TICKIT_BIND_UNBIND, &on_call_incr, NULL);
+    tickit_watch_cancel(t, watch);
+    pass("immediate tickit_watch_cancel does not segfault");
+  }
+  {
     int called = 0;
     tickit_watch_timer_after_msec(t, 10, 0, &on_call_incr, &called);
     int not_called = 0;

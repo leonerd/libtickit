@@ -447,26 +447,26 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
 {
   TickitWatch *watch = _watch;
 
-  TickitWatch **prevp;
+  TickitWatch **thisp;
   switch(watch->type) {
     case WATCH_IO:
-      prevp = &t->timers;
+      thisp = &t->timers;
       break;
     case WATCH_TIMER:
-      prevp = &t->timers;
+      thisp = &t->timers;
       break;
     case WATCH_LATER:
-      prevp = &t->laters;
+      thisp = &t->laters;
       break;
 
     default:
       return;
   }
 
-  while(*prevp) {
-    TickitWatch *this = *prevp;
+  while(*thisp) {
+    TickitWatch *this = *thisp;
     if(this == watch) {
-      *prevp = this->next;
+      *thisp = this->next;
 
       if(this->flags & TICKIT_BIND_UNBIND)
         (*this->fn)(t, TICKIT_EV_UNBIND, NULL, this->user);
@@ -491,7 +491,10 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
       free(this);
     }
 
-    prevp = &(*prevp)->next;
+    if(!thisp || !*thisp)
+      break;
+
+    thisp = &(*thisp)->next;
   }
 }
 
