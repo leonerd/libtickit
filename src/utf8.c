@@ -128,7 +128,7 @@ size_t tickit_utf8_ncountmore(const char *str, size_t len, TickitStringPos *pos,
     if(is_grapheme) // Commit on the previous grapheme
       *pos = here;
 
-    if(limit && limit->bytes != -1 && here.bytes + bytes > limit->bytes)
+    if(limit && limit->bytes != (size_t)-1 && here.bytes + bytes > limit->bytes)
       break;
     if(limit && limit->codepoints != -1 && here.codepoints + 1 > limit->codepoints)
       break;
