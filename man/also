@@ -102,6 +102,7 @@ tickit_window_ctltype.3 = tickit_window_ctlname.3
 
 tickit_unref.3 = tickit_ref.3
 tickit_stop.3 = tickit_run.3
+tickit_tick.3 = tickit_run.3
 tickit_getctl_int.3 = tickit_setctl_int.3
 tickit_watch_timer_after_tv.3 = tickit_watch_timer_after_msec.3
 tickit_watch_timer_at_tv.3 = tickit_watch_timer_at_epoch.3
