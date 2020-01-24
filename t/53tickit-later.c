@@ -30,6 +30,22 @@ int main(int argc, char *argv[])
     is_int(called, 1, "tickit_watch_later invokes callback");
   }
 
+  /* cancellation */
+  {
+    int called = 0;
+    void *w = tickit_watch_later(t, TICKIT_BIND_UNBIND, &on_call_incr, &called);
+
+    unbound_count = 0;
+
+    tickit_watch_cancel(t, w);
+
+    tickit_tick(t, TICKIT_RUN_NOHANG);
+
+    is_int(called, 0, "tickit_watch_cancel removes callback");
+    is_int(unbound_count, 1, "unbound_count after tickit_watch_cancel");
+  }
+
+
   /* object destruction */
   {
     tickit_watch_later(t, TICKIT_BIND_DESTROY, &on_call_incr, NULL);
