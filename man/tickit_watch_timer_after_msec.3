@@ -8,9 +8,9 @@ tickit_watch_timer_after_* \- invoke a callback after a fixed delay
 .BI "typedef int " TickitCallbackFn "(Tickit *" t ", TickitEventflags " flags ,
 .BI "    void *" info ", void *" user );
 .sp
-.BI "void *tickit_timer_after_msec(Tickit *" t ", int " msec ,
+.BI "void *tickit_watch_timer_after_msec(Tickit *" t ", int " msec ,
 .BI "    TickitBindFlags " flags ", TickitCallbackFn *" fn ", void *" user );
-.BI "void *tickit_timer_after_tv(Tickit *" t ", const struct timeval *" after ,
+.BI "void *tickit_watch_timer_after_tv(Tickit *" t ", const struct timeval *" after ,
 .BI "    TickitBindFlags " flags ", TickitCallbackFn *" fn ", void *" user );
 .EE
 .sp
@@ -22,7 +22,7 @@ When invoked, the callback function is always passed both \fBTICKIT_EV_FIRE\fP a
 .PP
 If cancelled by \fPtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
 .SH "RETURN VALUE"
-\fBtickit_timer_after_msec\fP() and \fBtickit_timer_after_tv\fP() return an opaque identifier pointer.
+\fBtickit_watch_timer_after_msec\fP() and \fBtickit_watch_timer_after_tv\fP() return an opaque identifier pointer.
 .SH "SEE ALSO"
 .BR tickit_new_stdio (3),
 .BR tickit_watch_timer_at_epoch (3),
