@@ -39,6 +39,10 @@ int main(int argc, char *argv[])
 
     tickit_watch_cancel(t, watch);
 
+    tickit_tick(t, TICKIT_RUN_NOHANG);
+
+    is_int(counter, 1, "tickit_cancel_watch removes iowatch");
+
     /* TODO: fds[0] is still readready currently but lets just throw it away */
   }
 

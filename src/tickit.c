@@ -450,7 +450,7 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
   TickitWatch **thisp;
   switch(watch->type) {
     case WATCH_IO:
-      thisp = &t->timers;
+      thisp = &t->iowatches;
       break;
     case WATCH_TIMER:
       thisp = &t->timers;
