@@ -20,6 +20,8 @@ The toplevel instance manages a tree of \fBTickitWindow\fP instances. The root o
 The \fBTickitTerm\fP instance behind the toplevel instance can be obtained by \fBtickit_get_term\fP(3), and is described more in \fBtickit_term\fP(7).
 .PP
 Event handling callback functions can be installed to be called at a later time, by using \fBtickit_watch_timer_after_msec\fP(3), \fBtickit_watch_timer_after_tv\fP(3), or \fBtickit_watch_later\fP(3). The main IO event loop is controlled using \fBtickit_run\fP(3) and \fBtickit_stop\fP(3).
+.PP
+The compile-time and run-time version of the library can be inspected using the macros and functions described in \fBtickit_version\fP(7).
 .SH "TYPICAL STRUCTURE"
 A typical program using this library would start by creating the toplevel instance, by calling \fBtickit_new_stdio\fP(3), then obtain its root window on it by calling \fBtickit_get_rootwin\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_WINDOW_ON_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter the main event loop by invoking \fBtickit_run\fP(3).
 .SH "COMMON TYPES"
@@ -102,4 +104,5 @@ The value is a boolean indicating whether the instance will activate the termina
 .BR tickit_rectset (7),
 .BR tickit_renderbuffer (7),
 .BR tickit_string (7),
-.BR tickit_utf8_count (3)
+.BR tickit_utf8_count (3),
+.BR tickit_version (7)

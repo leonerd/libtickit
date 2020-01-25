@@ -24,6 +24,14 @@ extern "C" {
 # define DEPRECATED
 #endif
 
+#define TICKIT_VERSION_MAJOR 0
+#define TICKIT_VERSION_MINOR 3
+#define TICKIT_VERSION_PATCH 3
+
+int tickit_version_major(void);
+int tickit_version_minor(void);
+int tickit_version_patch(void);
+
 /*
  * Top-level object / structure types
  */

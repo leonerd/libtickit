@@ -1,0 +1,20 @@
+.TH TICKIT_VERSION 7
+.SH NAME
+tickit_version_* \- \fIlibtickit\fP version queries
+.SH SYNOPSIS
+.EX
+.B #define TICKIT_VERSION_MAJOR
+.B #define TICKIT_VERSION_MINOR
+.B #define TICKIT_VERSION_PATCH
+.sp
+.BI "int tickit_version_major(void);"
+.BI "int tickit_version_minor(void);"
+.BI "int tickit_version_patch(void);"
+.EE
+.sp
+.SH DESCRIPTION
+These three macros provide the version numbers of the development header at compiletime. The related functions return the version numbers from the running library. Between them they can be used to check at program startup that the library version is suitable to support the running program.
+.SH "RETURN VALUE"
+Each \fBtickit_version_*\fP() function returns a version integer.
+.SH "SEE ALSO"
+.BR tickit (7)

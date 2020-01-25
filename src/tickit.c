@@ -651,3 +651,7 @@ TickitType tickit_ctltype(TickitCtl ctl)
   }
   return TICKIT_TYPE_NONE;
 }
+
+int tickit_version_major(void) { return TICKIT_VERSION_MAJOR; }
+int tickit_version_minor(void) { return TICKIT_VERSION_MINOR; }
+int tickit_version_patch(void) { return TICKIT_VERSION_PATCH; }
