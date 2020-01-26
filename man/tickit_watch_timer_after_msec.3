@@ -20,7 +20,7 @@ The \fBtickit_watch_timer_after_*\fP() family of functions register a callback f
 .PP
 When invoked, the callback function is always passed both \fBTICKIT_EV_FIRE\fP and \fBTICKIT_EV_UNBIND\fP flags to its \fIflags\fP argument. If the callback had been registered with the \fBTICKIT_BIND_DESTROY\fP flag, then it will also be invoked with the \fBTICKIT_EV_DESTROY\fP flag if it has not yet been invoked by the time the toplevel instance is destroyed.
 .PP
-If cancelled by \fPtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
+If cancelled by \fBtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
 .SH "RETURN VALUE"
 \fBtickit_watch_timer_after_msec\fP() and \fBtickit_watch_timer_after_tv\fP() return an opaque identifier pointer.
 .SH "SEE ALSO"
