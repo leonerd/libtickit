@@ -1,3 +1,10 @@
+2020-01-27 00:25  0.3.4
+  * Added macros and functions for version query
+  * Ensure that all kinds of event watches can be cancelled, even lone ones
+  * Fix name of tickit_watch_timer_at_epoch() function
+  * Fix manpages around recent function renames
+  * Added manpage documentation on behaviour of event watches at cancel time
+
 2019-11-18 17:05  0.3.3
   * Ensure that calling tickit_window_close(3) twice doesn't crash
     (thanks noctux)
