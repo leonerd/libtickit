@@ -4,6 +4,7 @@
 // With modifications:
 //   made functions static
 //   moved 'combining' table to file scope, so other functions can see it
+//   use uint32_t instead of wchar_t
 // ###################################################################
 
 /*
@@ -67,7 +68,7 @@
  * Latest version: http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c
  */
 
-#include <wchar.h>
+#include <stdint.h>
 
 struct interval {
   int first;
@@ -129,7 +130,7 @@ static const struct interval combining[] = {
 
 
 /* auxiliary function for binary search in interval table */
-static int bisearch(wchar_t ucs, const struct interval *table, int max) {
+static int bisearch(uint32_t ucs, const struct interval *table, int max) {
   int min = 0;
   int mid;
 
@@ -176,13 +177,10 @@ static int bisearch(wchar_t ucs, const struct interval *table, int max) {
  *    - All remaining characters (including all printable
  *      ISO 8859-1 and WGL4 characters, Unicode control characters,
  *      etc.) have a column width of 1.
- *
- * This implementation assumes that wchar_t characters are encoded
- * in ISO 10646.
  */
 
 
-static int mk_wcwidth(wchar_t ucs)
+static int mk_wcwidth(uint32_t ucs)
 {
   /* test for 8-bit control characters */
   if (ucs == 0)
