@@ -1,3 +1,7 @@
+2020-03-02 19:09  0.3.5
+  * Copied wcwidth() implementation from libvterm, for improved handling of
+    emoji characters and other fullwidth or wide characters (LP1865502)
+
 2020-01-27 00:25  0.3.4
   * Added macros and functions for version query
   * Ensure that all kinds of event watches can be cancelled, even lone ones
