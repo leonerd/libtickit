@@ -72,6 +72,10 @@ src/renderbuffer.lo: src/linechars.inc
 src/linechars.inc: src/linechars.inc.PL
 	perl $^ > $@
 
+src/utf8.lo: src/fullwidth.inc
+src/fullwidth.inc: src/fullwidth.inc.PL
+	perl $^ > $@
+
 t/%.t: t/%.lo $(LIBRARY) t/taplib.lo t/mockterm.lo t/taplib-tickit.lo
 	$(LIBTOOL) --mode=link --tag=CC $(CC) -o $@ $^ $(LDFLAGS)
 

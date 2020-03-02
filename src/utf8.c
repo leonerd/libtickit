@@ -120,7 +120,7 @@ size_t tickit_utf8_ncountmore(const char *str, size_t len, TickitStringPos *pos,
     if(cp < 0x20 || (cp >= 0x80 && cp < 0xa0))
       return -1;
 
-    int width = mk_wcwidth(cp);
+    int width = tickit_utf8_wcwidth(cp);
     if(width == -1)
       return -1;
 

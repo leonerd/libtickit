@@ -47,6 +47,16 @@ int main(int argc, char *argv[])
   is_int(pos.graphemes,  1, "tickit_utf8_count UTF-8 fullwidth graphemes");
   is_int(pos.columns,    2, "tickit_utf8_count UTF-8 fullwidth columns");
 
+  /* Non-BMP
+   * U+1F3E0 - HOUSE BUILDING
+   * 0xf0 0x9f 0x8f 0xa0
+   */
+  is_int(tickit_utf8_count("\xf0\x9f\x8f\xa0", &pos, NULL), 4, "tickit_utf8_count UTF-8 non-BMP emoji");
+  is_int(pos.bytes,      4, "tickit_utf8_count UTF-8 emoji bytes");
+  is_int(pos.codepoints, 1, "tickit_utf8_count UTF-8 emoji codepoints");
+  is_int(pos.graphemes,  1, "tickit_utf8_count UTF-8 emoji graphemes");
+  is_int(pos.columns,    2, "tickit_utf8_count UTF-8 emoji columns");
+
   /* And now a nice long string */
   is_int(tickit_utf8_count("(\xe3\x83\x8e\xe0\xb2\x0a\xe7\xb2\xa0)\xe3\x83\x8e\xe5\xbd\xa1\xe2\x94\xbb\xe2\x94\x81\xe2\x94\xbb", &pos, NULL),
       26, "tickit_utf8_count UTF-8 string");

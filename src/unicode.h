@@ -210,3 +210,18 @@ static int mk_wcwidth(uint32_t ucs)
       (ucs >= 0x20000 && ucs <= 0x2fffd) ||
       (ucs >= 0x30000 && ucs <= 0x3fffd)));
 }
+
+// ################################
+// ### The rest added by Paul Evans
+
+static const struct interval fullwidth[] = {
+#include "fullwidth.inc"
+};
+
+static int tickit_utf8_wcwidth(uint32_t codepoint)
+{
+  if(bisearch(codepoint, fullwidth, sizeof(fullwidth) / sizeof(fullwidth[0]) - 1))
+    return 2;
+
+  return mk_wcwidth(codepoint);
+}
