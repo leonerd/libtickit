@@ -214,7 +214,9 @@ TickitTerm *tickit_get_term(Tickit *t)
   if(!t->term) {
     /* Don't use tickit_term_open_stdio() because that observes SIGWINCH
      */
-    struct TickitTermBuilder builder = { 0 };
+    struct TickitTermBuilder builder = {
+      .open = TICKIT_OPEN_STDIO,
+    };
     if(t->ti_hook.getstr)
       builder.ti_hook = &t->ti_hook;
 
@@ -222,8 +224,6 @@ TickitTerm *tickit_get_term(Tickit *t)
     if(!tt)
       return NULL;
 
-    tickit_term_set_input_fd(tt, STDIN_FILENO);
-    tickit_term_set_output_fd(tt, STDOUT_FILENO);
     tickit_term_set_output_buffer(tt, 4096);
 
     setterm(t, tt);

@@ -395,6 +395,11 @@ struct TickitTermBuilder {
     const char *(*getstr)(const char *name, const char *value, void *data);
     void         *data;
   } *ti_hook;
+
+  enum {
+    TICKIT_NO_OPEN,
+    TICKIT_OPEN_STDIO,
+  } open;
 };
 TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
 

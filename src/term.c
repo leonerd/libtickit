@@ -230,6 +230,16 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
   // Can't 'start' yet until we have an output method
   tt->state = UNSTARTED;
 
+  switch(builder.open) {
+    case TICKIT_NO_OPEN:
+      break;
+
+    case TICKIT_OPEN_STDIO:
+      tickit_term_set_input_fd(tt, STDIN_FILENO);
+      tickit_term_set_output_fd(tt, STDOUT_FILENO);
+      break;
+  }
+
   return tt;
 }
 
@@ -254,12 +264,12 @@ TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd)
 
 TickitTerm *tickit_term_open_stdio(void)
 {
-  TickitTerm *tt = tickit_term_new();
+  TickitTerm *tt = tickit_term_build(&(struct TickitTermBuilder){
+    .open = TICKIT_OPEN_STDIO,
+  });
   if(!tt)
     return NULL;
 
-  tickit_term_set_input_fd(tt, STDIN_FILENO);
-  tickit_term_set_output_fd(tt, STDOUT_FILENO);
   tickit_term_observe_sigwinch(tt, true);
 
   return tt;
