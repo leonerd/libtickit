@@ -112,7 +112,14 @@ static void teardownterm(Tickit *t)
   t->done_setup = false;
 }
 
-Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *initdata)
+struct TickitBuilder {
+  TickitTerm *tt;
+
+  TickitEventHooks *evhooks;
+  void *evinitdata;
+};
+
+static Tickit *tickit_build(struct TickitBuilder *builder)
 {
   Tickit *t = malloc(sizeof(Tickit));
   if(!t)
@@ -123,8 +130,10 @@ Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *
   t->term = NULL;
   t->rootwin = NULL;
 
-  t->evhooks = evhooks;
-  t->evdata  = (*t->evhooks->init)(t, initdata);
+  t->evhooks = builder->evhooks;
+  if(!t->evhooks)
+    t->evhooks = &tickit_evloop_default;
+  t->evdata  = (*t->evhooks->init)(t, builder->evinitdata);
   if(!t->evdata)
     goto abort;
 
@@ -138,8 +147,8 @@ Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *
 
   t->use_altscreen = true;
 
-  if(tt)
-    setterm(t, tt);
+  if(builder->tt)
+    setterm(t, builder->tt);
 
   return t;
 
@@ -148,14 +157,26 @@ abort:
   return NULL;
 }
 
+Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *initdata)
+{
+  return tickit_build(&(struct TickitBuilder){
+    .tt = tt,
+
+    .evhooks = evhooks,
+    .evinitdata = initdata,
+  });
+}
+
 Tickit *tickit_new_for_term(TickitTerm *tt)
 {
-  return tickit_new_with_evloop(tt, &tickit_evloop_default, NULL);
+  return tickit_build(&(struct TickitBuilder){
+    .tt = tt,
+  });
 }
 
 Tickit *tickit_new_stdio(void)
 {
-  return tickit_new_for_term(NULL);
+  return tickit_build(&(struct TickitBuilder){ 0 });
 }
 
 static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc)(void *data, TickitWatch *watch))
