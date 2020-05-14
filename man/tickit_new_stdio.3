@@ -6,14 +6,17 @@ tickit_new_stdio \- create a new toplevel Tickit instance
 .B #include <tickit.h>
 .sp
 .BI "Tickit *tickit_new_stdio(void);"
+.BI "Tickit *tickit_new_stdtty(void);"
 .EE
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_new_stdio\fP() creates a new toplevel Tickit instance whose terminal is attached to the standard input and output streams.
 .PP
+\fBtickit_new_stdtty\fP() creates a new toplevel Tickit instance whose terminal is attached to the first terminal found among the standard input, output and error streams. This gives better results if the containing program is likely to be invoked with shell redirection on either input or output (e.g. similar to \fIless\fP).
+.PP
 The reference count of a newly-constructed toplevel instance will be one. This can be incremented or decremented using \fBtickit_ref\fP(3) and \fBtickit_unref\fP(3). When its reference count reaches zero it is destroyed.
 .SH "RETURN VALUE"
-If successful, \fBtickit_new_stdio\fP() returns a pointer to the new instance.
+If successful, \fBtickit_new_stdio\fP() and \fBtickit_new_stdtty\fP() return a pointer to the new instance.
 .SH "SEE ALSO"
 .BR tickit (7)

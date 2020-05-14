@@ -13,7 +13,7 @@ tickit \- Terminal Interface Construction KIT
 .PP
 As well as creating the initial root window, the toplevel \fBTickit\fP instance also performs a few other jobs for the containing program. It can act as a containing event loop for the program, performing IO multiplexing tasks both for \fItickit\fP's own needs and the needs of the program as a whole.
 .SH FUNCTIONS
-A new toplevel instance is created by using \fBtickit_new_stdio\fP(3). A toplevel instance stores a reference count to make it easier for applications to manage its lifetime. A new toplevel instance starts with a count of one, and it can be adjusted using \fBtickit_ref\fP(3) and \fBtickit_unref\fP(3). When the count reaches zero the instance is destroyed.
+A new toplevel instance is created by using \fBtickit_new_stdio\fP(3) or \fBtickit_new_stdtty\fP(3). A toplevel instance stores a reference count to make it easier for applications to manage its lifetime. A new toplevel instance starts with a count of one, and it can be adjusted using \fBtickit_ref\fP(3) and \fBtickit_unref\fP(3). When the count reaches zero the instance is destroyed.
 .PP
 The toplevel instance manages a tree of \fBTickitWindow\fP instances. The root of this tree is obtained by \fBtickit_get_rootwin\fP(3) and thereafter can be divided further by other functions on the window, described more in \fBtickit_window\fP(7).
 .PP
@@ -23,7 +23,7 @@ Event handling callback functions can be installed to be called at a later time,
 .PP
 The compile-time and run-time version of the library can be inspected using the macros and functions described in \fBtickit_version\fP(7).
 .SH "TYPICAL STRUCTURE"
-A typical program using this library would start by creating the toplevel instance, by calling \fBtickit_new_stdio\fP(3), then obtain its root window on it by calling \fBtickit_get_rootwin\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_WINDOW_ON_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter the main event loop by invoking \fBtickit_run\fP(3).
+A typical program using this library would start by creating the toplevel instance, by calling \fBtickit_new_stdtty\fP(3), then obtain its root window on it by calling \fBtickit_get_rootwin\fP(3). This root window can then be sub-divided into regions of interest by calling \fBtickit_window_new\fP(3) to build a tree of windows. Window can then have some event handlers attached by calling \fBtickit_window_bind_event\fP(3) - each window will need to handle the \fBTICKIT_WINDOW_ON_EXPOSE\fP event, but might also wish to handle other kinds like geometry change for dynamic resizing, or keyboard or mouse to react to user input. Finally, once the intial window tree is created, the program would enter the main event loop by invoking \fBtickit_run\fP(3).
 .SH "COMMON TYPES"
 The \fIflags\fP argument to the various \fBtickit_..._bind_event\fP() functions should be zero, or a bitmask of the following constants.
 .sp
