@@ -79,14 +79,6 @@ static int on_term_readable(Tickit *t, TickitEventFlags flags, void *info, void 
   return 0;
 }
 
-static void setterm(Tickit *t, TickitTerm *tt);
-static void setterm(Tickit *t, TickitTerm *tt)
-{
-  t->term = tt; /* take ownership */
-
-  tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
-}
-
 static void setupterm(Tickit *t)
 {
   TickitTerm *tt = tickit_get_term(t);
@@ -144,7 +136,9 @@ Tickit *tickit_build(struct TickitBuilder *builder)
 
     tickit_term_set_output_buffer(tt, 4096);
   }
-  setterm(t, tt);
+  t->term = tt; /* take ownership */
+
+  tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
 
   return t;
 
