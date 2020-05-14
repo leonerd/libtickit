@@ -81,7 +81,7 @@ static int on_term_readable(Tickit *t, TickitEventFlags flags, void *info, void 
 
 static void setupterm(Tickit *t)
 {
-  TickitTerm *tt = tickit_get_term(t);
+  TickitTerm *tt = t->term;
 
   tickit_term_await_started_msec(tt, 50);
 
@@ -230,11 +230,7 @@ TickitTerm *tickit_get_term(Tickit *t)
 TickitWindow *tickit_get_rootwin(Tickit *t)
 {
   if(!t->rootwin) {
-    TickitTerm *tt = tickit_get_term(t);
-    if(!tt)
-      return NULL;
-
-    t->rootwin = tickit_window_new_root2(t, tt);
+    t->rootwin = tickit_window_new_root2(t, t->term);
   }
 
   return t->rootwin;
