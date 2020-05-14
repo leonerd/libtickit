@@ -401,9 +401,14 @@ struct TickitTermBuilder {
 
   enum {
     TICKIT_NO_OPEN,
+    TICKIT_OPEN_FDS,    /* use input_fd, output_fd */
     TICKIT_OPEN_STDIO,  /* input=0, output=1 */
     TICKIT_OPEN_STDTTY, /* input = output = first of 0/1/2 for which isatty() is true */
+    /* TODO: Consider
+     *   TICKIT_OPEN_DEVTTY to open /dev/tty
+     */
   } open;
+  int input_fd, output_fd; /* only valid if open==TICKIT_OPEN_FDS */
 };
 TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
 

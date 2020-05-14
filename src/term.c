@@ -236,6 +236,11 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
     case TICKIT_NO_OPEN:
       break;
 
+    case TICKIT_OPEN_FDS:
+      fd_in  = builder.input_fd;
+      fd_out = builder.output_fd;
+      break;
+
     case TICKIT_OPEN_STDIO:
       fd_in  = STDIN_FILENO;
       fd_out = STDOUT_FILENO;
