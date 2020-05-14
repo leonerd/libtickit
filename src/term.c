@@ -265,6 +265,9 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
   if(fd_out != -1)
     tickit_term_set_output_fd(tt, fd_out);
 
+  if(builder.output_buffersize)
+    tickit_term_set_output_buffer(tt, builder.output_buffersize);
+
   return tt;
 }
 

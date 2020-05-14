@@ -402,6 +402,8 @@ struct TickitTermBuilder {
   } open;
   int input_fd, output_fd; /* only valid if open==TICKIT_OPEN_FDS */
 
+  size_t output_buffersize;
+
   /* Fields below here are undocumented and for vaguely internal or
    * special-case purposes
    */

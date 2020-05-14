@@ -130,11 +130,13 @@ Tickit *tickit_build(struct TickitBuilder *builder)
 
   TickitTerm *tt = builder->tt;
   if(!tt) {
-    tt = tickit_term_build(&builder->term_builder);
+    struct TickitTermBuilder term_builder = builder->term_builder;
+    if(!term_builder.output_buffersize)
+      term_builder.output_buffersize = 4096;
+
+    tt = tickit_term_build(&term_builder);
     if(!tt)
       goto abort;
-
-    tickit_term_set_output_buffer(tt, 4096);
   }
   t->term = tt; /* take ownership */
 
