@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
   ok(1, "tickit_term_unref");
 
-  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after termkey_term_unref resets modes");
+  is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after tickit_term_unref resets modes");
 
   return exit_status();
 }
