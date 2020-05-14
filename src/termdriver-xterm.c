@@ -493,8 +493,10 @@ static bool started(TickitTermDriver *ttd)
          xd->initialised.slrm;
 }
 
-static void gotkey_modereport(struct XTermDriver *xd, int initial, int mode, int value)
+static int on_modereport(TickitTermDriver *ttd, int initial, int mode, int value)
 {
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
   if(initial == '?') // DEC mode
     switch(mode) {
       case 12: // Cursor blink
@@ -513,10 +515,14 @@ static void gotkey_modereport(struct XTermDriver *xd, int initial, int mode, int
         xd->initialised.slrm = 1;
         break;
     }
+
+  return 1;
 }
 
-static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t arglen)
+static int on_decrqss(TickitTermDriver *ttd, const char *args, size_t arglen)
 {
+  struct XTermDriver *xd = (struct XTermDriver *)ttd;
+
   if(strneq(args + arglen - 2, " q", 2)) { // DECSCUSR
     int value;
     if(sscanf(args, "%d", &value)) {
@@ -532,7 +538,7 @@ static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t argl
     while(arglen && args[0] >= '0' && args[0] <= '9')
       args++, arglen--;
     if(!arglen)
-      return;
+      return 1;
 
     if(args[0] == ':')
       xd->cap.csi_sub_colon = 1;
@@ -543,33 +549,8 @@ static void gotkey_decrqss(struct XTermDriver *xd, const char *args, size_t argl
     if(sscanf(args, "%d", &value) && value == 2)
       xd->cap.rgb8 = 1;
   }
-}
 
-static int gotkey(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key)
-{
-  struct XTermDriver *xd = (struct XTermDriver *)ttd;
-
-  if(key->type == TERMKEY_TYPE_MODEREPORT) {
-    int initial, mode, value;
-    termkey_interpret_modereport(tk, key, &initial, &mode, &value);
-    gotkey_modereport(xd, initial, mode, value);
-
-    return 1;
-  }
-  else if(key->type == TERMKEY_TYPE_DCS) {
-    const char *dcs;
-    if(termkey_interpret_string(tk, key, &dcs) != TERMKEY_RES_KEY)
-      return 0;
-
-    if(strneq(dcs, "1$r", 3)) { // Successful DECRQSS
-      gotkey_decrqss(xd, dcs + 3, strlen(dcs + 3));
-    }
-
-    // Just eat all the DCSes
-    return 1;
-  }
-
-  return 0;
+  return 1;
 }
 
 static void teardown(TickitTermDriver *ttd)
@@ -627,7 +608,8 @@ static TickitTermDriverVTable xterm_vtable = {
   .getctl_int = getctl_int,
   .setctl_int = setctl_int,
   .setctl_str = setctl_str,
-  .gotkey     = gotkey,
+  .on_modereport = on_modereport,
+  .on_decrqss    = on_decrqss,
 };
 
 static TickitTermDriver *new(const TickitTermProbeArgs *args)

@@ -28,6 +28,7 @@
 #include <sys/time.h>
 
 #define streq(a,b) (!strcmp(a,b))
+#define strneq(a,b,n) (strncmp(a,b,n)==0)
 
 /* unit multipliers for working in microseconds */
 #define MSEC      1000
@@ -604,10 +605,6 @@ void tickit_term_await_started_tv(TickitTerm *tt, const struct timeval *timeout)
 
 static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
 {
-  if(tt->driver->vtable->gotkey &&
-     (*tt->driver->vtable->gotkey)(tt->driver, tk, key))
-    return;
-
   if(key->type == TERMKEY_TYPE_MOUSE) {
     TermKeyMouseEvent ev;
     TickitMouseEventInfo info;
@@ -671,6 +668,24 @@ static void got_key(TickitTerm *tt, TermKey *tk, TermKeyKey *key)
     };
 
     run_events_whilefalse(tt, TICKIT_TERM_ON_KEY, &info);
+  }
+  else if(key->type == TERMKEY_TYPE_MODEREPORT) {
+    if(tt->driver->vtable->on_modereport) {
+      int initial, mode, value;
+      termkey_interpret_modereport(tk, key, &initial, &mode, &value);
+
+      (tt->driver->vtable->on_modereport)(tt->driver, initial, mode, value);
+    }
+  }
+  else if(key->type == TERMKEY_TYPE_DCS) {
+    const char *dcs;
+    if(termkey_interpret_string(tk, key, &dcs) != TERMKEY_RES_KEY)
+      return;
+
+    if(strneq(dcs, "1$r", 3)) { // Successful DECRQSS
+      if(tt->driver->vtable->on_decrqss)
+        (tt->driver->vtable->on_decrqss)(tt->driver, dcs + 3, strlen(dcs + 3));
+    }
   }
 }
 

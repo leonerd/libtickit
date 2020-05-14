@@ -12,7 +12,6 @@ extern "C" {
  */
 
 #include "tickit.h"
-#include <termkey.h>
 
 typedef struct {
   void (*attach)(TickitTermDriver *ttd, TickitTerm *tt); /* optional */
@@ -32,7 +31,10 @@ typedef struct {
   bool (*getctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int *value);
   bool (*setctl_int)(TickitTermDriver *ttd, TickitTermCtl ctl, int value);
   bool (*setctl_str)(TickitTermDriver *ttd, TickitTermCtl ctl, const char *value);
-  int  (*gotkey)(TickitTermDriver *ttd, TermKey *tk, const TermKeyKey *key); /* optional */
+
+  /* optional */
+  int  (*on_modereport)(TickitTermDriver *ttd, int initial, int mode, int value);
+  int  (*on_decrqss)(TickitTermDriver *ttd, const char *args, size_t arglen);
 } TickitTermDriverVTable;
 
 struct TickitTermDriver {
