@@ -57,8 +57,6 @@ struct Tickit {
   TickitEventHooks *evhooks;
   void             *evdata;
 
-  struct TickitTerminfoHook ti_hook;
-
   unsigned int done_setup    : 1,
                use_altscreen : 1;
 };
@@ -134,14 +132,19 @@ Tickit *tickit_build(struct TickitBuilder *builder)
   t->timers    = NULL;
   t->laters    = NULL;
 
-  t->ti_hook.getstr = NULL;
-
   t->done_setup = false;
 
   t->use_altscreen = true;
 
-  if(builder->tt)
-    setterm(t, builder->tt);
+  TickitTerm *tt = builder->tt;
+  if(!tt) {
+    tt = tickit_term_build(&builder->term_builder);
+    if(!tt)
+      goto abort;
+
+    tickit_term_set_output_buffer(tt, 4096);
+  }
+  setterm(t, tt);
 
   return t;
 
@@ -169,7 +172,9 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
 
 Tickit *tickit_new_stdio(void)
 {
-  return tickit_build(&(struct TickitBuilder){ 0 });
+  return tickit_build(&(struct TickitBuilder){
+    .term_builder.open = TICKIT_OPEN_STDIO,
+  });
 }
 
 static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc)(void *data, TickitWatch *watch))
@@ -225,24 +230,6 @@ void tickit_unref(Tickit *t)
 
 TickitTerm *tickit_get_term(Tickit *t)
 {
-  if(!t->term) {
-    /* Don't use tickit_term_open_stdio() because that observes SIGWINCH
-     */
-    struct TickitTermBuilder builder = {
-      .open = TICKIT_OPEN_STDIO,
-    };
-    if(t->ti_hook.getstr)
-      builder.ti_hook = &t->ti_hook;
-
-    TickitTerm *tt = tickit_term_build(&builder);
-    if(!tt)
-      return NULL;
-
-    tickit_term_set_output_buffer(tt, 4096);
-
-    setterm(t, tt);
-  }
-
   return t->term;
 }
 
@@ -283,14 +270,6 @@ bool tickit_setctl_int(Tickit *t, TickitCtl ctl, int value)
       ;
   }
   return false;
-}
-
-void tickit_hook_terminfo(Tickit *t,
-    const char *(*getstr)(const char *name, const char *value, void *data),
-    void         *data)
-{
-  t->ti_hook.getstr = getstr;
-  t->ti_hook.data   = data;
 }
 
 // TODO: copy the entire SIGWINCH-like structure from term.c

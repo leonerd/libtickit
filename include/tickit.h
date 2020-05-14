@@ -723,6 +723,7 @@ void    tickit_unref(Tickit *t);
 // Internal use only for now but consider making it public API
 struct TickitBuilder {
   TickitTerm *tt;
+  struct TickitTermBuilder term_builder; /* used if tt == NULL */
 
   TickitEventHooks *evhooks;
   void *evinitdata;
@@ -758,11 +759,6 @@ void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFl
 void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
 void tickit_watch_cancel(Tickit *t, void *watch);
-
-/* Entirely undocumented right now */
-void tickit_hook_terminfo(Tickit *t,
-    const char *(*getstr)(const char *name, const char *value, void *data),
-    void         *data);
 
 /* Debug support */
 
