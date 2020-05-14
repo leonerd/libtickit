@@ -388,16 +388,15 @@ TickitTerm *tickit_term_new(void);
 TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_destroy(TickitTerm *tt);
 
-// Internal use only for now but consider making it public API
 struct TickitTermBuilder {
   const char *termtype;
 
-  TickitTermDriver *driver;
+  TickitTermDriver *driver; /* undocumented */
 
   const struct TickitTerminfoHook {
     const char *(*getstr)(const char *name, const char *value, void *data);
     void         *data;
-  } *ti_hook;
+  } *ti_hook; /* undocumented */
 
   enum {
     TICKIT_NO_OPEN,

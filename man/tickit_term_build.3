@@ -1,0 +1,50 @@
+.TH TICKIT_TERM_BUILD 3
+.SH NAME
+tickit_term_build \- create a new terminal instance with arguments
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "struct " TickitTermBuilder " {"
+.BI "  const char *" termtype ;
+.BI "  enum ... " open ;
+.BI "  int " input_fd ", " output_fd ;
+.BI "  ..."
+.BI "};"
+.sp
+.BI "TickitTerm *tickit_term_build(struct TickitTermBuilder *" builder );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_build\fP() creates a new \fBTickitTerm\fP instance initialised from the various parameters given in the \fIbuilder\fP struct. Note that the above definition for the struct is incomplete; the actual struct definition contains more fields than shown as some are for internal purposes. User code should only attempt to interact with those fields documented here.
+.PP
+If the \fItermtype\fP field is set, it should give the terminal type. If left blank, the value of the \fBTERM\fP environment variable is used. If that too is blank, a default of \f(Cwxterm\fP will be assumed.
+.PP
+The \fIopen\fP field controls the selection of input and output file descriptors for the terminal to use. It should take one of the following enumeration values:
+.TP
+.B TICKIT_NO_OPEN
+No file descriptors will be used. The terminal will operate entirely by abstract byte-buffered IO.
+.TP
+.B TICKIT_OPEN_FDS
+The terminal will use the file descriptors given by the \fIinput_fd\fP and \fIoutput_fd\fP fields. Either may be set to -1 to ignore it.
+.TP
+.B TICKIT_OPEN_STDIO
+The terminal will use the standard input and output streams.
+.TP
+.B TICKIT_OPEN_STDTTY
+The terminal will use the first file descriptor of standard input, output or error for which \fBisatty\fP(3) returns true.
+.PP
+The reference count of a newly-constructed terminal instance will be one. This can be incremented or decremented using \fBtickit_term_ref\fP(3) and \fBtickit_term_unref\fP(3). When its reference count reaches zero it is destroyed.
+.SH "RETURN VALUE"
+If successful, \fBtickit_term_build\fP() returns a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure.
+.SH "SEE ALSO"
+.BR tickit_term_new (3),
+.BR tickit_term_open_stdio (3),
+.BR tickit_term_set_output_fd (3),
+.BR tickit_term_set_output_func (3),
+.BR tickit_term_set_input_fd (3),
+.BR tickit_term_print (3),
+.BR tickit_term_bind_event (3),
+.BR tickit_term (7),
+.BR tickit (7)
