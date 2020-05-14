@@ -171,6 +171,13 @@ Tickit *tickit_new_stdio(void)
   });
 }
 
+Tickit *tickit_new_stdtty(void)
+{
+  return tickit_build(&(struct TickitBuilder){
+    .term_builder.open = TICKIT_OPEN_STDTTY,
+  });
+}
+
 static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc)(void *data, TickitWatch *watch))
 {
   TickitWatch *this, *next;

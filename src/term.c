@@ -230,15 +230,34 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
   // Can't 'start' yet until we have an output method
   tt->state = UNSTARTED;
 
+  int fd_in = -1, fd_out = -1;
+
   switch(builder.open) {
     case TICKIT_NO_OPEN:
       break;
 
     case TICKIT_OPEN_STDIO:
-      tickit_term_set_input_fd(tt, STDIN_FILENO);
-      tickit_term_set_output_fd(tt, STDOUT_FILENO);
+      fd_in  = STDIN_FILENO;
+      fd_out = STDOUT_FILENO;
+      break;
+
+    case TICKIT_OPEN_STDTTY:
+      for(fd_in = 0; fd_in <= 2; fd_in++) {
+        if(isatty(fd_in))
+          break;
+      }
+      if(fd_in > 2) {
+        fprintf(stderr, "Cannot find a TTY filehandle\n");
+        abort();
+      }
+      fd_out = fd_in;
       break;
   }
+
+  if(fd_in != -1)
+    tickit_term_set_input_fd(tt, fd_in);
+  if(fd_out != -1)
+    tickit_term_set_output_fd(tt, fd_out);
 
   return tt;
 }

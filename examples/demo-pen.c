@@ -171,7 +171,7 @@ static int checksuspend(TickitWindow *win, TickitEventFlags flags, void *_info, 
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_stdio();
+  Tickit *t = tickit_new_stdtty();
 
   TickitWindow *root = tickit_get_rootwin(t);
   if(!root) {

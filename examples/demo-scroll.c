@@ -121,7 +121,7 @@ static int render(Tickit *t, TickitEventFlags flags, void *data, void *user)
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_stdio();
+  Tickit *t = tickit_new_stdtty();
 
   TickitTerm *tt = tickit_get_term(t);
   if(!tt) {

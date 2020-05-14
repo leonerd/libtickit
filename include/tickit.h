@@ -401,7 +401,8 @@ struct TickitTermBuilder {
 
   enum {
     TICKIT_NO_OPEN,
-    TICKIT_OPEN_STDIO,
+    TICKIT_OPEN_STDIO,  /* input=0, output=1 */
+    TICKIT_OPEN_STDTTY, /* input = output = first of 0/1/2 for which isatty() is true */
   } open;
 };
 TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
@@ -716,6 +717,7 @@ typedef int TickitCallbackFn(Tickit *t, TickitEventFlags flags, void *info, void
 
 Tickit *tickit_new_for_term(TickitTerm *tt);
 Tickit *tickit_new_stdio(void);
+Tickit *tickit_new_stdtty(void);
 
 Tickit *tickit_ref(Tickit *t);
 void    tickit_unref(Tickit *t);

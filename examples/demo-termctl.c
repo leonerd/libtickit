@@ -92,7 +92,7 @@ static int later(Tickit *t, TickitEventFlags flags, void *_info, void *data)
 
 int main(int argc, char *argv[])
 {
-  Tickit *t = tickit_new_stdio();
+  Tickit *t = tickit_new_stdtty();
 
   TickitTerm *tt = tickit_get_term(t);
   if(!tt) {
