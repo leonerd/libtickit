@@ -151,6 +151,8 @@ Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *
 {
   return tickit_build(&(struct TickitBuilder){
     .tt = tt,
+    /* In case tt==NULL */
+    .term_builder.open = TICKIT_OPEN_STDTTY,
 
     .evhooks = evhooks,
     .evinitdata = initdata,
