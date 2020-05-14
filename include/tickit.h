@@ -391,13 +391,6 @@ void tickit_term_destroy(TickitTerm *tt);
 struct TickitTermBuilder {
   const char *termtype;
 
-  TickitTermDriver *driver; /* undocumented */
-
-  const struct TickitTerminfoHook {
-    const char *(*getstr)(const char *name, const char *value, void *data);
-    void         *data;
-  } *ti_hook; /* undocumented */
-
   enum {
     TICKIT_NO_OPEN,
     TICKIT_OPEN_FDS,    /* use input_fd, output_fd */
@@ -408,6 +401,16 @@ struct TickitTermBuilder {
      */
   } open;
   int input_fd, output_fd; /* only valid if open==TICKIT_OPEN_FDS */
+
+  /* Fields below here are undocumented and for vaguely internal or
+   * special-case purposes
+   */
+  TickitTermDriver *driver;
+
+  const struct TickitTerminfoHook {
+    const char *(*getstr)(const char *name, const char *value, void *data);
+    void         *data;
+  } *ti_hook;
 };
 TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
 
