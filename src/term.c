@@ -264,6 +264,8 @@ TickitTerm *tickit_term_build(const struct TickitTermBuilder *_builder)
     tickit_term_set_input_fd(tt, fd_in);
   if(fd_out != -1)
     tickit_term_set_output_fd(tt, fd_out);
+  if(builder.output_func)
+    tickit_term_set_output_func(tt, builder.output_func, builder.output_func_user);
 
   if(builder.output_buffersize)
     tickit_term_set_output_buffer(tt, builder.output_buffersize);

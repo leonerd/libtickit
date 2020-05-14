@@ -388,6 +388,8 @@ TickitTerm *tickit_term_new(void);
 TickitTerm *tickit_term_new_for_termtype(const char *termtype);
 void tickit_term_destroy(TickitTerm *tt);
 
+typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len, void *user);
+
 struct TickitTermBuilder {
   const char *termtype;
 
@@ -401,6 +403,9 @@ struct TickitTermBuilder {
      */
   } open;
   int input_fd, output_fd; /* only valid if open==TICKIT_OPEN_FDS */
+
+  TickitTermOutputFunc *output_func;
+  void                 *output_func_user;
 
   size_t output_buffersize;
 
@@ -422,8 +427,6 @@ void        tickit_term_unref(TickitTerm *tt);
 TickitTerm *tickit_term_open_stdio(void);
 
 const char *tickit_term_get_termtype(TickitTerm *tt);
-
-typedef void TickitTermOutputFunc(TickitTerm *tt, const char *bytes, size_t len, void *user);
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_output_fd(const TickitTerm *tt);

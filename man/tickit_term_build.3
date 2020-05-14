@@ -9,6 +9,8 @@ tickit_term_build \- create a new terminal instance with arguments
 .BI "  const char *" termtype ;
 .BI "  enum ... " open ;
 .BI "  int " input_fd ", " output_fd ;
+.BI "  TickitTermOutputFunc *" output_func ;
+.BI "  void *" output_func_user ;
 .BI "  size_t " output_buffersize ;
 .BI "  ..."
 .BI "};"
@@ -35,6 +37,8 @@ The terminal will use the standard input and output streams.
 .TP
 .B TICKIT_OPEN_STDTTY
 The terminal will use the first file descriptor of standard input, output or error for which \fBisatty\fP(3) returns true.
+.PP
+The \fIoutput_func\fP and \fIoutput_func_user\fP fields provide an output function which will be used for writing output data. If provided, this overrides the output file descriptor.
 .PP
 The \fIoutput_buffersize\fP field sets the initial size of the output buffer. It defaults to zero, meaning no buffer will be allocated.
 .PP
