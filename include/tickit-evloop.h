@@ -13,7 +13,7 @@ extern "C" {
 
 typedef struct TickitWatch TickitWatch; /* opaque */
 
-typedef struct {
+struct TickitEventHooks {
   void *(*init)(Tickit *t, void *initdata);
   void  (*destroy)(void *data);
   void  (*run)(void *data, TickitRunFlags flags);
@@ -25,7 +25,7 @@ typedef struct {
   void  (*cancel_timer)(void *data, TickitWatch *watch);
   bool  (*later)(void *data, TickitBindFlags flags, TickitWatch *watch);
   void  (*cancel_later)(void *data, TickitWatch *watch);
-} TickitEventHooks;
+};
 
 /* Helper functions for eventloop implementations */
 

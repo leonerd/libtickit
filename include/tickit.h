@@ -48,6 +48,9 @@ typedef struct Tickit Tickit;
 /* Opaque struct pointers required but not part of official API */
 typedef struct TickitTermDriver TickitTermDriver;
 
+/* Forward declaration to pointer defined by <tickit-evloop.h> */
+typedef struct TickitEventHooks TickitEventHooks;
+
 typedef struct {
   int top;
   int left;
@@ -716,6 +719,15 @@ Tickit *tickit_new_stdio(void);
 
 Tickit *tickit_ref(Tickit *t);
 void    tickit_unref(Tickit *t);
+
+// Internal use only for now but consider making it public API
+struct TickitBuilder {
+  TickitTerm *tt;
+
+  TickitEventHooks *evhooks;
+  void *evinitdata;
+};
+Tickit *tickit_build(struct TickitBuilder *builder);
 
 TickitTerm *tickit_get_term(Tickit *t);
 

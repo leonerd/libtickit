@@ -112,14 +112,7 @@ static void teardownterm(Tickit *t)
   t->done_setup = false;
 }
 
-struct TickitBuilder {
-  TickitTerm *tt;
-
-  TickitEventHooks *evhooks;
-  void *evinitdata;
-};
-
-static Tickit *tickit_build(struct TickitBuilder *builder)
+Tickit *tickit_build(struct TickitBuilder *builder)
 {
   Tickit *t = malloc(sizeof(Tickit));
   if(!t)
