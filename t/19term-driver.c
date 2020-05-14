@@ -72,9 +72,11 @@ int main(int argc, char *argv[])
   TickitTermDriver *ttd = malloc(sizeof(TickitTermDriver));
   ttd->vtable = &vtable;
 
-  tt = tickit_term_new_for_driver(ttd);
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .driver = ttd,
+  });
 
-  ok(!!tt, "tickit_term_new_for_driver");
+  ok(!!tt, "tickit_term_build with driver");
 
   tickit_term_set_output_func(tt, output, buffer);
   tickit_term_set_output_buffer(tt, 4096);

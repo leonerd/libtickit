@@ -458,7 +458,9 @@ TickitMockTerm *tickit_mockterm_new(int lines, int cols)
     mtd_clear_cells(mtd, line, 0, cols);
   }
 
-  TickitMockTerm *mt = (TickitMockTerm *)tickit_term_new_for_driver(&mtd->super);
+  TickitMockTerm *mt = (TickitMockTerm *)tickit_term_build(&(struct TickitTermBuilder){
+    .driver = &mtd->super,
+  });
   if(!mt) {
     mtd_destroy((TickitTermDriver *)mtd);
     return NULL;

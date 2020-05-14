@@ -48,11 +48,6 @@ void tickit_termdrv_write_strf(TickitTermDriver *ttd, const char *fmt, ...);
 TickitPen *tickit_termdrv_current_pen(TickitTermDriver *ttd);
 
 /*
- * Function to construct a new TickitTerm directly from a TickitTermDriver
- */
-TickitTerm *tickit_term_new_for_driver(TickitTermDriver *ttd);
-
-/*
  * Intended for "subclass" terminal methods, to obtain their custom driver
  * when given a TT instance
  */
