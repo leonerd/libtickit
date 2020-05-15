@@ -373,16 +373,29 @@ bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
     hi   = 8;
   }
 
+  const char *hashp = strchr(desc, '#');
+  size_t len;
+  if(hashp) {
+    len = hashp - desc;
+    // Trim spaces
+    while(len > 0 && desc[len-1] == ' ')
+      len--;
+  }
+  else
+    len = strlen(desc);
+
   if(sscanf(desc, "%d", &val) == 1) {
     if(hi && val > 7)
       return false;
 
     tickit_pen_set_colour_attr(pen, attr, val + hi);
+    if(hashp)
+      goto parse_rgb8;
     return true;
   }
 
   for(int i = 0; i < sizeof(colournames)/sizeof(colournames[0]); i++) {
-    if(strcmp(desc, colournames[i].name) != 0)
+    if(strncmp(desc, colournames[i].name, len) != 0)
       continue;
 
     val = colournames[i].colour;
@@ -390,10 +403,21 @@ bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
       val += hi;
 
     tickit_pen_set_colour_attr(pen, attr, val);
+    if(hashp)
+      goto parse_rgb8;
     return true;
   }
 
   return false;
+
+parse_rgb8:
+  {
+    TickitPenRGB8 rgb;
+    if(sscanf(hashp+1, "%2hhx%2hhx%2hhx", &rgb.r, &rgb.g, &rgb.b) == 3)
+      tickit_pen_set_colour_attr_rgb8(pen, attr, rgb);
+  }
+
+  return true;
 }
 
 void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)

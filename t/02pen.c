@@ -183,25 +183,35 @@ int main(int argc, char *argv[])
     is_int(val.g, 240, "val.g from get RGB8");
     is_int(val.b, 250, "val.b from get RGB8");
 
-    TickitPen *pen2 = tickit_pen_clone(pen);
-    ok(tickit_pen_has_colour_attr_rgb8(pen2, TICKIT_PEN_FG),
-        "tickit_pen_clone preserves RGB8 attributes");
+    {
+      TickitPen *pen2 = tickit_pen_clone(pen);
+      ok(tickit_pen_has_colour_attr_rgb8(pen2, TICKIT_PEN_FG),
+          "tickit_pen_clone preserves RGB8 attributes");
 
-    ok(tickit_pen_equiv(pen, pen2), "cloned pen is equivalent");
+      ok(tickit_pen_equiv(pen, pen2), "cloned pen is equivalent");
 
-    tickit_pen_clear_attr(pen2, TICKIT_PEN_FG);
-    tickit_pen_set_colour_attr(pen2, TICKIT_PEN_FG, 15);
-    ok(!tickit_pen_equiv(pen, pen2), "pen not equivalent after clearing RGB8");
+      tickit_pen_clear_attr(pen2, TICKIT_PEN_FG);
+      tickit_pen_set_colour_attr(pen2, TICKIT_PEN_FG, 15);
+      ok(!tickit_pen_equiv(pen, pen2), "pen not equivalent after clearing RGB8");
 
-    tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 20);
-    ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_FG),
-        "pen does not have FG RGB after set new index");
+      tickit_pen_set_colour_attr(pen, TICKIT_PEN_FG, 20);
+      ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_FG),
+          "pen does not have FG RGB after set new index");
 
-    tickit_pen_set_colour_attr_rgb8(pen, TICKIT_PEN_BG, (TickitPenRGB8){10, 20, 30});
-    ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_BG),
-        "pen does not have BG RGB8 with no index");
+      tickit_pen_set_colour_attr_rgb8(pen, TICKIT_PEN_BG, (TickitPenRGB8){10, 20, 30});
+      ok(!tickit_pen_has_colour_attr_rgb8(pen, TICKIT_PEN_BG),
+          "pen does not have BG RGB8 with no index");
 
-    tickit_pen_unref(pen2);
+      tickit_pen_unref(pen2);
+    }
+
+    tickit_pen_set_colour_attr_desc(pen, TICKIT_PEN_FG, "red #F01010");
+    is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 1, "index from set_desc with RGB");
+    val = tickit_pen_get_colour_attr_rgb8(pen, TICKIT_PEN_FG);
+    is_int(val.r, 240, "val.r from get RGB8 for desc RGB");
+    is_int(val.g,  16, "val.g from get RGB8 for desc RGB");
+    is_int(val.b,  16, "val.b from get RGB8 for desc RGB");
+
     tickit_pen_unref(pen);
   }
 

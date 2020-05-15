@@ -18,6 +18,16 @@ Link with \fI\-ltickit\fP.
 \fBtickit_pen_set_colour_attr\fP() provides a new value for the given colour attribute on the pen as a palette index. If the pen previously stored a secondary RGB8 value for this attribute it will be cleared. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance.
 .PP
 \fBtickit_pen_set_colour_attr_desc\fP() provides a new value for the given colour attribute on the pen as a textual description string, converting it into a colour index. It will invoke the \fBTICKIT_EV_CHANGE\fP event on the pen instance. It recognises decimal integers and the names of the first eight VGA colours (black, red, green, yellow, blue, magenta, cyan and white, respectively). It also recognises the prefix of "hi-" before one of the eight VGA colour names, to indicate the high-brightness versions at colour indexes 8 to 15. If it recognises the given string it returns a true value, or false if not.
+.PP
+Additionally, the string may be followed by an RGB8 specification formed from a hash symbol and 6 hexadecimal characters. If present, the secondary RGB8 value will also be set. Optional space characters between the base colour name and the hash symbol will be ignored.
+.PP
+For example,
+.sp
+.EX
+  tickit_pen_set_colour_attr_desc(pen, TICKIT_PEN_FG, "red #FF1515");
+.EE
+.sp
+is eqiuvalent to setting the basic \f(CWred\fP colour along with the secondary RGB8 value of \f(CW{ .r = 0xFF, .g = 0x15, .b = 0x15}\fP.
 .SH "RETURN VALUE"
 \fBtickit_pen_get_colour_attr\fP() returns an integer value. \fBtickit_pen_set_colour_attr\fP() returns no value. \fBtickit_pen_set_colour_attr_desc\fP() returns a boolean indicating success.
 .SH "SEE ALSO"
