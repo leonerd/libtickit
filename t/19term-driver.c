@@ -73,12 +73,13 @@ int main(int argc, char *argv[])
   ttd->vtable = &vtable;
 
   tt = tickit_term_build(&(struct TickitTermBuilder){
-    .driver = ttd,
+    .driver           = ttd,
+    .output_func      = output,
+    .output_func_user = buffer,
   });
 
   ok(!!tt, "tickit_term_build with driver");
 
-  tickit_term_set_output_func(tt, output, buffer);
   tickit_term_set_output_buffer(tt, 4096);
 
   buffer[0] = 0;

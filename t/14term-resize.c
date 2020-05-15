@@ -38,7 +38,9 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  tt = tickit_term_new_for_termtype("xterm");
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "xterm",
+  });
   tickit_term_set_size(tt, 25, 80);
 
   int bindid = tickit_term_bind_event(tt, TICKIT_TERM_ON_RESIZE, TICKIT_BIND_UNBIND, on_resize, NULL);

@@ -61,7 +61,9 @@ int main(int argc, char *argv[])
 {
   TickitTerm *tt;
 
-  tt = tickit_term_new_for_termtype("xterm");
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "xterm",
+  });
   tickit_term_set_utf8(tt, 1);
 
   ok(tickit_term_get_utf8(tt), "get_utf8 true");

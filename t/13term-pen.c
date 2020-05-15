@@ -14,8 +14,11 @@ int main(int argc, char *argv[])
   TickitTerm *tt;
   char buffer[1024] = { 0 };
 
-  tt = tickit_term_new_for_termtype("xterm");
-  tickit_term_set_output_func(tt, output, buffer);
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "xterm",
+    .output_func      = output,
+    .output_func_user = buffer,
+  });
 
   // setpen empty
   {

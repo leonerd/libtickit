@@ -15,9 +15,12 @@ int main(int argc, char *argv[])
 
   /* Regular setup */
   {
-    TickitTerm *tt = tickit_term_new_for_termtype("xterm");
+    TickitTerm *tt = tickit_term_build(&(struct TickitTermBuilder){
+      .termtype  = "xterm",
+      .output_func      = output,
+      .output_func_user = buffer,
+    });
     Tickit *t = tickit_new_for_term(tt);
-    tickit_term_set_output_func(tt, output, buffer);
 
     buffer[0] = 0;
     tickit_tick(t, TICKIT_RUN_NOHANG);
@@ -37,9 +40,12 @@ int main(int argc, char *argv[])
   }
 
   {
-    TickitTerm *tt = tickit_term_new_for_termtype("xterm");
+    TickitTerm *tt = tickit_term_build(&(struct TickitTermBuilder){
+      .termtype  = "xterm",
+      .output_func      = output,
+      .output_func_user = buffer,
+    });
     Tickit *t = tickit_new_for_term(tt);
-    tickit_term_set_output_func(tt, output, buffer);
 
     tickit_setctl_int(t, TICKIT_CTL_USE_ALTSCREEN, 0);
 

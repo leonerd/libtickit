@@ -17,12 +17,14 @@ int main(int argc, char *argv[])
   char buffer[1024] = { 0 };
   int lines, cols;
 
-  tt = tickit_term_new_for_termtype("xterm");
-  ok(!!tt, "tickit_term_new_for_termtype");
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "xterm",
+    .output_func      = output,
+    .output_func_user = buffer,
+  });
+  ok(!!tt, "tickit_term_build");
 
   is_str(tickit_term_get_termtype(tt), "xterm", "tickit_term_get_termtype");
-
-  tickit_term_set_output_func(tt, output, buffer);
 
   is_int(tickit_term_get_output_fd(tt), -1, "tickit_term_get_output_fd");
 

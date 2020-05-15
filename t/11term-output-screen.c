@@ -19,7 +19,11 @@ int main(int argc, char *argv[])
   char buffer[1024] = { 0 };
   int lines, cols;
 
-  tt = tickit_term_new_for_termtype("screen");
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "screen",
+    .output_func      = output,
+    .output_func_user = buffer,
+  });
   if(!tt && (errno == ENOENT || errno == EINVAL)) {
     /* Some systems (e.g. FreeBSD) provide extended terminfo cap strings for
      * screen's terminfo file, which current version of unibilium is unable to
@@ -38,8 +42,6 @@ int main(int argc, char *argv[])
   }
 
   is_str(tickit_term_get_termtype(tt), "screen", "tickit_term_get_termtype");
-
-  tickit_term_set_output_func(tt, output, buffer);
 
   is_int(tickit_term_get_output_fd(tt), -1, "tickit_term_get_output_fd");
 

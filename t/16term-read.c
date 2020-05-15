@@ -30,9 +30,12 @@ int main(int argc, char *argv[])
    * pipe() can make us one */
   pipe(fd);
 
-  tt = tickit_term_new_for_termtype("xterm");
-
-  tickit_term_set_input_fd(tt, fd[0]);
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "xterm",
+    .open      = TICKIT_OPEN_FDS,
+    .input_fd  = fd[0],
+    .output_fd = -1,
+  });
 
   is_int(tickit_term_get_input_fd(tt), fd[0], "tickit_term_get_input_fd");
 

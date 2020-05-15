@@ -15,11 +15,13 @@ int main(int argc, char *argv[])
   char buffer[1024] = { 0 };
   int value;
 
-  tt = tickit_term_new_for_termtype("xterm");
+  tt = tickit_term_build(&(struct TickitTermBuilder){
+    .termtype  = "xterm",
+    .output_func      = output,
+    .output_func_user = buffer,
+  });
 
-  ok(!!tt, "tickit_term_new_for_termtype");
-
-  tickit_term_set_output_func(tt, output, buffer);
+  ok(!!tt, "tickit_term_build");
 
   is_str(tickit_term_ctlname(TICKIT_TERMCTL_ALTSCREEN), "altscreen",
       "tickit_term_ctlname on TICKIT_TERMCTL_ALTSCREEN");

@@ -28,11 +28,14 @@ int main(int argc, char *argv[])
      * pipe() can make us one */
     pipe(fd);
 
-    TickitTerm *tt = tickit_term_new_for_termtype("xterm");
+    TickitTerm *tt = tickit_term_build(&(struct TickitTermBuilder){
+      .termtype  = "xterm",
+      .open      = TICKIT_OPEN_FDS,
+      .input_fd  = -1,
+      .output_fd = fd[1],
+    });
 
-    ok(!!tt, "tickit_term_new_for_termtype");
-
-    tickit_term_set_output_fd(tt, fd[1]);
+    ok(!!tt, "tickit_term_build");
 
     is_int(tickit_term_get_output_fd(tt), fd[1], "tickit_term_get_output_fd");
 
@@ -96,10 +99,11 @@ int main(int argc, char *argv[])
 
   /* Output by function */
   {
-    TickitTerm *tt = tickit_term_new_for_termtype("xterm");
-
-    buffer[0] = 0;
-    tickit_term_set_output_func(tt, output, buffer);
+    TickitTerm *tt = tickit_term_build(&(struct TickitTermBuilder){
+      .termtype  = "xterm",
+      .output_func      = output,
+      .output_func_user = buffer,
+    });
 
     /* Ignore startup string */
     buffer[0] = 0;
