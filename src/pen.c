@@ -388,10 +388,9 @@ bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
     if(hi && val > 7)
       return false;
 
+    freeze(pen);
     tickit_pen_set_colour_attr(pen, attr, val + hi);
-    if(hashp)
-      goto parse_rgb8;
-    return true;
+    goto parse_rgb8;
   }
 
   for(int i = 0; i < sizeof(colournames)/sizeof(colournames[0]); i++) {
@@ -402,21 +401,21 @@ bool tickit_pen_set_colour_attr_desc(TickitPen *pen, TickitPenAttr attr, const c
     if(val < 8 && hi)
       val += hi;
 
+    freeze(pen);
     tickit_pen_set_colour_attr(pen, attr, val);
-    if(hashp)
-      goto parse_rgb8;
-    return true;
+    goto parse_rgb8;
   }
 
   return false;
 
 parse_rgb8:
-  {
+  if (hashp) {
     TickitPenRGB8 rgb;
     if(sscanf(hashp+1, "%2hhx%2hhx%2hhx", &rgb.r, &rgb.g, &rgb.b) == 3)
       tickit_pen_set_colour_attr_rgb8(pen, attr, rgb);
   }
 
+  thaw(pen);
   return true;
 }
 
