@@ -18,7 +18,7 @@ struct TickitEventHooks {
   void  (*destroy)(void *data);
   void  (*run)(void *data, TickitRunFlags flags);
   void  (*stop)(void *data);
-  bool  (*io_read)(void *data, int fd, TickitBindFlags flags, TickitWatch *watch);
+  bool  (*io)(void *data, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitWatch *watch);
   void  (*cancel_io)(void *data, TickitWatch *watch);
   /* Below here is optional */
   bool  (*timer)(void *data, const struct timeval *at, TickitBindFlags flags, TickitWatch *watch);
@@ -39,6 +39,7 @@ int  tickit_evloop_get_watch_data_int(TickitWatch *watch);
 void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data);
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags);
+void tickit_evloop_invoke_iowatch(TickitWatch *watch, TickitEventFlags flags, TickitIOCondition cond);
 
 void tickit_evloop_sigwinch(Tickit *t);
 

@@ -36,6 +36,7 @@ struct TickitWatch {
   union {
     struct {
       int fd;
+      TickitIOCondition cond;
     } io;
 
     struct {
@@ -310,7 +311,7 @@ void tickit_stop(Tickit *t)
   return (*t->evhooks->stop)(t->evdata);
 }
 
-void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+void *tickit_watch_io(Tickit *t, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
   TickitWatch *watch = malloc(sizeof(TickitWatch));
   if(!watch)
@@ -324,9 +325,10 @@ void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallb
   watch->fn = fn;
   watch->user = user;
 
-  watch->io.fd = fd;
+  watch->io.fd   = fd;
+  watch->io.cond = cond;
 
-  if(!(*t->evhooks->io_read)(t->evdata, fd, flags, watch))
+  if(!(*t->evhooks->io)(t->evdata, fd, cond, flags, watch))
     goto fail;
 
   TickitWatch **prevp = &t->iowatches;
@@ -341,6 +343,11 @@ void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallb
 fail:
   free(watch);
   return NULL;
+}
+
+void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  return tickit_watch_io(t, fd, TICKIT_IO_IN|TICKIT_IO_HUP, flags, fn, user);
 }
 
 void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
@@ -572,9 +579,9 @@ void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data)
   watch->evdata.i = data;
 }
 
-void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
+static void invoke_watch(TickitWatch *watch, TickitEventFlags flags, void *info)
 {
-  (*watch->fn)(watch->t, flags, NULL, watch->user);
+  (*watch->fn)(watch->t, flags, info, watch->user);
 
   /* Remove oneshot watches from the list */
   TickitWatch **prevp;
@@ -603,6 +610,19 @@ void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
 
     prevp = &(*prevp)->next;
   }
+}
+
+void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
+{
+  invoke_watch(watch, flags, NULL);
+}
+
+void tickit_evloop_invoke_iowatch(TickitWatch *watch, TickitEventFlags flags, TickitIOCondition cond)
+{
+  invoke_watch(watch, flags, &(TickitIOWatchInfo){
+    .fd   = watch->io.fd,
+    .cond = cond,
+  });
 }
 
 void tickit_evloop_sigwinch(Tickit *t)

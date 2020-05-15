@@ -90,8 +90,24 @@ static void evloop_run(void *data, TickitRunFlags flags)
         if(evdata->pollfds[idx].fd == -1)
           continue;
 
-        if(evdata->pollfds[idx].revents & (POLLIN|POLLHUP|POLLERR))
-          tickit_evloop_invoke_watch(evdata->pollwatches[idx], TICKIT_EV_FIRE);
+        int revents = evdata->pollfds[idx].revents;
+        /* If there are any revents we presume them interesting */
+        if(!revents)
+          continue;
+
+        TickitIOCondition cond = 0;
+        if(revents & POLLIN)
+          cond |= TICKIT_IO_IN;
+        if(revents & POLLOUT)
+          cond |= TICKIT_IO_OUT;
+        if(revents & POLLHUP)
+          cond |= TICKIT_IO_HUP;
+        if(revents & POLLERR)
+          cond |= TICKIT_IO_ERR;
+        if(revents & POLLNVAL)
+          cond |= TICKIT_IO_INVAL;
+
+        tickit_evloop_invoke_iowatch(evdata->pollwatches[idx], TICKIT_EV_FIRE, cond);
       }
     }
     else if(pollret < 0 && errno == EINTR) {
@@ -114,7 +130,7 @@ static void evloop_stop(void *data)
   evdata->still_running = 0;
 }
 
-static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
+static bool evloop_io(void *data, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
 
@@ -144,7 +160,14 @@ static bool evloop_io_read(void *data, int fd, TickitBindFlags flags, TickitWatc
 
 reuse_idx:
   evdata->pollfds[idx].fd = fd;
-  evdata->pollfds[idx].events = POLLIN;
+  int events = 0;
+  if(cond & TICKIT_IO_IN)
+    events |= POLLIN;
+  if(cond & TICKIT_IO_OUT)
+    events |= POLLOUT;
+  if(cond & TICKIT_IO_HUP)
+    events |= POLLHUP;
+  evdata->pollfds[idx].events = events;
 
   evdata->pollwatches[idx] = watch;
 
@@ -168,6 +191,6 @@ TickitEventHooks tickit_evloop_default = {
   .destroy   = evloop_destroy,
   .run       = evloop_run,
   .stop      = evloop_stop,
-  .io_read   = evloop_io_read,
+  .io        = evloop_io,
   .cancel_io = evloop_cancel_io,
 };

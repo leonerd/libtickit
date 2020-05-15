@@ -1,0 +1,54 @@
+.TH TICKIT_WATCH_IO 3
+.SH NAME
+tickit_watch_io \- invoke a callback when IO is possible
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "typedef enum " TickitIOCondition ;
+.sp
+.B  typedef struct {
+.BI "  int " fd ;
+.BI "  TickitIOCondition " cond ;
+.BI "} " TickitIOWatchInfo ;
+.sp
+.BI "typedef int " TickitCallbackFn "(Tickit *" t ", TickitEventflags " flags ,
+.BI "    void *" info ", void *" user );
+.sp
+.BI "void *tickit_watch_io(Tickit *" t ", int " fd ", TickitIOCondition " cond ,
+.BI "    TickitBindFlags " flags ", TickitCallbackFn *" fn ", void *" user );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_watch_io\fP() registers a callback function to be invoked by the toplevel event loop when IO operations are possible on a given file descriptor. A registered callback will be invoked by a running call to \fBtickit_run\fP(3). The callback function will be invoked whenever the file descriptor is readable, writable, or in a hang-up condition, depending on the requested condition types. The \fIinfo\fP pointer will point to a structure containing the file descriptor and a bitmask of the IO operations currently possible.
+.PP
+The \fIcond\fP argument to \fPtickit_watch_io\fP() should be a bitmask of at least one of the following values:
+.TP
+.B TICKIT_IO_IN
+The file descriptor is ready to perform an input operation, such as reading bytes.
+.TP
+.B TICKIT_IO_OUT
+The file descriptor is ready to perform an output operation, such as writing bytes.
+.TP
+.B TICKIT_IO_HUP
+The file descriptor is in a hang-up condition. Typically this means that a connection such as a socket or pipe has been closed by the peer.
+.PP
+When the callback function is invoked, the \fIinfo\fP struct will contain the file descriptor in the \fIfd\fP field, and the current IO conditions in the \fIcond\fP field. This may be one of the values given above, and in addition may also be one of the following:
+.TP
+.B TICKIT_IO_ERR
+The file descriptor is in an error condition.
+.TP
+.B TICKIT_IO_INVAL
+The file descriptor itself is invalid and does not represent an open file.
+.PP
+If cancelled by \fBtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
+.SH "RETURN VALUE"
+\fBtickit_watch_io\fP() returns an opaque identifier pointer.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit_watch_timer_after_msec (3),
+.BR tickit_watch_timer_at_epoch (3),
+.BR tickit_watch_later (3),
+.BR tickit_watch_cancel (3),
+.BR tickit (7)

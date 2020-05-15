@@ -390,12 +390,22 @@ static void fire_io_event(uv_poll_t *handle, int status, int events)
 {
   TickitWatch *watch = handle->data;
 
-  if(events & UV_READABLE) {
-    tickit_evloop_invoke_watch(watch, TICKIT_EV_FIRE);
+  TickitIOCondition cond = 0;
+  if(events & UV_READABLE)
+    cond |= TICKIT_IO_IN;
+  if(events & UV_WRITABLE)
+    cond |= TICKIT_IO_OUT;
+  if(events & UV_DISCONNECT)
+    cond |= TICKIT_IO_HUP;
+  if(status < 0)
+    cond |= TICKIT_IO_ERR;
+
+  if(cond) {
+    tickit_evloop_invoke_iowatch(watch, TICKIT_EV_FIRE, cond);
   }
 }
 
-static bool el_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
+static bool el_io(void *data, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
 
@@ -403,8 +413,16 @@ static bool el_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *w
   if(!handle)
     return false;
 
+  enum uv_poll_event ev = 0;
+  if(cond & TICKIT_IO_IN)
+    ev |= UV_READABLE;
+  if(cond & TICKIT_IO_OUT)
+    ev |= UV_WRITABLE;
+  if(cond & TICKIT_IO_HUP)
+    ev |= UV_DISCONNECT;
+
   uv_poll_init(evdata->loop, handle, fd);
-  uv_poll_start(handle, UV_READABLE, &fire_io_event);
+  uv_poll_start(handle, ev, &fire_io_event);
 
   handle->data = watch;
   tickit_evloop_set_watch_data(watch, handle);
@@ -500,7 +518,7 @@ TickitEventHooks libuv_evhooks = {
   .destroy      = el_destroy,
   .run          = el_run,
   .stop         = el_stop,
-  .io_read      = el_io_read,
+  .io           = el_io,
   .cancel_io    = el_cancel_io,
   .timer        = el_timer,
   .cancel_timer = el_cancel_timer,

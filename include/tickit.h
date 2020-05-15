@@ -82,6 +82,19 @@ typedef enum {
 } TickitCursorShape;
 
 typedef enum {
+  TICKIT_IO_IN    = 1<<0,
+  TICKIT_IO_OUT   = 1<<1,
+  TICKIT_IO_HUP   = 1<<2,
+  TICKIT_IO_ERR   = 1<<3,
+  TICKIT_IO_INVAL = 1<<4,
+} TickitIOCondition;
+
+typedef struct {
+  int fd;
+  TickitIOCondition cond;
+} TickitIOWatchInfo;
+
+typedef enum {
   TICKIT_LINECAP_START = 0x01,
   TICKIT_LINECAP_END   = 0x02,
   TICKIT_LINECAP_BOTH  = 0x03,
@@ -771,7 +784,9 @@ TickitCtl tickit_lookup_ctl(const char *name);
 
 TickitType tickit_ctltype(TickitCtl ctl);
 
-/* TODO: Consider OUT and HUP conditions too */
+void *tickit_watch_io(Tickit *t, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+
+/* Discouraged synonyn for tickit_watch_io cond=TICKIT_IO_IN|TICKIT_IO_HUP */
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
 void *tickit_watch_timer_after_msec(Tickit *t, int msec, TickitBindFlags flags, TickitCallbackFn *fn, void *user);

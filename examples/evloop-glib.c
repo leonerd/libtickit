@@ -370,18 +370,38 @@ static void el_stop(void *data)
   g_main_loop_quit(evdata->loop);
 }
 
-static gboolean fire_io_event(gint fd, GIOCondition condition, gpointer watch)
+static gboolean fire_io_event(gint fd, GIOCondition gcond, gpointer watch)
 {
-  if(condition & G_IO_IN) {
-    tickit_evloop_invoke_watch(watch, TICKIT_EV_FIRE);
+  TickitIOCondition cond = 0;
+  if(gcond & G_IO_IN)
+    cond |= TICKIT_IO_IN;
+  if(gcond & G_IO_OUT)
+    cond |= TICKIT_IO_OUT;
+  if(gcond & G_IO_HUP)
+    cond |= TICKIT_IO_HUP;
+  if(gcond & G_IO_ERR)
+    cond |= TICKIT_IO_ERR;
+  if(gcond & G_IO_NVAL)
+    cond |= TICKIT_IO_INVAL;
+
+  if(cond) {
+    tickit_evloop_invoke_iowatch(watch, TICKIT_EV_FIRE, cond);
   }
 
   return TRUE;
 }
 
-static bool el_io_read(void *data, int fd, TickitBindFlags flags, TickitWatch *watch)
+static bool el_io(void *data, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitWatch *watch)
 {
-  int id = g_unix_fd_add(fd, G_IO_IN, fire_io_event, watch);
+  GIOCondition gcond = 0;
+  if(cond & TICKIT_IO_IN)
+    gcond |= G_IO_IN;
+  if(cond & TICKIT_IO_OUT)
+    gcond |= G_IO_OUT;
+  if(cond & TICKIT_IO_HUP)
+    gcond |= G_IO_HUP;
+
+  int id = g_unix_fd_add(fd, gcond, fire_io_event, watch);
   tickit_evloop_set_watch_data_int(watch, id);
 
   return true;
@@ -434,7 +454,7 @@ TickitEventHooks glib_evhooks = {
   .destroy      = el_destroy,
   .run          = el_run,
   .stop         = el_stop,
-  .io_read      = el_io_read,
+  .io           = el_io,
   .cancel_io    = el_cancel_io,
   .timer        = el_timer,
   .cancel_timer = el_cancel_timer,
