@@ -141,7 +141,8 @@ Tickit *tickit_build(const struct TickitBuilder *builder)
   }
   t->term = tt; /* take ownership */
 
-  tickit_watch_io_read(t, tickit_term_get_input_fd(tt), 0, on_term_readable, NULL);
+  tickit_watch_io(t, tickit_term_get_input_fd(tt), TICKIT_IO_IN|TICKIT_IO_HUP,
+      0, on_term_readable, NULL);
 
   return t;
 
