@@ -10,11 +10,11 @@ tickit_term_open_stdio \- create a terminal instance on standard input/output
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_open_stdio\fP() creates a new \fBTickitTerm\fP instance to represent the standard input and output streams of the process. This function is a convenient shortcut around the common use-case of creating an instance using \fBtickit_term_new\fP(3), setting the input and output handles using \fBtickit_term_set_input_fd\fP(3) and \fBtickit_term_set_output_fd\fP(3), and enabling \fBSIGWINCH\fP support using \fBtickit_term_observe_sigwinch\fP(3).
+\fBtickit_term_open_stdio\fP() creates a new \fBTickitTerm\fP instance to represent the standard input and output streams of the process. This function is a convenient shortcut around the common use-case of creating an instance using \fBtickit_term_build\fP(3) with the \fIopen\fP field set to \fBTICKIT_OPEN_STDIO\fP, and enabling \fBSIGWINCH\fP support using \fBtickit_term_observe_sigwinch\fP(3).
 .SH "RETURN VALUE"
 If successful, \fBtickit_term_open_stdio\fP() returns a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure.
 .SH "SEE ALSO"
-.BR tickit_term_new (3),
+.BR tickit_term_build (3),
 .BR tickit_term_print (3),
 .BR tickit_term_bind_event (3),
 .BR tickit_term (7),

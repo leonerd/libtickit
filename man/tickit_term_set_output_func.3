@@ -14,17 +14,11 @@ tickit_term_set_output_func \- manage terminal output via a callback function
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_set_output_func\fP() associates an output function with the terminal instance. If set, this function will be used to send bytes to the user's terminal even if an output file descriptor is also set. When the function is invoked, it will be passed the terminal instance, a byte buffer and size, and the user data pointer it was installed with.
-.PP
-When an output function is replaced by another or the terminal is destroyed, an existing function is invoked one final time to inform it. In this case, the \fIlen\fP argument will be 0 and \fIbytes\fP will be \fBNULL\fP.
-.PP
-After both an input and output method have been defined, it is recommended to call \fBtickit_term_await_started\fP(3) to wait for the terminal to be set up.
+This function is now discouraged. Applications should use \fBtickit_term_build\fP(3) instead.
 .SH "RETURN VALUE"
 \fBtickit_term_set_output_func\fP() returns no value.
 .SH "SEE ALSO"
-.BR tickit_term_new (3),
-.BR tickit_term_set_output_fd (3),
-.BR tickit_term_await_started (3),
+.BR tickit_term_build (3),
 .BR tickit_term_print (3),
 .BR tickit_term (7),
 .BR tickit (7)

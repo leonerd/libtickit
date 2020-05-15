@@ -10,13 +10,11 @@ tickit_term_flush \- flush the terminal output buffer
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_flush\fP() flushes any data pending in the output buffer to the terminal, either by calling the output function if defined by \fBtickit_term_set_output_func\fP(3), or by \fBwrite\fP(3) on the output file descriptor defined by \fBtickit_term_set_output_fd\fP(3). If there is no pending data then this function does nothing.
+\fBtickit_term_flush\fP() flushes any data pending in the output buffer to the terminal, either by calling the output function by \fBwrite\fP(3) on the output file descriptor. If there is no pending data then this function does nothing.
 .SH "RETURN VALUE"
 \fBtickit_term_flush\fP() returns no value.
 .SH "SEE ALSO"
-.BR tickit_term_new (3),
-.BR tickit_term_set_output_fd (3),
-.BR tickit_term_set_output_func (3),
+.BR tickit_term_build (3),
 .BR tickit_term_set_output_buffer (3),
 .BR tickit_term_print (3),
 .BR tickit_term (7),

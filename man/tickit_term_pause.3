@@ -17,7 +17,7 @@ Link with \fI\-ltickit\fP.
 .PP
 It is intended these functions be used to create a program-wide suspend feature, where the terminal can be handed back over to the invoking shell while the process backgrounds itself. Typically this is done by the process sending itself a \fBSIGSTOP\fP signal via \fBraise\fP(3). After calling \fBtickit_term_pause\fP(), no other terminal-related functions should be called, nor other IO operations attempted, until after a subsequent \fBtickit_term_resume\fP(3).
 .SH "SEE ALSO"
-.BR tickit_term_new (3),
+.BR tickit_term_build (3),
 .BR tickit_term_setctl_int (3),
 .BR tickit_term (7),
 .BR tickit (7)

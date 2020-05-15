@@ -10,10 +10,10 @@ tickit_term_get_termtype \- returns the terminal type
 .sp
 Link with \fI-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_get_termtype\fP() returns the string name of the type of the terminal. This is the string that was given to \fBtickit_term_new_for_termtype\fP(3), or was fetched from the \fBTERM\fP environment variable. The returned value points directly into the buffer allocated by the \fITickitTerm\fP instance itself; this buffer must not be modified or freed.
+\fBtickit_term_get_termtype\fP() returns the string name of the type of the terminal. This is the string that set in the \fBTickitTermBuilder\fP struct to \fBtickit_term_build\fP(3), or was fetched from the \fBTERM\fP environment variable. The returned value points directly into the buffer allocated by the \fITickitTerm\fP instance itself; this buffer must not be modified or freed.
 .SH "RETURN VALUE"
 \fBtickit_term_get_termtype\fP() returns a string buffer pointer.
 .SH "SEE ALSO"
-.BR tickit_term_new (3),
+.BR tickit_term_build (3),
 .BR tickit_term (7),
 .BR tickit (7)

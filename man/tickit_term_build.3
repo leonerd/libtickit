@@ -5,6 +5,9 @@ tickit_term_build \- create a new terminal instance with arguments
 .EX
 .B #include <tickit.h>
 .sp
+.BI "typedef void " TickitTermOutputFunc "(TickitTerm *" tt ", const char *" bytes ,
+.BI "    size_t " len ", void *" user );
+.sp
 .BI "struct " TickitTermBuilder " {"
 .BI "  const char *" termtype ;
 .BI "  enum ... " open ;
@@ -42,11 +45,18 @@ The \fIoutput_func\fP and \fIoutput_func_user\fP fields provide an output functi
 .PP
 The \fIoutput_buffersize\fP field sets the initial size of the output buffer. It defaults to zero, meaning no buffer will be allocated.
 .PP
+The input file descriptor will be used by \fBtickit_term_input_readable\fP(3) to read more data from the terminal. The value -1 may be set to indicate an absence of a file descriptor, in which case input data may still be given by calling \fBtickit_term_input_push_bytes\fP(3).
+.PP
+If set to a non-NULL value, output function is used to output bytes of data to the terminal even if a file descriptor is also set. When invoked, it is passed the terminal instance, a byte buffer and size, and the user data pointer that it was configured with. This pointer may be NULL if not required.
+.PP
+The output file descriptor will be used by \fBtickit_term_refresh_size\fP(3) to query the size of the terminal, by issuing the \fBTIOCGWINSZ\fP \fBioctl\fP(2). It will also be used to write output to the terminal if no function has been set. The value -1 may be set to indicate no file descriptor, in which case the size must be set by \fBtickit_term_set_size\fP(3) and an output function must be set for output to occur.
+.PP
 The reference count of a newly-constructed terminal instance will be one. This can be incremented or decremented using \fBtickit_term_ref\fP(3) and \fBtickit_term_unref\fP(3). When its reference count reaches zero it is destroyed.
+.PP
+After construction it is recommended to call \fBtickit_term_await_started\fP(3) to wait for the terminal to be set up.
 .SH "RETURN VALUE"
 If successful, \fBtickit_term_build\fP() returns a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure.
 .SH "SEE ALSO"
-.BR tickit_term_new (3),
 .BR tickit_term_open_stdio (3),
 .BR tickit_term_set_output_fd (3),
 .BR tickit_term_set_output_func (3),
