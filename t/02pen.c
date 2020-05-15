@@ -213,6 +213,13 @@ int main(int argc, char *argv[])
     is_int(val.b,  16, "val.b from get RGB8 for desc RGB");
 
     tickit_pen_unref(pen);
+
+    pen = tickit_pen_new_attrs(TICKIT_PEN_FG_DESC, "green#20FF20");
+    is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 2, "index from new FG_DESC");
+    val = tickit_pen_get_colour_attr_rgb8(pen, TICKIT_PEN_FG);
+    is_int(val.r,  32, "val.r from get RGB8 for new FG_DESC");
+    is_int(val.g, 255, "val.g from get RGB8 for new FG_DESC");
+    is_int(val.b,  32, "val.b from get RGB8 for new FG_DESC");
   }
 
   return exit_status();

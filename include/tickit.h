@@ -112,6 +112,13 @@ typedef enum {
   TICKIT_N_PEN_ATTRS
 } TickitPenAttr;
 
+/* additional attribute types recognised by tickit_pen_new_attrs */
+enum {
+  /* We're unlikely to ever have 256 attributes, so adding 0x100 should be safe */
+  TICKIT_PEN_FG_DESC = 0x100 + TICKIT_PEN_FG,
+  TICKIT_PEN_BG_DESC = 0x100 + TICKIT_PEN_BG,
+};
+
 typedef enum {
   TICKIT_PEN_UNDER_NONE,
   TICKIT_PEN_UNDER_SINGLE,

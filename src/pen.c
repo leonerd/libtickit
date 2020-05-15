@@ -80,7 +80,13 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...)
     if(a < 1)
       break;
 
-    // TODO: accept colour descs or rgb8
+    if(a == TICKIT_PEN_FG_DESC || a == TICKIT_PEN_BG_DESC) {
+      const char *str = va_arg(args, const char *);
+      tickit_pen_set_colour_attr_desc(pen, a - 0x100, str);
+      continue;
+    }
+
+    // TODO: accept colour rgb8?
     switch(tickit_pen_attrtype(a)) {
     case TICKIT_PENTYPE_BOOL:
       val = va_arg(args, int);

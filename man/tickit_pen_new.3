@@ -16,6 +16,8 @@ Link with \fI\-ltickit\fP.
 .PP
 \fBtickit_pen_new_attrs\fP() creates a new \fBTickitPen\fP instance and populates it with a given list of attribute values. The attributes are given as pairs; first a \fBTickitPenAttr\fP then an integer giving its value, terminated by a final 0 or -1.
 .PP
+Two additional attribute types are recognised here, \fBTICKIT_PEN_FG_DESC\fP and \fBTICKIT_PEN_BG_DESC\fP. These will expect to receive a string argument value, which will be parsed as for \fBtickit_pen_set_colour_attr_desc\fP(3).
+.PP
 \fBtickit_pen_clone\fP() creates a new \fBTickitPen\fP instance. It initially has the same attributes values set as the one given by \fIorig\fP.
 .PP
 The reference count of a newly-constructed pen instance will be one. This can be incremented or decremented using \fBtickit_pen_ref\fP(3) and \fBtickit_pen_unref\fP(3). When its reference count reaches zero it is destroyed.
