@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 
     tickit_pen_unref(pen);
 
-    pen = tickit_pen_new_attrs(TICKIT_PEN_FG_DESC, "green#20FF20");
+    pen = tickit_pen_new_attrs(TICKIT_PEN_FG_DESC, "green#20FF20", 0);
     is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), 2, "index from new FG_DESC");
     val = tickit_pen_get_colour_attr_rgb8(pen, TICKIT_PEN_FG);
     is_int(val.r,  32, "val.r from get RGB8 for new FG_DESC");
