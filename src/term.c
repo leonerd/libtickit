@@ -287,7 +287,7 @@ TickitTerm *tickit_term_new_for_termtype(const char *termtype)
 
 TickitTerm *tickit_term_open_stdio(void)
 {
-  TickitTerm *tt = tickit_term_build(&(struct TickitTermBuilder){
+  TickitTerm *tt = tickit_term_build(&(const struct TickitTermBuilder){
     .open = TICKIT_OPEN_STDIO,
   });
   if(!tt)

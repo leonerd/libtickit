@@ -741,10 +741,10 @@ struct TickitBuilder {
   /* Fields below here are undocumented and for vaguely internal or
    * special-case purposes
    */
-  TickitEventHooks *evhooks;
+  const TickitEventHooks *evhooks;
   void *evinitdata;
 };
-Tickit *tickit_build(struct TickitBuilder *builder);
+Tickit *tickit_build(const struct TickitBuilder *builder);
 
 TickitTerm *tickit_get_term(Tickit *t);
 

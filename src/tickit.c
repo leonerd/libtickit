@@ -54,8 +54,8 @@ struct Tickit {
 
   TickitWatch *iowatches, *timers, *laters;
 
-  TickitEventHooks *evhooks;
-  void             *evdata;
+  const TickitEventHooks *evhooks;
+  void                   *evdata;
 
   unsigned int done_setup    : 1,
                use_altscreen : 1;
@@ -102,7 +102,7 @@ static void teardownterm(Tickit *t)
   t->done_setup = false;
 }
 
-Tickit *tickit_build(struct TickitBuilder *builder)
+Tickit *tickit_build(const struct TickitBuilder *builder)
 {
   Tickit *t = malloc(sizeof(Tickit));
   if(!t)
@@ -170,14 +170,14 @@ Tickit *tickit_new_for_term(TickitTerm *tt)
 
 Tickit *tickit_new_stdio(void)
 {
-  return tickit_build(&(struct TickitBuilder){
+  return tickit_build(&(const struct TickitBuilder){
     .term_builder.open = TICKIT_OPEN_STDIO,
   });
 }
 
 Tickit *tickit_new_stdtty(void)
 {
-  return tickit_build(&(struct TickitBuilder){
+  return tickit_build(&(const struct TickitBuilder){
     .term_builder.open = TICKIT_OPEN_STDTTY,
   });
 }
