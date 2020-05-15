@@ -37,8 +37,18 @@ void tickit_bindings_run_event(struct TickitBindings *bindings, void *owner, int
   bindings->is_iterating = true;
 
   for(struct TickitBinding *bind = bindings->first; bind; bind = bind->next)
-    if(bind->evindex == evindex)
-      (*bind->fn)(owner, TICKIT_EV_FIRE, info, bind->data);
+    if(bind->evindex == evindex) {
+      TickitEventFlags flags = TICKIT_EV_FIRE;
+      if(bind->flags & TICKIT_BIND_ONESHOT) {
+        flags |= TICKIT_EV_UNBIND;
+        bind->id = BINDING_ID_TOMBSTONE;
+        bindings->needs_delete = true;
+      }
+      (*bind->fn)(owner, flags, info, bind->data);
+      /* TODO: if !was_iterating then actually we can just splice it out of
+       * the chain and free() it now.
+       */
+    }
 
   bindings->is_iterating = was_iterating;
   if(!was_iterating && bindings->needs_delete)
@@ -90,7 +100,7 @@ int tickit_bindings_bind_event(struct TickitBindings *bindings, void *owner, int
 
   (*newp)->next = next;
   (*newp)->evindex = evindex;
-  (*newp)->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
+  (*newp)->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY|TICKIT_BIND_ONESHOT);
   (*newp)->fn = fn;
   (*newp)->data = data;
 

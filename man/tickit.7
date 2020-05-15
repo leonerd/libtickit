@@ -32,6 +32,7 @@ The \fIflags\fP argument to the various \fBtickit_..._bind_event\fP() functions 
 .BR  "  TICKIT_BIND_FIRST" ,
 .BR  "  TICKIT_BIND_UNBIND" ,
 .BR  "  TICKIT_BIND_DESTROY" ,
+.BR  "  TICKIT_BIND_ONESHOT" ,
 .BI "} " TickitBindFlags ;
 .EE
 .sp
@@ -41,6 +42,8 @@ The \fIflags\fP argument to the various \fBtickit_..._bind_event\fP() functions 
 \fBTICKIT_BIND_UNBIND\fP indicates that this handler should also be invoked at the time it is unbound, either due to a specific call to the \fBtickit_..._unbind_event\fP() function, or because the bound object is being destroyed.
 .PP
 \fBTICKIT_BIND_DESTROY\fP indicates that this handler should also be invoked at the time that the bound object is being destroyed.
+.PP
+\fBTICKIT_BIND_ONESHOT\fP indicates that the handler should be invoke at-most once, and unbound the first time it is invoked. When invoked it will receive both the \fBTICKIT_EV_FIRE\fP and \fBTICKIT_EV_UNBIND\fP flags at once.
 .PP
 Some API functions take or return the following enum type, to represent a tri-state extended boolean concept of true, false, or some third condition typically indicating a "don't care" or "unknown" state; the exact semantics will vary between specific uses and should be documented specifically.
 .sp

@@ -51,5 +51,17 @@ int main(int argc, char *argv[])
     bindings.first = NULL;
   }
 
+  // TICKIT_BIND_ONESHOT
+  {
+    int count = 0;
+    tickit_bindings_bind_event(&bindings, NULL, 3, TICKIT_BIND_ONESHOT, &incr, &count);
+
+    tickit_bindings_run_event(&bindings, NULL, 3, NULL);
+    is_int(count, 1, "count incremented after first ONESHOT run");
+
+    tickit_bindings_run_event(&bindings, NULL, 3, NULL);
+    is_int(count, 1, "count not incremented after second ONESHOT run");
+  }
+
   return exit_status();
 }

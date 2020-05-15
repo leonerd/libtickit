@@ -66,6 +66,7 @@ typedef enum {
   TICKIT_BIND_FIRST   = 1<<0,
   TICKIT_BIND_UNBIND  = 1<<1,
   TICKIT_BIND_DESTROY = 1<<2,
+  TICKIT_BIND_ONESHOT = 1<<3,
 } TickitBindFlags;
 
 typedef enum {
