@@ -734,11 +734,13 @@ Tickit *tickit_new_stdtty(void);
 Tickit *tickit_ref(Tickit *t);
 void    tickit_unref(Tickit *t);
 
-// Internal use only for now but consider making it public API
 struct TickitBuilder {
   TickitTerm *tt;
   struct TickitTermBuilder term_builder; /* used if tt == NULL */
 
+  /* Fields below here are undocumented and for vaguely internal or
+   * special-case purposes
+   */
   TickitEventHooks *evhooks;
   void *evinitdata;
 };

@@ -1,0 +1,25 @@
+.TH TICKIT_BUILD 3
+.SH NAME
+tickit_build \- create a new toplevel Tickit instance with arguments
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "struct " TickitBuilder " {"
+.BI "  TickitTerm *" tt ;
+.BI "  struct TickitTermBuilder " term_builder ;
+.BI "  ..."
+.BI "};"
+.sp
+.BI "Tickit *tickit_build(struct TickitBuilder *" builder );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_build\fP() creates a new toplevel \fBTickit\fP instance initialised from the various parameters given in the \fIbuilder\fP struct. Note that the above definition for the struct is incomplete; the actual struct definition contains more fields than shown as some are for internal purposes. User code should only attempt to interact with those fields documented here.
+.PP
+If the \fItt\fP field is set, it should contain a \fBTickitTerm\fP instance. If left blank, then one will be constructed by passing the nested \fIterm_builder\fP structure to \fBtickit_term_build\fP(3).
+.SH "RETURN VALUE"
+If successful, \fBtickit_build\fP() returns a pointer to the new instance. On failure, \fBNULL\fP is returned with \fIerrno\fP set to indicate the failure.
+.SH "SEE ALSO"
+.BR tickit (7)
