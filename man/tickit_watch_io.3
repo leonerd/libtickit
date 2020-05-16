@@ -23,7 +23,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_watch_io\fP() registers a callback function to be invoked by the toplevel event loop when IO operations are possible on a given file descriptor. A registered callback will be invoked by a running call to \fBtickit_run\fP(3). The callback function will be invoked whenever the file descriptor is readable, writable, or in a hang-up condition, depending on the requested condition types. The \fIinfo\fP pointer will point to a structure containing the file descriptor and a bitmask of the IO operations currently possible.
 .PP
-The \fIcond\fP argument to \fPtickit_watch_io\fP() should be a bitmask of at least one of the following values:
+The \fIcond\fP argument to \fBtickit_watch_io\fP() should be a bitmask of at least one of the following values:
 .TP
 .B TICKIT_IO_IN
 The file descriptor is ready to perform an input operation, such as reading bytes.
