@@ -25,8 +25,8 @@ extern "C" {
 #endif
 
 #define TICKIT_VERSION_MAJOR 0
-#define TICKIT_VERSION_MINOR 3
-#define TICKIT_VERSION_PATCH 5
+#define TICKIT_VERSION_MINOR 4
+#define TICKIT_VERSION_PATCH 0
 
 int tickit_version_major(void);
 int tickit_version_minor(void);

@@ -1,3 +1,13 @@
+2020-05-16        0.4.0-RC1
+  * Expose TickitBuilder and TickitTermBuilder as API-visible structs
+  * Added tickit_build(3) and tickit_term_build(3)
+  * Added tickit_new_stdtty(3)
+  * Optionally parse a secondary RGB8 colour specification in
+    tickit_pen_set_colour_attr_desc(3)
+  * Accept colour desc strings in tickit_pen_new_attrs(3)
+  * Added TICKIT_BIND_ONESHOT event-binding flag
+  * Added tickit_watch_io(3)
+
 2020-03-02 19:09  0.3.5
   * Copied wcwidth() implementation from libvterm, for improved handling of
     emoji characters and other fullwidth or wide characters (LP1865502)
