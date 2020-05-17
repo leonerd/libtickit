@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     tickit_renderbuffer_erase(rb, 5);
 
     tickit_renderbuffer_goto(rb, 2, 2);
-    tickit_renderbuffer_textf(rb, "another %08s", "string");
+    tickit_renderbuffer_textf(rb, "another %8s", "string");
 
     tickit_renderbuffer_flush_to_term(rb, tt);
     is_termlog("RenderBuffer renders text at VC",
