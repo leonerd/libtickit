@@ -1,3 +1,6 @@
+2020-05-20        0.4.0-RC3
+  * Bugfixes for t/18term-builder.c on non-Linux platforms
+
 2020-05-19        0.4.0-RC2
   * Bugfix unit test by not including 0 flag in sprintf %s, as it is
     nonportable
