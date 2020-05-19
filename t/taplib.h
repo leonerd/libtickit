@@ -3,6 +3,7 @@ void skip_all(char *reason);
 void ok(int cmp, char *name);
 void pass(char *name);
 void fail(char *name);
+void skip(char *reason);
 void diag(char *fmt, ...);
 void is_int(int got, int expect, char *name);
 void is_ptr(void *got, void *expect, char *name);

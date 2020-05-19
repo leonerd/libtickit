@@ -32,6 +32,11 @@ void fail(char *name)
   _exit_status = 1;
 }
 
+void skip(char *reason)
+{
+  printf("ok %d # %s\n", nexttest++, reason);
+}
+
 void ok(int cmp, char *name)
 {
   if(cmp)
