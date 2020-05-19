@@ -1,3 +1,8 @@
+2020-05-19        0.4.0-RC2
+  * Bugfix unit test by not including 0 flag in sprintf %s, as it is
+    nonportable
+  * Ensure termkey_new() sees correct value of $TERM during its construction
+
 2020-05-16        0.4.0-RC1
   * Expose TickitBuilder and TickitTermBuilder as API-visible structs
   * Added tickit_build(3) and tickit_term_build(3)
