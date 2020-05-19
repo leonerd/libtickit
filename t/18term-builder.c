@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
       .termtype = "linux",
     };
     TickitTerm *tt = tickit_term_build(&builder);
+    ok(!!tt, "tickit_term_build for .termtype");
 
     is_str(tickit_term_get_termtype(tt), "linux", "termtype for built term");
 
@@ -40,6 +41,8 @@ int main(int argc, char *argv[])
       .ti_hook = &(const struct TickitTerminfoHook){ .getstr = ti_getstr },
     };
     TickitTerm *tt = tickit_term_build(&builder);
+    ok(!!tt, "tickit_term_build for .termtype, .ti_hook");
+
     char buffer[1024] = { 0 };
 
     tickit_term_set_output_func(tt, output, buffer);
