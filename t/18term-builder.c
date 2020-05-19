@@ -21,19 +21,6 @@ static void output(TickitTerm *tt, const char *bytes, size_t len, void *user)
 
 int main(int argc, char *argv[])
 {
-  // termtype
-  {
-    struct TickitTermBuilder builder = {
-      .termtype = "linux",
-    };
-    TickitTerm *tt = tickit_term_build(&builder);
-    ok(!!tt, "tickit_term_build for .termtype");
-
-    is_str(tickit_term_get_termtype(tt), "linux", "termtype for built term");
-
-    tickit_term_unref(tt);
-  }
-
   // getstr override
   {
     struct TickitTermBuilder builder = {
