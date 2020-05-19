@@ -124,7 +124,22 @@ static TermKey *get_termkey(TickitTerm *tt)
     else if(tt->is_utf8 == TICKIT_NO)
       flags |= TERMKEY_FLAG_RAW;
 
-    tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR|TERMKEY_FLAG_NOSTART | flags);
+    /* A horrible hack: termkey_new doesn't take a termtype;
+     * termkey_new_abstract does but doesn't take an fd. When we migrate
+     * libtermkey source into here this will be much neater
+     */
+    {
+      const char *was_term = getenv("TERM");
+      setenv("TERM", tt->termtype, true);
+
+      tt->termkey = termkey_new(tt->infd, TERMKEY_FLAG_EINTR|TERMKEY_FLAG_NOSTART | flags);
+
+      if(was_term)
+        setenv("TERM", was_term, true);
+      else
+        unsetenv("TERM");
+    }
+
     termkey_hook_terminfo_getstr(tt->termkey, getstr_hook, tt);
     termkey_start(tt->termkey);
 
