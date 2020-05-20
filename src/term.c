@@ -92,7 +92,7 @@ static const char *getstr_hook(const char *name, const char *value, void *_tt)
 {
   TickitTerm *tt = _tt;
 
-  if(tt->infd != -1 && streq(name, "key_backspace")) {
+  if(streq(name, "key_backspace")) {
     /* Many terminfos lie about backspace. Rather than trust it even a little
      * tiny smidge, we'll interrogate what termios thinks of the VERASE char
      * and claim that is the backspace key. It's what neovim does
@@ -100,13 +100,15 @@ static const char *getstr_hook(const char *name, const char *value, void *_tt)
      *   https://github.com/neovim/neovim/blob/1083c626b9a3fc858c552d38250c3c555cda4074/src/nvim/tui/tui.c#L1982
      */
     struct termios termios;
-    tcgetattr(tt->infd, &termios);
 
-    char *ret = get_tmpbuffer(tt, 2);
-    ret[0] = termios.c_cc[VERASE];
-    ret[1] = 0;
+    if(tt->infd != -1 &&
+       tcgetattr(tt->infd, &termios) == 0) {
+      char *ret = get_tmpbuffer(tt, 2);
+      ret[0] = termios.c_cc[VERASE];
+      ret[1] = 0;
 
-    value = ret;
+      value = ret;
+    }
   }
 
   if(tt->ti_hook.getstr)
