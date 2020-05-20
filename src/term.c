@@ -92,7 +92,7 @@ static const char *getstr_hook(const char *name, const char *value, void *_tt)
 {
   TickitTerm *tt = _tt;
 
-  if(streq(name, "key_backspace")) {
+  if(tt->infd != -1 && streq(name, "key_backspace")) {
     /* Many terminfos lie about backspace. Rather than trust it even a little
      * tiny smidge, we'll interrogate what termios thinks of the VERASE char
      * and claim that is the backspace key. It's what neovim does
