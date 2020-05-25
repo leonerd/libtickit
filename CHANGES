@@ -1,16 +1,4 @@
-2020-05-21        0.4.0-RC4
-  * Bugfixes for ti_getstr hook when operating on abstract terminals that are
-    not TTY filehandles
-
-2020-05-20        0.4.0-RC3
-  * Bugfixes for t/18term-builder.c on non-Linux platforms
-
-2020-05-19        0.4.0-RC2
-  * Bugfix unit test by not including 0 flag in sprintf %s, as it is
-    nonportable
-  * Ensure termkey_new() sees correct value of $TERM during its construction
-
-2020-05-16        0.4.0-RC1
+2020-05-25        0.4.0
   * Expose TickitBuilder and TickitTermBuilder as API-visible structs
   * Added tickit_build(3) and tickit_term_build(3)
   * Added tickit_new_stdtty(3)
@@ -19,6 +7,13 @@
   * Accept colour desc strings in tickit_pen_new_attrs(3)
   * Added TICKIT_BIND_ONESHOT event-binding flag
   * Added tickit_watch_io(3)
+  * Bugfix unit test by not including 0 flag in sprintf %s, as it is
+    nonportable
+  * Ensure termkey_new() sees correct value of $TERM during its construction
+  * Bugfixes for t/18term-builder.c on non-Linux platforms
+  * Bugfixes for ti_getstr hook when operating on abstract terminals that are
+    not TTY filehandles
+  * Many spelling mistakes / typo fixes in manpages
 
 2020-03-02 19:09  0.3.5
   * Copied wcwidth() implementation from libvterm, for improved handling of
