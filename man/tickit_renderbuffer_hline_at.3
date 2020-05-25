@@ -40,7 +40,7 @@ Other combinations are not directly supported (i.e. any combination of \fBDOUBLE
 .PP
 Conceptually, every cell involved in line drawing has a potential line segment type at each of its four borders to its neighbours. Horizontal lines are drawn though the vertical centre of each cell, and vertical lines are drawn through the horizontal centre.
 .PP
-There is a choice of how to handle the ends of line segments, as to whether the segment should go to the centre of each cell, or should continue through the entire body of the cell and stop at the boundary. By default line segments will start and end at the centre of the cells, so that horizontal and vertical lines meeting in a cell will form a neat corner. When drawing isolated lines such as horizontal or vertical rules, it is preferrable that the line go right through the cells at the start and end. To control this behaviour, the \fIcaps\fP bitmask argument should be one of the following \fBTickitLineCaps\fP constants:
+There is a choice of how to handle the ends of line segments, as to whether the segment should go to the centre of each cell, or should continue through the entire body of the cell and stop at the boundary. By default line segments will start and end at the centre of the cells, so that horizontal and vertical lines meeting in a cell will form a neat corner. When drawing isolated lines such as horizontal or vertical rules, it is preferable that the line go right through the cells at the start and end. To control this behaviour, the \fIcaps\fP bitmask argument should be one of the following \fBTickitLineCaps\fP constants:
 .TP
 .B CAP_START
 indicates that the line should consume the entire start cell

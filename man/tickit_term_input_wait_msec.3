@@ -15,7 +15,7 @@ The \fBtickit_term_input_wait_*\fP() family of functions wait for at least one i
 .PP
 These functions also invoke deferred \fBTICKIT_EV_RESIZE\fP events if enabled by \fBtickit_term_observe_sigwinch\fP(3).
 .PP
-The functions differ in how the timeout is specified. \fBtickit_term_input_wait_msec\fP() takes a time as an integer in miliseconds, or -1 to wait indefinitely. \fBtickit_term_input_wait_tv\fP() takes a time as a \fIstruct timeval\fP, or \fBNULL\fP to wait indefinitely.
+The functions differ in how the timeout is specified. \fBtickit_term_input_wait_msec\fP() takes a time as an integer in milliseconds, or -1 to wait indefinitely. \fBtickit_term_input_wait_tv\fP() takes a time as a \fIstruct timeval\fP, or \fBNULL\fP to wait indefinitely.
 .SH "RETURN VALUE"
 \fBtickit_term_input_wait_msec\fP() and \fBtickit_term_input_wait_tv\fP() return no value.
 .SH "SEE ALSO"

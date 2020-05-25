@@ -13,7 +13,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 The \fBtickit_term_await_started_*\fP() family of functions wait until the terminal driver announces it has completed setting up the terminal, and it is ready to be used. The timeout specifies the maximum time to wait; the function will return after this time even if the terminal is not ready yet. One of these functions should be called after the relevant input and output methods have been set on the terminal instance.
 .PP
-The functions differ in how the timeout is specified. \fBtickit_term_await_started_msec\fP() takes a time as an integer in miliseconds, or -1 to wait indefinitely. \fBtickit_term_await_started_tv\fP() takes a time as a \fIstruct timeval\fP, or \fBNULL\fP to wait indefinitely.
+The functions differ in how the timeout is specified. \fBtickit_term_await_started_msec\fP() takes a time as an integer in milliseconds, or -1 to wait indefinitely. \fBtickit_term_await_started_tv\fP() takes a time as a \fIstruct timeval\fP, or \fBNULL\fP to wait indefinitely.
 .PP
 Under most terminal drivers it is not strictly required that it be completely prepared before it is used, as preparation consists mainly of detecting optionally-supported features the terminal may have. If the application starts outputting before this is finished, it simply may not make use of some features, or not detect or report that some features are present.
 .SH "RETURN VALUE"

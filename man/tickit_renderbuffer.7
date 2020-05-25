@@ -37,7 +37,7 @@ Masking and clipping are related but separate concepts. Both place restrictions 
 .PP
 When combined with translation, these two features allow possibly-overlapping regions of content to be independently managed by separate pieces of code. To render each region of the screen, a render buffer can be set up with a translation offset and clipping rectangle to suit that region, thus avoiding the rendering code having to care about the exact on-screen geometry. By using masking regions, additionally these areas can be managed even when they overlap, by ensuring that areas already drawn by "higher" regions are masked off to ensure that "lower" regions do not overwrite them.
 .SS "SAVE STACK"
-As a further assistance to applications wishing to divide the screen area into nested regions, a set of functions exist to store the current auxilliary state of the buffer (that is, all of the mutable attributes listed above, but without the actual pending content) and later restore that state to its original values.
+As a further assistance to applications wishing to divide the screen area into nested regions, a set of functions exist to store the current auxiliary state of the buffer (that is, all of the mutable attributes listed above, but without the actual pending content) and later restore that state to its original values.
 .SH "FUNCTIONS"
 A new \fBTickitRenderBuffer\fP instance is created using \fBtickit_renderbuffer_new\fP(3). A render buffer instance stores a reference count to make it easier for applications to manage the lifetime of buffers. A new buffer starts with a count of one, and it can be adjusted using \fBtickit_renderbuffer_ref\fP(3) and \fBtickit_renderbuffer_unref\fP(3). When the count reaches zero the instance is destroyed.
 .PP
@@ -47,7 +47,7 @@ A translation offset can be set using \fBtickit_renderbuffer_translate\fP(3), an
 .PP
 The virtual cursor position can be set using \fBtickit_renderbuffer_goto\fP(3) and unset using \fBtickit_renderbuffer_ungoto\fP(3). It can be queried using \fBtickit_renderbuffer_has_cursorpos\fP(3) to determine if it is set, and \fBtickit_renderbuffer_get_cursorpos\fP(3) to return its position. A \fBTickitPen\fP instance can be set using \fBtickit_renderbuffer_setpen\fP(3).
 .PP
-The auxilliary state can be saved to the state stack using \fBtickit_renderbuffer_save\fP(3) and later restored using \fBtickit_renderbuffer_restore\fP(3). A stack state consisting of just the pen with no other state can be saved using \fBtickit_renderbuffer_savepen\fP(3).
+The auxiliary state can be saved to the state stack using \fBtickit_renderbuffer_save\fP(3) and later restored using \fBtickit_renderbuffer_restore\fP(3). A stack state consisting of just the pen with no other state can be saved using \fBtickit_renderbuffer_savepen\fP(3).
 .PP
 The stored content of a buffer can be copied to another buffer using \fBtickit_renderbuffer_blit\fP(3). This is useful for allowing a window to maintain a backing buffer that can be drawn to at any time and then copied to a destination buffer for display.
 .PP

@@ -16,7 +16,7 @@ tickit_term_bind_event, tickit_term_unbind_event_id \- add or remove event handl
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_term_bind_event\fP() adds a new event handler to the list of handlers stored by the terminal, and returns an integer to identify this handler. This handler will be invoked for occurrances of the event given by the \fIev\fP argument. When invoked, \fIfunc\fP will be passed the terminal instance, a flags bitmask, a pointer to an event information structure whose type depends on the event, and the user data pointer it was installed with.
+\fBtickit_term_bind_event\fP() adds a new event handler to the list of handlers stored by the terminal, and returns an integer to identify this handler. This handler will be invoked for occurrences of the event given by the \fIev\fP argument. When invoked, \fIfunc\fP will be passed the terminal instance, a flags bitmask, a pointer to an event information structure whose type depends on the event, and the user data pointer it was installed with.
 .PP
 \fBtickit_term_unbind_event_id\fP() removes an event handler previously added, by the identifier returned when it was added, invoking it with the \fBTICKIT_EV_UNBIND\fP flag if it was installed with \fBTICKIT_BIND_UNBIND\fP.
 .SH "RETURN VALUE"
