@@ -141,7 +141,7 @@ Tickit *tickit_build(const struct TickitBuilder *builder)
   }
   t->term = tt; /* take ownership */
 
-  tickit_watch_io(t, tickit_term_get_input_fd(tt), TICKIT_IO_IN|TICKIT_IO_HUP,
+  tickit_watch_io(t, tickit_term_get_input_fd(tt), TICKIT_IO_IN,
       0, on_term_readable, NULL);
 
   return t;
@@ -348,7 +348,7 @@ fail:
 
 void *tickit_watch_io_read(Tickit *t, int fd, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
 {
-  return tickit_watch_io(t, fd, TICKIT_IO_IN|TICKIT_IO_HUP, flags, fn, user);
+  return tickit_watch_io(t, fd, TICKIT_IO_IN, flags, fn, user);
 }
 
 void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
