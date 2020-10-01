@@ -36,7 +36,15 @@ int main(int argc, char *argv[])
         "\e[2J",             // clear
         "buffer after setup");
 
+    buffer[0] = 0;
     tickit_unref(t);
+
+    is_str_escape(buffer,
+        "\e[?1002l\e[?1006l" // MOUSE off
+        "\e[?25h"            // CURSORVIS on
+        "\e[?1049l"          // ALTSCREEN off
+        "\e[m",              // reset PEN
+        "buffer after tickit_unref");
   }
 
   {
