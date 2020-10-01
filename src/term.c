@@ -315,14 +315,28 @@ TickitTerm *tickit_term_open_stdio(void)
   return tt;
 }
 
+void tickit_term_teardown(TickitTerm *tt)
+{
+  if(tt->driver && tt->state != UNSTARTED) {
+    if(tt->driver->vtable->stop)
+      (*tt->driver->vtable->stop)(tt->driver);
+
+    tt->state = UNSTARTED;
+  }
+
+  if(tt->termkey)
+    termkey_stop(tt->termkey);
+
+  tickit_term_flush(tt);
+}
+
 void tickit_term_destroy(TickitTerm *tt)
 {
   if(tt->observe_winch)
     tickit_term_observe_sigwinch(tt, false);
 
   if(tt->driver) {
-    if(tt->driver->vtable->stop)
-      (*tt->driver->vtable->stop)(tt->driver);
+    tickit_term_teardown(tt);
 
     (*tt->driver->vtable->destroy)(tt->driver);
   }

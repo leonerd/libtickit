@@ -442,6 +442,8 @@ struct TickitTermBuilder {
 };
 TickitTerm *tickit_term_build(const struct TickitTermBuilder *builder);
 
+void tickit_term_teardown(TickitTerm *tt);
+
 TickitTerm *tickit_term_ref(TickitTerm *tt);
 void        tickit_term_unref(TickitTerm *tt);
 

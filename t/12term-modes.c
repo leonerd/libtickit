@@ -78,5 +78,25 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer, "\e[?1002l\e[?1006l\e[?25h\e[?1049l\e[m", "buffer after tickit_term_unref resets modes");
 
+  {
+    tt = tickit_term_build(&(struct TickitTermBuilder){
+      .termtype = "xterm",
+      .output_func      = output,
+      .output_func_user = buffer,
+    });
+
+    tickit_term_setctl_int(tt, TICKIT_TERMCTL_ALTSCREEN, 1);
+
+    buffer[0] = 0;
+    tickit_term_teardown(tt);
+
+    is_str_escape(buffer, "\e[?1049l\e[m", "buffer after tickit_term_teardown with altscreen on");
+
+    buffer[0] = 0;
+    tickit_term_unref(tt);
+
+    is_str_escape(buffer, "", "buffer empty after tickit_term_unref");
+  }
+
   return exit_status();
 }

@@ -7,6 +7,8 @@ tickit_term_pause, tickit_term_resume \- pause and resume a terminal instance
 .sp
 .BI "void tickit_term_pause(TickitTerm *" tt );
 .BI "void tickit_term_resume(TickitTerm *" tt );
+.sp
+.BI "void tickit_term_teardown(TickitTerm *" tt );
 .EE
 .sp
 Link with \fI\-ltickit\fP.
@@ -16,6 +18,8 @@ Link with \fI\-ltickit\fP.
 \fBtickit_term_resume\fP() returns the terminal back to the state it was operating in before \fBtickit_term_pause\fP() was called, allowing the program to continue as normal.
 .PP
 It is intended these functions be used to create a program-wide suspend feature, where the terminal can be handed back over to the invoking shell while the process backgrounds itself. Typically this is done by the process sending itself a \fBSIGSTOP\fP signal via \fBraise\fP(3). After calling \fBtickit_term_pause\fP(), no other terminal-related functions should be called, nor other IO operations attempted, until after a subsequent \fBtickit_term_resume\fP(3).
+.PP
+\fBtickit_term_teardown\fP() is similar to \fBtickit_term_stop\fP() except that it is intended to be used for final shutdown before the application itself terminates. This ensures that the terminal is restored to its original state, ahead of the application outputting any final exit message for the user to read. After this function has returned, no other functions on the terminal instance may be called.
 .SH "SEE ALSO"
 .BR tickit_term_build (3),
 .BR tickit_term_setctl_int (3),
