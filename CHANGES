@@ -1,3 +1,8 @@
+2020-10-01        0.4.1
+  * Added tickit_term_teardown(3)
+  * Call tickit_term_teardown() during tickit_destroy(3) to ensure reliable
+    terminal shutdown even when additional references remain
+
 2020-05-25        0.4.0
   * Expose TickitBuilder and TickitTermBuilder as API-visible structs
   * Added tickit_build(3) and tickit_term_build(3)
