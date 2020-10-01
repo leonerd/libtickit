@@ -207,8 +207,10 @@ static void tickit_destroy(Tickit *t)
 
   if(t->rootwin)
     tickit_window_unref(t->rootwin);
-  if(t->term)
+  if(t->term) {
+    tickit_term_teardown(t->term);
     tickit_term_unref(t->term);
+  }
 
   if(t->iowatches)
     destroy_watchlist(t, t->iowatches, t->evhooks->cancel_io);
