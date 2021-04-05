@@ -5,12 +5,12 @@ tickit_renderbuffer_blit \- copies buffer contents to another buffer
 .EX
 .B #include <tickit.h>
 .sp
-.BI "void tickit_renderbuffer_blit(TickitRenderBuffer *" dst ", TickitRenderBuffer *" src );
+.BI "void tickit_renderbuffer_blit(TickitRenderBuffer *" dst ", const TickitRenderBuffer *" src );
 .EE
 .sp
 Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
-\fBtickit_renderbuffer_blit\fP() copies the stored state in the \fIsrc\fP buffer to the \fIdst\fP buffer. The \fIsrc\fP buffer is not reset afterwards. Translation, clipping masks and current pen settings on the \fIdst\fP buffer are respected.
+\fBtickit_renderbuffer_blit\fP() copies the stored state in the \fIsrc\fP buffer to the \fIdst\fP buffer. The \fIsrc\fP buffer is not reset afterwards, or otherwise modified in any way. Translation, clipping masks and current pen settings on the \fIdst\fP buffer are respected.
 .PP
 This function is intended for storing long-term screen state that rarely changes in an of-screen buffer stored by the application, allowing fast efficient rendering when required.
 Applications using this should be aware that memory allocated internally by the \fITickitRenderBuffer\fP instance is only release by \fBtickit_renderbuffer_reset\fP(3).

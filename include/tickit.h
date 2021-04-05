@@ -630,7 +630,7 @@ void tickit_renderbuffer_moverect(TickitRenderBuffer *rb, const TickitRect *dest
 
 void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt);
 
-void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src);
+void tickit_renderbuffer_blit(TickitRenderBuffer *dst, const TickitRenderBuffer *src);
 
 // This API is still somewhat experimental
 

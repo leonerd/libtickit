@@ -1045,7 +1045,7 @@ void tickit_renderbuffer_flush_to_term(TickitRenderBuffer *rb, TickitTerm *tt)
   tickit_renderbuffer_reset(rb);
 }
 
-static void copyrect(TickitRenderBuffer *dst, TickitRenderBuffer *src,
+static void copyrect(TickitRenderBuffer *dst, const TickitRenderBuffer *src,
     const TickitRect *dstrect, const TickitRect *srcrect, bool copy_skip)
 {
   if(srcrect->lines == 0 || srcrect->cols == 0)
@@ -1164,7 +1164,7 @@ static void copyrect(TickitRenderBuffer *dst, TickitRenderBuffer *src,
   }
 }
 
-void tickit_renderbuffer_blit(TickitRenderBuffer *dst, TickitRenderBuffer *src)
+void tickit_renderbuffer_blit(TickitRenderBuffer *dst, const TickitRenderBuffer *src)
 {
   copyrect(dst, src,
       &(TickitRect){ .top = 0, .left = 0, .lines = src->lines, .cols = src->cols },
