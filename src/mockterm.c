@@ -35,7 +35,9 @@ typedef struct
   TickitPen *pen;
   int line;
   int col;
+
   int cursorvis;
+  int cursorblink;
   int cursorshape;
 } MockTermDriver;
 
@@ -390,6 +392,9 @@ static bool mtd_getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
     case TICKIT_TERMCTL_CURSORVIS:
       *value = mtd->cursorvis;
       return true;
+    case TICKIT_TERMCTL_CURSORBLINK:
+      *value = mtd->cursorblink;
+      return true;
     case TICKIT_TERMCTL_CURSORSHAPE:
       *value = mtd->cursorshape;
       return true;
@@ -409,6 +414,8 @@ static bool mtd_setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
   switch(ctl) {
     case TICKIT_TERMCTL_CURSORVIS:
       mtd->cursorvis = !!value; break;
+    case TICKIT_TERMCTL_CURSORBLINK:
+      mtd->cursorblink = !!value; break;
     case TICKIT_TERMCTL_CURSORSHAPE:
       mtd->cursorshape = value; break;
     case TICKIT_TERMCTL_ALTSCREEN:
@@ -450,6 +457,7 @@ TickitMockTerm *tickit_mockterm_new(int lines, int cols)
   mtd->line        = -1;
   mtd->col         = -1;
   mtd->cursorvis   = 0;
+  mtd->cursorblink = 0;
   mtd->cursorshape = 0;
 
   mtd->cells = malloc(lines * sizeof(MockTermCell **));
