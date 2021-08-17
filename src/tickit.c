@@ -627,20 +627,13 @@ void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCa
 
   watch->signal.signum = signum;
 
-  if(t->evhooks->signal) {
-    if(!(*t->evhooks->signal)(t->evdata, signum, flags, watch))
-      goto fail;
-  }
-  else
+  if(!t->evhooks->signal ||
+      !(*t->evhooks->signal)(t->evdata, signum, flags, watch))
     watch_signal(t, signum, watch);
 
   insert_watch(&t->signals, flags, watch);
 
   return watch;
-
-fail:
-  free(watch);
-  return NULL;
 }
 
 static int on_sigchld(Tickit *t, TickitEventFlags flags, void *info, void *data)
@@ -684,11 +677,8 @@ void *tickit_watch_process(Tickit *t, pid_t pid, TickitBindFlags flags, TickitCa
 
   watch->process.pid = pid;
 
-  if(t->evhooks->process) {
-    if(!(*t->evhooks->process)(t->evdata, pid, flags, watch))
-      goto fail;
-  }
-  else {
+  if(!t->evhooks->process ||
+      !(*t->evhooks->process)(t->evdata, pid, flags, watch)) {
     if(!t->sigchldwatch)
       t->sigchldwatch = tickit_watch_signal(t, SIGCHLD, 0, &on_sigchld, NULL);
 
@@ -706,10 +696,6 @@ void *tickit_watch_process(Tickit *t, pid_t pid, TickitBindFlags flags, TickitCa
   insert_watch(&t->processes, flags, watch);
 
   return watch;
-
-fail:
-  free(watch);
-  return NULL;
 }
 
 void tickit_watch_cancel(Tickit *t, void *_watch)
