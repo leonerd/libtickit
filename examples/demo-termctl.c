@@ -30,6 +30,8 @@ static void render_modes(TickitTerm *tt)
   tickit_term_goto(tt, 20, 10);
   tickit_term_print(tt, "Cursor  >   <");
   tickit_term_goto(tt, 20, 20);
+
+  tickit_term_flush(tt);
 }
 
 static int event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *data)

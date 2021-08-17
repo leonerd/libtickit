@@ -56,6 +56,10 @@ static int key_event(TickitTerm *tt, TickitEventFlags flags, void *_info, void *
     scroll(tt, 0, -1);
   else if(strcmp(key, "Right") == 0)
     scroll(tt, 0, +1);
+  else
+    return 1;
+
+  tickit_term_flush(tt);
 
   return 1;
 }
@@ -69,25 +73,18 @@ static int mouse_event(TickitTerm *tt, TickitEventFlags flags, void *_info, void
   int line = info->line;
   int col  = info->col;
 
-  if(line < 1) {
+  if(line < 1)
     scroll(tt, -1, 0);
-    return 1;
-  }
-
-  if(line > term_lines - 2) {
+  else if(line > term_lines - 2)
     scroll(tt, +1, 0);
-    return 1;
-  }
-
-  if(col < 1) {
+  else if(col < 1)
     scroll(tt, 0, -1);
-    return 1;
-  }
-
-  if(col > term_cols - 2) {
+  else if(col > term_cols - 2)
     scroll(tt, 0, +1);
+  else
     return 1;
-  }
+
+  tickit_term_flush(tt);
 
   return 1;
 }
@@ -115,6 +112,8 @@ static int render(Tickit *t, TickitEventFlags flags, void *data, void *user)
     tickit_term_goto(tt, line, 5);
     tickit_term_print(tt, buf);
   }
+
+  tickit_term_flush(tt);
 
   return 0;
 }
