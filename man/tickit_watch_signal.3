@@ -1,0 +1,31 @@
+.TH TICKIT_WATCH_SIGNAL 3
+.SH NAME
+tickit_watch_signal \- invoke a callback when a POSIX signal is raised
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "typedef int " TickitCallbackFn "(Tickit *" t ", TickitEventflags " flags ,
+.BI "    void *" info ", void *" user );
+.sp
+.BI "void *tickit_watch_signal(Tickit *" t ", int " signum ", TickitBindFlags " flags ,
+.BI "    TickitCallbackFn *" fn ", void *" user );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_watch_signal\fP() registers a callback function to be invoked by the toplevel evnt loop when a POSIX signal is received by the process. A registered callback will be invoked by a running call to \fBtickit_run\fP(3). The callback function may be invoked more than once, if the signal is received multiple times. The \fIinfo\fP pointer will be \fBNULL\fP.
+.PP
+Multiple registrations may be made for the same signal number; when that signal is received all of them will be invoked in the order they were registered in.
+.PP
+If cancelled by \fBtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
+.SH "RETURN VALUE"
+\fBtickit_watch_signal\fP() returns an opaque identifier pointer.
+.SH "SEE ALSO"
+.BR tickit_new_stdio (3),
+.BR tickit_watch_io (3),
+.BR tickit_watch_timer_after_msec (3),
+.BR tickit_watch_timer_at_epoch (3),
+.BR tickit_watch_later (3),
+.BR tickit_watch_cancel (3),
+.BR tickit (7)

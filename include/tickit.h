@@ -799,6 +799,8 @@ void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFl
 
 void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
+void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+
 void tickit_watch_cancel(Tickit *t, void *watch);
 
 /* Debug support */

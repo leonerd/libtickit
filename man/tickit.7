@@ -19,7 +19,7 @@ The toplevel instance manages a tree of \fBTickitWindow\fP instances. The root o
 .PP
 The \fBTickitTerm\fP instance behind the toplevel instance can be obtained by \fBtickit_get_term\fP(3), and is described more in \fBtickit_term\fP(7).
 .PP
-Event handling callback functions can be installed to be called at a later time, by using \fBtickit_watch_io\fP(3), \fBtickit_watch_timer_after_msec\fP(3), \fBtickit_watch_timer_after_tv\fP(3), or \fBtickit_watch_later\fP(3). The main IO event loop is controlled using \fBtickit_run\fP(3) and \fBtickit_stop\fP(3).
+Event handling callback functions can be installed to be called at a later time, by using \fBtickit_watch_io\fP(3), \fBtickit_watch_timer_after_msec\fP(3), \fBtickit_watch_timer_after_tv\fP(3), \fBtickit_watch_later\fP(3), or \fBtickit_watch_signal\fP(3). The main IO event loop is controlled using \fBtickit_run\fP(3) and \fBtickit_stop\fP(3).
 .PP
 The compile-time and run-time version of the library can be inspected using the macros and functions described in \fBtickit_version\fP(7).
 .SH "TYPICAL STRUCTURE"

@@ -7,6 +7,13 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+/* POSIX doesn't actually define an NSIG macro, but if it did, almost every
+ * known platform would set it to 32
+ */
+#ifndef NSIG
+#  define NSIG 32
+#endif
+
 #define streq(a,b) (!strcmp(a,b))
 
 /* INTERNAL */
@@ -22,6 +29,7 @@ struct TickitWatch {
     WATCH_IO,
     WATCH_TIMER,
     WATCH_LATER,
+    WATCH_SIGNAL,
   } type;
 
   TickitBindFlags flags;
@@ -42,6 +50,10 @@ struct TickitWatch {
     struct {
       struct timeval at;
     } timer;
+
+    struct {
+      int signum;
+    } signal;
   };
 };
 
@@ -53,10 +65,17 @@ struct Tickit {
   TickitTerm   *term;
   TickitWindow *rootwin;
 
-  TickitWatch *iowatches, *timers, *laters;
+  TickitWatch *iowatches, *timers, *laters, *signals;
 
   const TickitEventHooks *evhooks;
   void                   *evdata;
+
+  struct {
+    int pipefds[2];
+    void *pipewatch;
+    sigset_t watched;
+    sigset_t pending;
+  } signal;
 
   unsigned int done_setup    : 1,
                use_altscreen : 1;
@@ -77,6 +96,41 @@ static int on_term_readable(Tickit *t, TickitEventFlags flags, void *info, void 
   tickit_term_input_readable(t->term);
 
   on_term_timeout(t, TICKIT_EV_FIRE, NULL, NULL);
+  return 0;
+}
+
+static Tickit *signal_observer;
+
+static void sighandler(int signum)
+{
+  if(signal_observer) {
+    sigaddset(&signal_observer->signal.pending, signum);
+    write(signal_observer->signal.pipefds[1], "\0", 1);
+  }
+}
+
+static int on_sigpipe_readable(Tickit *t, TickitEventFlags flags, void *info, void *user)
+{
+  char buf[1];
+  read(t->signal.pipefds[0], &buf, 1);
+
+  sigset_t pending;
+  {
+    sigset_t orig;
+    sigprocmask(SIG_BLOCK, &t->signal.watched, &orig);
+
+    pending = t->signal.pending;
+    sigemptyset(&t->signal.pending);
+
+    sigprocmask(SIG_SETMASK, &orig, NULL);
+  }
+
+  TickitWatch *this;
+  for(this = t->signals; this; this = this->next) {
+    if(sigismember(&pending, this->signal.signum))
+      (*this->fn)(this->t, TICKIT_EV_FIRE, NULL, this->user);
+  }
+
   return 0;
 }
 
@@ -124,6 +178,12 @@ Tickit *tickit_build(const struct TickitBuilder *builder)
   t->iowatches = NULL;
   t->timers    = NULL;
   t->laters    = NULL;
+  t->signals   = NULL;
+
+  t->signal.pipefds[0] = -1;
+  t->signal.pipewatch = NULL;
+  sigemptyset(&t->signal.watched);
+  sigemptyset(&t->signal.pending);
 
   t->done_setup = false;
 
@@ -212,12 +272,23 @@ static void tickit_destroy(Tickit *t)
     tickit_term_unref(t->term);
   }
 
+  if(t->signal.pipewatch)
+    tickit_watch_cancel(t, t->signal.pipewatch);
+  for(int signum = 1; signum < NSIG; signum++) {
+    if(sigismember(&t->signal.watched, signum))
+      sigaction(signum, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
+  }
+  if(signal_observer == t)
+    signal_observer = NULL;
+
   if(t->iowatches)
     destroy_watchlist(t, t->iowatches, t->evhooks->cancel_io);
   if(t->timers)
     destroy_watchlist(t, t->timers, t->evhooks->cancel_timer);
   if(t->laters)
     destroy_watchlist(t, t->laters, t->evhooks->cancel_later);
+  if(t->signals)
+    destroy_watchlist(t, t->signals, NULL);
 
   (*t->evhooks->destroy)(t->evdata);
 
@@ -447,6 +518,66 @@ fail:
   return NULL;
 }
 
+static void watch_signal(Tickit *t, int signum, TickitWatch *watch)
+{
+  if(t->signal.pipefds[0] == -1) {
+    pipe(t->signal.pipefds);
+    t->signal.pipewatch = tickit_watch_io(t, t->signal.pipefds[0], TICKIT_IO_IN, 0, &on_sigpipe_readable, t);
+  }
+
+  if(sigismember(&t->signal.watched, signum))
+    return;
+
+  sigaction(signum, &(struct sigaction){ .sa_handler = sighandler }, NULL);
+  sigaddset(&t->signal.watched, signum);
+
+  if(!signal_observer)
+    signal_observer = t;
+}
+
+static void unwatch_signal(Tickit *t, TickitWatch *watch)
+{
+  int signum = watch->signal.signum;
+
+  /* watch has already been removed from t->signals */
+  TickitWatch *this;
+  for(this = t->signals; this; this = this->next) {
+    if(this->signal.signum == signum)
+      return;
+  }
+
+  sigdelset(&t->signal.watched, signum);
+  sigaction(signum, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
+}
+
+void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  TickitWatch *watch = malloc(sizeof(TickitWatch));
+  if(!watch)
+    return NULL;
+
+  watch->next = NULL;
+  watch->t    = t;
+  watch->type = WATCH_SIGNAL;
+
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
+  watch->fn = fn;
+  watch->user = user;
+
+  watch->signal.signum = signum;
+
+  watch_signal(t, signum, watch);
+
+  TickitWatch **prevp = &t->signals;
+  while(*prevp)
+    prevp = &(*prevp)->next;
+
+  watch->next = *prevp;
+  *prevp = watch;
+
+  return watch;
+}
+
 void tickit_watch_cancel(Tickit *t, void *_watch)
 {
   TickitWatch *watch = _watch;
@@ -462,8 +593,11 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
     case WATCH_LATER:
       thisp = &t->laters;
       break;
+    case WATCH_SIGNAL:
+      thisp = &t->signals;
+      break;
 
-    default:
+    case WATCH_NONE:
       return;
   }
 
@@ -487,8 +621,11 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
           if(t->evhooks->cancel_later)
             (*t->evhooks->cancel_later)(t->evdata, this);
           break;
+        case WATCH_SIGNAL:
+          unwatch_signal(t, this);
+          break;
 
-        default:
+        case WATCH_NONE:
           ;
       }
 
@@ -591,6 +728,7 @@ static void invoke_watch(TickitWatch *watch, TickitEventFlags flags, void *info)
   switch(watch->type) {
     case WATCH_NONE:
     case WATCH_IO:
+    case WATCH_SIGNAL:
       return;
 
     case WATCH_TIMER:
