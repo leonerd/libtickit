@@ -134,6 +134,15 @@ static int on_sigpipe_readable(Tickit *t, TickitEventFlags flags, void *info, vo
   return 0;
 }
 
+static int on_sigwinch(Tickit *t, TickitEventFlags flags, void *info, void *user)
+{
+  if(!t->term)
+    return 0;
+
+  tickit_term_refresh_size(t->term);
+  return 0;
+}
+
 static void setupterm(Tickit *t)
 {
   TickitTerm *tt = t->term;
@@ -203,6 +212,8 @@ Tickit *tickit_build(const struct TickitBuilder *builder)
 
   tickit_watch_io(t, tickit_term_get_input_fd(tt), TICKIT_IO_IN,
       0, on_term_readable, NULL);
+
+  tickit_watch_signal(t, SIGWINCH, 0, on_sigwinch, NULL);
 
   return t;
 
@@ -783,10 +794,9 @@ void tickit_evloop_invoke_sigwatches(Tickit *t, int signum)
 
 void tickit_evloop_sigwinch(Tickit *t)
 {
-  if(!t->term)
-    return;
-
-  tickit_term_refresh_size(t->term);
+  /* No longer need to do anything, as on_sigwinch() has already handled it
+   * But this function needs to remain for ABI reasons
+   */
 }
 
 const char *tickit_ctlname(TickitCtl ctl)
