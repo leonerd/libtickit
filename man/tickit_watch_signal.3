@@ -16,7 +16,7 @@ Link with \fI\-ltickit\fP.
 .SH DESCRIPTION
 \fBtickit_watch_signal\fP() registers a callback function to be invoked by the toplevel evnt loop when a POSIX signal is received by the process. A registered callback will be invoked by a running call to \fBtickit_run\fP(3). The callback function may be invoked more than once, if the signal is received multiple times. The \fIinfo\fP pointer will be \fBNULL\fP.
 .PP
-Multiple registrations may be made for the same signal number; when that signal is received all of them will be invoked in the order they were registered in.
+Multiple registrations may be made for the same signal number; when that signal is received all of them will be invoked in the order they exist in the queue. If registered with the \fBTICKIT_BIND_FIRST\fP flag, the callback will be inserted at the start of the queue, coming before others. If not, it is appended at the end.
 .PP
 If cancelled by \fBtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
 .SH "RETURN VALUE"

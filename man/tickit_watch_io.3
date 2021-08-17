@@ -42,6 +42,8 @@ The file descriptor is in an error condition.
 .B TICKIT_IO_INVAL
 The file descriptor itself is invalid and does not represent an open file.
 .PP
+If registered with the \fBTICKIT_BIND_FIRST\fP flag, the callback will be inserted at the start of the queue, coming before others. If not, it is appended at the end.
+.PP
 If cancelled by \fBtickit_watch_cancel\fP(3) the callback function is invoked with just the \fBTICKIT_EV_UNBIND\fP flag if it had been registered with \fBTICKIT_BIND_UNBIND\fP.
 .SH "RETURN VALUE"
 \fBtickit_watch_io\fP() returns an opaque identifier pointer.

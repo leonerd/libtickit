@@ -255,10 +255,12 @@ Tickit *tickit_new_stdtty(void)
   });
 }
 
-static void insert_watch(TickitWatch **watchesptr, TickitWatch *new)
+static void insert_watch(TickitWatch **watchesptr, TickitBindFlags flags, TickitWatch *new)
 {
-  while(*watchesptr)
-    watchesptr = &(*watchesptr)->next;
+  if(!(flags & TICKIT_BIND_FIRST)) {
+    while(*watchesptr)
+      watchesptr = &(*watchesptr)->next;
+  }
 
   new->next = *watchesptr;
   *watchesptr = new;
@@ -419,7 +421,7 @@ void *tickit_watch_io(Tickit *t, int fd, TickitIOCondition cond, TickitBindFlags
   if(!(*t->evhooks->io)(t->evdata, fd, cond, flags, watch))
     goto fail;
 
-  insert_watch(&t->iowatches, watch);
+  insert_watch(&t->iowatches, flags, watch);
 
   return watch;
 
@@ -513,7 +515,7 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
     if(!(*t->evhooks->later)(t->evdata, flags, watch))
       goto fail;
 
-  insert_watch(&t->laters, watch);
+  insert_watch(&t->laters, flags, watch);
 
   return watch;
 
@@ -577,7 +579,7 @@ void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCa
   else
     watch_signal(t, signum, watch);
 
-  insert_watch(&t->signals, watch);
+  insert_watch(&t->signals, flags, watch);
 
   return watch;
 
