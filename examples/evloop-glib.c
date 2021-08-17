@@ -325,6 +325,13 @@ static gboolean el_sigwinch(gpointer t)
   return TRUE;
 }
 
+static gboolean el_sighandler(gpointer t)
+{
+  tickit_evloop_invoke_watch(t, TICKIT_EV_FIRE);
+
+  return TRUE;
+}
+
 static void *el_init(Tickit *t, void *initdata)
 {
   EventLoopData *evdata = malloc(sizeof(EventLoopData));
@@ -449,15 +456,30 @@ static void el_cancel_later(void *data, TickitWatch *watch)
   g_source_remove(tickit_evloop_get_watch_data_int(watch));
 }
 
+static bool el_signal(void *data, int signum, TickitBindFlags flags, TickitWatch *watch)
+{
+  int id = g_unix_signal_add(signum, el_sighandler, watch);
+  tickit_evloop_set_watch_data_int(watch, id);
+
+  return true;
+}
+
+static void el_cancel_signal(void *data, TickitWatch *watch)
+{
+  g_source_remove(tickit_evloop_get_watch_data_int(watch));
+}
+
 TickitEventHooks glib_evhooks = {
-  .init         = el_init,
-  .destroy      = el_destroy,
-  .run          = el_run,
-  .stop         = el_stop,
-  .io           = el_io,
-  .cancel_io    = el_cancel_io,
-  .timer        = el_timer,
-  .cancel_timer = el_cancel_timer,
-  .later        = el_later,
-  .cancel_later = el_cancel_later,
+  .init          = el_init,
+  .destroy       = el_destroy,
+  .run           = el_run,
+  .stop          = el_stop,
+  .io            = el_io,
+  .cancel_io     = el_cancel_io,
+  .timer         = el_timer,
+  .cancel_timer  = el_cancel_timer,
+  .later         = el_later,
+  .cancel_later  = el_cancel_later,
+  .signal        = el_signal,
+  .cancel_signal = el_cancel_signal,
 };
