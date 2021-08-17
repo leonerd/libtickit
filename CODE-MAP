@@ -16,6 +16,12 @@ Makefile
 examples/
  - contains standalone example programs demonstrating parts of API
 
+examples/evloop-glib.c
+ - example program showing evloop integration with GLib
+
+examples/evloop-libuv.c
+ - example program showing evloop integration with libuv
+
 include/tickit.h
  - main include file
 
