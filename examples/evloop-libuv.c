@@ -321,15 +321,7 @@ static void destroy_handle(uv_handle_t *handle)
 typedef struct {
   uv_loop_t *loop;
   uv_async_t *stop;
-  uv_signal_t *sigwinch;
 } EventLoopData;
-
-static void el_sigwinch(uv_signal_t *handle, int signum)
-{
-  Tickit *t = handle->data;
-
-  tickit_evloop_sigwinch(t);
-}
 
 static void el_sighandler(uv_signal_t *handle, int signum)
 {
@@ -356,11 +348,6 @@ static void *el_init(Tickit *t, void *initdata)
   // See also  https://github.com/libuv/libuv/issues/2173
   evdata->stop = malloc(sizeof(uv_async_t));
   uv_async_init(evdata->loop, evdata->stop, NULL);
-
-  evdata->sigwinch = malloc(sizeof(uv_signal_t));
-  uv_signal_init(evdata->loop, evdata->sigwinch);
-  uv_signal_start(evdata->sigwinch, el_sigwinch, SIGWINCH);
-  evdata->sigwinch->data = t;
 
   return evdata;
 

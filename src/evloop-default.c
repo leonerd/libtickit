@@ -65,7 +65,6 @@ static void dispatch_signals(EventLoopData *evdata)
 #if HAVE_PPOLL
     block = evdata->watched_signals;
 #endif
-    sigaddset(&block, SIGWINCH);
     sigprocmask(SIG_BLOCK, &block, &orig);
 
     pending = evdata->pending_signals;
@@ -73,9 +72,6 @@ static void dispatch_signals(EventLoopData *evdata)
 
     sigprocmask(SIG_SETMASK, &orig, NULL);
   }
-
-  if(sigismember(&pending, SIGWINCH))
-    tickit_evloop_sigwinch(evdata->t);
 
 #if HAVE_PPOLL
   for(int signum = 1; signum < NSIG; signum++) {
@@ -114,7 +110,6 @@ static void *evloop_init(Tickit *t, void *initdata)
 
   if(!signal_observer)
     signal_observer = evdata;
-  sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = sighandler }, NULL);
 
   return evdata;
 }
@@ -128,7 +123,6 @@ static void evloop_destroy(void *data)
   if(evdata->pollwatches)
     free(evdata->pollwatches);
 
-  sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
   if(signal_observer == evdata)
     signal_observer = NULL;
 

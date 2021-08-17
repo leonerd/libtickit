@@ -318,13 +318,6 @@ typedef struct {
   GMainLoop *loop;
 } EventLoopData;
 
-static gboolean el_sigwinch(gpointer t)
-{
-  tickit_evloop_sigwinch(t);
-
-  return TRUE;
-}
-
 static gboolean el_sighandler(gpointer t)
 {
   tickit_evloop_invoke_watch(t, TICKIT_EV_FIRE);
@@ -342,8 +335,6 @@ static void *el_init(Tickit *t, void *initdata)
     evdata->loop = initdata;
   else
     evdata->loop = g_main_loop_new(NULL, FALSE);
-
-  g_unix_signal_add(SIGWINCH, el_sigwinch, t);
 
   return evdata;
 }
