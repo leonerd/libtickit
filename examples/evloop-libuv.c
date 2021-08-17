@@ -331,6 +331,13 @@ static void el_sigwinch(uv_signal_t *handle, int signum)
   tickit_evloop_sigwinch(t);
 }
 
+static void el_sighandler(uv_signal_t *handle, int signum)
+{
+  TickitWatch *watch = handle->data;
+
+  tickit_evloop_invoke_watch(watch, TICKIT_EV_FIRE);
+}
+
 static void *el_init(Tickit *t, void *initdata)
 {
   EventLoopData *evdata = malloc(sizeof(EventLoopData));
@@ -513,15 +520,41 @@ static void el_cancel_later(void *data, TickitWatch *watch)
   uv_close((uv_handle_t *)handle, &destroy_handle);
 }
 
+static bool el_signal(void *data, int signum, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+
+  uv_signal_t *handle = malloc(sizeof(uv_signal_t));
+  if(!handle)
+    return false;
+
+  uv_signal_init(evdata->loop, handle);
+  uv_signal_start(handle, el_sighandler, signum);
+  handle->data = watch;
+  tickit_evloop_set_watch_data(watch, handle);
+
+  return true;
+}
+
+static void el_cancel_signal(void *data, TickitWatch *watch)
+{
+  uv_signal_t *handle = tickit_evloop_get_watch_data(watch);
+
+  uv_signal_stop(handle);
+  uv_close((uv_handle_t *)handle, &destroy_handle);
+}
+
 TickitEventHooks libuv_evhooks = {
-  .init         = el_init,
-  .destroy      = el_destroy,
-  .run          = el_run,
-  .stop         = el_stop,
-  .io           = el_io,
-  .cancel_io    = el_cancel_io,
-  .timer        = el_timer,
-  .cancel_timer = el_cancel_timer,
-  .later        = el_later,
-  .cancel_later = el_cancel_later,
+  .init          = el_init,
+  .destroy       = el_destroy,
+  .run           = el_run,
+  .stop          = el_stop,
+  .io            = el_io,
+  .cancel_io     = el_cancel_io,
+  .timer         = el_timer,
+  .cancel_timer  = el_cancel_timer,
+  .later         = el_later,
+  .cancel_later  = el_cancel_later,
+  .signal        = el_signal,
+  .cancel_signal = el_cancel_signal,
 };
