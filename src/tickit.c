@@ -365,7 +365,7 @@ static void tickit_destroy(Tickit *t)
   if(t->signals)
     destroy_watchlist(t, t->signals, t->evhooks->cancel_signal);
   if(t->processes)
-    destroy_watchlist(t, t->processes, NULL);
+    destroy_watchlist(t, t->processes, t->evhooks->cancel_process);
 
   (*t->evhooks->destroy)(t->evdata);
 
@@ -663,11 +663,7 @@ static int process_notify(Tickit *t, TickitEventFlags flags, void *_info, void *
 {
   TickitWatch *watch = data;
 
-  TickitProcessWatchInfo info = {
-    .pid     = watch->process.pid,
-    .wstatus = watch->process.wstatus,
-  };
-  invoke_watch(watch, TICKIT_EV_FIRE, &info);
+  tickit_evloop_invoke_processwatch(watch, TICKIT_EV_FIRE, watch->process.wstatus);
 
   return 0;
 }
@@ -688,22 +684,32 @@ void *tickit_watch_process(Tickit *t, pid_t pid, TickitBindFlags flags, TickitCa
 
   watch->process.pid = pid;
 
-  if(!t->sigchldwatch)
-    t->sigchldwatch = tickit_watch_signal(t, SIGCHLD, 0, &on_sigchld, NULL);
+  if(t->evhooks->process) {
+    if(!(*t->evhooks->process)(t->evdata, pid, flags, watch))
+      goto fail;
+  }
+  else {
+    if(!t->sigchldwatch)
+      t->sigchldwatch = tickit_watch_signal(t, SIGCHLD, 0, &on_sigchld, NULL);
 
-  if(waitpid(pid, &watch->process.wstatus, WNOHANG) > 0) {
-    /* Process already exited, so SIGCHLD won't see it. We can't invoke
-     * callback immediately as user will be expecting it to only be called via
-     * tickit_run(). We'll install a later handler for it
-     */
-    tickit_watch_later(t, 0, process_notify, watch);
+    if(waitpid(pid, &watch->process.wstatus, WNOHANG) > 0) {
+      /* Process already exited, so SIGCHLD won't see it. We can't invoke
+       * callback immediately as user will be expecting it to only be called via
+       * tickit_run(). We'll install a later handler for it
+       */
+      tickit_watch_later(t, 0, process_notify, watch);
 
-    return watch;
+      return watch;
+    }
   }
 
   insert_watch(&t->processes, flags, watch);
 
   return watch;
+
+fail:
+  free(watch);
+  return NULL;
 }
 
 void tickit_watch_cancel(Tickit *t, void *_watch)
@@ -759,7 +765,8 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
             unwatch_signal(t, this);
           break;
         case WATCH_PROCESS:
-          /* TODO */
+          if(t->evhooks->cancel_process)
+            (*t->evhooks->cancel_process)(t->evdata, this);
           break;
 
         case WATCH_NONE:
@@ -866,6 +873,14 @@ void tickit_evloop_invoke_iowatch(TickitWatch *watch, TickitEventFlags flags, Ti
   invoke_watch(watch, flags, &(TickitIOWatchInfo){
     .fd   = watch->io.fd,
     .cond = cond,
+  });
+}
+
+void tickit_evloop_invoke_processwatch(TickitWatch *watch, TickitEventFlags flags, int wstatus)
+{
+  invoke_watch(watch, flags, &(TickitProcessWatchInfo){
+    .pid     = watch->process.pid,
+    .wstatus = wstatus,
   });
 }
 
