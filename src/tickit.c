@@ -288,7 +288,7 @@ static void tickit_destroy(Tickit *t)
   if(t->laters)
     destroy_watchlist(t, t->laters, t->evhooks->cancel_later);
   if(t->signals)
-    destroy_watchlist(t, t->signals, NULL);
+    destroy_watchlist(t, t->signals, t->evhooks->cancel_signal);
 
   (*t->evhooks->destroy)(t->evdata);
 
@@ -560,7 +560,12 @@ void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCa
 
   watch->signal.signum = signum;
 
-  watch_signal(t, signum, watch);
+  if(t->evhooks->signal) {
+    if(!(*t->evhooks->signal)(t->evdata, signum, flags, watch))
+      goto fail;
+  }
+  else
+    watch_signal(t, signum, watch);
 
   TickitWatch **prevp = &t->signals;
   while(*prevp)
@@ -570,6 +575,10 @@ void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCa
   *prevp = watch;
 
   return watch;
+
+fail:
+  free(watch);
+  return NULL;
 }
 
 void tickit_watch_cancel(Tickit *t, void *_watch)
@@ -616,7 +625,10 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
             (*t->evhooks->cancel_later)(t->evdata, this);
           break;
         case WATCH_SIGNAL:
-          unwatch_signal(t, this);
+          if(t->evhooks->cancel_signal)
+            (*t->evhooks->cancel_signal)(t->evdata, this);
+          else
+            unwatch_signal(t, this);
           break;
 
         case WATCH_NONE:
@@ -758,6 +770,15 @@ void tickit_evloop_invoke_iowatch(TickitWatch *watch, TickitEventFlags flags, Ti
     .fd   = watch->io.fd,
     .cond = cond,
   });
+}
+
+void tickit_evloop_invoke_sigwatches(Tickit *t, int signum)
+{
+  TickitWatch *this;
+  for(this = t->signals; this; this = this->next) {
+    if(this->signal.signum == signum)
+      (*this->fn)(this->t, TICKIT_EV_FIRE, NULL, this->user);
+  }
 }
 
 void tickit_evloop_sigwinch(Tickit *t)

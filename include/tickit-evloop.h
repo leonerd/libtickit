@@ -25,6 +25,8 @@ struct TickitEventHooks {
   void  (*cancel_timer)(void *data, TickitWatch *watch);
   bool  (*later)(void *data, TickitBindFlags flags, TickitWatch *watch);
   void  (*cancel_later)(void *data, TickitWatch *watch);
+  bool  (*signal)(void *data, int signum, TickitBindFlags flags, TickitWatch *watch);
+  void  (*cancel_signal)(void *data, TickitWatch *watch);
 };
 
 /* Helper functions for eventloop implementations */
@@ -40,7 +42,7 @@ void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data);
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags);
 void tickit_evloop_invoke_iowatch(TickitWatch *watch, TickitEventFlags flags, TickitIOCondition cond);
-
+void tickit_evloop_invoke_sigwatches(Tickit *t, int signum);
 void tickit_evloop_sigwinch(Tickit *t);
 
 Tickit *tickit_new_with_evloop(TickitTerm *tt, TickitEventHooks *evhooks, void *initdata);
