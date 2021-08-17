@@ -348,15 +348,10 @@ bool tickit_setctl_int(Tickit *t, TickitCtl ctl, int value)
   return false;
 }
 
-// TODO: copy the entire SIGWINCH-like structure from term.c
-// For now we only handle atmost-one running Tickit instance
-
-static Tickit *running_tickit;
-
-static void sigint(int sig)
+static int on_sigint(Tickit *t, TickitEventFlags flags, void *info, void *data)
 {
-  if(running_tickit)
-    tickit_stop(running_tickit);
+  tickit_stop(t);
+  return 0;
 }
 
 void tickit_tick(Tickit *t, TickitRunFlags flags)
@@ -369,15 +364,14 @@ void tickit_tick(Tickit *t, TickitRunFlags flags)
 
 void tickit_run(Tickit *t)
 {
-  running_tickit = t;
-  signal(SIGINT, sigint);
+  void *sigint_watch = tickit_watch_signal(t, SIGINT, 0, &on_sigint, NULL);
 
   if(!t->done_setup)
     setupterm(t);
 
   (*t->evhooks->run)(t->evdata, TICKIT_RUN_DEFAULT);
 
-  running_tickit = NULL;
+  tickit_watch_cancel(t, sigint_watch);
 }
 
 void tickit_stop(Tickit *t)
