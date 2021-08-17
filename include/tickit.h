@@ -126,6 +126,11 @@ typedef enum {
   TICKIT_N_PEN_ATTRS
 } TickitPenAttr;
 
+typedef struct {
+  pid_t pid;
+  int wstatus;
+} TickitProcessWatchInfo;
+
 /* additional attribute types recognised by tickit_pen_new_attrs */
 enum {
   /* We're unlikely to ever have 256 attributes, so adding 0x100 should be safe */
@@ -800,6 +805,8 @@ void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFl
 void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
 void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
+
+void *tickit_watch_process(Tickit *t, pid_t pid, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 
 void tickit_watch_cancel(Tickit *t, void *watch);
 

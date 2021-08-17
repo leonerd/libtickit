@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 /* POSIX doesn't actually define an NSIG macro, but if it did, almost every
@@ -30,6 +31,7 @@ struct TickitWatch {
     WATCH_TIMER,
     WATCH_LATER,
     WATCH_SIGNAL,
+    WATCH_PROCESS,
   } type;
 
   TickitBindFlags flags;
@@ -54,6 +56,11 @@ struct TickitWatch {
     struct {
       int signum;
     } signal;
+
+    struct {
+      pid_t pid;
+      int wstatus; /* in case of pre-exited process */
+    } process;
   };
 };
 
@@ -65,7 +72,7 @@ struct Tickit {
   TickitTerm   *term;
   TickitWindow *rootwin;
 
-  TickitWatch *iowatches, *timers, *laters, *signals;
+  TickitWatch *iowatches, *timers, *laters, *signals, *processes;
 
   const TickitEventHooks *evhooks;
   void                   *evdata;
@@ -76,6 +83,8 @@ struct Tickit {
     sigset_t watched;
     sigset_t pending;
   } signal;
+
+  void *sigchldwatch;
 
   unsigned int done_setup    : 1,
                use_altscreen : 1;
@@ -188,11 +197,14 @@ Tickit *tickit_build(const struct TickitBuilder *builder)
   t->timers    = NULL;
   t->laters    = NULL;
   t->signals   = NULL;
+  t->processes = NULL;
 
   t->signal.pipefds[0] = -1;
   t->signal.pipewatch = NULL;
   sigemptyset(&t->signal.watched);
   sigemptyset(&t->signal.pending);
+
+  t->sigchldwatch = NULL;
 
   t->done_setup = false;
 
@@ -282,6 +294,44 @@ static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc
   }
 }
 
+static void invoke_watch(TickitWatch *watch, TickitEventFlags flags, void *info)
+{
+  (*watch->fn)(watch->t, flags, info, watch->user);
+
+  /* Remove oneshot watches from the list */
+  TickitWatch **prevp;
+  switch(watch->type) {
+    case WATCH_NONE:
+    case WATCH_IO:
+    case WATCH_SIGNAL:
+      return;
+
+    case WATCH_TIMER:
+      prevp = &watch->t->timers;
+      break;
+
+    case WATCH_LATER:
+      prevp = &watch->t->laters;
+      break;
+
+    case WATCH_PROCESS:
+      prevp = &watch->t->processes;
+      break;
+  }
+
+  while(*prevp) {
+    if(*prevp == watch) {
+      *prevp = watch->next;
+      watch->next = NULL;
+      watch->type = WATCH_NONE;
+      free(watch);
+      return;
+    }
+
+    prevp = &(*prevp)->next;
+  }
+}
+
 static void tickit_destroy(Tickit *t)
 {
   if(t->done_setup)
@@ -293,6 +343,9 @@ static void tickit_destroy(Tickit *t)
     tickit_term_teardown(t->term);
     tickit_term_unref(t->term);
   }
+
+  if(t->sigchldwatch)
+    tickit_watch_cancel(t, t->sigchldwatch);
 
   if(t->signal.pipewatch)
     tickit_watch_cancel(t, t->signal.pipewatch);
@@ -311,6 +364,8 @@ static void tickit_destroy(Tickit *t)
     destroy_watchlist(t, t->laters, t->evhooks->cancel_later);
   if(t->signals)
     destroy_watchlist(t, t->signals, t->evhooks->cancel_signal);
+  if(t->processes)
+    destroy_watchlist(t, t->processes, NULL);
 
   (*t->evhooks->destroy)(t->evdata);
 
@@ -588,6 +643,69 @@ fail:
   return NULL;
 }
 
+static int on_sigchld(Tickit *t, TickitEventFlags flags, void *info, void *data)
+{
+  TickitWatch *this, *next;
+  for(this = t->processes; this; this = next) {
+    next = this->next;
+
+    TickitProcessWatchInfo info;
+    if(waitpid(this->process.pid, &info.wstatus, WNOHANG) <= 0)
+      continue;
+
+    info.pid = this->process.pid;
+    invoke_watch(this, TICKIT_EV_FIRE, &info);
+  }
+  return 0;
+}
+
+static int process_notify(Tickit *t, TickitEventFlags flags, void *_info, void *data)
+{
+  TickitWatch *watch = data;
+
+  TickitProcessWatchInfo info = {
+    .pid     = watch->process.pid,
+    .wstatus = watch->process.wstatus,
+  };
+  invoke_watch(watch, TICKIT_EV_FIRE, &info);
+
+  return 0;
+}
+
+void *tickit_watch_process(Tickit *t, pid_t pid, TickitBindFlags flags, TickitCallbackFn *fn, void *user)
+{
+  TickitWatch *watch = malloc(sizeof(TickitWatch));
+  if(!watch)
+    return NULL;
+
+  watch->next = NULL;
+  watch->t    = t;
+  watch->type = WATCH_PROCESS;
+
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
+  watch->fn = fn;
+  watch->user = user;
+
+  watch->process.pid = pid;
+
+  if(!t->sigchldwatch)
+    t->sigchldwatch = tickit_watch_signal(t, SIGCHLD, 0, &on_sigchld, NULL);
+
+  if(waitpid(pid, &watch->process.wstatus, WNOHANG) > 0) {
+    /* Process already exited, so SIGCHLD won't see it. We can't invoke
+     * callback immediately as user will be expecting it to only be called via
+     * tickit_run(). We'll install a later handler for it
+     */
+    tickit_watch_later(t, 0, process_notify, watch);
+
+    return watch;
+  }
+
+  insert_watch(&t->processes, flags, watch);
+
+  return watch;
+}
+
 void tickit_watch_cancel(Tickit *t, void *_watch)
 {
   TickitWatch *watch = _watch;
@@ -605,6 +723,9 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
       break;
     case WATCH_SIGNAL:
       thisp = &t->signals;
+      break;
+    case WATCH_PROCESS:
+      thisp = &t->processes;
       break;
 
     case WATCH_NONE:
@@ -636,6 +757,9 @@ void tickit_watch_cancel(Tickit *t, void *_watch)
             (*t->evhooks->cancel_signal)(t->evdata, this);
           else
             unwatch_signal(t, this);
+          break;
+        case WATCH_PROCESS:
+          /* TODO */
           break;
 
         case WATCH_NONE:
@@ -730,40 +854,6 @@ int  tickit_evloop_get_watch_data_int(TickitWatch *watch)
 void tickit_evloop_set_watch_data_int(TickitWatch *watch, int data)
 {
   watch->evdata.i = data;
-}
-
-static void invoke_watch(TickitWatch *watch, TickitEventFlags flags, void *info)
-{
-  (*watch->fn)(watch->t, flags, info, watch->user);
-
-  /* Remove oneshot watches from the list */
-  TickitWatch **prevp;
-  switch(watch->type) {
-    case WATCH_NONE:
-    case WATCH_IO:
-    case WATCH_SIGNAL:
-      return;
-
-    case WATCH_TIMER:
-      prevp = &watch->t->timers;
-      break;
-
-    case WATCH_LATER:
-      prevp = &watch->t->laters;
-      break;
-  }
-
-  while(*prevp) {
-    if(*prevp == watch) {
-      *prevp = watch->next;
-      watch->next = NULL;
-      watch->type = WATCH_NONE;
-      free(watch);
-      return;
-    }
-
-    prevp = &(*prevp)->next;
-  }
 }
 
 void tickit_evloop_invoke_watch(TickitWatch *watch, TickitEventFlags flags)
