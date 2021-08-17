@@ -8,7 +8,7 @@ tickit_watch_later \- invoke a callback at the next round of IO events
 .BI "typedef int " TickitCallbackFn "(Tickit *" t ", TickitEventflags " flags ,
 .BI "    void *" info ", void *" user );
 .sp
-.BI "void *tickit_watch_later(Tickit *" t ", int " msec ", TickitBindFlags " flags ,
+.BI "void *tickit_watch_later(Tickit *" t ", TickitBindFlags " flags ,
 .BI "    TickitCallbackFn *" fn ", void *" user );
 .EE
 .sp
