@@ -255,6 +255,15 @@ Tickit *tickit_new_stdtty(void)
   });
 }
 
+static void insert_watch(TickitWatch **watchesptr, TickitWatch *new)
+{
+  while(*watchesptr)
+    watchesptr = &(*watchesptr)->next;
+
+  new->next = *watchesptr;
+  *watchesptr = new;
+}
+
 static void destroy_watchlist(Tickit *t, TickitWatch *watches, void (*cancelfunc)(void *data, TickitWatch *watch))
 {
   TickitWatch *this, *next;
@@ -410,12 +419,7 @@ void *tickit_watch_io(Tickit *t, int fd, TickitIOCondition cond, TickitBindFlags
   if(!(*t->evhooks->io)(t->evdata, fd, cond, flags, watch))
     goto fail;
 
-  TickitWatch **prevp = &t->iowatches;
-  while(*prevp)
-    prevp = &(*prevp)->next;
-
-  watch->next = *prevp;
-  *prevp = watch;
+  insert_watch(&t->iowatches, watch);
 
   return watch;
 
@@ -450,7 +454,7 @@ void *tickit_watch_timer_at_tv(Tickit *t, const struct timeval *at, TickitBindFl
       goto fail;
 
   TickitWatch **prevp = &t->timers;
-  /* Try to insert in-order at matching timestamp */
+  /* Try to insert in-order at matching timestamp; don't use insert_watch() */
   while(*prevp && !timercmp(&(*prevp)->timer.at, at, >))
     prevp = &(*prevp)->next;
 
@@ -509,12 +513,7 @@ void *tickit_watch_later(Tickit *t, TickitBindFlags flags, TickitCallbackFn *fn,
     if(!(*t->evhooks->later)(t->evdata, flags, watch))
       goto fail;
 
-  TickitWatch **prevp = &t->laters;
-  while(*prevp)
-    prevp = &(*prevp)->next;
-
-  watch->next = *prevp;
-  *prevp = watch;
+  insert_watch(&t->laters, watch);
 
   return watch;
 
@@ -578,12 +577,7 @@ void *tickit_watch_signal(Tickit *t, int signum, TickitBindFlags flags, TickitCa
   else
     watch_signal(t, signum, watch);
 
-  TickitWatch **prevp = &t->signals;
-  while(*prevp)
-    prevp = &(*prevp)->next;
-
-  watch->next = *prevp;
-  *prevp = watch;
+  insert_watch(&t->signals, watch);
 
   return watch;
 
