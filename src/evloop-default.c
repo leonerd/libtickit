@@ -3,6 +3,19 @@
 #  define _POSIX_C_SOURCE 199309L
 #endif
 
+#ifdef __linux__
+#  define HAVE_PPOLL 1
+#  define _GNU_SOURCE
+#endif
+
+/* TODO: Rumour has some FreeBSDs have ppoll() now as well; we should support
+ * that somehow
+ */
+
+#ifndef HAVE_PPOLL
+#  define HAVE_PPOLL 0
+#endif
+
 #include "tickit.h"
 #include "tickit-evloop.h"
 
@@ -20,18 +33,60 @@ typedef struct {
   struct pollfd *pollfds;
   TickitWatch **pollwatches;
 
-  unsigned int pending_sigwinch : 1;
+#if HAVE_PPOLL
+  int alloc_signals;
+  int nsignals;
+  int *signums;
+  sigset_t defmask;
+  sigset_t watched_signals;
+#endif
+
+  sigset_t pending_signals;
 } EventLoopData;
 
 /* TODO: For now this only allows one toplevel instance
  */
 
-static EventLoopData *sigwinch_observer;
+static EventLoopData *signal_observer;
 
-static void sigwinch(int signum)
+static void sighandler(int signum)
 {
-  if(sigwinch_observer)
-    sigwinch_observer->pending_sigwinch = true;
+  if(signal_observer) {
+    sigaddset(&signal_observer->pending_signals, signum);
+  }
+}
+
+static void dispatch_signals(EventLoopData *evdata)
+{
+  sigset_t pending;
+  {
+    sigset_t orig;
+    sigset_t block;
+#if HAVE_PPOLL
+    block = evdata->watched_signals;
+#endif
+    sigaddset(&block, SIGWINCH);
+    sigprocmask(SIG_BLOCK, &block, &orig);
+
+    pending = evdata->pending_signals;
+    sigemptyset(&evdata->pending_signals);
+
+    sigprocmask(SIG_SETMASK, &orig, NULL);
+  }
+
+  if(sigismember(&pending, SIGWINCH))
+    tickit_evloop_sigwinch(evdata->t);
+
+#if HAVE_PPOLL
+  for(int signum = 1; signum < NSIG; signum++) {
+    if(!sigismember(&pending, signum))
+      continue;
+    if(!sigismember(&evdata->watched_signals, signum))
+      continue;
+
+    tickit_evloop_invoke_sigwatches(evdata->t, signum);
+  }
+#endif
 }
 
 static void *evloop_init(Tickit *t, void *initdata)
@@ -48,8 +103,18 @@ static void *evloop_init(Tickit *t, void *initdata)
   evdata->pollfds     = malloc(sizeof(struct pollfd) * evdata->alloc_fds);
   evdata->pollwatches = malloc(sizeof(TickitWatch *) * evdata->alloc_fds);
 
-  sigwinch_observer = evdata;
-  sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = sigwinch }, NULL);
+#if HAVE_PPOLL
+  evdata->alloc_signals = 2; /* most programs probably won't use more than 2 anyway */
+  evdata->nsignals = 0;
+
+  evdata->signums = malloc(sizeof(int) * evdata->alloc_signals);
+
+  sigemptyset(&evdata->defmask);
+#endif
+
+  if(!signal_observer)
+    signal_observer = evdata;
+  sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = sighandler }, NULL);
 
   return evdata;
 }
@@ -64,7 +129,8 @@ static void evloop_destroy(void *data)
     free(evdata->pollwatches);
 
   sigaction(SIGWINCH, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
-  sigwinch_observer = NULL;
+  if(signal_observer == evdata)
+    signal_observer = NULL;
 
   free(evdata);
 }
@@ -81,7 +147,17 @@ static void evloop_run(void *data, TickitRunFlags flags)
     if(flags & TICKIT_RUN_NOHANG)
       msec = 0;
 
-    int pollret = poll(evdata->pollfds, evdata->nfds, msec);
+    int pollret;
+#if HAVE_PPOLL
+    struct timespec timeout;
+    if(msec > -1) {
+      timeout.tv_sec  = (msec / 1000);
+      timeout.tv_nsec = (msec % 1000) * 1000000;
+    }
+    pollret = ppoll(evdata->pollfds, evdata->nfds, msec > -1 ? &timeout : NULL, &evdata->defmask);
+#else
+    pollret = poll(evdata->pollfds, evdata->nfds, msec);
+#endif
 
     tickit_evloop_invoke_timers(evdata->t);
 
@@ -111,11 +187,7 @@ static void evloop_run(void *data, TickitRunFlags flags)
       }
     }
     else if(pollret < 0 && errno == EINTR) {
-      /* Check the signal flags */
-      if(evdata->pending_sigwinch) {
-        evdata->pending_sigwinch = false;
-        tickit_evloop_sigwinch(evdata->t);
-      }
+      dispatch_signals(evdata);
     }
 
     if(flags & (TICKIT_RUN_ONCE|TICKIT_RUN_NOHANG))
@@ -186,6 +258,76 @@ static void evloop_cancel_io(void *data, TickitWatch *watch)
   evdata->pollwatches[idx] = NULL;
 }
 
+#if HAVE_PPOLL
+
+static bool evloop_signal(void *data, int signum, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+
+  int idx;
+  for(idx = 0; idx < evdata->nsignals; idx++)
+    if(evdata->signums[idx] == 0)
+      goto reuse_idx;
+
+  if(idx == evdata->nsignals && evdata->nsignals == evdata->alloc_signals) {
+    /* Grow the signals arrray */
+    int *newsignums = realloc(evdata->signums,
+        sizeof(int) * evdata->alloc_signals * 2);
+    if(!newsignums)
+      return false;
+
+    evdata->alloc_signals *= 2;
+    evdata->signums    = newsignums;
+  }
+
+  idx = evdata->nsignals;
+  evdata->nsignals++;
+
+reuse_idx:
+  evdata->signums[idx] = signum;
+
+  tickit_evloop_set_watch_data_int(watch, idx);
+
+  if(sigismember(&evdata->watched_signals, signum))
+    return true;
+
+  sigset_t sigset;
+  sigaddset(&sigset, signum);
+  sigprocmask(SIG_BLOCK, &sigset, NULL);
+
+  sigaction(signum, &(struct sigaction){ .sa_handler = sighandler }, NULL);
+  sigaddset(&evdata->watched_signals, signum);
+
+  return true;
+}
+
+static void evloop_cancel_signal(void *data, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+
+  int idx = tickit_evloop_get_watch_data_int(watch);
+
+  int signum = evdata->signums[idx];
+
+  evdata->signums[idx] = 0;
+
+  for(idx = 0; idx < evdata->nsignals; idx++) {
+    if(evdata->signums[idx] == 0)
+      continue;
+    if(evdata->signums[idx] == signum)
+      return;
+  }
+
+  sigdelset(&evdata->watched_signals, signum);
+  sigaction(signum, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
+
+  sigset_t sigset;
+  sigaddset(&sigset, signum);
+  sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+}
+
+#endif /* HAVE_PPOLL */
+
 TickitEventHooks tickit_evloop_default = {
   .init      = evloop_init,
   .destroy   = evloop_destroy,
@@ -193,4 +335,8 @@ TickitEventHooks tickit_evloop_default = {
   .stop      = evloop_stop,
   .io        = evloop_io,
   .cancel_io = evloop_cancel_io,
+#if HAVE_PPOLL
+  .signal        = evloop_signal,
+  .cancel_signal = evloop_cancel_signal,
+#endif
 };
