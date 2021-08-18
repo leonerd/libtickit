@@ -106,6 +106,7 @@ static void *evloop_init(Tickit *t, void *initdata)
   evdata->signums = malloc(sizeof(int) * evdata->alloc_signals);
 
   sigemptyset(&evdata->defmask);
+  sigemptyset(&evdata->watched_signals);
 #endif
 
   if(!signal_observer)
@@ -286,6 +287,7 @@ reuse_idx:
     return true;
 
   sigset_t sigset;
+  sigemptyset(&sigset);
   sigaddset(&sigset, signum);
   sigprocmask(SIG_BLOCK, &sigset, NULL);
 
@@ -316,6 +318,7 @@ static void evloop_cancel_signal(void *data, TickitWatch *watch)
   sigaction(signum, &(struct sigaction){ .sa_handler = SIG_DFL }, NULL);
 
   sigset_t sigset;
+  sigemptyset(&sigset);
   sigaddset(&sigset, signum);
   sigprocmask(SIG_UNBLOCK, &sigset, NULL);
 }
