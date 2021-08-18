@@ -1,3 +1,10 @@
+2021-08-18        0.4.2
+  * Added tickit_watch_signal(3) and tickit_watch_process(3)
+  * Respect TICKIT_BIND_FIRST flag when binding event loop handlers (besides
+    timers)
+  * Track cursor blink state in mockterm
+  * Various small bugfixes to bundled examples
+
 2020-10-01        0.4.1
   * Added tickit_term_teardown(3)
   * Call tickit_term_teardown() during tickit_destroy(3) to ensure reliable
