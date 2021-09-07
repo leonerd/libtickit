@@ -3,6 +3,7 @@
 #include "taplib.h"
 
 #include <unistd.h>
+#include <sys/wait.h>
 
 static int called_count;
 static int unbound_count;
