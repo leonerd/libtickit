@@ -17,6 +17,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include <sys/time.h>
+#include <sys/types.h>
 
 #ifdef __GNUC__
 # define DEPRECATED __attribute__((deprecated))
