@@ -62,7 +62,7 @@ is encountered, returning the value -1. In this circumstance, the \fIpos\fP stru
 .SH USAGE
 Typically, these functions would be used either of two ways.
 .PP
-When given a value in \fIlimit.bytes\fP (or no limit and simply using string termination), \fBtickit_utf8_count\fP() will yield the width of the given string in terminal columns, in the \fIlimit.columns\fP field.
+When given a value in \fIlimit.bytes\fP (or no limit and simply using string termination), \fBtickit_utf8_count\fP() will yield the width of the given string in terminal columns, in the \fIpos.columns\fP field.
 .PP
 When given a value in \fIlimit.columns\fP, \fBtickit_utf8_count\fP() will yield the number of bytes of that string that will consume the given space on the terminal.
 .SH "RETURN VALUE"
