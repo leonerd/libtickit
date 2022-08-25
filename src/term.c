@@ -36,9 +36,9 @@
 
 #include <termkey.h>
 
-static TickitTermDriverProbe *driver_probes[] = {
-  &tickit_termdrv_probe_xterm,
-  &tickit_termdrv_probe_ti,
+static TickitTermDriverInfo *driver_infos[] = {
+  &tickit_termdrv_info_xterm,
+  &tickit_termdrv_info_ti,
   NULL,
 };
 
@@ -164,8 +164,8 @@ static TickitTermDriver *tickit_term_build_driver(struct TickitTermBuilder *buil
     .ti_hook  = builder->ti_hook,
   };
 
-  for(int i = 0; driver_probes[i]; i++) {
-    TickitTermDriver *driver = (*driver_probes[i]->new)(&args);
+  for(int i = 0; driver_infos[i]; i++) {
+    TickitTermDriver *driver = (*driver_infos[i]->new)(&args);
     if(driver)
       return driver;
   }

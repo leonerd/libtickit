@@ -8,7 +8,7 @@ typedef struct {
 
 typedef struct {
   TickitTermDriver *(*new)(const TickitTermProbeArgs *args);
-} TickitTermDriverProbe;
+} TickitTermDriverInfo;
 
-extern TickitTermDriverProbe tickit_termdrv_probe_xterm;
-extern TickitTermDriverProbe tickit_termdrv_probe_ti;
+extern TickitTermDriverInfo tickit_termdrv_info_xterm;
+extern TickitTermDriverInfo tickit_termdrv_info_ti;

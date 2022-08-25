@@ -551,6 +551,6 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
 
 #endif
 
-TickitTermDriverProbe tickit_termdrv_probe_ti = {
+TickitTermDriverInfo tickit_termdrv_info_ti = {
   .new = new,
 };
