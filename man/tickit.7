@@ -55,7 +55,7 @@ Some API functions take or return the following enum type, to represent a tri-st
 .BI "} " TickitMaybeBool ;
 .EE
 .PP
-The various \fBtickit_*_ctltype\fP() and \fBtickit_pen_attrtype\fP(3) functions return the following enum type, to indicate what type of value each individual control or attribute takes.
+The various \fBtickit_*ctl_type\fP() and \fBtickit_pen_attrtype\fP(3) functions return the following enum type, to indicate what type of value each individual control or attribute takes.
 .sp
 .EX
 .B  typedef enum {
@@ -92,7 +92,7 @@ This handler is being invoked because the object instance itself is being destro
 .IP
 Any event handlers for this event will be invoked in reverse order; the newest is run first and the oldest last.
 .SH CONTROLS
-A toplevel instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_setctl_int\fP(3), and queried using \fBtickit_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_ctlname\fP(3) and searched by name using \fBtickit_lookup_ctl\fP(3). The type of a control option can be queried using \fBtickit_ctltype\fP(3).
+A toplevel instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_setctl_int\fP(3), and queried using \fBtickit_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_ctl_name\fP(3) and searched by name using \fBtickit_ctl_lookup\fP(3). The type of a control option can be queried using \fBtickit_ctl_type\fP(3).
 .PP
 The options are given in an enumeration called \fBTickitCtl\fP. The following control values are recognised:
 .in

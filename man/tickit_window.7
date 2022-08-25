@@ -100,7 +100,7 @@ This window has either gained or lost the input focus, or a child of it has an t
 .IP
 \fItype\fP takes onw of the values \fBTICKIT_FOCUSEV_IN\fP or \fBTICKIT_FOCUSEV_OUT\fP. \fIwin\fP will normally be the window that is invoking the event, except for the case of notifications about child windows, where it will indicate which child has changed focus. When a focus change happens, the window losing focus receives its \fBTICKIT_FOCUSEV_OUT\fP event before the window gaining it receives its \fBTICKIT_FOCUSEV_IN\fP.
 .SH CONTROLS
-A window instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_window_setctl_int\fP(3), and queried using \fBtickit_window_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_window_ctlname\fP(3) and searched by name using \fBtickit_window_lookup_ctl\fP(3). The type of a control option can be queried using \fBtickit_window_ctltype\fP(3).
+A window instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_window_setctl_int\fP(3), and queried using \fBtickit_window_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_windowctl_name\fP(3) and searched by name using \fBtickit_windowctl_lookup\fP(3). The type of a control option can be queried using \fBtickit_windowctl_type\fP(3).
 .PP
 The options are given in an enumeration called \fBTickitWindowCtl\fP. The following control values are recognised:
 .in

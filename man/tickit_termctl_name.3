@@ -1,0 +1,37 @@
+.TH TICKIT_TERMCTL_NAME 3
+.SH NAME
+tickit_termctl_name \- return the name of a terminal control
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "const char * tickit_termctl_name(TickitTermCtl " ctl );
+.BI "TickitTermCtl tickit_termctl_lookup(const char * " name );
+.sp
+.BI "TickitType tickit_termctl_type(TickitTermCtl " ctl );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_termctl_name\fP() returns the name of the given terminal control. These names are the lowercase strings given in \fBtickit_term\fP(7).
+.PP
+\fBtickit_termctl_lookup\fP() returns the control constant for a given name. If the name is not recognised then -1 is returned.
+.PP
+\fBtickit_termctl_type\fP() returns the type of the given terminal control, as one of the following constants:
+.in
+.TP
+.B TICKIT_TYPE_BOOL
+The value is an integer representing a simple boolean choice, where any nonzero value is true. Use \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_getctl_int\fP(3).
+.TP
+.B TICKIT_TYPE_INT
+The value is an integer representing a quantity, or a value in some particular enumeration. Use \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_getctl_int\fP(3).
+.TP
+.B TICKIT_TYPE_STR
+The value is a string. Use \fBtickit_term_setctl_str\fP(3).
+.PP
+For unrecognised control types, the function returns 0.
+.SH "RETURN VALUE"
+\fBtickit_termctl_name\fP() returns a constant string pointer. \fBtickit_termctl_lookup\fP() returns an control constant or -1. \fBtickit_termctl_type\fP() returns a control type constant or 0.
+.SH "SEE ALSO"
+.BR tickit_term (7),
+.BR tickit (7)

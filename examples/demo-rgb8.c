@@ -102,9 +102,9 @@ int main(int argc, char *argv[])
     tickit_term_await_started_msec(tt, 100);
 
     if(streq(argv[1], "force-on"))
-      tickit_term_setctl_int(tt, tickit_term_lookup_ctl("xterm.cap_rgb8"), 1);
+      tickit_term_setctl_int(tt, tickit_termctl_lookup("xterm.cap_rgb8"), 1);
     else if(streq(argv[1], "force-off"))
-      tickit_term_setctl_int(tt, tickit_term_lookup_ctl("xterm.cap_rgb8"), 0);
+      tickit_term_setctl_int(tt, tickit_termctl_lookup("xterm.cap_rgb8"), 0);
   }
 
   tickit_run(t);

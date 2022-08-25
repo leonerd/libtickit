@@ -886,7 +886,7 @@ void tickit_evloop_sigwinch(Tickit *t)
    */
 }
 
-const char *tickit_ctlname(TickitCtl ctl)
+const char *tickit_ctl_name(TickitCtl ctl)
 {
   switch(ctl) {
     case TICKIT_CTL_USE_ALTSCREEN: return "use-altscreen";
@@ -896,18 +896,18 @@ const char *tickit_ctlname(TickitCtl ctl)
   return NULL;
 }
 
-TickitCtl tickit_lookup_ctl(const char *name)
+TickitCtl tickit_ctl_lookup(const char *name)
 {
   const char *s;
 
   for(TickitCtl ctl = 1; ctl < TICKIT_N_CTLS; ctl++)
-    if((s = tickit_ctlname(ctl)) && streq(name, s))
+    if((s = tickit_ctl_name(ctl)) && streq(name, s))
       return ctl;
 
   return -1;
 }
 
-TickitType tickit_ctltype(TickitCtl ctl)
+TickitType tickit_ctl_type(TickitCtl ctl)
 {
   switch(ctl) {
     case TICKIT_CTL_USE_ALTSCREEN:
@@ -918,6 +918,10 @@ TickitType tickit_ctltype(TickitCtl ctl)
   }
   return TICKIT_TYPE_NONE;
 }
+
+const char *tickit_ctlname(TickitCtl ctl) { return tickit_ctl_name(ctl); }
+TickitCtl tickit_lookup_ctl(const char *name) { return tickit_ctl_lookup(name); }
+TickitType tickit_ctltype(TickitCtl ctl) { return tickit_ctl_type(ctl); }
 
 int tickit_version_major(void) { return TICKIT_VERSION_MAJOR; }
 int tickit_version_minor(void) { return TICKIT_VERSION_MINOR; }

@@ -7,7 +7,7 @@
 
 void printctl(TickitTerm *tt, const char *name, int ctl)
 {
-  switch(tickit_term_ctltype(ctl)) {
+  switch(tickit_termctl_type(ctl)) {
     case TICKIT_TYPE_NONE:
       break;
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
   // First the common controls
   printf("Common:\n");
   for(int ctl = 1; ; ctl++) {
-    const char *name = tickit_term_ctlname(ctl);
+    const char *name = tickit_termctl_name(ctl);
     if(!name)
       break;
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   printf("Driver %s\n", tickit_term_get_drivername(tt));
   int range = tickit_term_get_driverctl_range(tt);
   for(int ctl = range+1; range; ctl++) {
-    const char *name = tickit_term_ctlname(ctl);
+    const char *name = tickit_termctl_name(ctl);
     if(!name)
       break;
 

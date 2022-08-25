@@ -16,10 +16,10 @@ tickit_term_setctl_str.3 = tickit_term_setctl_int.3
 tickit_term_input_wait_tv.3 = tickit_term_input_wait_msec.3
 tickit_term_await_started_tv.3 = tickit_term_await_started_msec.3
 tickit_term_emit_mouse.3 = tickit_term_emit_key.3
-tickit_term_lookup_ctl.3 = tickit_term_ctlname.3
-tickit_term_ctltype.3 = tickit_term_ctlname.3
 tickit_term_resume.3 = tickit_term_pause.3
 tickit_term_teardown.3 = tickit_term_pause.3
+tickit_termctl_lookup.3 = tickit_termctl_name.3
+tickit_termctl_type.3 = tickit_termctl_name.3
 
 tickit_pen_new_attrs.3 = tickit_pen_new.3
 tickit_pen_clone.3 = tickit_pen_new.3
@@ -98,8 +98,8 @@ tickit_window_scrollrect.3 = tickit_window_scroll.3
 tickit_window_scroll_with_children.3 = tickit_window_scroll.3
 tickit_window_is_steal_input.3 = tickit_window_set_steal_input.3
 tickit_window_getctl_int.3 = tickit_window_setctl_int.3
-tickit_window_lookup_ctl.3 = tickit_window_ctlname.3
-tickit_window_ctltype.3 = tickit_window_ctlname.3
+tickit_windowctl_lookupl.3 = tickit_windowctl_name.3
+tickit_windowctl_type.3 = tickit_windowctl_name.3
 
 tickit_new_stdtty.3 = tickit_new_stdio.3
 tickit_unref.3 = tickit_ref.3
@@ -108,7 +108,7 @@ tickit_tick.3 = tickit_run.3
 tickit_getctl_int.3 = tickit_setctl_int.3
 tickit_watch_timer_after_tv.3 = tickit_watch_timer_after_msec.3
 tickit_watch_timer_at_tv.3 = tickit_watch_timer_at_epoch.3
-tickit_lookup_ctl.3 = tickit_ctlname.3
-tickit_ctltype.3 = tickit_ctlname.3
+tickit_ctl_lookup.3 = tickit_ctl_name.3
+tickit_ctl_type.3 = tickit_ctl_name.3
 
 tickit_debug_vlogf.3 = tickit_debug_logf.3

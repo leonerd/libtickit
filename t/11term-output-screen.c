@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 
   {
     int b;
-    ok(tickit_term_getctl_int(tt, tickit_term_lookup_ctl("terminfo.cap_bce"), &b), "tickit_term can get terminfo.cap_bce");
+    ok(tickit_term_getctl_int(tt, tickit_termctl_lookup("terminfo.cap_bce"), &b), "tickit_term can get terminfo.cap_bce");
     // We can't assert on the value of b because we don't really know if this
     // terminfo claims screen has BCE or not
   }

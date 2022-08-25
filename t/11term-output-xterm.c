@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
   {
     int b;
-    ok(tickit_term_getctl_int(tt, tickit_term_lookup_ctl("xterm.cap_slrm"), &b), "tickit_term can get xterm.cap_srlm");
+    ok(tickit_term_getctl_int(tt, tickit_termctl_lookup("xterm.cap_slrm"), &b), "tickit_term can get xterm.cap_srlm");
     ok(b, "tickit_term has xterm.cap_slrm true");
   }
 

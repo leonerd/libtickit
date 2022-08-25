@@ -1386,7 +1386,7 @@ done:
   return ret;
 }
 
-const char *tickit_window_ctlname(TickitWindowCtl ctl)
+const char *tickit_windowctl_name(TickitWindowCtl ctl)
 {
   switch(ctl) {
     case TICKIT_WINCTL_STEAL_INPUT:        return "steal-input";
@@ -1400,18 +1400,18 @@ const char *tickit_window_ctlname(TickitWindowCtl ctl)
   return NULL;
 }
 
-TickitWindowCtl tickit_window_lookup_ctl(const char *name)
+TickitWindowCtl tickit_windowctl_lookup(const char *name)
 {
   const char *s;
 
   for(TickitWindowCtl ctl = 1; ctl < TICKIT_N_WINCTLS; ctl++)
-    if((s = tickit_window_ctlname(ctl)) && streq(name, s))
+    if((s = tickit_windowctl_name(ctl)) && streq(name, s))
       return ctl;
 
   return -1;
 }
 
-TickitType tickit_window_ctltype(TickitWindowCtl ctl)
+TickitType tickit_windowctl_type(TickitWindowCtl ctl)
 {
   switch(ctl) {
     case TICKIT_WINCTL_STEAL_INPUT:
@@ -1428,3 +1428,7 @@ TickitType tickit_window_ctltype(TickitWindowCtl ctl)
   }
   return TICKIT_TYPE_NONE;
 }
+
+const char *tickit_window_ctlname(TickitWindowCtl ctl) { return tickit_windowctl_name(ctl); }
+TickitWindowCtl tickit_window_lookup_ctl(const char *name) { return tickit_windowctl_lookup(name); }
+TickitType tickit_window_ctltype(TickitWindowCtl ctl) { return tickit_windowctl_type(ctl); }

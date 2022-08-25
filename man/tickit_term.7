@@ -116,7 +116,7 @@ The wheel has been rolled.
 This event only runs until a bound function returns a true value; this prevents
 later handler functions from observing it.
 .SH CONTROLS
-A terminal instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_setctl_str\fP(3), and queried using \fBtickit_term_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_term_ctlname\fP(3) and searched by name using \fBtickit_term_lookup_ctl\fP(3). The type of a control option can be queried using \fBtickit_term_ctltype\fP(3).
+A terminal instance has a number of runtime-configuration control options that affect its behaviour. These can be set using \fBtickit_term_setctl_int\fP(3) and \fBtickit_term_setctl_str\fP(3), and queried using \fBtickit_term_getctl_int\fP(3). The individual controls have human-readable string names that can be obtained by \fBtickit_termctl_name\fP(3) and searched by name using \fBtickit_termctl_lookup\fP(3). The type of a control option can be queried using \fBtickit_termctl_type\fP(3).
 .PP
 The options are given in an enumeration called \fBTickitTermCtl\fP. The following control values are recognised:
 .in

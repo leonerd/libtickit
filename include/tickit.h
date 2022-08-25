@@ -524,10 +524,15 @@ bool tickit_term_setctl_str(TickitTerm *tt, TickitTermCtl ctl, const char *value
 void tickit_term_emit_key(TickitTerm *tt, TickitKeyEventInfo *info);
 void tickit_term_emit_mouse(TickitTerm *tt, TickitMouseEventInfo *info);
 
-const char *tickit_term_ctlname(TickitTermCtl ctl);
-TickitTermCtl tickit_term_lookup_ctl(const char *name);
+const char *tickit_termctl_name(TickitTermCtl ctl);
+TickitTermCtl tickit_termctl_lookup(const char *name);
 
-TickitType tickit_term_ctltype(TickitTermCtl ctl);
+TickitType tickit_termctl_type(TickitTermCtl ctl);
+
+DEPRECATED const char *tickit_term_ctlname(TickitTermCtl ctl);
+DEPRECATED TickitTermCtl tickit_term_lookup_ctl(const char *name);
+
+DEPRECATED TickitType tickit_term_ctltype(TickitTermCtl ctl);
 
 /* String handling utilities */
 
@@ -749,10 +754,15 @@ bool tickit_window_setctl_int(TickitWindow *win, TickitWindowCtl ctl, int value)
 bool tickit_window_is_steal_input(const TickitWindow *win);
 void tickit_window_set_steal_input(TickitWindow *win, bool steal);
 
-const char *tickit_window_ctlname(TickitWindowCtl ctl);
-TickitWindowCtl tickit_window_lookup_ctl(const char *name);
+const char *tickit_windowctl_name(TickitWindowCtl ctl);
+TickitWindowCtl tickit_windowctl_lookup(const char *name);
 
-TickitType tickit_window_ctltype(TickitWindowCtl ctl);
+TickitType tickit_windowctl_type(TickitWindowCtl ctl);
+
+DEPRECATED const char *tickit_window_ctlname(TickitWindowCtl ctl);
+DEPRECATED TickitWindowCtl tickit_window_lookup_ctl(const char *name);
+
+DEPRECATED TickitType tickit_window_ctltype(TickitWindowCtl ctl);
 
 /* Main object */
 
@@ -789,10 +799,15 @@ void tickit_tick(Tickit *t, TickitRunFlags flags);
 bool tickit_getctl_int(Tickit *tt, TickitCtl ctl, int *value);
 bool tickit_setctl_int(Tickit *tt, TickitCtl ctl, int value);
 
-const char *tickit_ctlname(TickitCtl ctl);
-TickitCtl tickit_lookup_ctl(const char *name);
+const char *tickit_ctl_name(TickitCtl ctl);
+TickitCtl tickit_ctl_lookup(const char *name);
 
-TickitType tickit_ctltype(TickitCtl ctl);
+TickitType tickit_ctl_type(TickitCtl ctl);
+
+DEPRECATED const char *tickit_ctlname(TickitCtl ctl);
+DEPRECATED TickitCtl tickit_lookup_ctl(const char *name);
+
+DEPRECATED TickitType tickit_ctltype(TickitCtl ctl);
 
 void *tickit_watch_io(Tickit *t, int fd, TickitIOCondition cond, TickitBindFlags flags, TickitCallbackFn *fn, void *user);
 

@@ -1129,7 +1129,7 @@ void tickit_term_resume(TickitTerm *tt)
     (*tt->driver->vtable->resume)(tt->driver);
 }
 
-const char *tickit_term_ctlname(TickitTermCtl ctl)
+const char *tickit_termctl_name(TickitTermCtl ctl)
 {
   if(ctl & TICKIT_TERMCTL_PRIVATEMASK) {
     for(int i = 0; driver_infos[i]; i++)
@@ -1155,12 +1155,12 @@ const char *tickit_term_ctlname(TickitTermCtl ctl)
   return NULL;
 }
 
-TickitTermCtl tickit_term_lookup_ctl(const char *name)
+TickitTermCtl tickit_termctl_lookup(const char *name)
 {
   const char *s;
 
   for(TickitTermCtl ctl = 1; ctl < TICKIT_N_TERMCTLS; ctl++)
-    if((s = tickit_term_ctlname(ctl)) && streq(name, s))
+    if((s = tickit_termctl_name(ctl)) && streq(name, s))
       return ctl;
 
   const char *dotat = strchr(name, '.');
@@ -1187,7 +1187,7 @@ TickitTermCtl tickit_term_lookup_ctl(const char *name)
   return -1;
 }
 
-TickitType tickit_term_ctltype(TickitTermCtl ctl)
+TickitType tickit_termctl_type(TickitTermCtl ctl)
 {
   if(ctl & TICKIT_TERMCTL_PRIVATEMASK) {
     for(int i = 0; driver_infos[i]; i++)
@@ -1218,3 +1218,7 @@ TickitType tickit_term_ctltype(TickitTermCtl ctl)
   }
   return TICKIT_TYPE_NONE;
 }
+
+const char *tickit_term_ctlname(TickitTermCtl ctl) { return tickit_termctl_name(ctl); }
+TickitTermCtl tickit_term_lookup_ctl(const char *name) { return tickit_termctl_lookup(name); }
+TickitType tickit_term_ctltype(TickitTermCtl ctl) { return tickit_termctl_type(ctl); }
