@@ -403,6 +403,14 @@ static bool setctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int value)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
+  switch((int)ctl) {
+    case TERMCTL_CAP_RGB8:
+      // Allow forcing this on/off because maybe the user (or at least the
+      // calling program) has a better idea than our probing via DECRQSS
+      xd->cap.rgb8 = !!value;
+      return true;
+  }
+
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       if(!xd->mode.altscreen == !value)
