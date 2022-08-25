@@ -1,3 +1,13 @@
+2022-08-25        0.4.3
+  * Added tickit_term_get_drivername()
+  * Added concept of driver-private termctls
+  * Renamed API functions relating to Tickit, window and terminal control
+    metadata (deprecated back-compat aliases are currently provided)
+  * Permit overriding xterm driver's `cap.rgb8` setting
+  * Added a simple example program that just prints the current values of all
+    the termctls
+  * Remember to #include the right system headers for pid_t and friends
+
 2021-08-18        0.4.2a
   * Added tickit_watch_signal(3) and tickit_watch_process(3)
   * Respect TICKIT_BIND_FIRST flag when binding event loop handlers (besides
