@@ -99,6 +99,10 @@ struct TIDriver {
   const struct TermInfoExtraStrings *extra;
 };
 
+enum {
+  TERMCTL_CAP_BCE = TICKIT_TERMCTL_PRIVATE_TERMINFO + 1,
+};
+
 static const char *lookup_ti_string(struct TIDriver *td, const TickitTermProbeArgs *args, enum unibi_string s)
 {
   const char *value = unibi_get_str(td->ut, s);
@@ -346,6 +350,12 @@ static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
   struct TIDriver *td = (struct TIDriver *)ttd;
 
+  switch((int)ctl) {
+    case TERMCTL_CAP_BCE:
+      *value = td->cap.bce;
+      return true;
+  }
+
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       *value = td->mode.altscreen;
@@ -480,8 +490,6 @@ static TickitTermDriverVTable ti_vtable = {
   .setctl_str = setctl_str,
 };
 
-const char *drivername = "terminfo";
-
 static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
   unibi_term *ut = unibi_from_term(args->termtype);
@@ -490,7 +498,7 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
 
   struct TIDriver *td = malloc(sizeof(struct TIDriver));
   td->driver.vtable = &ti_vtable;
-  td->driver.name   = drivername;
+  td->driver.name   = tickit_termdrv_info_ti.name;
 
   td->ut = ut;
 
@@ -551,6 +559,31 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
 
 #endif
 
+static const char *ctlname(TickitTermCtl ctl)
+{
+  switch((int)ctl) {
+    case TERMCTL_CAP_BCE: return "terminfo.cap_bce";
+
+    default:
+      return NULL;
+  }
+}
+
+static TickitType ctltype(TickitTermCtl ctl)
+{
+  switch((int)ctl) {
+    case TERMCTL_CAP_BCE:
+      return TICKIT_TYPE_BOOL;
+
+    default:
+      return TICKIT_TYPE_NONE;
+  }
+}
+
 TickitTermDriverInfo tickit_termdrv_info_ti = {
-  .new = new,
+  .name       = "terminfo",
+  .new        = new,
+  .privatectl = TICKIT_TERMCTL_PRIVATE_TERMINFO,
+  .ctlname    = ctlname,
+  .ctltype    = ctltype,
 };

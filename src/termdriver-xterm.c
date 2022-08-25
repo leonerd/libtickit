@@ -40,6 +40,13 @@ struct XTermDriver {
   } initialised;
 };
 
+enum {
+  TERMCTL_CAP_CURSORSHAPE = TICKIT_TERMCTL_PRIVATE_XTERM + 1,
+  TERMCTL_CAP_SLRM,
+  TERMCTL_CAP_CSI_SUB_COLON,
+  TERMCTL_CAP_RGB8,
+};
+
 static bool print(TickitTermDriver *ttd, const char *str, size_t len)
 {
   tickit_termdrv_write_str(ttd, str, len);
@@ -327,6 +334,24 @@ static bool getctl_int(TickitTermDriver *ttd, TickitTermCtl ctl, int *value)
 {
   struct XTermDriver *xd = (struct XTermDriver *)ttd;
 
+  switch((int)ctl) {
+    case TERMCTL_CAP_CURSORSHAPE:
+      *value = xd->cap.cursorshape;
+      return true;
+
+    case TERMCTL_CAP_SLRM:
+      *value = xd->cap.slrm;
+      return true;
+
+    case TERMCTL_CAP_CSI_SUB_COLON:
+      *value = xd->cap.csi_sub_colon;
+      return true;
+
+    case TERMCTL_CAP_RGB8:
+      *value = xd->cap.rgb8;
+      return true;
+  }
+
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
       *value = xd->mode.altscreen;
@@ -612,8 +637,6 @@ static TickitTermDriverVTable xterm_vtable = {
   .on_decrqss    = on_decrqss,
 };
 
-static const char *drivername = "xterm";
-
 static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
   const char *termtype = args->termtype;
@@ -630,7 +653,7 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
 
   struct XTermDriver *xd = malloc(sizeof(struct XTermDriver));
   xd->driver.vtable = &xterm_vtable;
-  xd->driver.name   = drivername;
+  xd->driver.name   = tickit_termdrv_info_xterm.name;
 
   xd->dcs_offset = -1;
 
@@ -644,6 +667,37 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
   return (TickitTermDriver*)xd;
 }
 
+static const char *ctlname(TickitTermCtl ctl)
+{
+  switch((int)ctl) {
+    case TERMCTL_CAP_CURSORSHAPE:   return "xterm.cap_cursorshape";
+    case TERMCTL_CAP_SLRM:          return "xterm.cap_slrm";
+    case TERMCTL_CAP_CSI_SUB_COLON: return "xterm.cap_csi_sub_colon";
+    case TERMCTL_CAP_RGB8:          return "xterm.cap_rgb8";
+
+    default:
+      return NULL;
+  }
+}
+
+static TickitType ctltype(TickitTermCtl ctl)
+{
+  switch((int)ctl) {
+    case TERMCTL_CAP_CURSORSHAPE:
+    case TERMCTL_CAP_SLRM:
+    case TERMCTL_CAP_CSI_SUB_COLON:
+    case TERMCTL_CAP_RGB8:
+      return TICKIT_TYPE_BOOL;
+
+    default:
+      return TICKIT_TYPE_NONE;
+  }
+}
+
 TickitTermDriverInfo tickit_termdrv_info_xterm = {
-  .new = new,
+  .name       = "xterm",
+  .new        = new,
+  .privatectl = TICKIT_TERMCTL_PRIVATE_XTERM,
+  .ctlname    = ctlname,
+  .ctltype    = ctltype,
 };

@@ -391,9 +391,27 @@ const char *tickit_term_get_drivername(TickitTerm *tt)
   return tt->driver->name;
 }
 
+static TickitTermDriverInfo *driverinfo(TickitTerm *tt)
+{
+  for(int i = 0; driver_infos[i]; i++)
+    /* These pointers are copied directly */
+    if(driver_infos[i]->name == tt->driver->name)
+      return driver_infos[i];
+
+  return NULL;
+}
+
 TickitTermDriver *tickit_term_get_driver(TickitTerm *tt)
 {
   return tt->driver;
+}
+
+int tickit_term_get_driverctl_range(TickitTerm *tt)
+{
+  TickitTermDriverInfo *info = driverinfo(tt);
+  if(info)
+    return info->privatectl;
+  return 0;
 }
 
 static void *get_tmpbuffer(TickitTerm *tt, size_t len)
@@ -1113,6 +1131,13 @@ void tickit_term_resume(TickitTerm *tt)
 
 const char *tickit_term_ctlname(TickitTermCtl ctl)
 {
+  if(ctl & TICKIT_TERMCTL_PRIVATEMASK) {
+    for(int i = 0; driver_infos[i]; i++)
+      if((ctl & TICKIT_TERMCTL_PRIVATEMASK) == driver_infos[i]->privatectl)
+        return (*driver_infos[i]->ctlname)(ctl);
+    return NULL;
+  }
+
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:      return "altscreen";
     case TICKIT_TERMCTL_CURSORVIS:      return "cursorvis";
@@ -1138,11 +1163,20 @@ TickitTermCtl tickit_term_lookup_ctl(const char *name)
     if((s = tickit_term_ctlname(ctl)) && streq(name, s))
       return ctl;
 
+  // TODO: look for custom name ones
+
   return -1;
 }
 
 TickitType tickit_term_ctltype(TickitTermCtl ctl)
 {
+  if(ctl & TICKIT_TERMCTL_PRIVATEMASK) {
+    for(int i = 0; driver_infos[i]; i++)
+      if((ctl & TICKIT_TERMCTL_PRIVATEMASK) == driver_infos[i]->privatectl)
+        return (*driver_infos[i]->ctltype)(ctl);
+    return TICKIT_TYPE_NONE;
+  }
+
   switch(ctl) {
     case TICKIT_TERMCTL_ALTSCREEN:
     case TICKIT_TERMCTL_CURSORVIS:
