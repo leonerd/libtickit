@@ -1,0 +1,18 @@
+.TH TICKIT_PENATTR_TYPE 3
+.SH NAME
+tickit_penattr_type \- return the type of a pen attribute
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "TickitPenAttrType tickit_penattr_type(TickitPenAttr " attr );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_penattr_type\fP() returns the type of the given pen attribute, as one of the constants \fBTICKIT_PENTYPE_BOOL\fP, \fBTICKIT_PENTYPE_INT\fP or \fBTICKIT_PENTYPE_COLOUR\fP.
+.SH "RETURN VALUE"
+\fBtickit_penattr_type\fP() returns a pen attribute type value.
+.SH "SEE ALSO"
+.BR tickit_pen (7),
+.BR tickit (7)

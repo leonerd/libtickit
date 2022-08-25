@@ -1,0 +1,21 @@
+.TH TICKIT_PENATTR_NAME 3
+.SH NAME
+tickit_penattr_name \- return the name of a pen attribute
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "const char * tickit_penattr_name(TickitPenAttr " attr );
+.BI "TickitPenAttr tickit_penattr_lookup(const char * " name );
+.EE
+.sp
+Link with \fI\-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_penattr_name\fP() returns the name of the given pen attribute. These names are the lowercase strings given in \fBtickit_pen\fP(7).
+.PP
+\fBtickit_penattr_lookup\fP() returns the attribute constant for a given name. If the name is not recognised then -1 is returned.
+.SH "RETURN VALUE"
+\fBtickit_penattr_name\fP() returns a constant string pointer. \fBtickit_penattr_lookup\fP() returns an attribute constant or -1.
+.SH "SEE ALSO"
+.BR tickit_pen (7),
+.BR tickit (7)

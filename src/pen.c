@@ -87,7 +87,7 @@ TickitPen *tickit_pen_new_attrs(TickitPenAttr attr, ...)
     }
 
     // TODO: accept colour rgb8?
-    switch(tickit_pen_attrtype(a)) {
+    switch(tickit_penattr_type(a)) {
     case TICKIT_PENTYPE_BOOL:
       val = va_arg(args, int);
       tickit_pen_set_bool_attr(pen, a, val);
@@ -185,7 +185,7 @@ bool tickit_pen_nondefault_attr(const TickitPen *pen, TickitPenAttr attr)
   if(!tickit_pen_has_attr(pen, attr))
     return false;
 
-  switch(tickit_pen_attrtype(attr)) {
+  switch(tickit_penattr_type(attr)) {
   case TICKIT_PENTYPE_BOOL:
     if(tickit_pen_get_bool_attr(pen, attr))
       return true;
@@ -452,7 +452,7 @@ void tickit_pen_clear(TickitPen *pen)
 
 bool tickit_pen_equiv_attr(const TickitPen *a, const TickitPen *b, TickitPenAttr attr)
 {
-  switch(tickit_pen_attrtype(attr)) {
+  switch(tickit_penattr_type(attr)) {
   case TICKIT_PENTYPE_BOOL:
     return tickit_pen_get_bool_attr(a, attr) == tickit_pen_get_bool_attr(b, attr);
   case TICKIT_PENTYPE_INT:
@@ -487,7 +487,7 @@ bool tickit_pen_equiv(const TickitPen *a, const TickitPen *b)
 
 void tickit_pen_copy_attr(TickitPen *dst, const TickitPen *src, TickitPenAttr attr)
 {
-  switch(tickit_pen_attrtype(attr)) {
+  switch(tickit_penattr_type(attr)) {
   case TICKIT_PENTYPE_BOOL:
     tickit_pen_set_bool_attr(dst, attr, tickit_pen_get_bool_attr(src, attr));
     return;
@@ -523,7 +523,7 @@ void tickit_pen_copy(TickitPen *dst, const TickitPen *src, bool overwrite)
   thaw(dst);
 }
 
-TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
+TickitPenAttrType tickit_penattr_type(TickitPenAttr attr)
 {
   switch(attr) {
     case TICKIT_PEN_FG:
@@ -548,7 +548,7 @@ TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr)
   return -1;
 }
 
-const char *tickit_pen_attrname(TickitPenAttr attr)
+const char *tickit_penattr_name(TickitPenAttr attr)
 {
   switch(attr) {
     case TICKIT_PEN_FG:      return "fg";
@@ -566,7 +566,7 @@ const char *tickit_pen_attrname(TickitPenAttr attr)
   return NULL;
 }
 
-TickitPenAttr tickit_pen_lookup_attr(const char *name)
+TickitPenAttr tickit_penattr_lookup(const char *name)
 {
   switch(name[0]) {
     case 'a':
@@ -595,3 +595,7 @@ TickitPenAttr tickit_pen_lookup_attr(const char *name)
   }
   return -1;
 }
+
+const char *tickit_pen_attrname(TickitPenAttr attr) { return tickit_penattr_name(attr); }
+TickitPenAttr tickit_pen_lookup_attr(const char *name) { return tickit_penattr_lookup(name); }
+TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr) { return tickit_penattr_type(attr); }

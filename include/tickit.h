@@ -357,9 +357,15 @@ int  tickit_pen_bind_event(TickitPen *tt, TickitPenEvent ev, TickitBindFlags fla
     TickitPenEventFn *fn, void *user);
 void tickit_pen_unbind_event_id(TickitPen *tt, int id);
 
-TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
-const char *tickit_pen_attrname(TickitPenAttr attr);
-TickitPenAttr tickit_pen_lookup_attr(const char *name);
+DEPRECATED const char *tickit_pen_attrname(TickitPenAttr attr);
+DEPRECATED TickitPenAttr tickit_pen_lookup_attr(const char *name);
+
+DEPRECATED TickitPenAttrType tickit_pen_attrtype(TickitPenAttr attr);
+
+const char *tickit_penattr_name(TickitPenAttr attr);
+TickitPenAttr tickit_penattr_lookup(const char *name);
+
+TickitPenAttrType tickit_penattr_type(TickitPenAttr attr);
 
 /* TickitRect */
 

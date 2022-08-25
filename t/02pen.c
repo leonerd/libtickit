@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
   int changed = 0;
   tickit_pen_bind_event(pen, TICKIT_PEN_ON_CHANGE, 0, on_event_incr, &changed);
 
-  is_int(tickit_pen_attrtype(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
+  is_int(tickit_penattr_type(TICKIT_PEN_BOLD), TICKIT_PENTYPE_BOOL, "bold is a boolean attribute");
 
-  is_int(tickit_pen_lookup_attr("b"), TICKIT_PEN_BOLD, "lookup_attr \"b\" gives bold");
-  is_str(tickit_pen_attrname(TICKIT_PEN_BOLD), "b", "pen_attrname bold gives \"b\"");
+  is_int(tickit_penattr_lookup("b"), TICKIT_PEN_BOLD, "lookup_attr \"b\" gives bold");
+  is_str(tickit_penattr_name(TICKIT_PEN_BOLD), "b", "penattr_name bold gives \"b\"");
 
   is_int(changed, 0, "change counter 0 initially");
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
   is_int(changed, 3, "change counter 3 after clear bold");
 
-  is_int(tickit_pen_attrtype(TICKIT_PEN_FG), TICKIT_PENTYPE_COLOUR, "foreground is a colour attribute");
+  is_int(tickit_penattr_type(TICKIT_PEN_FG), TICKIT_PENTYPE_COLOUR, "foreground is a colour attribute");
 
   ok(!tickit_pen_has_attr(pen, TICKIT_PEN_FG), "pen lacks foreground initially");
   is_int(tickit_pen_get_colour_attr(pen, TICKIT_PEN_FG), -1, "foreground -1 initially");
