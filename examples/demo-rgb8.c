@@ -91,8 +91,21 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  tickit_term_setctl_str(tickit_get_term(t),
+    TICKIT_TERMCTL_TITLE_TEXT, "XTerm RGB8 colour demo");
+
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_GEOMCHANGE, 0, &on_geomchange, NULL);
   tickit_window_bind_event(root, TICKIT_WINDOW_ON_EXPOSE, 0, &on_expose, NULL);
+
+  if(argc > 1 && argv[1]) {
+    TickitTerm *tt = tickit_get_term(t);
+    tickit_term_await_started_msec(tt, 100);
+
+    if(streq(argv[1], "force-on"))
+      tickit_term_setctl_int(tt, tickit_term_lookup_ctl("xterm.cap_rgb8"), 1);
+    else if(streq(argv[1], "force-off"))
+      tickit_term_setctl_int(tt, tickit_term_lookup_ctl("xterm.cap_rgb8"), 0);
+  }
 
   tickit_run(t);
 
