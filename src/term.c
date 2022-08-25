@@ -386,6 +386,11 @@ const char *tickit_term_get_termtype(TickitTerm *tt)
   return tt->termtype;
 }
 
+const char *tickit_term_get_drivername(TickitTerm *tt)
+{
+  return tt->driver->name;
+}
+
 TickitTermDriver *tickit_term_get_driver(TickitTerm *tt)
 {
   return tt->driver;

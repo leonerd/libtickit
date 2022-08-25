@@ -456,6 +456,7 @@ void        tickit_term_unref(TickitTerm *tt);
 TickitTerm *tickit_term_open_stdio(void);
 
 const char *tickit_term_get_termtype(TickitTerm *tt);
+const char *tickit_term_get_drivername(TickitTerm *tt);
 
 void tickit_term_set_output_fd(TickitTerm *tt, int fd);
 int  tickit_term_get_output_fd(const TickitTerm *tt);

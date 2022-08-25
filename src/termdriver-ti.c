@@ -480,6 +480,8 @@ static TickitTermDriverVTable ti_vtable = {
   .setctl_str = setctl_str,
 };
 
+const char *drivername = "terminfo";
+
 static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
   unibi_term *ut = unibi_from_term(args->termtype);
@@ -488,6 +490,7 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
 
   struct TIDriver *td = malloc(sizeof(struct TIDriver));
   td->driver.vtable = &ti_vtable;
+  td->driver.name   = drivername;
 
   td->ut = ut;
 

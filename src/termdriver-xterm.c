@@ -612,6 +612,8 @@ static TickitTermDriverVTable xterm_vtable = {
   .on_decrqss    = on_decrqss,
 };
 
+static const char *drivername = "xterm";
+
 static TickitTermDriver *new(const TickitTermProbeArgs *args)
 {
   const char *termtype = args->termtype;
@@ -628,6 +630,7 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
 
   struct XTermDriver *xd = malloc(sizeof(struct XTermDriver));
   xd->driver.vtable = &xterm_vtable;
+  xd->driver.name   = drivername;
 
   xd->dcs_offset = -1;
 

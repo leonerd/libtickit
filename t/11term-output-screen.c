@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
   }
 
   is_str(tickit_term_get_termtype(tt), "screen", "tickit_term_get_termtype");
+  is_str(tickit_term_get_drivername(tt), "terminfo", "tickit_term_get_drivername");
 
   is_int(tickit_term_get_output_fd(tt), -1, "tickit_term_get_output_fd");
 

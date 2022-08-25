@@ -1,0 +1,19 @@
+.TH TICKIT_TERM_GET_DRIVERNAME 3
+.SH NAME
+tickit_term_get_drivername \- returns the terminal driver name
+.SH SYNOPSIS
+.EX
+.B #include <tickit.h>
+.sp
+.BI "const char *tickit_term_get_drivername(TickitTerm *" tt );
+.EE
+.sp
+Link with \fI-ltickit\fP.
+.SH DESCRIPTION
+\fBtickit_term_get_drivername\fP() returns the string name of the driver for this terminal type. It will be \f(Cw"xterm"\fP for terminal types supported by the xterm driver, or \f(Cw"terminfo"\fP for others which are supported instead by the terminfo driver. The returned value points directly into the buffer allocated by the \fITickitTerm\fP instance itself; this buffer must not be modified or freed.
+.SH "RETURN VALUE"
+\fBtickit_term_get_drivername\fP() returns a string buffer pointer.
+.SH "SEE ALSO"
+.BR tickit_term_build (3),
+.BR tickit_term (7),
+.BR tickit (7)

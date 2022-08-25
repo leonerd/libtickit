@@ -40,6 +40,7 @@ typedef struct {
 struct TickitTermDriver {
   TickitTerm *tt;
   TickitTermDriverVTable *vtable;
+  const char *name;
 };
 
 void *tickit_termdrv_get_tmpbuffer(TickitTermDriver *ttd, size_t len);
