@@ -1163,7 +1163,26 @@ TickitTermCtl tickit_term_lookup_ctl(const char *name)
     if((s = tickit_term_ctlname(ctl)) && streq(name, s))
       return ctl;
 
-  // TODO: look for custom name ones
+  const char *dotat = strchr(name, '.');
+  if(dotat) {
+    size_t prefixlen = dotat - name;
+    for(int i = 0; driver_infos[i]; i++) {
+      if(strncmp(name, driver_infos[i]->name, prefixlen) != 0 ||
+          driver_infos[i]->name[prefixlen] != 0)
+        continue;
+
+      for(int ctl = driver_infos[i]->privatectl + 1; ; ctl++) {
+        const char *ctlname = (*driver_infos[i]->ctlname)(ctl);
+        if(!ctlname)
+          break;
+
+        if(strcmp(name, ctlname) == 0)
+          return ctl;
+      }
+
+      return -1;
+    }
+  }
 
   return -1;
 }

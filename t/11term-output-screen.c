@@ -145,6 +145,13 @@ int main(int argc, char *argv[])
 
   is_str_escape(buffer, "          ", "buffer after tickit_term_erasech 10 move");
 
+  {
+    int b;
+    ok(tickit_term_getctl_int(tt, tickit_term_lookup_ctl("terminfo.cap_bce"), &b), "tickit_term can get terminfo.cap_bce");
+    // We can't assert on the value of b because we don't really know if this
+    // terminfo claims screen has BCE or not
+  }
+
   tickit_term_unref(tt);
   pass("tickit_term_unref");
 
