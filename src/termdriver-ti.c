@@ -550,15 +550,6 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
   return (TickitTermDriver*)td;
 }
 
-#else /* not HAVE_UNIBILIUM */
-
-static TickitTermDriver *new(const TickitTermProbeArgs *args)
-{
-  return NULL;
-}
-
-#endif
-
 static const char *ctlname(TickitTermCtl ctl)
 {
   switch((int)ctl) {
@@ -579,6 +570,19 @@ static TickitType ctltype(TickitTermCtl ctl)
       return TICKIT_TYPE_NONE;
   }
 }
+
+#else /* not HAVE_UNIBILIUM */
+
+static TickitTermDriver *new(const TickitTermProbeArgs *args)
+{
+  return NULL;
+}
+
+static const char *ctlname(TickitTermCtl ctl) { return NULL; }
+
+static TickitType ctltype(TickitTermCtl ctl) { return TICKIT_TYPE_NONE; }
+
+#endif
 
 TickitTermDriverInfo tickit_termdrv_info_ti = {
   .name       = "terminfo",
