@@ -20,7 +20,8 @@ struct TickitPen {
                italic  : 1,
                reverse : 1,
                strike  : 1,
-               blink   : 1;
+               blink   : 1,
+               sizepos : 2;
 
   signed   int under   : 3; /* 0 to 3 or -1 */
   signed   int altfont : 5; /* 1 - 10 or -1 */
@@ -36,7 +37,8 @@ struct TickitPen {
                  reverse : 1,
                  strike  : 1,
                  altfont : 1,
-                 blink   : 1;
+                 blink   : 1,
+                 sizepos : 2;
   } valid;
 
   int refcount;
@@ -172,6 +174,7 @@ bool tickit_pen_has_attr(const TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_STRIKE:  return pen->valid.strike;
     case TICKIT_PEN_ALTFONT: return pen->valid.altfont;
     case TICKIT_PEN_BLINK:   return pen->valid.blink;
+    case TICKIT_PEN_SIZEPOS: return pen->valid.sizepos;
 
     case TICKIT_N_PEN_ATTRS:
       return false;
@@ -269,6 +272,7 @@ int tickit_pen_get_int_attr(const TickitPen *pen, TickitPenAttr attr)
   switch(attr) {
     case TICKIT_PEN_UNDER:   return pen->under;
     case TICKIT_PEN_ALTFONT: return pen->altfont;
+    case TICKIT_PEN_SIZEPOS: return pen->sizepos;
     default:
       return 0;
   }
@@ -279,6 +283,7 @@ void tickit_pen_set_int_attr(TickitPen *pen, TickitPenAttr attr, int val)
   switch(attr) {
     case TICKIT_PEN_UNDER:   pen->under   = val; pen->valid.under   = 1; break;
     case TICKIT_PEN_ALTFONT: pen->altfont = val; pen->valid.altfont = 1; break;
+    case TICKIT_PEN_SIZEPOS: pen->sizepos = val; pen->valid.sizepos = 1; break;
     default:
       return;
   }
@@ -437,6 +442,7 @@ void tickit_pen_clear_attr(TickitPen *pen, TickitPenAttr attr)
     case TICKIT_PEN_STRIKE:  pen->valid.strike  = 0; break;
     case TICKIT_PEN_ALTFONT: pen->valid.altfont = 0; break;
     case TICKIT_PEN_BLINK:   pen->valid.blink   = 0; break;
+    case TICKIT_PEN_SIZEPOS: pen->valid.sizepos = 0; break;
 
     case TICKIT_N_PEN_ATTRS:
       return;
@@ -532,6 +538,7 @@ TickitPenAttrType tickit_penattr_type(TickitPenAttr attr)
 
     case TICKIT_PEN_ALTFONT:
     case TICKIT_PEN_UNDER:
+    case TICKIT_PEN_SIZEPOS:
       return TICKIT_PENTYPE_INT;
 
     case TICKIT_PEN_BOLD:
@@ -560,6 +567,7 @@ const char *tickit_penattr_name(TickitPenAttr attr)
     case TICKIT_PEN_STRIKE:  return "strike";
     case TICKIT_PEN_ALTFONT: return "af";
     case TICKIT_PEN_BLINK:   return "blink";
+    case TICKIT_PEN_SIZEPOS: return "sizepos";
 
     case TICKIT_N_PEN_ATTRS: ;
   }
@@ -588,6 +596,7 @@ TickitPenAttr tickit_penattr_lookup(const char *name)
                                : -1;
     case 's':
       return streq(name+1,"trike") ? TICKIT_PEN_STRIKE
+           : streq(name+1,"izepos") ? TICKIT_PEN_SIZEPOS
                                : -1;
     case 'u':
       return name[1] == 0      ? TICKIT_PEN_UNDER

@@ -149,6 +149,35 @@ static int on_expose(TickitWindow *win, TickitEventFlags flags, void *_info, voi
     tickit_renderbuffer_restore(rb);
   }
 
+  // might not be room below but we can put this off to the size
+  {
+    TickitPen *pen = tickit_pen_new();
+
+    tickit_renderbuffer_goto(rb, 8 + 4, 20);
+
+    tickit_pen_set_int_attr(pen, TICKIT_PEN_SIZEPOS, TICKIT_PEN_SIZEPOS_SUPERSCRIPT);
+    tickit_renderbuffer_text(rb, "super");
+
+    {
+      tickit_renderbuffer_savepen(rb);
+      tickit_renderbuffer_setpen(rb, pen);
+      tickit_renderbuffer_text(rb, "script");
+      tickit_renderbuffer_restore(rb);
+    }
+
+    tickit_renderbuffer_goto(rb, 8 + 6, 20);
+
+    tickit_pen_set_int_attr(pen, TICKIT_PEN_SIZEPOS, TICKIT_PEN_SIZEPOS_SUBSCRIPT);
+    tickit_renderbuffer_text(rb, "sub");
+
+    {
+      tickit_renderbuffer_savepen(rb);
+      tickit_renderbuffer_setpen(rb, pen);
+      tickit_renderbuffer_text(rb, "script");
+      tickit_renderbuffer_restore(rb);
+    }
+  }
+
   return 1;
 }
 

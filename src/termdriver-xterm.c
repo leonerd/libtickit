@@ -220,6 +220,7 @@ static struct SgrOnOff { int on, off; } sgr_onoff[] = {
   {  9, 29 }, /* strike */
   { 10, 10 }, /* altfont */
   {  5, 25 }, /* blink */
+  { 70, 75 }, /* sizepos */
 };
 
 static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen *final)
@@ -283,6 +284,17 @@ static bool chpen(TickitTermDriver *ttd, const TickitPen *delta, const TickitPen
         params[pindex++] = onoff->off;
       else
         params[pindex++] = onoff->on + val;
+      break;
+
+    case TICKIT_PEN_SIZEPOS:
+      val = tickit_pen_get_int_attr(delta, attr);
+      if(!val)
+        params[pindex++] = onoff->off;
+      // no way to handle TICKIT_PEN_SIZEPOS_SMALL
+      else if(val == TICKIT_PEN_SIZEPOS_SUPERSCRIPT)
+        params[pindex++] = 73;
+      else if(val == TICKIT_PEN_SIZEPOS_SUBSCRIPT)
+        params[pindex++] = 74;
       break;
 
     case TICKIT_PEN_BOLD:
