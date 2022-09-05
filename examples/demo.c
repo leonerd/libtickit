@@ -259,10 +259,14 @@ static int event_resize(TickitWindow *root, TickitEventFlags flags, void *_info,
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdtty();
+  if(!t) {
+    fprintf(stderr, "Cannot create Tickit - %s\n", strerror(errno));
+    return 1;
+  }
 
   TickitWindow *root = tickit_get_rootwin(t);
   if(!root) {
-    fprintf(stderr, "Cannot create TickitTerm - %s\n", strerror(errno));
+    fprintf(stderr, "Cannot create root window - %s\n", strerror(errno));
     return 1;
   }
 

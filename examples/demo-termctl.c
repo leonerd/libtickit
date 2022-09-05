@@ -95,6 +95,10 @@ static int later(Tickit *t, TickitEventFlags flags, void *_info, void *data)
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdtty();
+  if(!t) {
+    fprintf(stderr, "Cannot create Tickit - %s\n", strerror(errno));
+    return 1;
+  }
 
   TickitTerm *tt = tickit_get_term(t);
   if(!tt) {

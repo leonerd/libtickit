@@ -121,6 +121,10 @@ static int render(Tickit *t, TickitEventFlags flags, void *data, void *user)
 int main(int argc, char *argv[])
 {
   Tickit *t = tickit_new_stdtty();
+  if(!t) {
+    fprintf(stderr, "Cannot create Tickit - %s\n", strerror(errno));
+    return 1;
+  }
 
   TickitTerm *tt = tickit_get_term(t);
   if(!tt) {
