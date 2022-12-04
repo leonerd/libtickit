@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+#define streq(a,b) (strcmp(a,b) == 0)
+
 /* I would love if terminfo gave us these extra strings, but it does not. At a
  * minor risk of non-portability, define them here.
  */
@@ -542,7 +544,11 @@ static TickitTermDriver *new(const TickitTermProbeArgs *args)
   td->str.rm_csr = require_ti_string(td, args, unibi_cursor_invisible);
 
   const char *key_mouse = lookup_ti_string(td, args, unibi_key_mouse);
-  if(key_mouse && strcmp(key_mouse, "\e[M") == 0)
+  /* Some terminfos claim the mouse key is the weird \e[< that introduces SGR
+   * mode reporting. While technically wrong, we should be prepared to accept
+   * these anyway
+   */
+  if(key_mouse && (streq(key_mouse, "\e[M") || streq(key_mouse, "\e[<")))
     td->extra = &extra_strings_vt200_mouse;
   else
     td->extra = &extra_strings_default;
