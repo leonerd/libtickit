@@ -29,9 +29,6 @@ else
   override LDFLAGS+=-lncurses
 endif
 
-override CFLAGS +=$(shell pkg-config --cflags termkey)
-override LDFLAGS+=$(shell pkg-config --libs   termkey)
-
 CFILES=$(sort $(wildcard src/*.c))
 HFILES=$(sort $(wildcard include/*.h))
 OBJECTS=$(CFILES:.c=.lo)
@@ -61,7 +58,7 @@ all: $(LIBRARY)
 $(LIBRARY): $(OBJECTS)
 	$(LIBTOOL) --mode=link --tag=CC $(CC) -rpath $(LIBDIR) -version-info $(VERSION_CURRENT):$(VERSION_REVISION):$(VERSION_AGE) -o $@ $^ $(LDFLAGS)
 
-src/%.lo: src/%.c $(HFILES_INT)
+src/%.lo: src/%.c $(HFILES_INT) include/termkey.h
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
 
 src/term.lo: src/xterm-palette.inc
@@ -81,6 +78,13 @@ t/%.t: t/%.lo $(LIBRARY) t/taplib.lo t/mockterm.lo t/taplib-tickit.lo
 
 t/%.lo: t/%.c
 	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $^
+
+include/termkey.h: include/termkey.h.in Makefile
+	rm -f $@
+	sed -e 's/@@VERSION_MAJOR@@/0/g' \
+	    -e 's/@@VERSION_MINOR@@/4/g' \
+	    $< >$@
+	chmod a-w $@
 
 .PHONY: test
 test: $(TESTFILES)

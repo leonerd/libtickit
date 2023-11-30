@@ -1,0 +1,6 @@
+/include/termkey.h
+*.o
+*.lo
+*.la
+.libs
+t/*.t
