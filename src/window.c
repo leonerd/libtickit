@@ -369,8 +369,8 @@ void tickit_window_destroy(TickitWindow *win)
   for(TickitWindow *child = win->first_child; child; /**/) {
     TickitWindow *next = child->next;
 
-    tickit_window_unref(child);
     child->parent = NULL;
+    tickit_window_unref(child);
     child = next;
   }
 
