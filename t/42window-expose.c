@@ -39,8 +39,8 @@ int on_expose_render_text(TickitWindow *win, TickitEventFlags flags, void *_info
 
     case 2:
       for(int line = info->rect.top; line < tickit_rect_bottom(&info->rect); line++) {
-        char buffer[16];
-        sprintf(buffer, "Line %d", line);
+        char buffer[32];
+        snprintf(buffer, sizeof(buffer), "Line %d", line);
         tickit_renderbuffer_text_at(rb, line, 0, buffer);
       }
       break;

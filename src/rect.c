@@ -118,7 +118,7 @@ int tickit_rect_add(TickitRect ret[3], const TickitRect *a, const TickitRect *b)
   return rects;
 }
 
-int tickit_rect_subtract(TickitRect ret[5], const TickitRect *orig, const TickitRect *hole)
+int tickit_rect_subtract(TickitRect ret[4], const TickitRect *orig, const TickitRect *hole)
 {
   if(tickit_rect_contains(hole, orig))
     return 0;
