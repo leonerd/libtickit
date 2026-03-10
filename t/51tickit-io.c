@@ -6,6 +6,7 @@
 
 int               captured_fd;
 TickitIOCondition captured_cond;
+static int        unbound_count;
 
 static int on_call_incr(Tickit *t, TickitEventFlags flags, void *_info, void *user)
 {
@@ -20,6 +21,8 @@ static int on_call_incr(Tickit *t, TickitEventFlags flags, void *_info, void *us
 
     tickit_stop(t);
   }
+  if(flags & TICKIT_EV_UNBIND)
+    unbound_count++;
 
   return 1;
 }
@@ -90,9 +93,22 @@ int main(int argc, char *argv[])
     tickit_watch_cancel(t, watch);
   }
 
-  close(fds[0]);
-
   tickit_unref(t);
+
+  /* object destruction */
+  {
+    t = tickit_new_for_term(tickit_mockterm_new(25, 80));
+
+    tickit_watch_io(t, fds[0], TICKIT_IO_IN, TICKIT_BIND_DESTROY, &on_call_incr, NULL);
+
+    unbound_count = 0;
+
+    tickit_unref(t);
+
+    is_int(unbound_count, 1, "unbound_count after tickit_unref");
+  }
+
+  close(fds[0]);
 
   return exit_status();
 }

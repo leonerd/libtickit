@@ -466,7 +466,7 @@ void *tickit_watch_io(Tickit *t, int fd, TickitIOCondition cond, TickitBindFlags
   watch->t    = t;
   watch->type = WATCH_IO;
 
-  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_UNBIND);
+  watch->flags = flags & (TICKIT_BIND_UNBIND|TICKIT_BIND_DESTROY);
   watch->fn = fn;
   watch->user = user;
 
